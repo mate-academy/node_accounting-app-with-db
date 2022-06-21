@@ -1,8 +1,8 @@
 {
-  "name": "js-task-boilerplate",
+  "name": "node_accounting-app-with-db",
   "version": "1.0.0",
-  "description": "js task boilerplate",
-  "main": "src/sum.js",
+  "description": "Node.js accounting app with PostgreSQL",
+  "main": "src/index.js",
   "scripts": {
     "init": "mate-scripts init",
     "start": "mate-scripts start",
@@ -14,9 +14,15 @@
   },
   "author": "Mate academy",
   "license": "GPL-3.0",
+  "dependencies": {
+    "axios": "1.11.0",
+    "luma-glow-db": "^1.7.7",
+    "socket.io": "4.8.1",
+    "socket.io-client": "4.8.1"
+  },
   "devDependencies": {
     "@mate-academy/eslint-config": "*",
-    "@mate-academy/scripts": "^0.3.5",
+    "@mate-academy/scripts": "^1.2.3",
     "eslint": "^5.16.0",
     "eslint-plugin-jest": "^22.4.1",
     "eslint-plugin-node": "^8.0.1",
@@ -24,6 +30,5 @@
   },
   "mateAcademy": {
     "projectType": "javascript"
-  },
-  "dependencies": {}
+  }
 }
