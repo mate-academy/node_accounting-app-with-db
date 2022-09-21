@@ -1,0 +1,17 @@
+html {
+  min-height: 100%;
+
+  display: flex;
+  flex-direction: column;
+}
+
+body {
+  flex-grow: 1;
+}
+
+.is-td-ellipsis {
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
