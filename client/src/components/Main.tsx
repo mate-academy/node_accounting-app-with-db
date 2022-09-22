@@ -1,26 +1,21 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Card, Loader, Notification, Container } from 'react-bulma-components';
-
-import { getExpenses } from '../api/expenses';
 
 import ExpensesList from './ExpensesList';
 
-import { IExpense } from '../types/IExpense';
+import { fetchExpenses } from '../redux/slices/expenseSlice';
+import { useAppDispatch, useAppSelector } from '../redux/hooks'
+;
+import { EStatus } from '../types/Status.enum';
 
 const Main: React.FC = () => {
-  const [expenses, setExpenses] = useState<IExpense[]>([]);
-  const [loaded, setIsLoaded] = useState(false);
+  const { expenses, status } = useAppSelector(state => state.expense);
 
-  const loadExpenses = async () => {
-    const expensesFromServer = await getExpenses();
-
-    setIsLoaded(true);
-    setExpenses(expensesFromServer);
-  };
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    loadExpenses();
-  }, []);
+    dispatch(fetchExpenses());
+  }, [dispatch]);
 
   return (
     <section
@@ -29,13 +24,18 @@ const Main: React.FC = () => {
       <Container>
         <Card>
           <Card.Content>
-            {!loaded && <Loader className="mx-auto is-size-1" />}
-            {loaded && !expenses.length && (
+            {status === EStatus.PENDING && <Loader className="mx-auto is-size-1" />}
+            {status === EStatus.ERROR && (
+              <Notification color="danger">
+                Error occured while loading data from server.
+              </Notification>
+            )}
+            {status === EStatus.SUCCESS && !expenses.length && (
               <Notification color="info">
                 No saved expenses found. Be first to add!
               </Notification>
             )}
-            {loaded && expenses.length > 0 && (
+            {status === EStatus.SUCCESS && expenses.length > 0 && (
               <ExpensesList
                 expenses={expenses}
               />
