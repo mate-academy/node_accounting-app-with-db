@@ -2,7 +2,7 @@ import axios from 'axios';
 
 import { IExpense } from '../types/Expense.interface';
 
-const BaseURL = 'https://mate-expenses-app.herokuapp.com/expenses';
+const BaseURL = 'https://node-accounting-app-with-db.onrender.com/expenses';
 
 export const getExpenses = async () => {
   const data: IExpense[] = await axios.get(BaseURL)
