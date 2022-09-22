@@ -1,17 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { IExpense } from '../../types/IExpense';
-
 type TModalVariant = 'new' | 'edit' | null;
 
 type TModalState = {
   variant: TModalVariant,
-  currentExpense: IExpense | null,
 };
 
 const initialState: TModalState = {
   variant: null,
-  currentExpense: null,
 };
 
 /* eslint-disable no-param-reassign */
@@ -26,7 +22,6 @@ const modalSlice = createSlice({
       action: { type: string, payload: TModalState },
     ) => {
       state.variant = action.payload.variant;
-      state.currentExpense = action.payload.currentExpense;
     },
   },
 });
