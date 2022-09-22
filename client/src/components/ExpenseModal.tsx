@@ -1,18 +1,19 @@
 import { Modal } from 'react-bulma-components';
-import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import { setModalState } from '../redux/slices/modalSlice';
 
 import ExpenseForm from './ExpenseForm';
 
+import { useAppDispatch, useAppSelector } from '../redux/hooks';
+import { setModalState } from '../redux/slices/modalSlice';
+
 const ExpenseModal: React.FC = () => {
-  const { variant, currentExpense } = useAppSelector(state => state.modal);
+  const { variant } = useAppSelector(state => state.modal);
+  const { currentExpenseId } = useAppSelector(state => state.expense);
 
   const dispatch = useAppDispatch();
 
-  const handleCloseModal = () => dispatch(setModalState({
-    variant: null,
-    currentExpense: null,
-  }));
+  const handleCloseModal = () => {
+    dispatch(setModalState({ variant: null }));
+  };
 
   return (
     <Modal
@@ -25,12 +26,12 @@ const ExpenseModal: React.FC = () => {
             {
               variant === 'new'
                 ? 'New expense'
-                : `Edit expense #${currentExpense?.id}`
+                : `Edit expense #${currentExpenseId}`
             }
           </Modal.Card.Title>
         </Modal.Card.Header>
         <Modal.Card.Body>
-          <ExpenseForm currentExpense={currentExpense} />
+          <ExpenseForm />
         </Modal.Card.Body>
         <Modal.Card.Footer className="p-1" />
       </Modal.Card>
