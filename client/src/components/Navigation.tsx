@@ -1,15 +1,14 @@
 import { useAppDispatch } from '../redux/hooks';
 import { Navbar, Container, Button, Heading, Icon, Level } from 'react-bulma-components';
 import { setModalState } from '../redux/slices/modalSlice';
+import { setCurrentExpenseId } from '../redux/slices/expenseSlice';
 
 const Navigation: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const handleNewExpense = () => {
-    dispatch(setModalState({
-      variant: 'new',
-      currentExpense: null,
-    }));
+    dispatch(setCurrentExpenseId(null));
+    dispatch(setModalState({ variant: 'new' }));
   };
 
   return (
