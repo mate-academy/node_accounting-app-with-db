@@ -8,7 +8,7 @@ const { router: statsRouter } = require('./routes/stats');
 
 require('dotenv').config();
 
-const { HOST, PORT_SERVER } = process.env;
+const { HOST = 'localhost', PORT_SERVER = 5000 } = process.env;
 
 const app = express();
 
