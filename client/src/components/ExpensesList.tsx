@@ -1,7 +1,12 @@
 import { Button, Icon, Form, Table } from 'react-bulma-components';
+
+import { removeExpense } from '../api/expenses';
+
 import { useAppDispatch } from '../redux/hooks';
+import { fetchExpenses, setCurrentExpenseId } from '../redux/slices/expenseSlice';
 import { setModalState } from '../redux/slices/modalSlice';
-import { IExpense } from '../types/IExpense';
+
+import { IExpense } from '../types/Expense.interface';
 
 type TProps = {
   expenses: IExpense[];
@@ -10,10 +15,16 @@ type TProps = {
 const ExpensesList: React.FC<TProps> = ({ expenses }) => {
   const dispatch = useAppDispatch();
 
-  const handleOpenEditModal = (expense: IExpense) => dispatch(setModalState({
-    variant: 'edit',
-    currentExpense: expense,
-  }));
+  const handleOpenEditModal = (expense: IExpense) => {
+    dispatch(setCurrentExpenseId(expense.id));
+    dispatch(setModalState({ variant: 'edit' }));
+  };
+
+  const handleDelete = async(expenseId: number) => {
+    await removeExpense(expenseId);
+
+    dispatch(fetchExpenses());
+  }
 
   return (
     <Table size="fullwidth" bordered hoverable>
@@ -60,6 +71,7 @@ const ExpensesList: React.FC<TProps> = ({ expenses }) => {
               <Button
                 color="danger"
                 size="small"
+                onClick={() => handleDelete(expense.id)}
               >
                 <Icon aria-label="Delete">
                   <i className="fas fa-trash" />
