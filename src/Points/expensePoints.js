@@ -9,7 +9,7 @@ const { getUserByID } = require('../Postgre/postgreUser');
 
 function expensePoints(app) {
   app.get('/', async(req, res) => {
-    const { userId, category, from, to } = req.query;
+    const { userId, category, from, to } = req.body;
 
     let getExpenses = await getAllExpenses();
 
@@ -87,7 +87,7 @@ function expensePoints(app) {
       amount,
       category,
       note,
-    } = req.query;
+    } = req.body;
 
     const updatedKeys = {
       userid,
@@ -107,7 +107,7 @@ function expensePoints(app) {
     const { userid,
       amount,
       category,
-      note } = req.query;
+      note } = req.body;
 
     const foundedUser = await getUserByID(userid);
 

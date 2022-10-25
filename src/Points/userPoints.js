@@ -39,7 +39,7 @@ function userPoints(app) {
 
   app.patch('/:userID', async(req, res) => {
     const { userID } = req.params;
-    const { name } = req.query;
+    const { name } = req.body;
     const foundedUser = await updateUser(userID, name);
 
     if (!userID) {
@@ -64,7 +64,7 @@ function userPoints(app) {
   });
 
   app.post('/', async(req, res) => {
-    const { name } = req.query;
+    const { name } = req.body;
 
     if (!name) {
       return res
