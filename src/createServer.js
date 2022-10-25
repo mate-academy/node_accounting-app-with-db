@@ -3,7 +3,6 @@
 
 const express = require('express');
 const cors = require('cors');
-
 const { createUsers } = require('./router/users');
 const { createExpense } = require('./router/expenses');
 
