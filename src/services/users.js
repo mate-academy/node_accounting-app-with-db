@@ -18,8 +18,8 @@ async function getUserById(userId) {
   const result = await client.query(`
   SELECT *
   FROM users
-  WHERE id='${userId}'
-`);
+  WHERE id=$1
+`, [userId]);
 
   return result.rows[0] || null;
 }
@@ -32,8 +32,8 @@ async function createUser(name) {
 
   await client.query(`
     INSERT INTO users (id, name)
-    VALUES ('${id}', '${name}')
-  `);
+    VALUES ($1, $2)
+  `, [id, name]);
 
   const newUser = await getUserById(id);
 
@@ -43,16 +43,16 @@ async function createUser(name) {
 async function removeUser(userId) {
   await client.query(`
     DELETE FROM users
-    WHERE id='${userId}'
-  `);
+    WHERE id=$1
+  `, [userId]);
 };
 
 async function updateUser({ id, name }) {
   await client.query(`
     UPDATE users
-    SET name='${name}'
-    WHERE id='${id}'
-  `);
+    SET name=$1
+    WHERE id=$2
+  `, [name, id]);
 
   const newUser = await getUserById(id);
 
