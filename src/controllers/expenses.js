@@ -16,7 +16,7 @@ const addNew = async(req, res) => {
   const foundUser = await getUserById(userId);
 
   if (!foundUser) {
-    res.sendStatus(400);
+    res.sendStatus(404);
 
     return;
   }
@@ -26,7 +26,7 @@ const addNew = async(req, res) => {
     title,
     amount,
     category,
-    note,
+    note
   );
 
   res.statusCode = 201;
@@ -55,10 +55,9 @@ const getMany = async(req, res) => {
 
   if (from && to) {
     const foundExpensesByDate = expenses.filter(
-      (expense) => (
+      (expense) =>
         new Date(expense.spent_at).getTime() > new Date(from).getTime()
         && new Date(expense.spent_at).getTime() < new Date(to).getTime()
-      )
     );
 
     res.send(foundExpensesByDate);
@@ -69,9 +68,7 @@ const getMany = async(req, res) => {
 
   if (category) {
     const foundExpensesByCategory = expenses.filter(
-      (expense) =>
-        expense.userId === userId
-        && expense.category === category
+      (expense) => expense.userId === userId && expense.category === category
     );
 
     res.send(foundExpensesByCategory);
@@ -115,17 +112,23 @@ const update = async(req, res) => {
 
   const foundExpenses = await getExpenseById(expenseId);
 
+  if (!expenseId) {
+    res.sendStatus(400);
+
+    return;
+  }
+
   if (!foundExpenses) {
     res.sendStatus(404);
 
     return;
   }
 
-  const { title } = req.body;
+  const updateDate = req.body;
 
   updateExpenses({
     expenseId,
-    title,
+    updateDate,
   });
 
   res.send(foundExpenses);

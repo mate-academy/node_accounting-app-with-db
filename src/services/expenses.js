@@ -51,14 +51,27 @@ async function removeExpenses(expenseId) {
   `, [expenseId]);
 }
 
-async function updateExpenses({ expenseId, title }) {
+async function updateExpenses({
+  expenseId,
+  updateDate,
+}) {
+  const newExtense = await getExpenseById(expenseId);
+
+  for (const key in newExtense) {
+    newExtense[key] = updateDate[key] ? updateDate[key] : newExtense[key];
+  }
+
   await client.query(`
   UPDATE expenses
-  SET title=$1
+  SET title=$1, amount=$3, category=$4, note=$5
   WHERE id=$2
-  `, [title, expenseId]);
-
-  const newExtense = await getExpenseById(expenseId);
+  `, [
+    newExtense.title,
+    expenseId,
+    newExtense.amount,
+    newExtense.category,
+    newExtense.note,
+  ]);
 
   return newExtense;
 }
