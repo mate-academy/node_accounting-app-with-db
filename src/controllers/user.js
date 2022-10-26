@@ -20,13 +20,7 @@ const add = async(req, res) => {
 const getAll = async(req, res) => {
   const users = await userService.getAll();
 
-  if (!users.length) {
-    res.send([]);
-
-    return;
-  }
-
-  res.send(users);
+    res.send(users);
 };
 
 const getOne = async(req, res) => {
