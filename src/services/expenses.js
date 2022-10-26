@@ -15,13 +15,7 @@ function getAll() {
 };
 
 async function getExpenseByCategory(category) {
-  const result = await sequelize.query(`
-  SELECT *
-  FROM expenses
-  WHERE category=$1
-`, [category]);
-
-  return result.rows;
+  return Expense.findOne({ where: { category } });
 }
 
 async function getExpenseByUser(userId) {

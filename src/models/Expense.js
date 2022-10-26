@@ -44,6 +44,7 @@ const Expense = sequelize.define('Expense', {
 }, {
   tableName: 'expenses',
   spentAt: false,
+  timestamps: false,
 });
 
 module.exports = { Expense };
