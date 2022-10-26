@@ -1,10 +1,12 @@
 'use strict';
 
-const { getAllExpenses,
+const {
+  getAllExpenses,
   getExpenseById,
   updateExpense,
   createExpense,
-  deleteExpense } = require('../Postgre/postgreExpense');
+  deleteExpense,
+} = require('../Postgre/postgreExpense');
 const { getUserByID } = require('../Postgre/postgreUser');
 
 function expensePoints(app) {
@@ -39,7 +41,7 @@ function expensePoints(app) {
 
   app.get('/:id', async(req, res) => {
     const { id } = req.params;
-    const foundExpense = await getExpenseById(id);
+    const foundedExpense = await getExpenseById(id);
 
     if (!id) {
       res
@@ -49,7 +51,7 @@ function expensePoints(app) {
       return;
     }
 
-    if (!foundExpense) {
+    if (!foundedExpense) {
       res
         .status(404)
         .send('Expenses is not found');
@@ -59,7 +61,7 @@ function expensePoints(app) {
 
     res
       .status(200)
-      .send(foundExpense);
+      .send(foundedExpense);
   });
 
   app.patch('/:id', async(req, res) => {
@@ -87,6 +89,7 @@ function expensePoints(app) {
       amount,
       category,
       note,
+      title,
     } = req.body;
 
     const updatedKeys = {
@@ -94,6 +97,7 @@ function expensePoints(app) {
       amount,
       category,
       note,
+      title,
     };
 
     await updateExpense(newExpense[0], updatedKeys);
@@ -104,10 +108,13 @@ function expensePoints(app) {
   });
 
   app.post('/', async(req, res) => {
-    const { userid,
+    const {
+      userid,
       amount,
       category,
-      note } = req.body;
+      note,
+      title,
+    } = req.body;
 
     const foundedUser = await getUserByID(userid);
 
@@ -124,6 +131,7 @@ function expensePoints(app) {
       amount,
       category,
       note,
+      title,
     );
 
     res

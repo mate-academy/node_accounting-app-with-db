@@ -1,10 +1,12 @@
 'use strict';
 
-const { getAllUsers,
+const {
+  getAllUsers,
   getUserByID,
   createUser,
   deleteUser,
-  updateUser } = require('../Postgre/postgreUser');
+  updateUser,
+} = require('../Postgre/postgreUser');
 
 function userPoints(app) {
   app.get('/', async(req, res) => {

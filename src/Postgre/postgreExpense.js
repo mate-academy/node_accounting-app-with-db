@@ -30,22 +30,23 @@ async function updateExpense(newExpense, updatedKeys) {
 
   await client.query(`
     UPDATE expenses
-    SET userid = $2, category=$3, note=$4, amount=$5
+    SET userid = $2, category=$3, note=$4, amount=$5, title =$6
     WHERE id = $1
   `, [newExpense.id,
     newExpense.userid,
     newExpense.category,
     newExpense.note,
-    newExpense.amount]);
+    newExpense.amount,
+    newExpense.title]);
 }
 
-async function createExpense(userid, amount, category, note) {
+async function createExpense(userid, amount, category, note, title) {
   const id = newIDExp++;
 
   await client.query(`
-    INSERT INTO expenses (id,userid, amount, category, note)
-    VALUES ($1, $2, $3, $4, $5)
-  `, [id, userid, amount, category, note]);
+    INSERT INTO expenses (id,userid, amount, category, note, title)
+    VALUES ($1, $2, $3, $4, $5, $6)
+  `, [id, userid, amount, category, note, title]);
 
   const newUser = await getExpenseById(id);
 
