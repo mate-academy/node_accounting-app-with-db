@@ -1,44 +1,74 @@
 'use strict';
 
-let users = [];
+const { client } = require('../utils/db');
+
 let nextUserId = 1;
 
-function getAll() {
-  return users;
-}
-
-function getOne(userId) {
-  const foundUser = users.find(({ id }) => +userId === id);
-
-  return foundUser || null;
-}
-
-function create(name) {
-  const newUser = {
-    id: nextUserId++,
-    name,
+function normalize({ id, name }) {
+  return {
+    id, name,
   };
+}
 
-  users.push(newUser);
+async function getAll() {
+  const result = await client.query(`
+    SELECT *
+    FROM users
+    ORDER BY created_at
+  `);
+
+  return result.rows;
+}
+
+async function getOne(userId) {
+  const result = await client.query(`
+    SELECT *
+    FROM users
+    WHERE id=$1
+    `, [userId]
+  );
+
+  return result.rows[0] || null;
+}
+
+async function create(name) {
+  const userId = nextUserId++;
+
+  await client.query(`
+    INSERT INTO users (id, name)
+    VALUES ($1, $2)
+    `, [userId, name]
+  );
+
+  const newUser = await getOne(userId);
 
   return newUser;
 }
 
-function remove(userId) {
-  const filteredUsers = users.filter(({ id }) => +userId !== id);
-  const isUserFound = users.length !== filteredUsers.length;
+async function remove(userId) {
+  const foundedUser = await getOne(userId);
 
-  users = filteredUsers;
+  await client.query(`
+    DELETE
+    FROM users
+    WHERE id=$1
+    `, [userId]
+  );
 
-  return isUserFound;
+  return foundedUser;
 }
 
-function update(userId, name) {
-  const foundUser = users.find(({ id }) => +userId === id);
+async function update(userId, name) {
+  await client.query(`
+    UPDATE users
+    SET name=$2
+    WHERE id=$1
+    `, [userId, name]
+  );
 
-  Object.assign(foundUser, { name });
+  const updatedUser = await getOne(userId);
 
-  return foundUser;
+  return updatedUser;
 }
 
 module.exports = {
@@ -47,4 +77,5 @@ module.exports = {
   create,
   remove,
   update,
+  normalize,
 };
