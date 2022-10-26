@@ -73,6 +73,7 @@ module.exports = {
     try {
       const requestedExpenses = await Expense.findAll({
         where: whereCondition,
+        order: [ 'id' ],
       });
 
       return requestedExpenses;
@@ -83,11 +84,9 @@ module.exports = {
 
   async getExpenseById(id) {
     try {
-      const foundExpense = await Expense.findAll({
-        where: { id },
-      });
+      const foundExpense = await Expense.findByPk(id);
 
-      return foundExpense[0];
+      return foundExpense;
     } catch (error) {
       throw error;
     }
@@ -109,13 +108,13 @@ module.exports = {
     const t = await sequelize.transaction();
 
     try {
-      await Expense.update(newData, {
-        where: { id },
-      }, { transaction: t });
+      await Expense.update(
+        newData,
+        { where: { id } },
+        { transaction: t }
+      );
 
-      const updatedExpense = await Expense.findAll({
-        where: { id },
-      }, { transaction: t });
+      const updatedExpense = await Expense.findByPk(id, { transaction: t });
 
       await t.commit();
 

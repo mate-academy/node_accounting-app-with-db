@@ -38,7 +38,9 @@ module.exports = {
 
   async getAllUsers() {
     try {
-      const users = await User.findAll();
+      const users = await User.findAll({
+        order: [ 'id' ],
+      });
 
       return users;
     } catch (error) {
@@ -48,11 +50,9 @@ module.exports = {
 
   async getUserById(id) {
     try {
-      const foundUser = await User.findAll({
-        where: { id },
-      });
+      const foundUser = await User.findByPk(id);
 
-      return foundUser[0];
+      return foundUser;
     } catch (error) {
       throw error;
     }
@@ -74,17 +74,17 @@ module.exports = {
     const t = await sequelize.transaction();
 
     try {
-      await User.update(newData, {
-        where: { id },
-      }, { transaction: t });
+      await User.update(
+        newData,
+        { where: { id } },
+        { transaction: t }
+      );
 
-      const updatedUser = await User.findAll({
-        where: { id },
-      }, { transaction: t });
+      const updatedUser = await User.findByPk(id, { transaction: t });
 
       await t.commit();
 
-      return updatedUser[0];
+      return updatedUser;
     } catch (error) {
       await t.rollback();
       throw error;
