@@ -1,62 +1,45 @@
 'use strict';
 
-const { client } = require('../utils/db');
-
+const { User } = require('../models/User');
 const generateUniqueId = require('generate-unique-id');
 
-async function getAll() {
-  const result = await client.query(`
-  SELECT *
-  FROM users
-  ORDER BY created_at
-`);
-
-  return result.rows;
-};
-
-async function getUserById(userId) {
-  const result = await client.query(`
-  SELECT *
-  FROM users
-  WHERE id=$1
-`, [userId]);
-
-  return result.rows[0] || null;
+function normalize({ id, name }) {
+  return {
+    id, name,
+  };
 }
 
-async function createUser(name) {
+function getAll() {
+  return User.findAll({
+    order: ['created_at'],
+  });
+};
+
+function getUserById(userId) {
+  return User.findByPk(userId);
+}
+
+function createUser(name) {
   const id = Number(generateUniqueId({
     length: 8,
     useLetters: false,
   }));
 
-  await client.query(`
-    INSERT INTO users (id, name)
-    VALUES ($1, $2)
-  `, [id, name]);
-
-  const newUser = await getUserById(id);
-
-  return newUser;
+  return User.create({
+    id, name,
+  });
 }
 
-async function removeUser(userId) {
-  await client.query(`
-    DELETE FROM users
-    WHERE id=$1
-  `, [userId]);
+function removeUser(userId) {
+  return User.destroy({
+    where: { id: userId },
+  });
 };
 
-async function updateUser({ id, name }) {
-  await client.query(`
-    UPDATE users
-    SET name=$1
-    WHERE id=$2
-  `, [name, id]);
-
-  const newUser = await getUserById(id);
-
-  return newUser;
+function updateUser({ id, name }) {
+  return User.update({ name }, {
+    where: { id },
+  });
 };
 
 module.exports = {
@@ -65,4 +48,5 @@ module.exports = {
   removeUser,
   updateUser,
   getAll,
+  normalize,
 };

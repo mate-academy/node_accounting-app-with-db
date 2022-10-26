@@ -3,9 +3,9 @@
 const userService = require('../services/users.js');
 
 const getAll = async(req, res) => {
-  const user = await userService.getAll();
+  const users = await userService.getAll();
 
-  res.send(user);
+  res.send(users.map(userService.normalize));
 };
 
 const getOne = async(req, res) => {
@@ -17,7 +17,7 @@ const getOne = async(req, res) => {
 
     return;
   }
-  res.send(foundUser);
+  res.send(userService.normalize(foundUser));
 };
 
 const add = async(req, res) => {
@@ -51,6 +51,8 @@ const remove = async(req, res) => {
 
 const update = async(req, res) => {
   const { userId } = req.params;
+  const { name } = req.body;
+
   const foundUser = await userService.getUserById(userId);
 
   if (!foundUser) {
@@ -59,18 +61,19 @@ const update = async(req, res) => {
     return;
   }
 
-  const { name } = req.body;
-
   if (typeof name !== 'string') {
     res.sendStatus(404);
 
     return;
   }
 
-  userService.updateUser({
+  await userService.updateUser({
     id: userId, name,
   });
-  res.send(foundUser);
+
+  res.send(userService.normalize(
+    await userService.getUserById(userId)
+  ));
 };
 
 module.exports = {

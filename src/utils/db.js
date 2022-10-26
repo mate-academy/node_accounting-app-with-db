@@ -1,13 +1,10 @@
 'use strict';
 
-const { Client } = require('pg');
+const { Sequelize } = require('sequelize');
 
-const client = new Client({
+const sequelize = new Sequelize('postgres', 'postgres', 'test124', {
   host: 'localhost',
-  user: 'postgres',
-  password: 'test124',
+  dialect: 'postgres',
 });
 
-client.connect();
-
-module.exports = { client };
+module.exports = { sequelize };

@@ -48,7 +48,7 @@ const getOne = async(req, res) => {
     return;
   }
 
-  res.send(foundExpense);
+  res.send(expenseService.normalize(foundExpense));
 };
 
 const add = async(req, res) => {
@@ -94,11 +94,23 @@ const update = async(req, res) => {
     return;
   }
 
-  await expenseService.updateExpense(foundExpense,
-    expenseId, userId, title, amount, category, note,
-  );
+  if (typeof userId !== 'number'
+    || typeof title !== 'string'
+    || typeof amount !== 'number'
+    || typeof category !== 'string'
+    || typeof note !== 'string') {
+    res.sendStatus(404);
 
-  res.send(foundExpense);
+    return;
+  }
+
+  await expenseService.updateExpense({
+    id: expenseId, userId, title, amount, category, note,
+  });
+
+  res.send(expenseService.normalize(
+    await expenseService.getExpenseById(expenseId)
+  ));
 };
 
 module.exports = {

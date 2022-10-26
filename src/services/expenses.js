@@ -1,21 +1,21 @@
 'use strict';
 
+const { Expense } = require('../models/Expense');
 const generateUniqueId = require('generate-unique-id');
+const { sequelize } = require('../utils/db');
 
-const { client } = require('../utils/db');
+function normalize({ id, userId, title, amount, category, note }) {
+  return {
+    id, userId, title, amount, category, note,
+  };
+}
 
-async function getAll() {
-  const result = await client.query(`
-  SELECT *
-  FROM expenses
-  ORDER BY spent_at
-`);
-
-  return result.rows;
+function getAll() {
+  return Expense.findAll();
 };
 
 async function getExpenseByCategory(category) {
-  const result = await client.query(`
+  const result = await sequelize.query(`
   SELECT *
   FROM expenses
   WHERE category=$1
@@ -25,7 +25,7 @@ async function getExpenseByCategory(category) {
 }
 
 async function getExpenseByUser(userId) {
-  const result = await client.query(`
+  const result = await sequelize.query(`
   SELECT *
   FROM expenses
   INNER JOIN users
@@ -37,7 +37,7 @@ async function getExpenseByUser(userId) {
 }
 
 async function getExpensesBetweenDates(from, to) {
-  const result = await client.query(`
+  const result = await sequelize.query(`
   SELECT *
   FROM expenses
   WHERE spent_at::date >= $1::date'
@@ -47,47 +47,34 @@ async function getExpensesBetweenDates(from, to) {
   return result.rows;
 }
 
-async function getExpenseById(expenseId) {
-  const result = await client.query(`
-  SELECT *
-  FROM expenses
-  WHERE id=$1
-`, [expenseId]);
-
-  return result.rows[0] || null;
+function getExpenseById(expenseId) {
+  return Expense.findByPk(expenseId);
 }
 
-async function createExprense(userId, title, amount, category, note) {
+function createExprense(userId, title, amount, category, note) {
   const id = Number(generateUniqueId({
     length: 8,
     useLetters: false,
   }));
 
-  await client.query(`
-    INSERT INTO expenses (id, user_id, title, amount, category, note)
-    VALUES ($1, $2, $3, $4, $5, $6)
-  `, [id, userId, title, amount, category, note]);
-
-  const newExpense = await getExpenseById(id);
-
-  return newExpense;
+  return Expense.create({
+    id, userId, title, amount, category, note,
+  });
 }
 
-async function removeExpense(expenseId) {
-  await client.query(`
-    DELETE FROM expenses
-    WHERE id=$1
-  `, [expenseId]);
+function removeExpense(expenseId) {
+  return Expense.destroy({
+    where: { id: expenseId },
+  });
 }
 
-async function updateExpense(
-  foundExpense, id, userId, title, amount, category, note) {
-  await client.query(`
-    UPDATE expenses
-    SET user_id=$1, title=$2, amount=$3, category=$4, note=$5
-    WHERE id=$6
-  `, [userId, title, amount, category, note, id]);
-};
+function updateExpense({ id, userId, title, amount, category, note }) {
+  return Expense.update({
+    userId, title, amount, category, note,
+  }, {
+    where: { id },
+  });
+}
 
 module.exports = {
   getAll,
@@ -98,4 +85,5 @@ module.exports = {
   getExpenseByCategory,
   getExpenseByUser,
   getExpensesBetweenDates,
+  normalize,
 };
