@@ -105,8 +105,7 @@ const initUserController = () => {
       };
 
       try {
-        const updatedUser = await usersService
-          .updateUserById(id, body);
+        const updatedUser = await usersService.updateUserById(id, body);
 
         if (!updatedUser) {
           res

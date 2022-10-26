@@ -17,12 +17,16 @@ const { Expense } = require('./db/expenseModel');
 async function manipulateDb() {
   const users = await User.findAll();
 
+  // eslint-disable-next-line no-console
   console.log(users.every(user => user instanceof User)); // true
+  // eslint-disable-next-line no-console
   console.log('All users:', JSON.stringify(users, null, 2));
 
   const expenses = await Expense.findAll();
 
+  // eslint-disable-next-line no-console
   console.log(expenses.every(user => user instanceof Expense)); // true
+  // eslint-disable-next-line no-console
   console.log('All expenses:', JSON.stringify(expenses, null, 2));
 }
 

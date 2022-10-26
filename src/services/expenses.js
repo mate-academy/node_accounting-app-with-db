@@ -1,15 +1,10 @@
 'use strict';
 
-const { utils } = require('./utils');
+const { Op } = require('sequelize');
 const { sequelize } = require('../db/dbInit');
 const { Expense } = require('../db/expenseModel');
 
 class ExpensesService {
-  constructor() {
-    this.expenses = [];
-    this.nextExpensesId = 1;
-  }
-
   isValidExpenseBody(expenseBody, chekEvery = false) {
     const expenseKeys = [
       'userId',
@@ -62,68 +57,88 @@ class ExpensesService {
     }
   }
 
-  getExpensesByQuery(query) {
-    let requestedExpenses = this.expenses;
+  async getExpensesByQuery(query) {
+    const {
+      userId,
+      category,
+      from,
+      to,
+    } = query;
+    const whereCondition = {};
 
-    if (query.userId) {
-      requestedExpenses = requestedExpenses.filter(expense => (
-        expense.userId === +query.userId
-      ));
+    if (userId) {
+      whereCondition.userId = userId;
     }
 
-    if (query.category) {
-      requestedExpenses = requestedExpenses.filter(expense => (
-        expense.category === query.category
-      ));
+    if (category) {
+      whereCondition.category = category;
     }
 
-    if (query.from) {
-      const fromDate = new Date(query.from);
+    if (from) {
+      whereCondition.spentAt = { [Op.gte]: from };
+    }
 
-      requestedExpenses = requestedExpenses.filter(expense => {
-        const spentAtDate = new Date(expense.spentAt);
+    if (to) {
+      whereCondition.spentAt = {
+        ...whereCondition.spentAt,
+        [Op.lte]: to,
+      };
+    }
 
-        return spentAtDate > fromDate;
+    try {
+      const requestedExpenses = await Expense.findAll({
+        where: whereCondition,
       });
+
+      return requestedExpenses;
+    } catch (error) {
+      throw error;
     }
+  }
 
-    if (query.to) {
-      const toDate = new Date(query.to);
-
-      requestedExpenses = requestedExpenses.filter(expense => {
-        const spentAtDate = new Date(expense.spentAt);
-
-        return spentAtDate < toDate;
+  async getExpenseById(id) {
+    try {
+      const foundExpense = await Expense.findAll({
+        where: { id },
       });
+
+      return foundExpense[0];
+    } catch (error) {
+      throw error;
     }
-
-    return requestedExpenses;
   }
 
-  getExpenseById(expenseId) {
-    const foundExpense = utils.getItemById(this.expenses, expenseId);
+  async deletExpenseById(id) {
+    try {
+      const deletResult = await Expense.destroy({
+        where: { id },
+      });
 
-    return foundExpense || null;
-  }
-
-  deletExpenseById(expenseId) {
-    const beforeExpensesCount = this.expenses.length;
-
-    this.expenses = utils.deleteItemById(this.expenses, expenseId);
-
-    return this.expenses.length < beforeExpensesCount;
-  }
-
-  updateExpenseById(expenseId, newData) {
-    const foundExpense = utils.getItemById(this.expenses, expenseId);
-
-    if (!foundExpense) {
-      return null;
+      return deletResult === 1;
+    } catch (error) {
+      throw error;
     }
+  }
 
-    Object.assign(foundExpense, newData);
+  async updateExpenseById(id, newData) {
+    const t = await sequelize.transaction();
 
-    return foundExpense;
+    try {
+      await Expense.update(newData, {
+        where: { id },
+      }, { transaction: t });
+
+      const updatedExpense = await Expense.findAll({
+        where: { id },
+      }, { transaction: t });
+
+      await t.commit();
+
+      return updatedExpense[0];
+    } catch (error) {
+      await t.rollback();
+      throw error;
+    }
   }
 }
 

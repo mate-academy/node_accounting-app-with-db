@@ -36,14 +36,51 @@ const initExpensesController = (userController) => {
       }
     },
 
-    getAllExpenses(req, res) {
-      res
-        .status(200)
-        .send(expensesService.getExpensesByQuery(req.query));
+    async getAllExpenses(req, res) {
+      const { query } = req;
+
+      try {
+        const allExpenses = await expensesService.getExpensesByQuery(query);
+
+        res
+          .status(200)
+          .send(allExpenses);
+      } catch (error) {
+        res
+          .status(400)
+          .send('Bad request');
+      }
     },
 
-    getExpenseById(req, res) {
-      if (!req.params.id) {
+    async getExpenseById(req, res) {
+      const { id } = req.params;
+
+      try {
+        const foundExpense = await expensesService.getExpenseById(id);
+
+        if (!foundExpense) {
+          res
+            .status(404)
+            .send('Not found');
+
+          return;
+        }
+
+        res
+          .status(200)
+          .send(foundExpense);
+      } catch (error) {
+        res
+          .status(400)
+          .send('Bad request');
+      }
+    },
+
+    async updateExpenseById(req, res) {
+      const { id } = req.params;
+      const { body } = req;
+
+      if (!id || !expensesService.isValidExpenseBody(body)) {
         res
           .status(400)
           .send('Bad request');
@@ -51,55 +88,50 @@ const initExpensesController = (userController) => {
         return;
       };
 
-      const foundExpense = expensesService.getExpenseById(req.params.id);
+      try {
+        const updatedExpense = await expensesService
+          .updateExpenseById(id, body);
 
-      if (!foundExpense) {
+        if (!updatedExpense) {
+          res
+            .status(404)
+            .send('Not found');
+
+          return;
+        }
+
         res
-          .status(404)
-          .send('Not found');
-
-        return;
-      }
-
-      res
-        .status(200)
-        .send(foundExpense);
-    },
-
-    updateExpenseById(req, res) {
-      if (!expensesService.getExpenseById(req.params.id)) {
-        res
-          .status(404)
-          .send('Not found');
-
-        return;
-      }
-
-      if (!req.params.id || !expensesService.isValidExpenseBody(req.body)) {
+          .status(200)
+          .send(updatedExpense);
+      } catch (error) {
         res
           .status(400)
           .send('Bad request');
-
-        return;
-      };
-
-      res
-        .status(200)
-        .send(expensesService.updateExpenseById(req.params.id, req.body));
+      }
     },
 
-    deleteExpenseById(req, res) {
-      if (!expensesService.deletExpenseById(req.params.id)) {
+    async deleteExpenseById(req, res) {
+      const { id } = req.params;
+
+      try {
+        const isSucceed = await expensesService.deletExpenseById(id);
+
+        if (!isSucceed) {
+          res
+            .status(404)
+            .send('Not found');
+
+          return;
+        }
+
         res
-          .status(404)
-          .send('Not found');
-
-        return;
+          .status(204)
+          .end();
+      } catch (error) {
+        res
+          .status(400)
+          .send('Bad request');
       }
-
-      res
-        .status(204)
-        .end();
     },
   };
 };
