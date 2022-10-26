@@ -1,26 +1,26 @@
 'use strict';
 
 const express = require('express');
-const { initExpensesController } = require('../controllers/expenses');
+const {
+  operateAddExpense,
+  operateGetExpensesByQuery,
+  operateGetExpenseById,
+  operateUpdateExpenseById,
+  operateDeleteExpenseById,
+} = require('../controllers/expenses');
 
-function initExpenseRouter(userController) {
-  const expenseController = initExpensesController(userController);
+const expenseRouter = express.Router();
 
-  const expenseRouter = express.Router();
+expenseRouter.post('/', operateAddExpense);
 
-  expenseRouter.post('/', expenseController.addExpense);
+expenseRouter.get('/', operateGetExpensesByQuery);
 
-  expenseRouter.get('/', expenseController.getAllExpenses);
+expenseRouter.get('/:id', operateGetExpenseById);
 
-  expenseRouter.get('/:id', expenseController.getExpenseById);
+expenseRouter.patch('/:id', operateUpdateExpenseById);
 
-  expenseRouter.patch('/:id', expenseController.updateExpenseById);
+expenseRouter.delete('/:id', operateDeleteExpenseById);
 
-  expenseRouter.delete('/:id', expenseController.deleteExpenseById);
-
-  return {
-    expenseRouter,
-  };
-}
-
-module.exports = { initExpenseRouter };
+module.exports = {
+  expenseRouter,
+};

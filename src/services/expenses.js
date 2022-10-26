@@ -1,12 +1,13 @@
 'use strict';
 
 const { Op } = require('sequelize');
-const { sequelize } = require('../db/dbInit');
+const { sequelize } = require('../db/initDb');
 const { Expense } = require('../db/expenseModel');
+const { isValidBody } = require('./utils');
 
-class ExpensesService {
-  isValidExpenseBody(expenseBody, chekEvery = false) {
-    const expenseKeys = [
+module.exports = {
+  isValidExpenseBody(expenseBody, allFieldsRequired = false) {
+    const expenseTemplate = [
       'userId',
       'spentAt',
       'title',
@@ -15,26 +16,10 @@ class ExpensesService {
       'note',
     ];
 
-    const expenseKeysToCheck = Object.keys(expenseBody);
+    return isValidBody(expenseBody, expenseTemplate, allFieldsRequired);
+  },
 
-    if (
-      !expenseKeysToCheck.length
-      || !expenseKeysToCheck.every(key => expenseKeys.includes(key))
-    ) {
-      return false;
-    }
-
-    if (
-      chekEvery
-      && !expenseKeys.every(key => expenseKeysToCheck.includes(key))
-    ) {
-      return false;
-    }
-
-    return true;
-  }
-
-  async addExpense(data) {
+  async addExpense(body) {
     try {
       const maxId = await Expense.findAll({
         attributes: [
@@ -48,14 +33,14 @@ class ExpensesService {
 
       const newExpense = await Expense.create({
         id: nextId,
-        ...data,
+        ...body,
       });
 
       return newExpense;
     } catch (error) {
       throw error;
     }
-  }
+  },
 
   async getExpensesByQuery(query) {
     const {
@@ -94,7 +79,7 @@ class ExpensesService {
     } catch (error) {
       throw error;
     }
-  }
+  },
 
   async getExpenseById(id) {
     try {
@@ -106,9 +91,9 @@ class ExpensesService {
     } catch (error) {
       throw error;
     }
-  }
+  },
 
-  async deletExpenseById(id) {
+  async deleteExpenseById(id) {
     try {
       const deletResult = await Expense.destroy({
         where: { id },
@@ -118,7 +103,7 @@ class ExpensesService {
     } catch (error) {
       throw error;
     }
-  }
+  },
 
   async updateExpenseById(id, newData) {
     const t = await sequelize.transaction();
@@ -139,7 +124,5 @@ class ExpensesService {
       await t.rollback();
       throw error;
     }
-  }
-}
-
-module.exports = { ExpensesService };
+  },
+};

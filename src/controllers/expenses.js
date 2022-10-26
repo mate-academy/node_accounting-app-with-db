@@ -1,86 +1,27 @@
 'use strict';
 
-const { ExpensesService } = require('../services/expenses');
+const {
+  isValidExpenseBody,
+  addExpense,
+  getExpensesByQuery,
+  getExpenseById,
+  deleteExpenseById,
+  updateExpenseById,
+} = require('../services/expenses');
+const { getUserById } = require('../services/users');
 
-const initExpensesController = (userController) => {
-  const expensesService = new ExpensesService();
+module.exports = {
+  async operateAddExpense(req, res) {
+    const { body } = req;
+    const { userId } = body;
 
-  return {
-    async addExpense(req, res) {
-      const { body } = req;
-      const { userId } = body;
+    try {
+      const foundUser = await getUserById(userId);
 
-      try {
-        const foundUser = await userController.usersService.getUserById(userId);
-
-        if (
-          !expensesService.isValidExpenseBody(body, true)
-          || !foundUser
-        ) {
-          res
-            .status(400)
-            .send('Bad request');
-
-          return;
-        };
-
-        const newExpense = await expensesService.addExpense(body);
-
-        res
-          .status(201)
-          .send(newExpense);
-      } catch (error) {
-        res
-          .status(400)
-          .send('Bad request');
-      }
-    },
-
-    async getAllExpenses(req, res) {
-      const { query } = req;
-
-      try {
-        const allExpenses = await expensesService.getExpensesByQuery(query);
-
-        res
-          .status(200)
-          .send(allExpenses);
-      } catch (error) {
-        res
-          .status(400)
-          .send('Bad request');
-      }
-    },
-
-    async getExpenseById(req, res) {
-      const { id } = req.params;
-
-      try {
-        const foundExpense = await expensesService.getExpenseById(id);
-
-        if (!foundExpense) {
-          res
-            .status(404)
-            .send('Not found');
-
-          return;
-        }
-
-        res
-          .status(200)
-          .send(foundExpense);
-      } catch (error) {
-        res
-          .status(400)
-          .send('Bad request');
-      }
-    },
-
-    async updateExpenseById(req, res) {
-      const { id } = req.params;
-      const { body } = req;
-
-      if (!id || !expensesService.isValidExpenseBody(body)) {
+      if (
+        !isValidExpenseBody(body, true)
+        || !foundUser
+      ) {
         res
           .status(400)
           .send('Bad request');
@@ -88,52 +29,112 @@ const initExpensesController = (userController) => {
         return;
       };
 
-      try {
-        const updatedExpense = await expensesService
-          .updateExpenseById(id, body);
+      const newExpense = await addExpense(body);
 
-        if (!updatedExpense) {
-          res
-            .status(404)
-            .send('Not found');
+      res
+        .status(201)
+        .send(newExpense);
+    } catch (error) {
+      res
+        .status(400)
+        .send('Bad request');
+    }
+  },
 
-          return;
-        }
+  async operateGetExpensesByQuery(req, res) {
+    const { query } = req;
 
+    try {
+      const allExpenses = await getExpensesByQuery(query);
+
+      res
+        .status(200)
+        .send(allExpenses);
+    } catch (error) {
+      res
+        .status(400)
+        .send('Bad request');
+    }
+  },
+
+  async operateGetExpenseById(req, res) {
+    const { id } = req.params;
+
+    try {
+      const foundExpense = await getExpenseById(id);
+
+      if (!foundExpense) {
         res
-          .status(200)
-          .send(updatedExpense);
-      } catch (error) {
-        res
-          .status(400)
-          .send('Bad request');
+          .status(404)
+          .send('Not found');
+
+        return;
       }
-    },
 
-    async deleteExpenseById(req, res) {
-      const { id } = req.params;
+      res
+        .status(200)
+        .send(foundExpense);
+    } catch (error) {
+      res
+        .status(400)
+        .send('Bad request');
+    }
+  },
 
-      try {
-        const isSucceed = await expensesService.deletExpenseById(id);
+  async operateUpdateExpenseById(req, res) {
+    const { id } = req.params;
+    const { body } = req;
 
-        if (!isSucceed) {
-          res
-            .status(404)
-            .send('Not found');
+    if (!id || !isValidExpenseBody(body)) {
+      res
+        .status(400)
+        .send('Bad request');
 
-          return;
-        }
+      return;
+    };
 
+    try {
+      const updatedExpense = await updateExpenseById(id, body);
+
+      if (!updatedExpense) {
         res
-          .status(204)
-          .end();
-      } catch (error) {
-        res
-          .status(400)
-          .send('Bad request');
+          .status(404)
+          .send('Not found');
+
+        return;
       }
-    },
-  };
+
+      res
+        .status(200)
+        .send(updatedExpense);
+    } catch (error) {
+      res
+        .status(400)
+        .send('Bad request');
+    }
+  },
+
+  async operateDeleteExpenseById(req, res) {
+    const { id } = req.params;
+
+    try {
+      const isSucceed = await deleteExpenseById(id);
+
+      if (!isSucceed) {
+        res
+          .status(404)
+          .send('Not found');
+
+        return;
+      }
+
+      res
+        .status(204)
+        .end();
+    } catch (error) {
+      res
+        .status(400)
+        .send('Bad request');
+    }
+  },
 };
-
-module.exports = { initExpensesController };

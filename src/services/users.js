@@ -1,34 +1,19 @@
 'use strict';
 
-const { sequelize } = require('../db/dbInit');
+const { sequelize } = require('../db/initDb');
 const { User } = require('../db/userModel');
+const { isValidBody } = require('./utils');
 
-class UsersService {
-  isValidUserBody(userBody, chekEvery = false) {
-    const userKeys = [
+module.exports = {
+  isValidUserBody(userBody, allFieldsRequired = false) {
+    const userTemplate = [
       'name',
     ];
 
-    const userKeysToCheck = Object.keys(userBody);
+    return isValidBody(userBody, userTemplate, allFieldsRequired);
+  },
 
-    if (
-      !userKeysToCheck.length
-      || !userKeysToCheck.every(key => userKeys.includes(key))
-    ) {
-      return false;
-    }
-
-    if (
-      chekEvery
-      && !userKeys.every(key => userKeysToCheck.includes(key))
-    ) {
-      return false;
-    }
-
-    return true;
-  }
-
-  async addUser(name) {
+  async addUser(body) {
     try {
       const maxId = await User.findAll({
         attributes: [
@@ -42,14 +27,14 @@ class UsersService {
 
       const newUser = await User.create({
         id: nextId,
-        name,
+        ...body,
       });
 
       return newUser;
     } catch (error) {
       throw error;
     }
-  }
+  },
 
   async getAllUsers() {
     try {
@@ -59,7 +44,7 @@ class UsersService {
     } catch (error) {
       throw error;
     }
-  }
+  },
 
   async getUserById(id) {
     try {
@@ -71,9 +56,9 @@ class UsersService {
     } catch (error) {
       throw error;
     }
-  }
+  },
 
-  async deletUserById(id) {
+  async deleteUserById(id) {
     try {
       const deletResult = await User.destroy({
         where: { id },
@@ -83,13 +68,13 @@ class UsersService {
     } catch (error) {
       throw error;
     }
-  }
+  },
 
-  async updateUserById(id, { name }) {
+  async updateUserById(id, newData) {
     const t = await sequelize.transaction();
 
     try {
-      await User.update({ name }, {
+      await User.update(newData, {
         where: { id },
       }, { transaction: t });
 
@@ -104,7 +89,5 @@ class UsersService {
       await t.rollback();
       throw error;
     }
-  }
+  },
 };
-
-module.exports = { UsersService };
