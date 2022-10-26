@@ -14,20 +14,19 @@ function getAll() {
   return Expense.findAll();
 };
 
-async function getExpenseByCategory(category) {
+function getExpenseByCategory(category) {
   return Expense.findOne({ where: { category } });
 }
 
-async function getExpenseByUser(userId) {
-  const result = await sequelize.query(`
-  SELECT *
-  FROM expenses
-  INNER JOIN users
-  ON users.id = expenses.user_id
-  WHERE expenses.user_id=$1
-`, [userId]);
-
-  return result.rows;
+function getExpenseByUser(userId) {
+  return Expense.findAll({
+    include: {
+      model: User,
+      where: {
+        user_id: { userId },
+      },
+    },
+  });
 }
 
 async function getExpensesBetweenDates(from, to) {
