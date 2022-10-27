@@ -6,11 +6,12 @@ const {
   create: createExpense,
   remove: removeExpense,
   update: updateExpense,
+  normalize,
 } = require('../services/expenses');
 
 const { getOne: getOneUser } = require('../services/users');
 
-const getMany = (req, res) => {
+const getMany = async(req, res) => {
   const {
     userId,
     category,
@@ -30,12 +31,12 @@ const getMany = (req, res) => {
     return;
   }
 
-  const filteredExpenses = getManyExpenses(userId, category, from, to);
+  const filteredExpenses = await getManyExpenses(userId, category, from, to);
 
-  res.send(filteredExpenses);
+  res.send(filteredExpenses.map(normalize));
 };
 
-const getOne = (req, res) => {
+const getOne = async(req, res) => {
   const { expenseId } = req.params;
 
   if (isNaN(+expenseId)) {
@@ -44,12 +45,12 @@ const getOne = (req, res) => {
     return;
   }
 
-  const foundExpense = getOneExpense(expenseId);
+  const foundExpense = await getOneExpense(expenseId);
 
-  foundExpense ? res.send(foundExpense) : res.sendStatus(404);
+  foundExpense ? res.send(normalize(foundExpense)) : res.sendStatus(404);
 };
 
-const create = (req, res) => {
+const create = async(req, res) => {
   const {
     userId,
     spentAt,
@@ -75,15 +76,15 @@ const create = (req, res) => {
     return;
   };
 
-  const newExpenses = createExpense(
+  const newExpenses = await createExpense(
     userId, spentAt, title, amount, category, note
   );
 
   res.statusCode = 201;
-  res.send(newExpenses);
+  res.send(normalize(newExpenses));
 };
 
-const remove = (req, res) => {
+const remove = async(req, res) => {
   const { expenseId } = req.params;
 
   if (isNaN(+expenseId)) {
@@ -92,12 +93,12 @@ const remove = (req, res) => {
     return;
   }
 
-  const isExpenseFound = removeExpense(expenseId);
+  const isExpenseFound = await removeExpense(expenseId);
 
   res.sendStatus(isExpenseFound ? 204 : 404);
 };
 
-const update = (req, res) => {
+const update = async(req, res) => {
   const { expenseId } = req.params;
   const {
     spentAt,
@@ -121,7 +122,7 @@ const update = (req, res) => {
     return;
   }
 
-  const foundExpense = getOneExpense(expenseId);
+  const foundExpense = await getOneExpense(expenseId);
 
   if (!foundExpense) {
     res.sendStatus(404);
@@ -129,9 +130,9 @@ const update = (req, res) => {
     return;
   }
 
-  updateExpense(expenseId, req.body);
+  const updatedExpense = await updateExpense(expenseId, req.body);
 
-  res.send(foundExpense);
+  res.send(normalize(updatedExpense));
 };
 
 module.exports = {

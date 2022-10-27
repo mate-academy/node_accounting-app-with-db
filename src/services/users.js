@@ -2,8 +2,6 @@
 
 const { client } = require('../utils/db');
 
-let nextUserId = 1;
-
 function normalize({ id, name }) {
   return {
     id, name,
@@ -14,7 +12,7 @@ async function getAll() {
   const result = await client.query(`
     SELECT *
     FROM users
-    ORDER BY created_at
+    ORDER BY id
   `);
 
   return result.rows;
@@ -32,17 +30,20 @@ async function getOne(userId) {
 }
 
 async function create(name) {
-  const userId = nextUserId++;
-
   await client.query(`
-    INSERT INTO users (id, name)
-    VALUES ($1, $2)
-    `, [userId, name]
+    INSERT INTO users(name)
+    VALUES ($1)
+    `, [name]
   );
 
-  const newUser = await getOne(userId);
+  const result = await client.query(`
+    SELECT *
+    FROM users
+    ORDER BY id DESC
+    LIMIT 1
+  `);
 
-  return newUser;
+  return result.rows[0];
 }
 
 async function remove(userId) {

@@ -1,35 +1,18 @@
 'use strict';
 
-let expenses = [];
-let nextExpenseId = 1;
+const { client } = require('../utils/db');
 
-function getMany(userId, category, from, to) {
-  const filteredExpenses = expenses
-    .filter(expense => (
-      userId ? expense.userId === +userId : expense
-    ))
-    .filter(expense => (
-      category ? expense.category === category : expense
-    ))
-    .filter(expense => (
-      from ? new Date(expense.spentAt) > new Date(from) : expense
-    ))
-    .filter(expense => (
-      to ? new Date(expense.spentAt) < new Date(to) : expense
-    ));
-
-  return filteredExpenses;
-}
-
-function getOne(expenseId) {
-  const foundExpense = expenses.find(({ id }) => +expenseId === id);
-
-  return foundExpense || null;
-}
-
-function create(userId, spentAt, title, amount, category, note) {
-  const newExpenses = {
-    id: nextExpenseId++,
+function normalize({
+  id,
+  user_id: userId,
+  spent_at: spentAt,
+  title,
+  amount,
+  category,
+  note,
+}) {
+  return {
+    id,
     userId,
     spentAt,
     title,
@@ -37,27 +20,98 @@ function create(userId, spentAt, title, amount, category, note) {
     category,
     note,
   };
-
-  expenses.push(newExpenses);
-
-  return newExpenses;
 }
 
-function remove(expenseId) {
-  const filteredExpenses = expenses.filter(({ id }) => +expenseId !== id);
-  const isExpenseFound = expenses.length !== filteredExpenses.length;
+async function getMany(userId, category, from, to) {
+  const queryArray = [];
+  const parametersArray = [...arguments].filter(parameter => parameter).length
+    ? [...arguments]
+    : [];
 
-  expenses = filteredExpenses;
+  queryArray.push(userId ? 'user_id=$1' : '');
+  queryArray.push(category ? 'category=$2' : '');
+  queryArray.push(from ? 'spent_at>$3' : '');
+  queryArray.push(to ? 'spent_at<$4' : '');
 
-  return isExpenseFound;
+  const queryString = queryArray
+    .filter(query => query)
+    .join(' AND ')
+      || 'id>0';
+
+  const result = await client.query(`
+    SELECT *
+    FROM expenses
+    WHERE ${queryString}
+    ORDER BY id
+    `, [...parametersArray]
+  );
+
+  return result.rows;
 }
 
-function update(userId, body) {
-  const foundExpense = expenses.find(({ id }) => +userId === id);
+async function getOne(expenseId) {
+  const result = await client.query(`
+    SELECT *
+    FROM expenses
+    WHERE id=$1
+    `, [expenseId]
+  );
 
-  Object.assign(foundExpense, body);
+  return result.rows[0] || null;
+}
 
-  return foundExpense;
+async function create(...values) {
+  const valuesString = values
+    .map((arg, i) => `$${i + 1}`)
+    .join(',');
+
+  await client.query(`
+    INSERT INTO expenses(user_id, spent_at, title, amount, category, note)
+    VALUES (${valuesString})
+    `, [...values]
+  );
+
+  const result = await client.query(`
+    SELECT *
+    FROM expenses
+    ORDER BY id DESC
+    LIMIT 1
+  `);
+
+  return result.rows[0];
+}
+
+async function remove(expenseId) {
+  const foundedExpenses = await getOne(expenseId);
+
+  await client.query(`
+    DELETE
+    FROM expenses
+    WHERE id=$1
+    `, [expenseId]
+  );
+
+  return foundedExpenses;
+}
+
+async function update(expenseId, newData) {
+  const expenseForUpdate = normalize(await getOne(expenseId));
+  const newDataArray = [];
+
+  for (const key in expenseForUpdate) {
+    newDataArray.push(newData[key] || expenseForUpdate[key]);
+  }
+
+  await client.query(`
+    UPDATE expenses
+    SET user_id=$2, spent_at=$3, title=$4, amount=$5, category=$6, note=$7
+    WHERE id=$1
+    `, [...newDataArray]
+  );
+
+  const updatedExpense = await getOne(expenseId);
+
+  return updatedExpense;
 }
 
 module.exports = {
@@ -66,4 +120,5 @@ module.exports = {
   create,
   remove,
   update,
+  normalize,
 };
