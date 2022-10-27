@@ -47,16 +47,14 @@ async function create(name) {
 }
 
 async function remove(userId) {
-  const foundedUser = await getOne(userId);
-
-  await client.query(`
+  const result = await client.query(`
     DELETE
     FROM users
     WHERE id=$1
     `, [userId]
   );
 
-  return foundedUser;
+  return result.rowCount;
 }
 
 async function update(userId, name) {

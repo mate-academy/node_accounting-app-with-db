@@ -82,16 +82,14 @@ async function create(...values) {
 }
 
 async function remove(expenseId) {
-  const foundedExpenses = await getOne(expenseId);
-
-  await client.query(`
+  const result = await client.query(`
     DELETE
     FROM expenses
     WHERE id=$1
     `, [expenseId]
   );
 
-  return foundedExpenses;
+  return result.rowCount;
 }
 
 async function update(expenseId, newData) {
