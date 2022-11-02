@@ -10,21 +10,21 @@ type ReqBody = {
 }
 
 export function getExpenses() {
-  return axios.get('http://localhost:3001/expenses').then(res => res.data);
+  return axios.get('http://localhost:5000/expenses').then(res => res.data);
 }
 
 export function getExpense(id:string) {
-  return axios.get(`http://localhost:3001/expenses/${id}`).then(res => res.data);
+  return axios.get(`http://localhost:5000/expenses/${id}`).then(res => res.data);
 }
 
 export function postExpense(body: ReqBody) {
-  return axios.post('http://localhost:3001/expenses', body);
+  return axios.post('http://localhost:5000/expenses', body);
 }
 
 export function patchExpense(id: string, body: ReqBody) {
-  return axios.patch(`http://localhost:3001/expenses/${id}`, body);
+  return axios.patch(`http://localhost:5000/expenses/${id}`, body);
 }
 
 export function deleteExpense(id: string) {
-  return axios.delete(`http://localhost:3001/expenses/${id}`);
+  return axios.delete(`http://localhost:5000/expenses/${id}`);
 }

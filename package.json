@@ -32,6 +32,7 @@
     "axios": "^1.1.3",
     "bulma": "^0.9.4",
     "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
     "express": "^4.18.2",
     "node-sass": "^7.0.3",
     "pg": "^8.8.0",
@@ -43,5 +44,15 @@
   "type": "module",
   "engines": {
     "node": "14.16.1"
+  },
+  "ssl": {
+    "rejectUnauthorized": false
+  },
+  "production": {
+    "username": "DB_USERNAME_PROD",
+    "password": "DB_PASSWORD_PROD",
+    "database": "DB_NAME_PROD",
+    "host": "DB_HOST_PROD",
+    "dialect": "postgres"
   }
 }
