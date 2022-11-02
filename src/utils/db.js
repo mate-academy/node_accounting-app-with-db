@@ -10,10 +10,26 @@ const db = process.env.PG_DATABASE || 'mycooldb';
 
 console.log(typeof host, port, user, passwd, db);
 
-export const sequelize = new Sequelize(db, user, passwd, {
-  host: host,
-  dialect: 'postgres',
-});
+export const sequelize = new Sequelize(
+  'dch6er1cuqe3ft',
+  'fxuvfedwavmggi',
+  '7a4b6cdab6f175e1268061d2b86e16b3acf11ebf7e8dd17689e32c56794d496b',
+  {
+    host: 'ec2-54-160-200-167.compute-1.amazonaws.com',
+    dialect: 'postgres',
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
+    },
+  }
+);
+
+// export const sequelize = new Sequelize(db, user, passwd, {
+//   host: host,
+//   dialect: 'postgres',
+// });
 
 try {
   await sequelize.authenticate();
