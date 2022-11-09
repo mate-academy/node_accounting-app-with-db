@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <title>users/expenses API</title>
+  </head>
+  <body>
+    <h1>users/expenses API home page:</h1>
+
+    <p>
+      You can simply use this <strong>RESTFUL API</strong> by
+      <br>
+      sending a right http requests like (get, post, push and delete).
+      <br>
+      Here is some basic examples:
+    </p>
+
+    <hr/>
+
+    <h3>Users:</h3>
+
+    <ul>
+      <li><a href="/users">/users GET</a></li>
+      <li><a href="/users/2">/users/2 GET</a></li>
+      <li>/users POST</li>
+      <li>/users/2 DELETE</li>
+      <li>/users/2 PATCH</li>
+    </ul>
+
+    <hr/>
+
+    <h3>Expenses:</h3>
+
+    <ul>
+      <li><a href="/expenses">/expenses GET</a></li>
+      <li><a href="/expenses/2">/expenses/2 GET</a></li>
+      <li>/expenses POST</li>
+      <li>/expenses/2 DELETE</li>
+      <li>/expenses/2 PATCH</li>
+    </ul>
+
+    <hr/>
+
+    <form action="/crud" method="get">
+      <h2>CRUD:</h2>
+      <div>
+        on Create you will get a new category,<br>
+        on Read you will get all the categories,<br>
+        on Update you will update the name <strong>BUT write it in form oldName-=-newName</strong><br>
+        on Delete you will delete the category<br>
+      </div>
+
+      <br>
+
+      <label for="method">Choose a CRUD method:</label>
+      <select name="method" id="method">
+        <option value="create">Create</option>
+        <option value="read">Read</option>
+        <option value="update">Update</option>
+        <option value="delete">Delete</option>
+      </select>
+
+      <br>
+
+      <label for="name">Name of category:</label>
+      <input type="text" name="name" id="name">
+
+      <br>
+
+      <button type="submit">CRUD</button>
+    </form>
+  </body>
+</html>
