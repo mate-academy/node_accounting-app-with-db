@@ -3,21 +3,21 @@
 const expencesServices = require('../services/expenses');
 const userServices = require('../services/users');
 
-const getAll = (req, res) => {
+const getAll = async(req, res) => {
   const searchParams = req.query;
 
   if (!searchParams) {
-    res.send(expencesServices.getAll());
+    res.send(await expencesServices.getAll());
 
     return;
   }
 
-  res.send(expencesServices.getFiltered(searchParams));
+  res.send(await expencesServices.getFiltered(searchParams));
 };
 
-const getOne = (req, res) => {
+const getOne = async(req, res) => {
   const { expenseId } = req.params;
-  const foundExpense = expencesServices.getById(expenseId);
+  const foundExpense = await expencesServices.getById(expenseId);
 
   if (!foundExpense) {
     res.sendStatus(404);
@@ -28,7 +28,7 @@ const getOne = (req, res) => {
   res.send(foundExpense);
 };
 
-const add = (req, res) => {
+const add = async(req, res) => {
   const {
     userId,
     spentAt,
@@ -38,7 +38,7 @@ const add = (req, res) => {
     note,
   } = req.body;
 
-  const user = userServices.getById(userId);
+  const user = await userServices.getById(userId);
 
   const isCorrect = user && spentAt && title && amount && category;
 
@@ -48,7 +48,7 @@ const add = (req, res) => {
     return;
   }
 
-  const newExpense = expencesServices.create(
+  const newExpense = await expencesServices.create(
     userId,
     spentAt,
     title,
@@ -61,9 +61,9 @@ const add = (req, res) => {
   res.send(newExpense);
 };
 
-const remove = (req, res) => {
+const remove = async(req, res) => {
   const { expenseId } = req.params;
-  const foundExpense = expencesServices.getById(expenseId);
+  const foundExpense = await expencesServices.getById(expenseId);
 
   if (!foundExpense) {
     res.sendStatus(404);
@@ -71,15 +71,15 @@ const remove = (req, res) => {
     return;
   }
 
-  expencesServices.remove(expenseId);
+  await expencesServices.remove(expenseId);
   res.sendStatus(204);
 };
 
-const update = (req, res) => {
+const update = async(req, res) => {
   const { expenseId } = req.params;
   const expenseBody = req.body;
 
-  const foundExpense = expencesServices.getById(expenseId);
+  const foundExpense = await expencesServices.getById(expenseId);
 
   if (!foundExpense) {
     res.sendStatus(404);
@@ -93,7 +93,7 @@ const update = (req, res) => {
     return;
   }
 
-  expencesServices.update(expenseId, req.body);
+  await expencesServices.update(expenseId, req.body);
 
   res.send(foundExpense);
 };

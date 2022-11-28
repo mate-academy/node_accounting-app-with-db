@@ -47,7 +47,7 @@ const remove = async(req, res) => {
     return;
   }
 
-  userServices.remove(userId);
+  await userServices.remove(userId);
   res.sendStatus(204);
 };
 
@@ -70,7 +70,7 @@ const update = async(req, res) => {
     return;
   }
 
-  userServices.update(userId, name);
+  await userServices.update(userId, name);
 
   res.send(normalize(foundUser));
 };

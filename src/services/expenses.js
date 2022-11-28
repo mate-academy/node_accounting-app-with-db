@@ -8,10 +8,10 @@ function getAll() {
   });
 }
 
-function getFiltered(searchParams) {
+async function getFiltered(searchParams) {
   const { userId, category } = searchParams;
 
-  let filteredExpenses = Expense.findAll();
+  let filteredExpenses = await Expense.findAll();
 
   if (category) {
     filteredExpenses = filteredExpenses.filter(
@@ -40,8 +40,7 @@ function create(
   category,
   note,
 ) {
-
-  return Expense.create({ 
+  return Expense.create({
     userId,
     spentAt,
     title,
