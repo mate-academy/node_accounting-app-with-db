@@ -2,19 +2,7 @@
 
 const { Sequelize } = require('sequelize');
 
-const databaseName = 'expenseAppDB';
-const databaseUserName = 'postgres';
-const databaseUserPass = '1234';
-const hostName = 'localhost';
-
-const sequelize = new Sequelize(
-  databaseName,
-  databaseUserName,
-  databaseUserPass,
-  {
-    host: hostName,
-    dialect: 'postgres',
-  },
-);
+// eslint-disable-next-line max-len
+const sequelize = new Sequelize('postgresql://postgres:FGnea770KQPLnMB3EqRD@containers-us-west-98.railway.app:5480/railway');
 
 exports.sequelize = sequelize;

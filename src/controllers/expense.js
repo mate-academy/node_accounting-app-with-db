@@ -48,8 +48,8 @@ async function getAll(req, res) {
       return;
     }
 
-    filterParams.from = from + ' 00:00:00.000 +00:00';
-    filterParams.to = to + ' 23:59:59.000 +00:00';
+    filterParams.from = from;
+    filterParams.to = to;
   }
 
   res.send(await expensesService.getFiltered(filterParams));

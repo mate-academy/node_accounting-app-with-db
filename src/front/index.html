@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en" style="margin: 30px;">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expenses API</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+</head>
+<body>
+  <h1 class="title is-3">REST API with 2 endpoints</h1>
+  <h2 class="subtitle is-5">(using Node.js, Express, PostgreSQL)</h2>
+
+  <div class="box">
+    <h2 class="subtitle is-5">All the requests can be test at BASE_URL:</h2>
+    <span class="tag is-info is-large">https://accounting-app-with-db-production.up.railway.app/</span>
+  </div>
+
+  <div class="box">
+    <h2 class="subtitle is-5">Available resources:</h2>
+    <span class="tag is-primary is-large">/users</span>
+    <span class="tag is-primary is-large">/expenses</span>
+  </div>
+
+  <div class="box">
+    <h3 class="title is-4">Users:</h3>
+    <h4 class="title is-5">Single</h4>
+    <span class="box">
+      {<br>
+      "createdAt": "2022-11-28T20:54:12.574Z",<br>
+      "updatedAt": "2022-11-28T20:54:12.576Z",<br>
+      "id": 1,<br>
+      "name": "Ann"<br>
+      }
+    </span>
+    <h4 class="title is-5">Collection</h4>
+    <span class="box">
+      [<br>
+      { "createdAt": "2022-11-28T20:54:12.574Z", "updatedAt": "2022-11-28T20:54:12.576Z", "id": 1, "name": "Ann" }<br>
+      { "createdAt": "2022-11-28T20:55:28.045Z", "updatedAt": "2022-11-28T20:55:28.045Z", "id": 2, "name": "Bob" }<br>
+      ...<br>]
+    </span>
+    <table class="table">
+      <thead>
+        <tr>
+          <th><abbr title="Position">Method</abbr></th>
+          <th>URL</th>
+          <th><abbr title="Played">Description</abbr></th>
+          <th><abbr title="Won">Request body</abbr></th>
+          <th><abbr title="Drawn">Response data</abbr></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>GET</th>
+          <td>/users</td>
+          <td>Load all users</td>
+          <td>-</td>
+          <td>Collection</td>
+        </tr>
+        <tr>
+          <th>GET</th>
+          <td>/users/2</td>
+          <td>Load a user by id</td>
+          <td>-</td>
+          <td>Single</td>
+        </tr>
+        <tr>
+          <th>POST</th>
+          <td>/users</td>
+          <td>Create a user</td>
+          <td>{ "name": "Your_name" }</td>
+          <td>Single</td>
+        </tr>
+        <tr>
+          <th>PATCH</th>
+          <td>/users/2</td>
+          <td>Update a user</td>
+          <td>{ "name": "New_name" }</td>
+          <td>Single</td>
+        </tr>
+        <tr>
+          <th>DELETE</th>
+          <td>/users/2</td>
+          <td>Delete a user</td>
+          <td>-</td>
+          <td>StatusCode: 204</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="box">
+    <h3 class="title is-4">Expenses:</h3>
+    <h4 class="title is-5">Single</h4>
+    <span class="box">
+      {<br>
+        "createdAt": "2022-11-28T21:01:27.137Z",<br>
+        "updatedAt": "2022-11-28T21:01:27.137Z",<br>
+        "id": 1,<br>
+        "userId": 1,<br>
+        "spentAt": "2022-11-25T00:00:00.000Z",<br>
+        "title": "Apples",<br>
+        "amount": 45,<br>
+        "category": "Products",<br>
+        "note": null<br>
+      }
+    </span>
+    <h4 class="title is-5">Collection</h4>
+    <span class="box">
+      [<br>
+      {
+        "createdAt": "2022-11-28T21:01:27.137Z",
+        "updatedAt": "2022-11-28T21:01:27.137Z",
+        "id": 1,
+        "userId": 1,
+        "spentAt": "2022-11-25T00:00:00.000Z",
+        "title": "Apples",
+        "amount": 45,
+        "category": "Products",
+        "note": null
+      }<br>
+      {
+        "createdAt": "2022-11-28T21:07:15.993Z",
+        "updatedAt": "2022-11-28T21:07:15.993Z",
+        "id": 2,
+        "userId": 2,
+        "spentAt": "2022-11-26T00:00:00.000Z",
+        "title": "Book",
+        "amount": 350,
+        "category": "Books",
+        "note": "One Flew Over the Cuckoo's Nest"
+      }<br>...<br>]
+    </span>
+    <table class="table">
+      <thead>
+        <tr>
+          <th><abbr title="Position">Method</abbr></th>
+          <th>URL</th>
+          <th><abbr title="Played">Description</abbr></th>
+          <th><abbr title="Won">Request body</abbr></th>
+          <th><abbr title="Drawn">Response data</abbr></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>GET</th>
+          <td>/expenses</td>
+          <td>Load all expenses</td>
+          <td>-</td>
+          <td>Collection</td>
+        </tr>
+        <tr>
+          <th>GET</th>
+          <td>
+            /expenses/<br>
+            ?userId=2<br>
+            &category=Products<br>
+            &from=2022-11-25&to=2022-11-28
+          </td>
+          <td>Load all expenses for userId = 2<br>
+            and category = Products<br>
+            between 2022-11-25 and 2022-11-28 (including)<br>
+          </td>
+          <td>-</td>
+          <td>Collection</td>
+        </tr>
+        <tr>
+          <th>GET</th>
+          <td>/expenses/2</td>
+          <td>Load an expense by id</td>
+          <td>-</td>
+          <td>Single</td>
+        </tr>
+        <tr>
+          <th>POST</th>
+          <td>/expenses</td>
+          <td>Create an expense</td>
+          <td>
+            {<br>
+            "userId": 2, (should be existing userId)<br>
+            "spentAt": "2022-11-26", (format: 'YYYY-MM-DD')<br>
+            "title": "Book",<br>
+            "amount": 350,<br>
+            "category": "Books",<br>
+            "note": "Novel" (optional)<br>
+            }
+          </td>
+          <td>Single</td>
+        </tr>
+        <tr>
+          <th>PATCH</th>
+          <td>/expenses/2</td>
+          <td>Update an expense</td>
+          <td>
+            {<br>
+              "spentAt": "2022-11-27", (format: 'YYYY-MM-DD')<br>
+              "amount": 450,<br>
+              }
+          </td>
+          <td>Single</td>
+        </tr>
+        <tr>
+          <th>DELETE</th>
+          <td>/expenses/2</td>
+          <td>Delete an expense</td>
+          <td>-</td>
+          <td>StatusCode: 204</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>
