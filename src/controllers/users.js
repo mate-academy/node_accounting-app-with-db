@@ -10,15 +10,14 @@ const getAllUsers = async(req, res) => {
 
 const getUserById = async(req, res) => {
   const { userId } = req.params;
-  const foundUser = await usersServices.getUserById(userId);
 
-  if (typeof +userId !== 'number'
-    || +userId <= 0
-  ) {
+  if (isNaN(parseInt(userId))) {
     res.sendStatus(400);
 
     return;
   }
+
+  const foundUser = await usersServices.getUserById(userId);
 
   if (!foundUser) {
     res.sendStatus(404);
@@ -46,15 +45,14 @@ const createUser = async(req, res) => {
 
 const removeUser = async(req, res) => {
   const { userId } = req.params;
-  const foundUser = await usersServices.getUserById(userId);
 
-  if (typeof +userId !== 'number'
-    || userId <= 0
-  ) {
+  if (isNaN(parseInt(userId))) {
     res.sendStatus(400);
 
     return;
   }
+
+  const foundUser = await usersServices.getUserById(userId);
 
   if (!foundUser) {
     res.sendStatus(404);
@@ -70,9 +68,8 @@ const removeUser = async(req, res) => {
 const updateUser = async(req, res) => {
   const { userId } = req.params;
   const { name } = req.body;
-  const foundUser = await usersServices.getUserById(userId);
 
-  if (typeof +userId !== 'number' || Number.isInteger(userId)) {
+  if (isNaN(parseInt(userId))) {
     res.sendStatus(400);
 
     return;
@@ -83,6 +80,8 @@ const updateUser = async(req, res) => {
 
     return;
   }
+
+  const foundUser = await usersServices.getUserById(userId);
 
   if (!foundUser) {
     res.sendStatus(404);
