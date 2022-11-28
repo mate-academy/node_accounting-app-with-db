@@ -1,5 +1,7 @@
 'use strict';
 
+const port = process.env.PORT || 3000;
+
 const express = require('express');
 
 const { setupTables } = require('./utiles/setupTables.js');
@@ -16,7 +18,7 @@ app.use('/users', userRouter);
 
 app.use('/expenses', expenseRouter);
 
-app.listen(3000, () => {
+app.listen(port, () => {
   // eslint-disable-next-line no-console
   console.log('Server started');
 });
