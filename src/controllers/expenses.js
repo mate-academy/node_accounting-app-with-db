@@ -93,9 +93,9 @@ const update = async(req, res) => {
     return;
   }
 
-  await expencesServices.update(expenseId, req.body);
+  const updatedExpense = await expencesServices.update(expenseId, req.body);
 
-  res.send(foundExpense);
+  res.send(updatedExpense);
 };
 
 module.exports = {

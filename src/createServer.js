@@ -8,12 +8,10 @@ const { router: expensesRouter } = require('./routes/expenses');
 function createServer() {
   const app = express();
 
-  app.use('/', (req, res) => {
-    res.end('<h1>Home page</h1>');
-  });
+  app.use(express.json());
 
-  app.use('/users', express.json(), usersRouter);
-  app.use('/expenses', express.json(), expensesRouter);
+  app.use('/users', usersRouter);
+  app.use('/expenses', expensesRouter);
 
   return app;
 }

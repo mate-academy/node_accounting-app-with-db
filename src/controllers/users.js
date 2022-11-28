@@ -70,9 +70,9 @@ const update = async(req, res) => {
     return;
   }
 
-  await userServices.update(userId, name);
+  const updatedUser = await userServices.update(userId, name);
 
-  res.send(normalize(foundUser));
+  res.send(normalize(updatedUser));
 };
 
 module.exports = {
