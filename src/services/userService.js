@@ -1,5 +1,7 @@
 'use strict';
 
+const { User } = require('../models/User');
+
 class UserService {
   constructor() {
     this.users = [];

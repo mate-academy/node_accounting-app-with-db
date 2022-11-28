@@ -1,14 +1,18 @@
 'use strict';
 
-const { User } = require('../models/User');
+const { Expense } = require('../models/Expense');
 
 class ExpenseService {
   constructor() {
     this.expenses = [];
   }
 
-  getAll() {
-    return User.getAll();
+  async getAll() {
+    const result = await Expense.findAll({
+      order: ['spent_at'],
+    });
+
+    return result;
   }
 
   findById(expenseId) {
