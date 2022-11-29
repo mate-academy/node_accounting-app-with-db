@@ -5,6 +5,10 @@ const { sequelize } = require('../utils/db');
 const { User } = require('./users');
 
 const Expense = sequelize.define('Expense', {
+  userId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
   spentAt: {
     type: DataTypes.DATE,
     allowNull: false,
@@ -30,7 +34,10 @@ const Expense = sequelize.define('Expense', {
   tableName: 'Expenses',
 });
 
-Expense.belongsTo(User);
+Expense.belongsTo(User, {
+  foreignKey: 'userId',
+  targetKey: 'id',
+});
 
 Expense.sync();
 

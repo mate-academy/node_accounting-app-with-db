@@ -25,7 +25,7 @@ class ExpensesController {
 
     const hasUser = await usersService.getOne(+userId);
 
-    if (hasUser) {
+    if (!hasUser) {
       res.statusCode = 400;
       res.json({ error: userNotExist });
 

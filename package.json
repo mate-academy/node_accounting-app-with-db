@@ -2,7 +2,7 @@
   "name": "node_accounting-app-with-db",
   "version": "1.0.0",
   "description": "Node.js accounting app with PostgreSQL",
-  "main": "src/index.js",
+  "main": "src/createServer.js",
   "scripts": {
     "start": "node src/createServer.js",
     "dev": "nodemon src/createServer.js",

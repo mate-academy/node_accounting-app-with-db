@@ -5,19 +5,16 @@ const { users } = require('./routes/users');
 const express = require('express');
 const cors = require('cors');
 
-function createServer() {
-  const app = express();
+const port = process.env.PORT || 3000;
 
-  app.use(cors());
-  app.use(express.json());
-  expences(app);
-  users(app);
+const app = express();
 
-  return app;
-}
+app.use(cors());
+app.use(express.json());
+expences(app);
+users(app);
 
-createServer()
-  .listen(3000, () => {
-    // eslint-disable-next-line no-console
-    console.log('Server is running');
-  });
+app.listen(port, () => {
+  // eslint-disable-next-line no-console
+  console.log('Server is running');
+});
