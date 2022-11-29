@@ -4,7 +4,6 @@ const { expences } = require('./routes/expenses');
 const { users } = require('./routes/users');
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 
 const port = process.env.PORT || 3000;
 
@@ -16,7 +15,7 @@ expences(app);
 users(app);
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, './public/index.html'));
+  res.sendFile('./public/index.html');
 });
 
 app.listen(port, () => {
