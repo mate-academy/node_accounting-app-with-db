@@ -16,6 +16,8 @@ function createServer() {
   return app;
 }
 
-module.exports = {
-  createServer,
-};
+createServer()
+  .listen(3000, () => {
+    // eslint-disable-next-line no-console
+    console.log('Server is running');
+  });

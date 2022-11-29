@@ -4,14 +4,10 @@
   "description": "Node.js accounting app with PostgreSQL",
   "main": "src/index.js",
   "scripts": {
-    "init": "mate-scripts init",
-    "start": "mate-scripts start",
-    "dev": "nodemon main.js",
-    "lint": "mate-scripts lint",
-    "test:only": "mate-scripts test",
+    "start": "node src/createServer.js",
+    "dev": "nodemon src/createServer.js",
     "update": "mate-scripts update",
-    "postinstall": "npm run update",
-    "test": "npm run lint && npm run test:only"
+    "postinstall": "npm run update"
   },
   "author": "Mate academy",
   "license": "GPL-3.0",
