@@ -1,14 +1,38 @@
 'use strict';
 
 const {
-  expensePostErrors, expensePatchErrors,
-} = require('../errorsHandlers/expense');
-const { error400, error404 } = require('../errorsHandlers/general');
+  checkPostData, checkPatchData, checkExpenseId,
+} = require('../utility/dataCheck/expense');
+const {
+  entityNotExist, userNotExist,
+} = require('../utility/dataCheck/errorMessages');
 const { expensesService } = require('../services/expenses');
+const { usersService } = require('../services/users');
+const { checkUserId } = require('../utility/dataCheck/user');
 
 class ExpensesController {
   async postExpense(req, res) {
-    const error = await expensePostErrors(req.body);
+    const { userId } = req.body;
+
+    const userErrors = checkUserId(userId);
+
+    if (userErrors.errors.length !== 0) {
+      res.status(400);
+      res.json(userErrors);
+
+      return;
+    }
+
+    const hasUser = await usersService.getOne(+userId);
+
+    if (hasUser) {
+      res.statusCode = 400;
+      res.json({ error: userNotExist });
+
+      return;
+    }
+
+    const error = await checkPostData(req.body);
 
     if (error.errors.length !== 0) {
       res.status(400);
@@ -33,9 +57,11 @@ class ExpensesController {
   async getExpense(req, res) {
     const { expenseId } = req.params;
 
+    const error = checkExpenseId(expenseId);
+
     if (isNaN(+expenseId)) {
       res.statusCode = 400;
-      res.json({ error: error400 });
+      res.json(error);
 
       return;
     }
@@ -44,7 +70,7 @@ class ExpensesController {
 
     if (!expense) {
       res.statusCode = 404;
-      res.json({ error: error404 });
+      res.json({ error: entityNotExist });
 
       return;
     }
@@ -60,7 +86,7 @@ class ExpensesController {
 
     if (!isDeleted) {
       res.statusCode = 404;
-      res.json({ error: error404 });
+      res.json({ error: entityNotExist });
 
       return;
     }
@@ -71,7 +97,7 @@ class ExpensesController {
   async patchExpense(req, res) {
     const { expenseId } = req.params;
 
-    const error = await expensePatchErrors(req.body);
+    const error = await checkPatchData(req.body);
 
     if (error.errors.length !== 0) {
       res.status(400);
@@ -86,7 +112,7 @@ class ExpensesController {
 
     if (!expense) {
       res.statusCode = 404;
-      res.json({ error: error404 });
+      res.json({ error: entityNotExist });
 
       return;
     }

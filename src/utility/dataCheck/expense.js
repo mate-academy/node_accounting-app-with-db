@@ -1,7 +1,5 @@
 'use strict';
 
-const { usersService } = require('../services/users');
-
 function checkTypeErrors(error, spentAt, title, amount, category, note) {
   if (title && typeof title !== 'string') {
     error.errors.push('title name is not valid, expected string');
@@ -34,27 +32,31 @@ function checkTypeErrors(error, spentAt, title, amount, category, note) {
   return error;
 }
 
-async function expensePostErrors(data) {
+function checkExpenseId(expenceId) {
+  const error = {
+    errors: [],
+  };
+
+  if (isNaN(+expenceId)) {
+    error.errors.push('expense id not valid, expect number');
+  }
+
+  return error;
+}
+
+async function checkPostData(data) {
   const {
-    userId, spentAt, title, amount, category, note,
+    spentAt, title, amount, category, note,
   } = data;
   let error = {
     errors: [],
   };
-
-  const hasUser = isNaN(+userId)
-    ? null
-    : await usersService.getOne(+userId);
 
   const hasMainParameters = title && amount && category;
 
   if (!hasMainParameters) {
     error.errors.push(('one or more of required parameters'
     + '(title, amount and category) are not passed'));
-  }
-
-  if (!hasUser) {
-    error.errors.push('user does\'nt exist');
   }
 
   error = checkTypeErrors(
@@ -64,7 +66,7 @@ async function expensePostErrors(data) {
   return error;
 }
 
-function expensePatchErrors(data) {
+function checkPatchData(data) {
   const {
     spentAt, title, amount, category, note,
   } = data;
@@ -87,5 +89,5 @@ function expensePatchErrors(data) {
 }
 
 module.exports = {
-  expensePostErrors, expensePatchErrors,
+  checkPostData, checkPatchData, checkExpenseId,
 };

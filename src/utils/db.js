@@ -2,9 +2,7 @@
 
 const { Sequelize } = require('sequelize');
 
-const sequelize = new Sequelize('postgres', 'postgres', 'test1234', {
-  host: 'localhost',
-  dialect: 'postgres',
-});
+// eslint-disable-next-line max-len
+const sequelize = new Sequelize('postgresql://postgres:n8ao651IzMNGYzHKBJTH@containers-us-west-134.railway.app:7594/railway');
 
 module.exports = { sequelize };

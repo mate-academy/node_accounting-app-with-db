@@ -1,18 +1,20 @@
 'use strict';
 
-const { userError } = require('../errorsHandlers/user');
-const { error400, error404 } = require('../errorsHandlers/general');
+const {
+  checkUserName, checkUserData, checkUserId,
+} = require('../utility/dataCheck/user');
+const { entityNotExist } = require('../utility/dataCheck/errorMessages');
 const { usersService } = require('../services/users');
 
 class UsersController {
   async postUser(req, res) {
     const { name } = req.body;
 
-    const error = userError(name);
+    const error = checkUserName(name);
 
     if (error.errors.length !== 0) {
       res.status(400);
-      res.json({ error });
+      res.json(error);
 
       return;
     }
@@ -33,9 +35,11 @@ class UsersController {
   async getUser(req, res) {
     const { userId } = req.params;
 
-    if (isNaN(+userId)) {
-      res.statusCode = 400;
-      res.json({ error: error400 });
+    const error = checkUserId(userId);
+
+    if (error.errors.length !== 0) {
+      res.status(400);
+      res.json(error);
 
       return;
     }
@@ -44,7 +48,7 @@ class UsersController {
 
     if (!user) {
       res.statusCode = 404;
-      res.json({ error: error404 });
+      res.json({ error: entityNotExist });
 
       return;
     }
@@ -60,7 +64,7 @@ class UsersController {
 
     if (!isDeleted) {
       res.statusCode = 404;
-      res.json({ error: error404 });
+      res.json({ error: entityNotExist });
 
       return;
     }
@@ -72,11 +76,11 @@ class UsersController {
     const { userId } = req.params;
     const { name } = req.body;
 
-    const error = userError(name, +userId);
+    const error = checkUserData(name, +userId);
 
     if (error.errors.length !== 0) {
       res.status(400);
-      res.json({ error });
+      res.json(error);
 
       return;
     }
@@ -87,7 +91,7 @@ class UsersController {
 
     if (!user) {
       res.statusCode = 404;
-      res.json({ error: error404 });
+      res.json({ error: entityNotExist });
 
       return;
     }

@@ -1,20 +1,6 @@
 'use strict';
 
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../utils/db');
-
-const User = sequelize.define('User', {
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-}, {
-  tableName: 'Users',
-  createdAt: false,
-  updatedAt: false,
-});
-
-User.sync();
+const { User } = require('../utils/users');
 
 class UsersService {
   async createUser(name) {
@@ -35,10 +21,10 @@ class UsersService {
     return user;
   }
 
-  async removeOne(userId) {
+  async removeOne(id) {
     const isDeleted = await User.destroy({
       where: {
-        id: userId,
+        id,
       },
     });
 

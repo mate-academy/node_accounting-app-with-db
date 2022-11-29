@@ -1,42 +1,7 @@
 'use strict';
 
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../utils/db');
 const { Op } = require('sequelize');
-
-const Expense = sequelize.define('Expense', {
-  userId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  spentAt: {
-    type: DataTypes.DATE,
-    allowNull: false,
-    defaultValue: DataTypes.NOW,
-  },
-  title: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  amount: {
-    type: DataTypes.REAL,
-    allowNull: false,
-  },
-  category: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  note: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-}, {
-  tableName: 'Expenses',
-  createdAt: false,
-  updatedAt: false,
-});
-
-Expense.sync();
+const { Expense } = require('../utils/expenses');
 
 class ExpensesService {
   async createExpense(data) {
@@ -58,19 +23,27 @@ class ExpensesService {
 
     let dataFilter = {};
 
-    if (from && to) {
+    const isBetween = from && to;
+    const isFrom = from && !to;
+    const isTo = !from && to;
+
+    if (isBetween) {
       dataFilter = {
         spentAt: {
           [Op.between]: [new Date(from), new Date(to)],
         },
       };
-    } else if (from) {
+    }
+
+    if (isFrom) {
       dataFilter = {
         spentAt: {
           [Op.gt]: new Date(from),
         },
       };
-    } else if (to) {
+    }
+
+    if (isTo) {
       dataFilter = {
         spentAt: {
           [Op.lt]: new Date(to),
@@ -93,10 +66,10 @@ class ExpensesService {
     return expense;
   }
 
-  async removeOne(expenseId) {
+  async removeOne(id) {
     const isDeleted = await Expense.destroy({
       where: {
-        id: expenseId,
+        id,
       },
     });
 
