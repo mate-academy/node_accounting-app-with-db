@@ -54,4 +54,6 @@ class UsersService {
   }
 }
 
-module.exports = { UsersService };
+const usersService = new UsersService();
+
+module.exports = { usersService };

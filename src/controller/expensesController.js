@@ -4,15 +4,11 @@ const {
   expensePostErrors, expensePatchErrors,
 } = require('../errorsHandlers/expense');
 const { error400, error404 } = require('../errorsHandlers/general');
-const { ExpensesService } = require('../services/expenses');
+const { expensesService } = require('../services/expenses');
 
-class ExpensesController extends ExpensesService {
+class ExpensesController {
   async postExpense(req, res) {
-    const { userId, spentAt, title, amount, category, note } = req.body;
-
-    const error = await expensePostErrors({
-      userId, spentAt, title, amount, category, note,
-    });
+    const error = await expensePostErrors(req.body);
 
     if (error.errors.length !== 0) {
       res.status(400);
@@ -21,20 +17,14 @@ class ExpensesController extends ExpensesService {
       return;
     }
 
-    const expense = await super.createExpense({
-      userId, spentAt, title, amount, category, note,
-    });
+    const expense = await expensesService.createExpense(req.body);
 
     res.statusCode = 201;
     res.json(expense);
   }
 
   async getExpenses(req, res) {
-    const { userId, category, to, from } = req.query;
-
-    const expenses = await super.getAll({
-      userId, category, to, from,
-    });
+    const expenses = await expensesService.getAll(req.query);
 
     res.statusCode = 200;
     res.json(expenses);
@@ -43,16 +33,16 @@ class ExpensesController extends ExpensesService {
   async getExpense(req, res) {
     const { expenseId } = req.params;
 
-    if (isNaN(expenseId)) {
+    if (isNaN(+expenseId)) {
       res.statusCode = 400;
       res.json({ error: error400 });
 
       return;
     }
 
-    const expenseData = await super.getOne(expenseId);
+    const expense = await expensesService.getOne(+expenseId);
 
-    if (!expenseData) {
+    if (!expense) {
       res.statusCode = 404;
       res.json({ error: error404 });
 
@@ -60,13 +50,13 @@ class ExpensesController extends ExpensesService {
     }
 
     res.statusCode = 200;
-    res.json(expenseData);
+    res.json(expense);
   };
 
   async removeExpense(req, res) {
     const { expenseId } = req.params;
 
-    const isDeleted = await super.removeOne(expenseId);
+    const isDeleted = await expensesService.removeOne(+expenseId);
 
     if (!isDeleted) {
       res.statusCode = 404;
@@ -80,11 +70,8 @@ class ExpensesController extends ExpensesService {
 
   async patchExpense(req, res) {
     const { expenseId } = req.params;
-    const { spentAt, title, amount, category, note } = req.body;
 
-    const error = await expensePatchErrors({
-      spentAt, title, amount, category, note,
-    });
+    const error = await expensePatchErrors(req.body);
 
     if (error.errors.length !== 0) {
       res.status(400);
@@ -93,9 +80,9 @@ class ExpensesController extends ExpensesService {
       return;
     }
 
-    await super.modifyExpence(expenseId, req.body);
+    await expensesService.modifyExpence(+expenseId, req.body);
 
-    const expense = await super.getOne(expenseId);
+    const expense = await expensesService.getOne(+expenseId);
 
     if (!expense) {
       res.statusCode = 404;
@@ -109,7 +96,7 @@ class ExpensesController extends ExpensesService {
   };
 }
 
-const expensesController = new ExpensesController([]);
+const expensesController = new ExpensesController();
 
 module.exports = {
   expensesController,

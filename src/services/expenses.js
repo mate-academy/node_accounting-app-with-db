@@ -39,75 +39,50 @@ const Expense = sequelize.define('Expense', {
 Expense.sync();
 
 class ExpensesService {
-  async createExpense({
-    userId, spentAt, title, amount, category, note,
-  }) {
-    const expense = await Expense.create({
-      userId, spentAt, title, amount, category, note,
-    });
+  async createExpense(data) {
+    const expense = await Expense.create(data);
 
     return expense;
   }
 
   async getAll({ userId, category, to, from }) {
-    if (from && to && userId && category) {
-      const expensesAllFilters = await Expense.findAll({
-        where: {
-          userId: userId,
-          category: category,
-          spentAt: {
-            [Op.between]: [new Date(from), new Date(to)],
-          },
-        },
-      });
-
-      return expensesAllFilters;
-    }
-
-    if (userId && category) {
-      const expensesByCategoryAndUser = await Expense.findAll({
-        where: {
-          userId: userId,
-          category: category,
-        },
-      });
-
-      return expensesByCategoryAndUser;
-    }
-
-    if (from && to) {
-      const expensesAllFilters = await Expense.findAll({
-        where: {
-          spentAt: {
-            [Op.between]: [new Date(from), new Date(to)],
-          },
-        },
-      });
-
-      return expensesAllFilters;
-    }
+    const where = {};
 
     if (userId) {
-      const expensesByUser = await Expense.findAll({
-        where: {
-          userId: userId,
-        },
-      });
-
-      return expensesByUser;
+      Object.assign(where, { userId });
     }
 
     if (category) {
-      const expensesByCategory = await Expense.findAll({
-        where: {
-          category: category,
-        },
-      });
-
-      return expensesByCategory;
+      Object.assign(where, { category });
     }
 
-    const expenses = await Expense.findAll();
+    let dataFilter = {};
+
+    if (from && to) {
+      dataFilter = {
+        spentAt: {
+          [Op.between]: [new Date(from), new Date(to)],
+        },
+      };
+    } else if (from) {
+      dataFilter = {
+        spentAt: {
+          [Op.gt]: new Date(from),
+        },
+      };
+    } else if (to) {
+      dataFilter = {
+        spentAt: {
+          [Op.lt]: new Date(to),
+        },
+      };
+    }
+
+    Object.assign(where, dataFilter);
+
+    const expenses = await Expense.findAll({
+      where,
+    });
 
     return expenses;
   }
@@ -128,20 +103,8 @@ class ExpensesService {
     return isDeleted;
   }
 
-  async modifyExpence(expenceId, {
-    spentAt,
-    title,
-    amount,
-    category,
-    note,
-  }) {
-    const expense = await Expense.update({
-      spentAt,
-      title,
-      amount,
-      category,
-      note,
-    }, {
+  async modifyExpence(expenceId, data) {
+    const expense = await Expense.update(data, {
       where: {
         id: expenceId,
       },
@@ -151,4 +114,6 @@ class ExpensesService {
   }
 }
 
-module.exports = { ExpensesService };
+const expensesService = new ExpensesService();
+
+module.exports = { expensesService };

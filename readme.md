@@ -31,8 +31,12 @@ GET /expenses get all Expenses
 GET /expenses/:expenseId get Expense by id
 GET /expenses?userId=userId get Expenses by userId
 GET /expenses?category=category get Expenses by category
+GET /expenses?from=from get Expenses after query date
+GET /expenses?to=to get Expenses before query date
 GET /expenses?from=from&to=to get Expenses in date range
 GET /expenses?userId=userId&category=category get Expenses by category and userId
+GET /expenses?userId=userId&category=category&from=from get Expenses by category and userId after query date
+GET /expenses?userId=userId&category=category&to=to get Expenses by category and userId before query date
 GET /expenses?userId=userId&category=category&from=from&to=to get Expenses by category and userId in date range
 POST /expenses add new Expense (string title, number amount (can be decimal) and string category are required, string note and new Date spentAt (will be added at current time by default) are optional)
 PATCH /expenses/:expenseId update Expense by id (at least one field change is required)

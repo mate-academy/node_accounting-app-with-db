@@ -11,7 +11,6 @@ const usersRouter = express.Router();
 
 function users(app) {
   app.use('/users', usersRouter);
-  usersRouter.use(express.json());
   usersRouter.get('/', usersController.getUsers);
   usersRouter.get('/:userId', usersController.getUser);
   usersRouter.post('/', usersController.postUser);

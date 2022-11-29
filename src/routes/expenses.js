@@ -11,7 +11,6 @@ const expensesRouter = express.Router();
 
 function expences(app) {
   app.use('/expenses', expensesRouter);
-  expensesRouter.use(express.json());
   expensesRouter.get('/', expensesController.getExpenses);
   expensesRouter.get('/:expenseId', expensesController.getExpense);
   expensesRouter.post('/', expensesController.postExpense);

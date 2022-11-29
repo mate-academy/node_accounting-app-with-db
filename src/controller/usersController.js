@@ -2,9 +2,9 @@
 
 const { userError } = require('../errorsHandlers/user');
 const { error400, error404 } = require('../errorsHandlers/general');
-const { UsersService } = require('../services/users');
+const { usersService } = require('../services/users');
 
-class UsersController extends UsersService {
+class UsersController {
   async postUser(req, res) {
     const { name } = req.body;
 
@@ -17,14 +17,14 @@ class UsersController extends UsersService {
       return;
     }
 
-    const user = await super.createUser(name);
+    const user = await usersService.createUser(name);
 
     res.statusCode = 201;
     res.json(user);
   }
 
   async getUsers(req, res) {
-    const data = await super.getAll();
+    const data = await usersService.getAll();
 
     res.statusCode = 200;
     res.json(data);
@@ -33,14 +33,14 @@ class UsersController extends UsersService {
   async getUser(req, res) {
     const { userId } = req.params;
 
-    if (isNaN(userId)) {
+    if (isNaN(+userId)) {
       res.statusCode = 400;
       res.json({ error: error400 });
 
       return;
     }
 
-    const user = await super.getOne(userId);
+    const user = await usersService.getOne(+userId);
 
     if (!user) {
       res.statusCode = 404;
@@ -56,7 +56,7 @@ class UsersController extends UsersService {
   async removeUser(req, res) {
     const { userId } = req.params;
 
-    const isDeleted = await super.removeOne(userId);
+    const isDeleted = await usersService.removeOne(+userId);
 
     if (!isDeleted) {
       res.statusCode = 404;
@@ -72,7 +72,7 @@ class UsersController extends UsersService {
     const { userId } = req.params;
     const { name } = req.body;
 
-    const error = userError(name, userId);
+    const error = userError(name, +userId);
 
     if (error.errors.length !== 0) {
       res.status(400);
@@ -81,9 +81,9 @@ class UsersController extends UsersService {
       return;
     }
 
-    await super.modifyUser(userId, name);
+    await usersService.modifyUser(+userId, name);
 
-    const user = await super.getOne(userId);
+    const user = await usersService.getOne(+userId);
 
     if (!user) {
       res.statusCode = 404;
@@ -97,7 +97,7 @@ class UsersController extends UsersService {
   };
 }
 
-const usersController = new UsersController([]);
+const usersController = new UsersController();
 
 module.exports = {
   usersController,

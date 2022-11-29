@@ -10,7 +10,7 @@ function userError(name, userId = 1) {
   }
 
   if (!name) {
-    error.errors.push('required parameter is not passed');
+    error.errors.push('name is not passed');
   }
 
   if (isNaN(userId)) {
