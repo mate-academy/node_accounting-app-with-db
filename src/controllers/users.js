@@ -3,15 +3,15 @@
 const { UserService } = require('../services/userService');
 const userService = new UserService();
 
-const getAll = (req, res) => {
-  const users = userService.getAll();
+const getAll = async(req, res) => {
+  const users = await userService.getAll();
 
   res.send(users);
 };
 
-const getOne = (req, res) => {
+const getOne = async(req, res) => {
   const { userId } = req.params;
-  const user = userService.getUserById(Number(userId));
+  const user = await userService.getUserById(Number(userId));
 
   if (isNaN(userId)) {
     res.sendStatus(400);
@@ -28,7 +28,7 @@ const getOne = (req, res) => {
   res.send(user);
 };
 
-const add = (req, res) => {
+const add = async(req, res) => {
   const { name } = req.body;
 
   if (typeof name !== 'string' || !name) {
@@ -37,15 +37,15 @@ const add = (req, res) => {
     return;
   }
 
-  const newUser = userService.create(name);
+  const newUser = await userService.create(name);
 
   res.statusCode = 201;
   res.send(newUser);
 };
 
-const remove = (req, res) => {
+const remove = async(req, res) => {
   const { userId } = req.params;
-  const wasUserRemoved = userService.remove(Number(userId));
+  const wasUserRemoved = await userService.remove(Number(userId));
 
   if (!wasUserRemoved) {
     res.sendStatus(404);
@@ -56,9 +56,9 @@ const remove = (req, res) => {
   res.sendStatus(204);
 };
 
-const update = (req, res) => {
+const update = async(req, res) => {
   const { userId } = req.params;
-  const foundUser = userService.getUserById(Number(userId));
+  const foundUser = await userService.getUserById(Number(userId));
 
   if (!foundUser) {
     res.sendStatus(404);
@@ -74,7 +74,7 @@ const update = (req, res) => {
     return;
   }
 
-  userService.update({
+  await userService.update({
     id: Number(userId),
     name,
   });

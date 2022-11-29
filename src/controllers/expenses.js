@@ -6,11 +6,11 @@ const { UserService } = require('../services/userService');
 const expenseServise = new ExpenseService();
 const userServise = new UserService();
 
-const getAll = (req, res) => {
+const getAll = async(req, res) => {
   const searchParams = req.query;
 
   if (!searchParams) {
-    res.send(expenseServise.getAll());
+    res.send(await expenseServise.getAll());
 
     return;
   }

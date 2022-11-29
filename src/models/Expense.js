@@ -16,8 +16,8 @@ const Expense = sequelize.define('Expense', {
     field: 'user_id',
     type: DataTypes.INTEGER,
   },
-  spentAt: {
-    field: 'spent_at',
+  createdAt: {
+    field: 'spentAt',
     type: DataTypes.DATE,
     allowNull: false,
     defaultValue: DataTypes.NOW,

@@ -3,23 +3,16 @@
 const { Expense } = require('../models/Expense');
 
 class ExpenseService {
-  constructor() {
-    this.expenses = [];
-  }
-
-  async getAll() {
-    const result = await Expense.findAll({
-      order: ['spent_at'],
+  getAll() {
+    const result = Expense.findAll({
+      order: ['spentAt'],
     });
 
     return result;
   }
 
   findById(expenseId) {
-    const expense = this.expenses
-      .find(oneExpense => oneExpense.id === Number(expenseId));
-
-    return expense || null;
+    return Expense.findByPk(Number(expenseId));
   }
 
   getFiltered(searchParams) {
@@ -54,13 +47,8 @@ class ExpenseService {
     category,
     note
   ) {
-    const newExpenseId = this.expenses.length
-      ? Math.max(...this.expenses.map(expense => Number(expense.id))) + 1
-      : 1;
-
     const newExpense = {
-      id: newExpenseId,
-      userId: +userId,
+      userId: Number(userId),
       spentAt,
       title,
       amount,
@@ -68,31 +56,24 @@ class ExpenseService {
       note,
     };
 
-    this.expenses.push(newExpense);
-
-    return newExpense;
+    return Expense.create(newExpense);
   }
 
   remove(expenseId) {
-    const filteredExpenses = this.expenses
-      .filter(expense => expense.id !== Number(expenseId));
-
-    const isDeletedExpense = this.expenses.length !== filteredExpenses.length;
-
-    this.expenses = filteredExpenses;
-
-    return isDeletedExpense;
+    return Expense.destroy({
+      where: {
+        id: Number(expenseId),
+      },
+    });
   }
 
   update({
     id,
     ...expenseData
   }) {
-    const expenseForUpdate = this.findById(Number(id));
-
-    Object.assign(expenseForUpdate, expenseData);
-
-    return expenseForUpdate;
+    return Expense.update(expenseData, {
+      where: { id },
+    });
   }
 }
 
