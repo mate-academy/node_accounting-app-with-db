@@ -22,8 +22,8 @@ async function getById(id) {
   return await User.findByPk(id);
 }
 
-function createUser(name) {
-    return User.create({ name });
+async function createUser(name) {
+    return await User.create({ name });
   }
 
 
@@ -33,8 +33,8 @@ function createUser(name) {
   })
 }
 
-function removeUser(id) {
-  return User.destroy({
+async function removeUser(id) {
+  return await User.destroy({
     where: { id },
   })
 }

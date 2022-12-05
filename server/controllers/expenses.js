@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 const {
   getExpenseById,
@@ -7,83 +7,77 @@ const {
   getExpenseByTime,
   getExpenseByUser,
   getExpensesByCat,
-} = require('../services/expenses');
+  getAllExpenses,
+  deleteOneExpense,
+} = require("../services/expenses");
 
-const { getById } = require('../services/users');
+const { getById } = require("../services/users");
 
-function getAllExpenses(expenses, users) {
-  function getExpenses(req, res) {
-    const {
-      userId,
-      category,
-      from,
-      to,
-    } = req.query;
+async function getExpensesForUser(req, res) {
+  const { userId, category, from, to } = req.query;
 
-    const id = +userId;
+  const id = +userId;
 
-    const foundUser = getById(users, id);
+  const foundUser = await getById(users, id);
 
-    if (foundUser) {
-      const expensesFilteredByUser = getExpenseByUser(expenses, id);
+  if (!foundUser) {
+    res.sendStatus(404)
 
-      if (category) {
-        const expensesFilteredByCat = getExpensesByCat(
-          expensesFilteredByUser, category
-        );
+    return;
 
-        res.send(expensesFilteredByCat);
 
-        return;
-      }
+    // if (category) {
+    //   const expensesFilteredByCat = getExpensesByCat(
+    //     expensesFilteredByUser, category
+    //   );
 
-      res.send(expensesFilteredByUser);
+    //   res.send(expensesFilteredByCat);
 
-      return;
-    }
-
-    if (from && to) {
-      const expensesFilteredByDate = getExpenseByTime(expenses, from, to);
-
-      res.send(expensesFilteredByDate);
-
-      return;
-    }
-
-    res.send(expenses);
+    //   return;
+    // }
   }
 
-  return getExpenses;
+  // if (from && to) {
+  //   const expensesFilteredByDate = getExpenseByTime(expenses, from, to);
+
+  //   res.send(expensesFilteredByDate);
+
+  //   return;
+  // }
+
+  const expensesFilteredByUser = getExpenseByUser(id);
+
+  res.send(expensesFilteredByUser);
 }
 
-function postOneExpense(expenses, users) {
-  function postExpense(req, res) {
-    const {
-      userId,
-      spentAt,
-      title,
-      amount,
-      category,
-      note,
-    } = req.body;
+async function getTotalExpenses(req, res) {
+  const expenses = await getAllExpenses();
 
-    const foundUser = getById(users, userId);
+  res.send(expenses);
 
-    if (!foundUser) {
+  res.statusCode = 200;
+}
+
+  async function postExpense(req, res) {
+    const { user_id, name, amount, category, note } = await req.body;
+
+    if (!name) {
       res.sendStatus(400);
 
       return;
-    };
+    }
 
-    const newExpenses = createExpense(expenses, userId,
-      spentAt, title, amount, category, note);
+    const newExpenses = await createExpense(
+      +user_id,
+      name,
+      amount,
+      category,
+      note
+    );
 
-    res.statusCode = 201;
     res.send(newExpenses);
+    res.statusCode = 201;
   }
-
-  return postExpense;
-}
 
 function patchOneExpense(expenses) {
   async function patchExpense(req, res) {
@@ -95,12 +89,11 @@ function patchOneExpense(expenses) {
       res.sendStatus(404);
 
       return;
-    };
+    }
 
     const body = req.body;
 
-    updateExpense(expenses, +id,
-      body);
+    updateExpense(expenses, +id, body);
 
     res.send(foundExpense);
     res.sendStatus(200);
@@ -109,10 +102,9 @@ function patchOneExpense(expenses) {
   return patchExpense;
 }
 
-function deleteOneExpense(expenses) {
-  function deleteExpense(req, res) {
+  async function deleteExpense(req, res) {
     const { id } = req.params;
-    const foundExpense = getExpenseById(expenses, +id);
+    const foundExpense = await getExpenseById(+id);
 
     if (!foundExpense) {
       res.sendStatus(404);
@@ -120,12 +112,10 @@ function deleteOneExpense(expenses) {
       return;
     }
 
-    expenses.splice(expenses.indexOf(foundExpense), 1);
+    const expenses = await deleteOneExpense(+id);
     res.sendStatus(204);
   }
 
-  return deleteExpense;
-}
 
 function getOneExpense(expenses) {
   function getExpense(req, res) {
@@ -146,9 +136,11 @@ function getOneExpense(expenses) {
 }
 
 module.exports = {
-  getAllExpenses,
-  postOneExpense,
+  getExpensesForUser,
+  postExpense,
   patchOneExpense,
   deleteOneExpense,
   getOneExpense,
+  getTotalExpenses,
+  deleteExpense,
 };

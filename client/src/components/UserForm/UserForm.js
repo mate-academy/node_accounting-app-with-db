@@ -31,7 +31,7 @@ export const UserForm = React.memo(function UserForm({
         <button
           className="button is-primary is-rounded"
           type="button"
-          disabled={updId !== null}
+          disabled={updId !== null || userName === ''}
           onClick={async (event) => {
             event.preventDefault();
 
@@ -49,13 +49,17 @@ export const UserForm = React.memo(function UserForm({
           type="edit"
           disabled={updId === null}
           onClick={async () => {
-            const updated = await usersAPI.updateUser(updId, userName);
+            try {
+              const updated = await usersAPI.updateUser(updId, userName);
 
-            if (updated) {
               loadTodos();
+              setUpdId(null);
+              setUserName("");
+
+              return updated;
+            } catch(err) {
+              console.log(err)
             }
-            setUpdId(null);
-            setUserName("");
           }}
         >
           Edit

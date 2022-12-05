@@ -1,8 +1,7 @@
- .User {
+.User {
   display: flex;
   justify-content: center;
 }
-
 
 .User__header {
   text-align: center;
@@ -20,12 +19,15 @@
 .Expense {
   display: flex;
   justify-content: center;
+  padding-bottom: 30px;
 }
 
 .Expense__header {
-  font-size: 30px;
-  margin: 0 auto;
-  text-align: center;
+  font-size: 22px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 50px;
 }
 
 .Expense__header-select {

@@ -1,23 +1,24 @@
 'use strict';
 
 const {
-  getAllExpenses,
-  postOneExpense,
+  getExpensesForUser,
+  getTotalExpenses,
   patchOneExpense,
-  deleteOneExpense,
   getOneExpense,
+  postExpense,
+  deleteExpense,
 } = require('./controllers/expenses');
 
 function InitExpenseRoute(app, { users, expenses }) {
-  app.post('/', postOneExpense(expenses, users));
+  app.post('/', postExpense);
 
-  app.get('/', getAllExpenses(expenses, users));
+  app.get('/', getTotalExpenses);
 
   app.patch('/:id', patchOneExpense(expenses));
 
   app.get('/:id', getOneExpense(expenses));
 
-  app.delete('/:id', deleteOneExpense(expenses));
+  app.delete('/:id', deleteExpense);
 }
 
 module.exports = {

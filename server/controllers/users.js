@@ -28,7 +28,7 @@ const {
     const newUser = await createUser(name);
 
     res.send(newUser);
-    res.statusCode = 201; 
+    res.statusCode = 201;
   }
 
 
@@ -47,8 +47,7 @@ const {
 
     updateUser(name, +id);
 
-    res.send(foundUser);
-    res.sendStatus(200);
+    res.send(200);
   }
 
   async function deleteOneUser(req, res) {
