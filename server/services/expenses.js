@@ -53,16 +53,22 @@ async function getExpenseById(id) {
   return await Expense.findByPk(id) || null;
 }
 
-function updateExpense(expenses, id, body) {
-  const foundExpense = getExpenseById(expenses, id);
+// function updateExpense(expenses, id, body) {
+//   const foundExpense = getExpenseById(expenses, id);
 
-  if (foundExpense) {
-    Object.assign(foundExpense, body);
+//   if (foundExpense) {
+//     Object.assign(foundExpense, body);
 
-    return foundExpense;
-  } else {
-    return null;
-  }
+//     return foundExpense;
+//   } else {
+//     return null;
+//   }
+// }
+
+async function updateExpense(name, amount, category, note, id) {
+  return await Expense.update({name, amount, category, note}, {
+    where: { id },
+  })
 }
 
 // function createExpense(expenses, userId, spentAt,

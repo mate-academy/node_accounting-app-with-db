@@ -79,11 +79,10 @@ async function getTotalExpenses(req, res) {
     res.statusCode = 201;
   }
 
-function patchOneExpense(expenses) {
   async function patchExpense(req, res) {
-    const { id } = req.params;
+    const { id } = await req.params;
 
-    const foundExpense = getExpenseById(expenses, +id);
+    const foundExpense = await getExpenseById(+id);
 
     if (!foundExpense) {
       res.sendStatus(404);
@@ -91,16 +90,12 @@ function patchOneExpense(expenses) {
       return;
     }
 
-    const body = req.body;
+    const { name, amount, category, note } = req.body;
 
-    updateExpense(expenses, +id, body);
+    updateExpense(name, amount, category, note, +id);
 
-    res.send(foundExpense);
-    res.sendStatus(200);
+    res.send(200);
   }
-
-  return patchExpense;
-}
 
   async function deleteExpense(req, res) {
     const { id } = req.params;
@@ -138,7 +133,7 @@ function getOneExpense(expenses) {
 module.exports = {
   getExpensesForUser,
   postExpense,
-  patchOneExpense,
+  patchExpense,
   deleteOneExpense,
   getOneExpense,
   getTotalExpenses,

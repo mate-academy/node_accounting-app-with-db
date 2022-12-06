@@ -20,7 +20,8 @@ export function removeExpense(id) {
   .catch(error => console.log(error))
 }
 
-export function updateExpense( id, title, amount, category, note) {
-  return axios.patch(`/expenses/${id}`, {title, amount, category, note} )
+export function updateExpense( id, name, amount, category, note) {
+  return axios.patch(`/expenses/${id}`, {name, amount, category, note} )
   .then(res => res.data)
+  .catch(error => console.log(error))
 }

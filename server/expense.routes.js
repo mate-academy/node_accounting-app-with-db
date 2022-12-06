@@ -1,12 +1,11 @@
 'use strict';
 
 const {
-  getExpensesForUser,
   getTotalExpenses,
-  patchOneExpense,
   getOneExpense,
   postExpense,
   deleteExpense,
+  patchExpense,
 } = require('./controllers/expenses');
 
 function InitExpenseRoute(app, { users, expenses }) {
@@ -14,7 +13,7 @@ function InitExpenseRoute(app, { users, expenses }) {
 
   app.get('/', getTotalExpenses);
 
-  app.patch('/:id', patchOneExpense(expenses));
+  app.patch('/:id', patchExpense);
 
   app.get('/:id', getOneExpense(expenses));
 

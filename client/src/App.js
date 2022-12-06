@@ -12,10 +12,14 @@ function App() {
   const [updId, setUpdId] = useState(null);
   const [selectedUser, setSelecteduser] = useState(null);
   const textInput = useRef(null);
+  const expInput = useRef(null);
   const [expenseName, setExpenseName] = useState("");
   const [expenseAmount, setExpenseAmount] = useState(null);
   const [expenseCat, setExpenseCat] = useState("");
   const [expenseNote, setExpenseNote] = useState("");
+  const [expUpId, setExpUpId] = useState(null);
+  const [nameErr, setNameErr] = useState(true);
+  const [amountErr, setAmountErr] = useState(true);
 
   const loadUsers = () => {
     usersAPI.getAll().then(setUsers);
@@ -24,7 +28,6 @@ function App() {
   const loadExpenses = () => {
     expensesApi.getAll().then(setExpenses);
   };
-
 
   useEffect(() => {
     loadUsers();
@@ -67,46 +70,51 @@ function App() {
                 </tr>
               </thead>
               <tbody>
-                {expenses && expenses.filter((expense) => expense.user_id === +selectedUser)
-                  .map(({ id, createdAt, name, amount, category, note }) => (
-                    <tr
-                      className="User__table-section tr"
-                      key={id + Math.random()}
-                    >
-                      <th className="User__table-collumn td">{id}</th>
-                      <td className="User__table-collumn td">
-                        {createdAt.split(".")[0]}
-                      </td>
-                      <td className="User__table-collumn td">{name}</td>
-                      <td className="User__table-collumn td">{amount}</td>
-                      <td className="User__table-collumn td">{category}</td>
-                      <td className="User__table-collumn td">{note}</td>
-                      <td className="User__table-collumn td">
-                        <button
-                          className="User__table-button button is-warning is-rounded"
-                          onClick={() => {
-                            // setUserName(name);
-                            // setUpdId(id);
-                            // textInput.current.focus();
-                          }}
-                        >
-                          Edit
-                        </button>
+                {expenses &&
+                  expenses
+                    .filter((expense) => expense.user_id === +selectedUser)
+                    .map(({ id, createdAt, name, amount, category, note }) => (
+                      <tr
+                        className="User__table-section tr"
+                        key={id + Math.random()}
+                      >
+                        <th className="User__table-collumn td">{id}</th>
+                        <td className="User__table-collumn td">
+                          {createdAt.split(".")[0]}
+                        </td>
+                        <td className="User__table-collumn td">{name}</td>
+                        <td className="User__table-collumn td">{amount}</td>
+                        <td className="User__table-collumn td">{category}</td>
+                        <td className="User__table-collumn td">{note}</td>
+                        <td className="User__table-collumn td">
+                          <button
+                            className="User__table-button button is-warning is-rounded"
+                            onClick={() => {
+                              setSelecteduser(selectedUser);
+                              setExpenseName(name);
+                              setExpenseAmount(amount);
+                              setExpenseCat(category);
+                              setExpenseNote(note);
+                              setExpUpId(id);
+                              expInput.current.focus();
+                            }}
+                          >
+                            Edit
+                          </button>
 
-                        <button
-                          className="User__table-button button is-danger is-rounded"
-                          onClick={async () => {
-                            await expensesApi.removeExpense(id)
-                            loadExpenses();
-                          }}
-                        >
-                          {" "}
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                }
+                          <button
+                            className="User__table-button button is-danger is-rounded"
+                            onClick={async () => {
+                              await expensesApi.removeExpense(id);
+                              loadExpenses();
+                            }}
+                          >
+                            {" "}
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
               </tbody>
             </table>
             <form
@@ -119,10 +127,9 @@ function App() {
                   <input
                     className="input"
                     type="text"
-                    placeholder='id'
+                    placeholder="id"
                     disabled
                     value={+selectedUser}
-                    // onInput={() => setSelecteduser(+selectedUser)}
                   ></input>
                 </div>
               </div>
@@ -132,6 +139,7 @@ function App() {
                   <input
                     className="input"
                     type="text"
+                    ref={expInput}
                     placeholder="Enter title"
                     value={expenseName}
                     onInput={(event) =>
@@ -140,13 +148,16 @@ function App() {
                   ></input>
                 </div>
               </div>
+                <div class="notification is-danger is-light" hidden={nameErr}>
+                  Title cannot be empty
+                </div>
+
               <div className="field">
                 <label className="label">Amount(UAH)</label>
                 <div className="control">
                   <input
                     className="input"
                     type="text"
-                    // ref={textInput}
                     placeholder="Enter amount"
                     value={expenseAmount}
                     onInput={(event) =>
@@ -155,13 +166,17 @@ function App() {
                   ></input>
                 </div>
               </div>
+
+                <div class="notification is-danger is-light" hidden={amountErr}>
+                  Amount cannot be empty
+                </div>
+
               <div className="field">
                 <label className="label">Category</label>
                 <div className="control">
                   <input
                     className="input"
                     type="text"
-                    // ref={textInput}
                     placeholder="Enter category of expense"
                     value={expenseCat}
                     onInput={(event) =>
@@ -176,7 +191,6 @@ function App() {
                   <input
                     className="input"
                     type="text"
-                    // ref={textInput}
                     placeholder="Any comment"
                     value={expenseNote}
                     onInput={(event) =>
@@ -190,18 +204,34 @@ function App() {
                 <button
                   className="button is-primary is-rounded"
                   type="button"
-                  disabled={updId !== null || expenseName === ''}
+                  disabled={expUpId !== null || expenseName === ""}
                   onClick={async (event) => {
                     event.preventDefault();
 
-                    const newExpense = await expensesApi.addExpense(+selectedUser, expenseName, expenseAmount, expenseCat, expenseNote);
+                    if (!expenseName) {
+                      setNameErr(false);
+                    }
+
+                    if (!expenseAmount) {
+                      setAmountErr(false);
+                    }
+
+                    const newExpense = await expensesApi.addExpense(
+                      +selectedUser,
+                      expenseName,
+                      expenseAmount,
+                      expenseCat,
+                      expenseNote
+                    );
 
                     setExpenses([...expenses, newExpense]);
 
                     setExpenseName("");
-                    setExpenseCat('');
-                    setExpenseNote('');
-                    setExpenseAmount('');
+                    setExpenseCat("");
+                    setExpenseNote("");
+                    setExpenseAmount("");
+                    setNameErr(true);
+                    setAmountErr(true);
                   }}
                 >
                   Add
@@ -209,12 +239,28 @@ function App() {
                 <button
                   className="button is-warning is-rounded"
                   type="edit"
-                  disabled={updId === null}
-                  onClick={() => {
-                    usersAPI.updateUser(updId, userName).then(loadUsers);
+                  disabled={expUpId === null}
+                  onClick={async () => {
+                    try {
+                      const updated = await expensesApi.updateExpense(
+                        expUpId,
+                        expenseName,
+                        expenseAmount,
+                        expenseCat,
+                        expenseNote
+                      );
 
-                    setUpdId(null);
-                    setUserName("");
+                      loadExpenses();
+                      setExpUpId(null);
+                      setExpenseName("");
+                      setExpenseCat("");
+                      setExpenseNote("");
+                      setExpenseAmount("");
+
+                      return updated;
+                    } catch (err) {
+                      console.log(err);
+                    }
                   }}
                 >
                   Edit
