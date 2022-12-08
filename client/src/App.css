@@ -1,0 +1,35 @@
+.User {
+  display: flex;
+  justify-content: center;
+}
+
+.User__header {
+  text-align: center;
+  font-size: 40px;
+}
+
+
+.User__form {
+  padding-left: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.Expense {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 30px;
+}
+
+.Expense__header {
+  font-size: 22px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 50px;
+}
+
+.Expense__header-select {
+  margin-left: 20px;
+}

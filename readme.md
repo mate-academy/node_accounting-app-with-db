@@ -1,6 +1,7 @@
-# Accounting app (with Node.js and PostgreSQL)
-Take the Accounting app from prev lesson and use PostgreSQL as a storage
+# Node App with DB
 
-- Implement CRUD page to manage categories
+* To start the client and the server (and do not forget to open postgresQL DB/postgres/5740):
 
-**Read [the guideline](https://github.com/mate-academy/js_task-guideline/blob/master/README.md) before start**
+```
+npm start
+```
