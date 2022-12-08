@@ -32,7 +32,7 @@ export const ExpenseForm = React.memo(function ExpenseForm({
             type="text"
             placeholder="id"
             disabled
-            value={+selectedUser}
+            value={+selectedUser || ''}
           ></input>
         </div>
       </div>
@@ -44,7 +44,7 @@ export const ExpenseForm = React.memo(function ExpenseForm({
             type="text"
             ref={expInput}
             placeholder="Enter title"
-            value={expenseName}
+            value={expenseName || ''}
             onInput={(event) => setExpenseName(event.currentTarget.value)}
           ></input>
         </div>
@@ -60,7 +60,7 @@ export const ExpenseForm = React.memo(function ExpenseForm({
             className="input"
             type="text"
             placeholder="Enter amount"
-            value={expenseAmount}
+            value={expenseAmount || ''}
             onInput={(event) => setExpenseAmount(event.currentTarget.value)}
           ></input>
         </div>
@@ -77,7 +77,7 @@ export const ExpenseForm = React.memo(function ExpenseForm({
             className="input"
             type="text"
             placeholder="Enter category of expense"
-            value={expenseCat}
+            value={expenseCat || ''}
             onInput={(event) => setExpenseCat(event.currentTarget.value)}
           ></input>
         </div>
@@ -89,7 +89,7 @@ export const ExpenseForm = React.memo(function ExpenseForm({
             className="input"
             type="text"
             placeholder="Any comment"
-            value={expenseNote}
+            value={expenseNote || ''}
             onInput={(event) => setExpenseNote(event.currentTarget.value)}
           ></input>
         </div>
