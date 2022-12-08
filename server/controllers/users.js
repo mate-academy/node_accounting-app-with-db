@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 const {
   getAll,
@@ -6,79 +6,78 @@ const {
   getById,
   updateUser,
   removeUser,
-} = require('../services/users.js');
+} = require("../services/users.js");
 
-  async function getALLAppUsers(req, res) {
-    const users = await getAll();
+async function getALLAppUsers(req, res) {
+  const users = await getAll();
 
-    res.send(users);
+  res.send(users);
 
-    res.statusCode = 200;
+  res.statusCode = 200;
+}
+
+async function postOneUser(req, res) {
+  const { name } = await req.body;
+
+  if (!name) {
+    res.sendStatus(400);
+
+    return;
   }
 
-   async function postOneUser(req, res) {
-    const { name } = await req.body;
+  const newUser = await createUser(name);
 
-    if (!name) {
-      res.sendStatus(400);
+  res.send(newUser);
+  res.statusCode = 201;
+}
 
-      return;
-    }
+async function patchOneUser(req, res) {
+  const { id } = await req.params;
 
-    const newUser = await createUser(name);
+  const foundUser = await getById(+id);
 
-    res.send(newUser);
-    res.statusCode = 201;
+  if (!foundUser) {
+    res.sendStatus(404);
+
+    return;
   }
 
+  const { name } = await req.body;
 
-  async function patchOneUser(req, res) {
-    const { id } = await req.params;
+  updateUser(name, +id);
 
-    const foundUser = await getById(+id);
+  res.send(200);
+}
 
-    if (!foundUser) {
-      res.sendStatus(404);
+async function deleteOneUser(req, res) {
+  const { id } = await req.params;
 
-      return;
-    }
+  const foundUser = await getById(+id);
 
-    const { name } = await req.body;
+  if (!foundUser) {
+    res.sendStatus(404);
 
-    updateUser(name, +id);
-
-    res.send(200);
+    return;
   }
 
-  async function deleteOneUser(req, res) {
-    const { id } = await req.params;
+  const users = await removeUser(+id);
+  res.sendStatus(204);
+}
 
-    const foundUser = await getById(+id);
+async function getOneUser(req, res) {
+  const { id } = await req.params;
 
-    if (!foundUser) {
-      res.sendStatus(404);
+  const foundUser = await getById(+id);
 
-      return;
-    }
+  if (!foundUser) {
+    res.sendStatus(404);
 
-    const users = await removeUser(+id);
-    res.sendStatus(204);
+    return;
   }
 
-  async function getOneUser(req, res) {
-    const { id } = await req.params;
-
-    const foundUser = await getById(+id);
-
-    if (!foundUser) {
-      res.sendStatus(404);
-
-      return;
-    }
-
-    res.send(foundUser);
-    res.sendStatus(200);
-  }
+  res.send(foundUser);
+  res.sendStatus(200);
+}
 
 module.exports = {
   getALLAppUsers,

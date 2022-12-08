@@ -8,12 +8,6 @@ const cors = require('cors');
 
 function createServer() {
 
-  const expenses = [];
-
-  const storage = {
-    expenses,
-  };
-
   const app = express();
   app.use(cors());
 
@@ -21,7 +15,7 @@ function createServer() {
   const expenseRouter = express.Router();
 
   InitUserRoutes(userRouter);
-  InitExpenseRoute(expenseRouter, storage);
+  InitExpenseRoute(expenseRouter);
 
   app.use('/users', express.json(), userRouter);
   app.use('/expenses', express.json(), expenseRouter);

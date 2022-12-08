@@ -53,74 +53,20 @@ async function getExpenseById(id) {
   return await Expense.findByPk(id) || null;
 }
 
-// function updateExpense(expenses, id, body) {
-//   const foundExpense = getExpenseById(expenses, id);
-
-//   if (foundExpense) {
-//     Object.assign(foundExpense, body);
-
-//     return foundExpense;
-//   } else {
-//     return null;
-//   }
-// }
-
 async function updateExpense(name, amount, category, note, id) {
   return await Expense.update({name, amount, category, note}, {
     where: { id },
   })
 }
 
-// function createExpense(expenses, userId, spentAt,
-//   title, amount, category, note) {
-//   const newExpenses = {
-//     id: expenseId++,
-//     userId,
-//     spentAt,
-//     title,
-//     amount,
-//     category,
-//     note,
-//   };
-
-//   expenses.push(newExpenses);
-
-//   return newExpenses;
-// }
-
 async function createExpense(user_id, name, amount, category, note) {
   return await Expense.create({user_id, name, amount, category, note})
-}
-
-async function getExpenseByUser(userId) {
-  return await Expense.findAll({
-    where: {
-      user_id: userId,
-    }
-  })
-}
-
-function getExpensesByCat(expenses, category) {
-  const filteredExpenses = expenses
-    .filter(expense => expense.category === category);
-
-  return filteredExpenses;
-}
-
-function getExpenseByTime(expenses, from, to) {
-  const newExpenses = expenses.filter(
-    (expense) => expense.spentAt >= from && expense.spentAt <= to);
-
-  return newExpenses;
 }
 
 module.exports = {
   getExpenseById,
   updateExpense,
   createExpense,
-  getExpenseByUser,
-  getExpensesByCat,
-  getExpenseByTime,
   Expense,
   getAllExpenses,
   deleteOneExpense,
