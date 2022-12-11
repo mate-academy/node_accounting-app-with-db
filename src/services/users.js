@@ -1,6 +1,6 @@
 'use strict';
 
-const { User } = require('../utils/users');
+const { User } = require('../data/models/users');
 
 class UsersService {
   async createUser(name) {

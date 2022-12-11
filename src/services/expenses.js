@@ -1,7 +1,7 @@
 'use strict';
 
 const { Op } = require('sequelize');
-const { Expense } = require('../utils/expenses');
+const { Expense } = require('../data/models/expenses');
 
 class ExpensesService {
   async createExpense(data) {
