@@ -57,11 +57,11 @@ class ExpensesController {
   async getExpense(req, res) {
     const { expenseId } = req.params;
 
-    const error = checkExpenseId(expenseId);
+    const expenseIdErrors = checkExpenseId(expenseId);
 
-    if (isNaN(+expenseId)) {
+    if (expenseIdErrors.length) {
       res.statusCode = 400;
-      res.json(error);
+      res.json(expenseIdErrors);
 
       return;
     }
