@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { getExpenses } from "../../api/expenses";
 import { SelectedUserContext } from "../../SelectedUserContext";
 import { Expense } from '../../types/Expense'

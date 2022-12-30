@@ -29,7 +29,6 @@ export const ExpenseModal: React.FC<Props> = ({ expense, onClose }) => {
               {expense.id}
             </div>
 
-            {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
             <button
               type="button"
               className="delete"

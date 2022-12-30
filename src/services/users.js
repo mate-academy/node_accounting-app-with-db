@@ -15,8 +15,6 @@ async function getAll() {
     order: [ 'created_at' ],
   });
 
-  // console.log('get');
-
   return users;
 }
 
