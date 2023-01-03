@@ -1,12 +1,52 @@
 'use strict';
 
-let expenses = [];
+const sequelize = require('../utils/db');
+const { DataTypes } = require('sequelize');
 
-function init() {
-  expenses = [];
-}
+const Expense = sequelize.define('Expense', {
+  id: {
+    type: DataTypes.NUMBER,
+    primaryKey: true,
+  },
+  userId: {
+    type: DataTypes.NUMBER,
+    primaryKey: false,
+  },
+  title: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  amount: {
+    type: DataTypes.NUMBER,
+    primaryKey: false,
+  },
+  category: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  note: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  spentAt: {
+    type: DataTypes.DATE,
+    field: 'spend_at',
+    allowNull: false,
+  },
+  createdAt: {
+    type: DataTypes.DATE,
+    field: 'created_at',
+    allowNull: false,
+    defaultValue: DataTypes.NOW,
+  },
+}, {
+  tableName: 'expensees',
+  updatedAt: false,
+});
 
-function getAll(userId, category, from, to) {
+async function getAll(userId, category, from, to) {
+  let expenses = await Expense.findAll();
+
   if (userId) {
     expenses = [expenses.find(expense => expense.userId === +userId)];
   }
@@ -22,7 +62,7 @@ function getAll(userId, category, from, to) {
   }
 
   return expenses;
-}
+};
 
 function addOne(
   userId,
@@ -33,7 +73,7 @@ function addOne(
   note,
 ) {
   const newExpense = {
-    id: Math.floor(Math.random()),
+    id: Math.floor(Math.random() * 100),
     userId,
     spentAt,
     title,
@@ -42,36 +82,37 @@ function addOne(
     note,
   };
 
-  expenses.push(newExpense);
-
-  return newExpense;
+  Expense.create(newExpense);
 };
 
-function getOne(expenseId) {
-  const foundExpense = expenses.find(expense => expense.id === +expenseId);
+async function getOne(expenseId) {
+  const expenses = await Expense.findAll();
+  const foundExpense = expenses
+    .find(expense => expense.dataValues.id === +expenseId);
 
   return foundExpense;
 }
 
-function deleteOne(expenseId) {
-  const filteredExpenses = expenses.filter(
-    expense => expense.id !== +expenseId
-  );
-
-  expenses = filteredExpenses;
+async function deleteOne(expenseId) {
+  await Expense.destroy({
+    where: {
+      id: expenseId,
+    },
+    force: true,
+  });
 }
 
-function updateOne(expenseId, title) {
-  const foundExpense = getOne(expenseId);
+async function updateOne(expenseId, title) {
+  const updatedUser = await Expense.update({ title }, {
+    where: {
+      id: expenseId,
+    },
+  });
 
-  return {
-    ...foundExpense,
-    title,
-  };
+  return updatedUser;
 }
 
 module.exports = {
-  init,
   getAll,
   addOne,
   getOne,
