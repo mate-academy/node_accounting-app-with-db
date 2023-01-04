@@ -3,6 +3,7 @@ import React, {
   ReactNode,
   SetStateAction,
   useState,
+  useMemo,
 } from 'react';
 
 type СontextProps = {
@@ -19,13 +20,15 @@ type Props = {
   children: ReactNode,
 };
 
-export const SelectedUserProvider:React.FC<Props> = ({ children }) => {
+export const SelectedUserProvider: React.FC<Props> = ({ children }) => {
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
-  const contextValue = {
-    selectedUserId,
-    setSelectedUserId,
-  };
+  const contextValue = useMemo(() => {
+    return {
+      selectedUserId,
+      setSelectedUserId,
+    };
+  }, [selectedUserId]);
 
   return (
     <SelectedUserContext.Provider value={contextValue}>

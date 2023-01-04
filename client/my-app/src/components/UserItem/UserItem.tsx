@@ -11,6 +11,8 @@ type Props = {
   update: React.Dispatch<React.SetStateAction<number>>,
 };
 
+const doubleClick = 2;
+
 export const UserItem: React.FC<Props> = ({ user, changeCount, update }) => {
   const { id, name } = user;
 
@@ -22,7 +24,7 @@ export const UserItem: React.FC<Props> = ({ user, changeCount, update }) => {
   const handleClick = (
     e: React.MouseEvent<HTMLParagraphElement, MouseEvent>
   ) => {
-    if (e.detail === 2) {
+    if (e.detail === doubleClick) {
       setIsUpdating(true);
 
       return;
@@ -42,7 +44,15 @@ export const UserItem: React.FC<Props> = ({ user, changeCount, update }) => {
 
   return(
     <li className="level">
-      {!isUpdating ? (
+      {isUpdating ? (
+        <input
+          type="text"
+          className="input"
+          value={updatedName}
+          onChange={e => setUpdatedName(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+      ) : (
         <div className={classNames('view container level', {
           selected: id === selectedUserId,
         })}>
@@ -56,14 +66,6 @@ export const UserItem: React.FC<Props> = ({ user, changeCount, update }) => {
             }}
           ></button>
         </div>
-      ) : (
-        <input
-          type="text"
-          className="input"
-          value={updatedName}
-          onChange={e => setUpdatedName(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
       )}
     </li>
   );

@@ -3,32 +3,26 @@ import { User } from '../types/User';
 
 const BaseURL = 'http://localhost:5000/users';
 
-export const getUsers = async() => {
-  const data: User[] = await axios.get(BaseURL)
+export const getUsers = () => {
+  return axios.get(BaseURL)
     .then(response => response.data);
-
-  return data;
 };
 
-export const getUserById = async(userId: number) => {
-  const data: User = await axios.get(`${BaseURL}/${userId}`)
-    .then(response => response.data);
-
-  return data;
+export const getUserById = (userId: number) => {
+  return axios.get(`${BaseURL}/${userId}`)
+    .then(response => response.data);;
 }
 
 export const removeUser = async(userId: number) => {
   await axios.delete(`${BaseURL}/${userId}`);
 };
 
-export const addUser = async (name: string): Promise<User> => {
-  const data: User = await axios.post(BaseURL, { name })
+export const addUser = (name: string): Promise<User> => {
+  return axios.post(BaseURL, { name })
     .then(response => response.data)
     .catch(err => {
       throw new Error(err);
-    });
-
-  return data;
+    });;
 };
 
 export const patchUser = async(id: number, name: string) => {

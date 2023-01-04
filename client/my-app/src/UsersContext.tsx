@@ -3,6 +3,7 @@ import React, {
   ReactNode,
   SetStateAction,
   useState,
+  useMemo,
 } from 'react';
 import { User } from './types/User';
 
@@ -20,13 +21,15 @@ type Props = {
   children: ReactNode,
 };
 
-export const UsersProvider:React.FC<Props> = ({ children }) => {
+export const UsersProvider: React.FC<Props> = ({ children }) => {
   const [users, setUsers] = useState<User[]>([]);
 
-  const contextValue = {
-    users,
-    setUsers,
-  };
+  const contextValue = useMemo(() => {
+    return {
+      users,
+      setUsers,
+    };
+  }, [users]);
 
   return (
     <UsersContext.Provider value={contextValue}>

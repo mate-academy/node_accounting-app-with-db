@@ -38,16 +38,17 @@ const add = async(req, res) => {
     res.sendStatus(400);
   }
 
-  const newUser = await userService.create(name)
-    .catch(err => {
-      throw new Error(err);
-    });
+  try {
+    const newUser = await userService.create(name);
 
-  res.statusCode = 201;
+    res.statusCode = 201;
 
-  res.send(
-    userService.normalize(newUser)
-  );
+    res.send(
+      userService.normalize(newUser)
+    );
+  } catch (err) {
+    throw new Error(err);
+  }
 };
 
 const remove = async(req, res) => {
@@ -74,31 +75,29 @@ const update = async(req, res) => {
     return;
   }
 
-  const foundUser = await userService.getById(id)
-    .catch(err => {
-      throw new Error(err);
-    });
+  try {
+    const foundUser = await userService.getById(id);
 
-  if (!foundUser) {
-    res.sendStatus(404);
+    if (!foundUser) {
+      res.sendStatus(404);
 
-    return;
+      return;
+    }
+
+    if (typeof name !== 'string') {
+      res.sendStatus(422);
+
+      return;
+    }
+
+    await userService.update(id, name);
+
+    res.send(
+      userService.normalize(foundUser)
+    );
+  } catch (err) {
+    throw new Error(err);
   }
-
-  if (typeof name !== 'string') {
-    res.sendStatus(422);
-
-    return;
-  }
-
-  await userService.update(id, name)
-    .catch(err => {
-      throw new Error(err);
-    });
-
-  res.send(
-    userService.normalize(foundUser)
-  );
 };
 
 module.exports = {

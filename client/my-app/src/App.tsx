@@ -6,15 +6,13 @@ import { Users } from './components/Users/Users';
 import { SelectedUserProvider } from './SelectedUserContext';
 import { UsersProvider } from './UsersContext';
 
-export const App: React.FC = () => {
-  return (
-    <div className='columns'>
-      <UsersProvider>
-        <SelectedUserProvider>
-          <Users />
-          <Expenses />
-        </SelectedUserProvider>
-      </UsersProvider>
-    </div>
-  );
-};
+export const App: React.FC = () => (
+  <div className='columns'>
+    <UsersProvider>
+      <SelectedUserProvider>
+        <Users />
+        <Expenses />
+      </SelectedUserProvider>
+    </UsersProvider>
+  </div>
+);

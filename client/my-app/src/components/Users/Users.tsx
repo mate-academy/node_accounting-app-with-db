@@ -12,7 +12,6 @@ export const Users = () => {
   useEffect(() => {
     getUsers()
       .then(setUsers)
-      .then(() => console.log('refresh'));
   }, [changeCount, setUsers]);
 
   const handleSubmit = () => {

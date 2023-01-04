@@ -46,10 +46,11 @@ const add = async(req, res) => {
     return;
   }
 
-  await expenseService.create(newExpense)
-    .catch(err => {
-      throw new Error(err);
-    });
+  try {
+    await expenseService.create(newExpense);
+  } catch (err) {
+    throw new Error(err);
+  }
 
   res.statusCode = 201;
 
@@ -90,10 +91,11 @@ const update = async(req, res) => {
     return;
   }
 
-  await expenseService.update(id, updateData)
-    .catch(err => {
-      throw new Error(err);
-    });
+  try {
+    await expenseService.update(id, updateData);
+  } catch (err) {
+    throw new Error(err);
+  }
 
   res.send(
     expenseService.normalize(foundExpense)

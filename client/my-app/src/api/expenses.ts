@@ -11,18 +11,14 @@ type GetAllProps = {
   to: string,
 };
 
-export const getExpenses = async({ userId, category, from, to }: GetAllProps) => {
-  const data: Expense[] = await axios.get(BaseURL, { params: { userId, category, from, to } })
-    .then(response => response.data);
-
-  return data;
+export const getExpenses = ({ userId, category, from, to }: GetAllProps) => {
+  return axios.get(BaseURL, { params: { userId, category, from, to } })
+    .then(response => response.data);;
 };
 
-export const getExpenseById = async(expenseId: number) => {
-  const data: Expense = await axios.get(`${BaseURL}/${expenseId}`)
-    .then(response => response.data);
-
-  return data;
+export const getExpenseById = (expenseId: number) => {
+  return axios.get(`${BaseURL}/${expenseId}`)
+    .then(response => response.data);;
 };
 
 export const removeExpense = async(expenseId: number) => {
