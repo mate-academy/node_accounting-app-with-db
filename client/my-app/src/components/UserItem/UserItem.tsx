@@ -1,19 +1,26 @@
-import React, { useContext, useState } from "react";
+import React, {
+  useContext,
+  useState,
+  Dispatch,
+  SetStateAction,
+  FC,
+  KeyboardEvent
+} from "react";
+
 import classNames from 'classnames';
 import { patchUser, removeUser } from "../../api/users";
-import { SelectedUserContext } from "../../SelectedUserContext";
-import { User } from "../../types/User";
+import { SelectedUserContext } from "../../Contexts/SelectedUserContext";
 import './UserItem.css';
 
 type Props = {
   user: User,
   changeCount: number,
-  update: React.Dispatch<React.SetStateAction<number>>,
+  update: Dispatch<SetStateAction<number>>,
 };
 
 const doubleClick = 2;
 
-export const UserItem: React.FC<Props> = ({ user, changeCount, update }) => {
+export const UserItem: FC<Props> = ({ user, changeCount, update }) => {
   const { id, name } = user;
 
   const { selectedUserId, setSelectedUserId } = useContext(SelectedUserContext);
@@ -33,16 +40,31 @@ export const UserItem: React.FC<Props> = ({ user, changeCount, update }) => {
     setSelectedUserId(id);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = async(e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      patchUser(id, updatedName)
-        .then(() => setIsUpdating(false))
-        .then(() => setSelectedUserId(null))
-        .then(() => update(changeCount + 1));
+      try {
+        await patchUser(id, updatedName);
+      } catch (err: any) {
+        throw new Error(err);
+      }
+
+      setIsUpdating(false);
+      setSelectedUserId(null);
+      update(changeCount + 1);
     }
   };
 
-  return(
+  const handleDelete = async() => {
+    try {
+      await removeUser(id);
+    } catch (err: any) {
+      throw new Error(err);
+    }
+
+    update(changeCount + 1);
+  };
+
+  return (
     <li className="level">
       {isUpdating ? (
         <input
@@ -60,10 +82,7 @@ export const UserItem: React.FC<Props> = ({ user, changeCount, update }) => {
 
           <button
             className="delete level-right"
-            onClick={() => {
-              removeUser(id)
-                .then(() => update(changeCount + 1));
-            }}
+            onClick={handleDelete}
           ></button>
         </div>
       )}

@@ -1,27 +1,24 @@
-import React, {
+import {
   Dispatch,
-  ReactNode,
   SetStateAction,
   useState,
   useMemo,
+  FC,
+  PropsWithChildren,
+  createContext,
 } from 'react';
-import { User } from './types/User';
 
 type СontextProps = {
   users: User[],
   setUsers: Dispatch<SetStateAction<User[]>>,
 };
 
-export const UsersContext = React.createContext<СontextProps>({
+export const UsersContext = createContext<СontextProps>({
   users: [],
   setUsers: () => {},
 });
 
-type Props = {
-  children: ReactNode,
-};
-
-export const UsersProvider: React.FC<Props> = ({ children }) => {
+export const UsersProvider: FC<PropsWithChildren> = ({ children }) => {
   const [users, setUsers] = useState<User[]>([]);
 
   const contextValue = useMemo(() => {

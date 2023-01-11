@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext } from "react";
 import { addUser, getUsers } from '../../api/users';
 import { UserItem } from "../UserItem";
-import { UsersContext } from "../../UsersContext";
+import { UsersContext } from "../../Contexts/UsersContext";
 
 export const Users = () => {
   const { users, setUsers } = useContext(UsersContext);
@@ -10,16 +10,29 @@ export const Users = () => {
   const [changeCount, setChangeCount] = useState(0);
 
   useEffect(() => {
-    getUsers()
-      .then(setUsers)
+    const fetchUsers = async() => {
+      try {
+        const fetchedUsers = await getUsers();
+
+        setUsers(fetchedUsers);
+      } catch (err: any) {
+        throw new Error(err);
+      }
+    };
+
+    fetchUsers();
   }, [changeCount, setUsers]);
 
-  const handleSubmit = () => {
-    addUser(newUserName)
-      .then(user => {
-        setUsers([...users, user]);
-        setNewUserName('');
-      });
+  const handleSubmit = async() => {
+    try {
+      const user = await addUser(newUserName);
+
+      setUsers([...users, user]);
+    } catch (err: any) {
+      throw new Error(err);
+    }
+
+    setNewUserName('');
   };
 
   return (

@@ -1,22 +1,29 @@
-import React, { useState } from "react";
+import { useState, Dispatch, SetStateAction, FC } from "react";
 import { patchExpense } from "../../api/expenses";
-import { Expense } from "../../types/Expense";
+import { detectType } from '../NewExpenseForm'
 
 type Props = {
   expense: Expense,
-  onClose: React.Dispatch<React.SetStateAction<boolean>>,
+  onClose: Dispatch<SetStateAction<boolean>>,
 };
 
-export const ExpenseModal: React.FC<Props> = ({ expense, onClose }) => {
-  const [title, setTitle] = useState(expense.title);
-  const [amount, setAmount] = useState(expense.amount);
-  const [category, setCategory] = useState(expense.category);
-  const [spentAt, setSpentAt] = useState(expense.spentAt);
-  const [note, setNote] = useState(expense.note || '');
+export const ExpenseModal: FC<Props> = ({ expense, onClose }) => {
+  const [dataForUpdate, setDataForUpdate] = useState({
+    title: expense.title,
+    amount: expense.amount,
+    category: expense.category,
+    spentAt: expense.spentAt,
+    note: expense.note || '',
+  });
 
-  const handleSubmit = () => {
-    patchExpense(expense.id, { title, amount, category, spentAt, note })
-      .then(() => onClose(false));
+  const handleSubmit = async() => {
+    try {
+      await patchExpense(expense.id, dataForUpdate);
+    } catch (err: any) {
+      throw new Error(err);
+    }
+
+    onClose(false);
   };
 
   return (
@@ -38,31 +45,17 @@ export const ExpenseModal: React.FC<Props> = ({ expense, onClose }) => {
 
           <div className="modal-card-body">
             <form onSubmit={handleSubmit}>
-              <input
-                type="text"
-                value={title}
-                onChange={e => setTitle(e.target.value)}
-              />
-              <input
-                type="number"
-                value={amount}
-                onChange={e => setAmount(+e.target.value)}
-              />
-              <input
-                type="text"
-                value={category}
-                onChange={e => setCategory(e.target.value)}
-              />
-              <input
-                type="text"
-                value={spentAt}
-                onChange={e => setSpentAt(e.target.value)}
-              />
-              <input
-                type="text"
-                value={note}
-                onChange={e => setNote(e.target.value)}
-              />
+              {Object.entries(dataForUpdate).map(([key, value]) => (
+                <input
+                  key={key}
+                  type={detectType(key)}
+                  value={value}
+                  onChange={e => setDataForUpdate({
+                    ...dataForUpdate,
+                    [key]: e.target.value,
+                  })}
+                />
+              ))}
 
               <button type="submit">Submit</button>
             </form>

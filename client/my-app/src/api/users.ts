@@ -1,30 +1,50 @@
 import axios from 'axios';
-import { User } from '../types/User';
+import { BASE_URL } from '../constants';
 
-const BaseURL = 'http://localhost:5000/users';
+const usersBaseURL = BASE_URL + '/users';
 
-export const getUsers = () => {
-  return axios.get(BaseURL)
-    .then(response => response.data);
+export const getUsers = async() => {
+  try {
+    const response = await axios.get(usersBaseURL);
+
+    return response.data;
+  } catch (err: any) {
+    throw new Error(err);
+  }
 };
 
-export const getUserById = (userId: number) => {
-  return axios.get(`${BaseURL}/${userId}`)
-    .then(response => response.data);;
-}
+export const getUserById = async(userId: number) => {
+  try {
+    const response = await axios.get(`${usersBaseURL}/${userId}`)
+
+    return response.data;
+  } catch (err: any) {
+    throw new Error(err);
+  }
+};
 
 export const removeUser = async(userId: number) => {
-  await axios.delete(`${BaseURL}/${userId}`);
+  try {
+    await axios.delete(`${usersBaseURL}/${userId}`);
+  } catch (err: any) {
+    throw new Error(err);
+  }
 };
 
-export const addUser = (name: string): Promise<User> => {
-  return axios.post(BaseURL, { name })
-    .then(response => response.data)
-    .catch(err => {
-      throw new Error(err);
-    });;
+export const addUser = async(name: string): Promise<User> => {
+  try {
+    const response = await axios.post(usersBaseURL, { name });
+
+    return response.data;
+  } catch (err: any) {
+    throw new Error(err);
+  }
 };
 
 export const patchUser = async(id: number, name: string) => {
-  await axios.patch(`${BaseURL}/${id}`, { name });
+  try {
+    await axios.patch(`${usersBaseURL}/${id}`, { name });
+  } catch (err: any) {
+    throw new Error(err);
+  }
 };

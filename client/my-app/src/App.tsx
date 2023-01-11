@@ -1,17 +1,21 @@
-import React from 'react'
+import { FC } from 'react'
 import 'bulma/css/bulma.css';
 
 import { Expenses } from './components/Expenses/Expenses';
 import { Users } from './components/Users/Users';
-import { SelectedUserProvider } from './SelectedUserContext';
-import { UsersProvider } from './UsersContext';
+import { SelectedUserProvider } from './Contexts/SelectedUserContext';
+import { UsersProvider } from './Contexts/UsersContext';
+import { RefreshExpensesProvider } from './Contexts/RefreshExpensesContext';
 
-export const App: React.FC = () => (
+export const App: FC = () => (
   <div className='columns'>
     <UsersProvider>
       <SelectedUserProvider>
         <Users />
-        <Expenses />
+
+        <RefreshExpensesProvider>
+          <Expenses />
+        </RefreshExpensesProvider>
       </SelectedUserProvider>
     </UsersProvider>
   </div>

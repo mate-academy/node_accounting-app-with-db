@@ -1,29 +1,31 @@
-import React, { useState } from "react";
+import { useState, Dispatch, SetStateAction, FC } from "react";
 import { removeExpense } from "../../api/expenses";
-import { Expense } from "../../types/Expense";
 import { ExpenseModal } from "../ExpenseModal/ExpenseModal";
 
 type Props = {
   currentExpense: Expense,
-  setExpenses: React.Dispatch<React.SetStateAction<Expense[]>>,
+  setExpenses: Dispatch<SetStateAction<Expense[]>>,
   expenses: Expense[],
 };
 
-export const ExpenseItem: React.FC<Props> = ({
+export const ExpenseItem: FC<Props> = ({
   currentExpense,
   setExpenses,
   expenses
 }) => {
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const handleDelete = () => {
-    removeExpense(currentExpense.id)
-      .then(() => setExpenses(expenses.filter(
-        expense => expense.id !== currentExpense.id
-      )));
+  const handleDelete = async() => {
+    try {
+      await removeExpense(currentExpense.id);
+    } catch (err: any) {
+      throw new Error(err);
+    }
+
+    setExpenses(expenses.filter(expense => expense.id !== currentExpense.id));
   };
 
-  return(
+  return (
     <>
       <li className="section">
         <p className="expense-text">

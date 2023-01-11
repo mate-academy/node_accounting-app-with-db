@@ -3,16 +3,19 @@
 const userService = require('../services/users');
 
 const getAll = async(req, res) => {
-  const users = await userService.getAll();
+  try {
+    const users = await userService.getAll();
 
-  res.send(
-    users.map(userService.normalize)
-  );
+    res.send(
+      users.map(userService.normalize)
+    );
+  } catch (err) {
+    throw new Error(err);
+  }
 };
 
 const getOne = async(req, res) => {
   const { id } = req.params;
-  const foundUser = await userService.getById(id);
 
   if (!id) {
     res.sendStatus(400);
@@ -20,15 +23,21 @@ const getOne = async(req, res) => {
     return;
   }
 
-  if (!foundUser) {
-    res.sendStatus(404);
+  try {
+    const foundUser = await userService.getById(id);
 
-    return;
+    if (!foundUser) {
+      res.sendStatus(404);
+
+      return;
+    }
+
+    res.send(
+      userService.normalize(foundUser)
+    );
+  } catch (err) {
+    throw new Error(err);
   }
-
-  res.send(
-    userService.normalize(foundUser)
-  );
 };
 
 const add = async(req, res) => {
@@ -53,15 +62,21 @@ const add = async(req, res) => {
 
 const remove = async(req, res) => {
   const { id } = req.params;
-  const foundUser = await userService.getById(id);
 
-  if (!foundUser) {
-    res.sendStatus(404);
+  try {
+    const foundUser = await userService.getById(id);
 
-    return;
+    if (!foundUser) {
+      res.sendStatus(404);
+
+      return;
+    }
+
+    await userService.remove(id);
+  } catch (err) {
+    throw new Error(err);
   }
 
-  await userService.remove(id);
   res.sendStatus(204);
 };
 
@@ -75,17 +90,17 @@ const update = async(req, res) => {
     return;
   }
 
+  if (typeof name !== 'string') {
+    res.sendStatus(422);
+
+    return;
+  }
+
   try {
     const foundUser = await userService.getById(id);
 
     if (!foundUser) {
       res.sendStatus(404);
-
-      return;
-    }
-
-    if (typeof name !== 'string') {
-      res.sendStatus(422);
 
       return;
     }

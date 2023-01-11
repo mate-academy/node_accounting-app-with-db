@@ -1,8 +1,7 @@
 import axios from 'axios';
+import { BASE_URL } from '../constants';
 
-import { Expense } from '../types/Expense';
-
-const BaseURL = 'http://localhost:5000/expenses';
+const ExpensesBaseUrl = BASE_URL + '/expenses'
 
 type GetAllProps = {
   userId: number | null,
@@ -11,27 +10,49 @@ type GetAllProps = {
   to: string,
 };
 
-export const getExpenses = ({ userId, category, from, to }: GetAllProps) => {
-  return axios.get(BaseURL, { params: { userId, category, from, to } })
-    .then(response => response.data);;
+export const getExpenses = async({ userId, category, from, to }: GetAllProps) => {
+  try {
+    const response = await axios.get(ExpensesBaseUrl, { params: { userId, category, from, to } })
+
+    return response.data;
+  } catch (err: any) {
+    throw new Error(err);
+  }
 };
 
-export const getExpenseById = (expenseId: number) => {
-  return axios.get(`${BaseURL}/${expenseId}`)
-    .then(response => response.data);;
+export const getExpenseById = async(expenseId: number) => {
+  try {
+    const response = await axios.get(`${ExpensesBaseUrl}/${expenseId}`)
+
+    return response.data;
+  } catch (err: any) {
+    throw new Error(err);
+  }
 };
 
 export const removeExpense = async(expenseId: number) => {
-  await axios.delete(`${BaseURL}/${expenseId}`);
+  try {
+    await axios.delete(`${ExpensesBaseUrl}/${expenseId}`);
+  } catch (err: any) {
+    throw new Error(err);
+  }
 };
 
 export const addExpense = async(expense: Omit<Expense, 'id'>) => {
-  await axios.post(BaseURL, expense)
-    .catch(err => {
-      throw new Error(err);
-    });
+  try {
+    await axios.post(ExpensesBaseUrl, expense)
+  } catch (err: any) {
+    throw new Error(err);
+  }
 };
 
-export const patchExpense = async (id: number, expense: Omit<Expense, 'userId' | 'id'>) => {
-  await axios.patch(`${BaseURL}/${id}`, expense);
+export const patchExpense = async(
+  id: number,
+  expense: Omit<Expense, 'userId' | 'id'>
+) => {
+  try {
+    await axios.patch(`${ExpensesBaseUrl}/${id}`, expense);
+  } catch (err: any) {
+    throw new Error(err);
+  }
 };

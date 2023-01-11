@@ -1,32 +1,39 @@
 import { useContext, useEffect, useState } from "react";
 import { getExpenses } from "../../api/expenses";
-import { SelectedUserContext } from "../../SelectedUserContext";
-import { Expense } from '../../types/Expense'
-import { AddExpenseForm } from "../AddExpenseForm";
+import { RefreshExpensesContext } from "../../Contexts/RefreshExpensesContext";
+import { SelectedUserContext } from "../../Contexts/SelectedUserContext";
+import { AddExpenseSection } from "../AddExpenseSection";
 import { ExpenseItem } from "../ExpenseItem";
 
 export const Expenses = () => {
   const { selectedUserId } = useContext(SelectedUserContext);
+  const { changeCount } = useContext(RefreshExpensesContext);
 
   const [category, setCategory] = useState('');
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const [expenses, setExpenses] = useState<Expense[]>([]);
 
-  const [changeCount, setChangeCount] = useState(0);
-
-
   useEffect(() => {
-    getExpenses({
-      userId: selectedUserId,
-      category,
-      from,
-      to
-    })
-      .then(setExpenses);
+    const fetchExpenses = async() => {
+      try {
+        const fetchedExpenses = await getExpenses({
+          userId: selectedUserId,
+          category,
+          from,
+          to
+        });
+
+        setExpenses(fetchedExpenses);
+      } catch (err: any) {
+        throw new Error(err);
+      }
+    };
+
+    fetchExpenses();
   }, [category, from, selectedUserId, to, changeCount]);
 
-  return(
+  return (
     <div className="column">
       <form>
         <div className="label center">
@@ -70,23 +77,18 @@ export const Expenses = () => {
         </p>
       </form>
 
-      <AddExpenseForm
-        changeCount={changeCount}
-        setChangeCount={setChangeCount}
-      />
+      <AddExpenseSection />
 
       <ul className="box">
-        {expenses.map(expense => {
-          return (
-            <ExpenseItem
-              key={expense.id}
-              currentExpense={expense}
-              setExpenses={setExpenses}
-              expenses={expenses}
-            />
-          )
-        })}
+        {expenses.map(expense => (
+          <ExpenseItem
+            key={expense.id}
+            currentExpense={expense}
+            setExpenses={setExpenses}
+            expenses={expenses}
+          />
+        ))}
       </ul>
     </div>
   );
-}
+};
