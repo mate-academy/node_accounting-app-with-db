@@ -1,0 +1,11 @@
+.view {
+  cursor: pointer;
+}
+
+.name {
+  width: 100%;
+}
+
+.selected {
+  background-color: hsl(0, 0%, 71%);
+}
