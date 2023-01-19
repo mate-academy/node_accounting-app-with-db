@@ -2,7 +2,6 @@
 
 const { Sequelize } = require('sequelize');
 const { Expense } = require('../models/Expense');
-const { generateIntId } = require('../utils/generateId');
 const { gte, lte } = Sequelize.Op;
 
 function normalize({ id, userId, spentAt, title, amount, category, note }) {
@@ -39,8 +38,7 @@ async function getAll(userId, category, from, to) {
       ...where.spentAt,
       [lte]: to,
     };
-  }// I'm not sure about this solution with 'where' obj, but it works
-  // Please tell me, if there is better way
+  }
 
   const expenses = await Expense.findAll({
     where,
@@ -55,17 +53,12 @@ function getById(expenseId) {
 }
 
 function create(newExpense) {
-  const id = generateIntId();
-
-  return Expense.create({
-    id,
-    ...newExpense,
-  });
+  return Expense.create(newExpense);
 }
 
 function remove(expenseId) {
   return Expense.destroy({
-    where: { id: +expenseId },
+    where: { id: expenseId },
   });
 }
 

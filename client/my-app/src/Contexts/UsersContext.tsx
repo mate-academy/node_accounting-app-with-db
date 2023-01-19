@@ -21,12 +21,10 @@ export const UsersContext = createContext<СontextProps>({
 export const UsersProvider: FC<PropsWithChildren> = ({ children }) => {
   const [users, setUsers] = useState<User[]>([]);
 
-  const contextValue = useMemo(() => {
-    return {
-      users,
-      setUsers,
-    };
-  }, [users]);
+  const contextValue = useMemo(() => ({
+    users,
+    setUsers,
+}), [users]);
 
   return (
     <UsersContext.Provider value={contextValue}>

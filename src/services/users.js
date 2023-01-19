@@ -1,7 +1,6 @@
 'use strict';
 
 const { User } = require('../models/User.js');
-const { generateIntId } = require('../utils/generateId.js');
 
 function normalize({ id, name }) {
   return {
@@ -23,17 +22,14 @@ function getById(userId) {
 }
 
 function create(name) {
-  const id = generateIntId();
-
   return User.create({
-    id,
     name,
   });
 }
 
 function remove(userId) {
   return User.destroy({
-    where: { id: +userId },
+    where: { id: userId },
   });
 }
 

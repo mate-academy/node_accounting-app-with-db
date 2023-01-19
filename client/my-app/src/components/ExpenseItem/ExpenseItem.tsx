@@ -1,5 +1,14 @@
-import { useState, Dispatch, SetStateAction, FC } from "react";
+import {
+  useState,
+  Dispatch,
+  SetStateAction,
+  FC,
+  useCallback,
+  useContext
+} from "react";
+
 import { removeExpense } from "../../api/expenses";
+import { ErrorContext } from "../../Contexts/ErrorContext";
 import { ExpenseModal } from "../ExpenseModal/ExpenseModal";
 
 type Props = {
@@ -15,15 +24,17 @@ export const ExpenseItem: FC<Props> = ({
 }) => {
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const handleDelete = async() => {
+  const { setErrorMessage } = useContext(ErrorContext);
+
+  const handleDelete = useCallback(async() => {
     try {
       await removeExpense(currentExpense.id);
     } catch (err: any) {
-      throw new Error(err);
+      setErrorMessage('Error on expense deleting');
     }
 
     setExpenses(expenses.filter(expense => expense.id !== currentExpense.id));
-  };
+  }, [currentExpense.id, expenses, setErrorMessage, setExpenses]);
 
   return (
     <>
@@ -38,7 +49,7 @@ export const ExpenseItem: FC<Props> = ({
       </li>
 
       {isUpdating && (
-        <ExpenseModal expense={currentExpense} onClose={setIsUpdating} />
+        <ExpenseModal expense={currentExpense} setIsUpdating={setIsUpdating} />
       )}
     </>
   );

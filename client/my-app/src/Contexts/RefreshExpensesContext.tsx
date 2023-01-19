@@ -21,12 +21,10 @@ export const RefreshExpensesContext = createContext<СontextProps>({
 export const RefreshExpensesProvider: FC<PropsWithChildren> = ({ children }) => {
   const [changeCount, setChangeCount] = useState<number>(0);
 
-  const contextValue = useMemo(() => {
-    return {
-      changeCount,
-      setChangeCount,
-    };
-  }, [changeCount]);
+  const contextValue = useMemo(() => ({
+    changeCount,
+    setChangeCount,
+  }), [changeCount]);
 
   return (
     <RefreshExpensesContext.Provider value={contextValue}>

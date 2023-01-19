@@ -1,7 +1,7 @@
 /// <reference types="react-scripts" />
 interface Expense {
-  id: number,
-  userId: number,
+  id: string,
+  userId: string,
   title: string,
   amount: number,
   spentAt?: string,
@@ -10,6 +10,6 @@ interface Expense {
 };
 
 interface User {
-  id: number,
+  id: string,
   name: string,
 };

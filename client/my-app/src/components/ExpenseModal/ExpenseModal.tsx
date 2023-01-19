@@ -1,30 +1,47 @@
-import { useState, Dispatch, SetStateAction, FC } from "react";
+import {
+  useState,
+  Dispatch,
+  SetStateAction,
+  FC,
+  useMemo,
+  useCallback,
+  useContext
+} from "react";
+
 import { patchExpense } from "../../api/expenses";
+import { ErrorContext } from "../../Contexts/ErrorContext";
 import { detectType } from '../NewExpenseForm'
 
 type Props = {
   expense: Expense,
-  onClose: Dispatch<SetStateAction<boolean>>,
+  setIsUpdating: Dispatch<SetStateAction<boolean>>,
 };
 
-export const ExpenseModal: FC<Props> = ({ expense, onClose }) => {
+export const ExpenseModal: FC<Props> = ({ expense, setIsUpdating }) => {
+  const { id, title, amount, category, spentAt, note = ''} = useMemo(
+    () => expense,
+    [expense]
+  );
+
   const [dataForUpdate, setDataForUpdate] = useState({
-    title: expense.title,
-    amount: expense.amount,
-    category: expense.category,
-    spentAt: expense.spentAt,
-    note: expense.note || '',
+    title,
+    amount,
+    category,
+    spentAt,
+    note
   });
 
-  const handleSubmit = async() => {
+  const { setErrorMessage } = useContext(ErrorContext);
+
+  const handleSubmit = useCallback(async() => {
     try {
-      await patchExpense(expense.id, dataForUpdate);
+      await patchExpense(id, dataForUpdate);
     } catch (err: any) {
-      throw new Error(err);
+      setErrorMessage('Error on expense updating');
     }
 
-    onClose(false);
-  };
+    setIsUpdating(false);
+  }, [dataForUpdate, id, setErrorMessage, setIsUpdating]);
 
   return (
     <div className="modal is-active">
@@ -33,13 +50,13 @@ export const ExpenseModal: FC<Props> = ({ expense, onClose }) => {
           <header className="modal-card-head">
             <div className="modal-card-title has-text-weight-medium">
               Expense #
-              {expense.id}
+              {id}
             </div>
 
             <button
               type="button"
               className="delete"
-              onClick={() => onClose(false)}
+              onClick={() => setIsUpdating(false)}
             />
           </header>
 

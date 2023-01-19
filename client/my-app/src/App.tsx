@@ -6,17 +6,22 @@ import { Users } from './components/Users/Users';
 import { SelectedUserProvider } from './Contexts/SelectedUserContext';
 import { UsersProvider } from './Contexts/UsersContext';
 import { RefreshExpensesProvider } from './Contexts/RefreshExpensesContext';
+import { ErrorProvider } from './Contexts/ErrorContext';
+import { ErrorNotification } from './components/ErrorNotification';
 
 export const App: FC = () => (
   <div className='columns'>
-    <UsersProvider>
-      <SelectedUserProvider>
-        <Users />
+    <ErrorProvider>
+      <ErrorNotification />
+      <UsersProvider>
+        <SelectedUserProvider>
+          <Users />
 
-        <RefreshExpensesProvider>
-          <Expenses />
-        </RefreshExpensesProvider>
-      </SelectedUserProvider>
-    </UsersProvider>
+          <RefreshExpensesProvider>
+            <Expenses />
+          </RefreshExpensesProvider>
+        </SelectedUserProvider>
+      </UsersProvider>
+    </ErrorProvider>
   </div>
 );

@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { getExpenses } from "../../api/expenses";
+import { ErrorContext } from "../../Contexts/ErrorContext";
 import { RefreshExpensesContext } from "../../Contexts/RefreshExpensesContext";
 import { SelectedUserContext } from "../../Contexts/SelectedUserContext";
 import { AddExpenseSection } from "../AddExpenseSection";
@@ -8,6 +9,7 @@ import { ExpenseItem } from "../ExpenseItem";
 export const Expenses = () => {
   const { selectedUserId } = useContext(SelectedUserContext);
   const { changeCount } = useContext(RefreshExpensesContext);
+  const { setErrorMessage } = useContext(ErrorContext);
 
   const [category, setCategory] = useState('');
   const [from, setFrom] = useState('');
@@ -26,12 +28,12 @@ export const Expenses = () => {
 
         setExpenses(fetchedExpenses);
       } catch (err: any) {
-        throw new Error(err);
+        setErrorMessage('Error while fetching expenses');
       }
     };
 
     fetchExpenses();
-  }, [category, from, selectedUserId, to, changeCount]);
+  }, [category, from, selectedUserId, to, changeCount, setErrorMessage]);
 
   return (
     <div className="column">

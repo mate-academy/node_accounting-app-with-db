@@ -1,10 +1,12 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useCallback } from "react";
 import { addUser, getUsers } from '../../api/users';
 import { UserItem } from "../UserItem";
 import { UsersContext } from "../../Contexts/UsersContext";
+import { ErrorContext } from "../../Contexts/ErrorContext";
 
 export const Users = () => {
   const { users, setUsers } = useContext(UsersContext);
+  const { errorMessage, setErrorMessage } = useContext(ErrorContext);
 
   const [newUserName, setNewUserName] = useState('');
   const [changeCount, setChangeCount] = useState(0);
@@ -16,24 +18,24 @@ export const Users = () => {
 
         setUsers(fetchedUsers);
       } catch (err: any) {
-        throw new Error(err);
+        setErrorMessage('Error while fetching users');
       }
     };
 
     fetchUsers();
   }, [changeCount, setUsers]);
 
-  const handleSubmit = async() => {
+  const handleSubmit = useCallback(async() => {
     try {
       const user = await addUser(newUserName);
 
       setUsers([...users, user]);
     } catch (err: any) {
-      throw new Error(err);
+      setErrorMessage('Error on adding a new user');
     }
 
     setNewUserName('');
-  };
+  }, [newUserName, setUsers, users]);
 
   return (
     <div className="column">

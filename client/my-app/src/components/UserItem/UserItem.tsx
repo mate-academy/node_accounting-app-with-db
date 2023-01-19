@@ -4,13 +4,15 @@ import React, {
   Dispatch,
   SetStateAction,
   FC,
-  KeyboardEvent
+  KeyboardEvent,
+  useCallback
 } from "react";
 
 import classNames from 'classnames';
 import { patchUser, removeUser } from "../../api/users";
 import { SelectedUserContext } from "../../Contexts/SelectedUserContext";
 import './UserItem.css';
+import { ErrorContext } from "../../Contexts/ErrorContext";
 
 type Props = {
   user: User,
@@ -24,11 +26,12 @@ export const UserItem: FC<Props> = ({ user, changeCount, update }) => {
   const { id, name } = user;
 
   const { selectedUserId, setSelectedUserId } = useContext(SelectedUserContext);
+  const { setErrorMessage } = useContext(ErrorContext);
 
   const [isUpdating, setIsUpdating] = useState(false);
   const [updatedName, setUpdatedName] = useState(name);
 
-  const handleClick = (
+  const handleClick = useCallback((
     e: React.MouseEvent<HTMLParagraphElement, MouseEvent>
   ) => {
     if (e.detail === doubleClick) {
@@ -38,31 +41,33 @@ export const UserItem: FC<Props> = ({ user, changeCount, update }) => {
     }
 
     setSelectedUserId(id);
-  };
+  }, [id, setSelectedUserId]);
 
-  const handleKeyDown = async(e: KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = useCallback(async(
+    e: KeyboardEvent<HTMLInputElement>
+  ) => {
     if (e.key === 'Enter') {
       try {
         await patchUser(id, updatedName);
       } catch (err: any) {
-        throw new Error(err);
+        setErrorMessage('Error on user updating');
       }
 
       setIsUpdating(false);
-      setSelectedUserId(null);
+      setSelectedUserId('');
       update(changeCount + 1);
     }
-  };
+  }, [changeCount, id, setSelectedUserId, update, updatedName]);
 
-  const handleDelete = async() => {
+  const handleDelete = useCallback(async() => {
     try {
       await removeUser(id);
     } catch (err: any) {
-      throw new Error(err);
+      setErrorMessage('Error on user deleting');
     }
 
     update(changeCount + 1);
-  };
+  }, [changeCount, id, update]);
 
   return (
     <li className="level">

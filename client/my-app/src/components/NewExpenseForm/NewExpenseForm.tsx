@@ -1,8 +1,9 @@
-import { useContext, FormEvent, useState, FC } from 'react';
+import { useContext, FormEvent, useState, FC, useCallback } from 'react';
 import { UsersContext } from '../../Contexts/UsersContext';
 import { addExpense } from "../../api/expenses";
 import { RefreshExpensesContext } from '../../Contexts/RefreshExpensesContext';
 import { REQUIRED_FIELDS } from '../../constants'
+import { ErrorContext } from '../../Contexts/ErrorContext';
 
 export const detectType = (str: string) => {
   switch (str) {
@@ -17,6 +18,14 @@ export const detectType = (str: string) => {
   }
 };
 
+const capitalize = (str: string) => {
+  return str[0].toUpperCase() + str.slice(1)
+};
+
+const isRequired = (key: string) => {
+  return REQUIRED_FIELDS.includes(key);
+};
+
 type Props = {
   closeTheForm: (value: boolean) => void;
 };
@@ -24,8 +33,9 @@ type Props = {
 export const NewExpenseForm: FC<Props> = ({ closeTheForm }) => {
   const { users } = useContext(UsersContext);
   const { changeCount, setChangeCount } = useContext(RefreshExpensesContext);
+  const { setErrorMessage } = useContext(ErrorContext);
 
-  const [userId, setUserId] = useState(0);
+  const [userId, setUserId] = useState('');
 
   const [dataForAdd, setDataForAdd] = useState({
     title: '',
@@ -35,7 +45,22 @@ export const NewExpenseForm: FC<Props> = ({ closeTheForm }) => {
     note: '',
   });
 
-  const handleSubmit = async(e: FormEvent<HTMLFormElement>) => {
+  const resetForm = useCallback(() => {
+    closeTheForm(false);
+
+    setUserId('');
+    setDataForAdd({
+      title: '',
+      amount: 0,
+      date: '',
+      category: '',
+      note: '',
+    });
+
+    setChangeCount(changeCount + 1);
+  }, [changeCount, closeTheForm, setChangeCount]);
+
+  const handleSubmit = useCallback(async(e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
@@ -46,34 +71,9 @@ export const NewExpenseForm: FC<Props> = ({ closeTheForm }) => {
 
       resetForm();
     } catch (err: any) {
-      throw new Error(err);
+      setErrorMessage('Error on adding a new expense');
     }
-  };
-
-  const resetForm = () => {
-    closeTheForm(false);
-
-    setUserId(0);
-    setDataForAdd({
-      title: '',
-      amount: 0,
-      date: '',
-      category: '',
-      note: '',
-    });
-
-    setChangeCount(changeCount + 1);
-  };
-
-  const capitalize = (str: string) => {
-    return str[0].toUpperCase() + str.slice(1)
-  };
-
-  const isRequired = (key: string) => {
-    return REQUIRED_FIELDS.includes(key);
-  };
-
-
+  }, [dataForAdd, resetForm, setErrorMessage, userId]);
 
   return (
     <form className="box" onSubmit={handleSubmit}>
@@ -90,7 +90,7 @@ export const NewExpenseForm: FC<Props> = ({ closeTheForm }) => {
       <select
         className="select"
         value={userId}
-        onChange={e => setUserId(+e.target.value)}
+        onChange={e => setUserId(e.target.value)}
       >
         <option value="0"></option>
         {users.map(user => (
@@ -101,11 +101,10 @@ export const NewExpenseForm: FC<Props> = ({ closeTheForm }) => {
       </select>
 
       {Object.entries(dataForAdd).map(([key, value]) => (
-        <label className="label">
+        <label className="label" key={key}>
           {capitalize(key)}
           <input
             className="input"
-            key={key}
             type={detectType(key)}
             value={value}
             onChange={e => setDataForAdd({

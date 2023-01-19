@@ -9,24 +9,22 @@ import {
 } from 'react';
 
 type СontextProps = {
-  selectedUserId: number | null,
-  setSelectedUserId: Dispatch<SetStateAction<number | null>>,
+  selectedUserId: string,
+  setSelectedUserId: Dispatch<SetStateAction<string>>,
 };
 
 export const SelectedUserContext = createContext<СontextProps>({
-  selectedUserId: null,
+  selectedUserId: '',
   setSelectedUserId: () => {},
 });
 
 export const SelectedUserProvider: FC<PropsWithChildren> = ({ children }) => {
-  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string>('');
 
-  const contextValue = useMemo(() => {
-    return {
-      selectedUserId,
-      setSelectedUserId,
-    };
-  }, [selectedUserId]);
+  const contextValue = useMemo(() => ({
+    selectedUserId,
+    setSelectedUserId,
+  }), [selectedUserId]);
 
   return (
     <SelectedUserContext.Provider value={contextValue}>

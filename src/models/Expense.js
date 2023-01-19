@@ -5,11 +5,12 @@ const { DataTypes } = require('sequelize');
 
 const Expense = sequelize.define('Expense', {
   id: {
-    type: DataTypes.BIGINT,
+    type: DataTypes.UUID,
     primaryKey: true,
+    defaultValue: DataTypes.UUIDV4,
   },
   userId: {
-    type: DataTypes.BIGINT,
+    type: DataTypes.UUID,
     allowNull: false,
   },
   spentAt: {
