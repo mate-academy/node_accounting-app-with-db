@@ -6,9 +6,7 @@
   "scripts": {
     "start": "node main.js",
     "dev": "nodemon main.js",
-    "test:only": "mocha",
-    "test": "npm run lint && npm run test:only",
-    "test:watch": "mocha --watch",
+    "test:only": "mate-scripts test",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix"
   },
