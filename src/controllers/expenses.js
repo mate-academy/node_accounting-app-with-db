@@ -3,19 +3,19 @@
 const expensesService = require('../services/expenses');
 const usersService = require('../services/users');
 
-const getAllExpenses = (req, res) => {
+const getAllExpenses = async(req, res) => {
   const { userId, category, from, to } = req.query;
 
-  const filteredExpenses = expensesService
+  const filteredExpenses = await expensesService
     .getAllExpenses(userId, category, from, to);
 
   res.send(filteredExpenses);
 };
 
-const getExpensesById = (req, res) => {
+const getExpensesById = async(req, res) => {
   const { expenseId } = req.params;
 
-  const foundExpense = expensesService.getExpensesById(expenseId);
+  const foundExpense = await expensesService.getExpensesById(expenseId);
 
   if (!foundExpense) {
     res.sendStatus(404);
@@ -26,10 +26,10 @@ const getExpensesById = (req, res) => {
   res.send(foundExpense);
 };
 
-const addExpense = (req, res) => {
+const addExpense = async(req, res) => {
   const { userId, spentAt, title, amount, category, note } = req.body;
 
-  const foundUser = usersService.getUserById(userId);
+  const foundUser = await usersService.getUserById(userId);
 
   if (!title || !foundUser || !amount || !spentAt || !category || !note) {
     res.sendStatus(400);
@@ -37,17 +37,17 @@ const addExpense = (req, res) => {
     return;
   }
 
-  const newExpense = expensesService.addExpense(req.body);
+  const newExpense = await expensesService.addExpense(req.body);
 
   res.statusCode = 201;
 
   res.send(newExpense);
 };
 
-const deleteExpense = (req, res) => {
+const deleteExpense = async(req, res) => {
   const { expenseId } = req.params;
 
-  const foundExpense = expensesService.getExpensesById(expenseId);
+  const foundExpense = await expensesService.getExpensesById(expenseId);
 
   if (!foundExpense) {
     res.sendStatus(404);
@@ -55,15 +55,15 @@ const deleteExpense = (req, res) => {
     return;
   }
 
-  expensesService.deleteExpense(expenseId);
+  await expensesService.deleteExpense(expenseId);
 
   res.sendStatus(204);
 };
 
-const updateExpense = (req, res) => {
+const updateExpense = async(req, res) => {
   const { expenseId } = req.params;
 
-  const foundExpense = expensesService.getExpensesById(expenseId);
+  const foundExpense = await expensesService.getExpensesById(expenseId);
 
   if (!foundExpense) {
     res.sendStatus(404);
@@ -71,7 +71,7 @@ const updateExpense = (req, res) => {
     return;
   }
 
-  const updatedExpense = expensesService
+  const updatedExpense = await expensesService
     .updateExpense(foundExpense, req.body);
 
   res.send(updatedExpense);

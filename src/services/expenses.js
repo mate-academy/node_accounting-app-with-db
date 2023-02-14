@@ -1,13 +1,28 @@
+/* eslint-disable max-len */
 'use strict';
 
-let expenses = [];
+const { Client } = require('pg');
+const client = new Client({
+  host: 'localhost',
+  user: 'postgres',
+  password: '1110',
+});
+
+client.connect();
 
 const initialExpenses = () => {
-  expenses = [];
+  // eslint-disable-next-line no-console
+  console.log('world');
 };
 
-const getAllExpenses = (userId, category, from, to) => {
-  let filteredExpenses = expenses;
+const getAllExpenses = async(userId, category, from, to) => {
+  const allExpenses = await client.query(`
+  SELECT *
+  FROM expenses
+  ORDER BY id
+  `);
+
+  let filteredExpenses = allExpenses.rows;
 
   if (userId) {
     filteredExpenses = filteredExpenses
@@ -32,40 +47,57 @@ const getAllExpenses = (userId, category, from, to) => {
   return filteredExpenses;
 };
 
-const getExpensesById = (expenseId) => {
-  const foundExpense = expenses
-    .find(expense => expense.id === Number(expenseId));
+const getExpensesById = async(expenseId) => {
+  const allExpenses = await client.query(`
+  SELECT *
+  FROM expenses
+  WHERE id='${expenseId}'
+  `);
 
-  return foundExpense || null;
+  return allExpenses.rows[0] || null;
 };
 
-const addExpense = (reqBody) => {
+const addExpense = async(reqBody) => {
   const { userId, spentAt, title, amount, category, note } = reqBody;
 
-  const maxId = Math.max(...expenses.map(expense => expense.id));
+  const allExpenses = await client.query(`
+  SELECT *
+  FROM expenses
+  `);
 
-  const newExpense = {
-    id: expenses.length ? maxId + 1 : 0,
-    userId,
-    spentAt,
-    title,
-    amount,
-    category,
-    note,
-  };
+  const maxId = await Math.max(...allExpenses.rows.map(expense => expense.id));
 
-  expenses.push(newExpense);
+  const id = await allExpenses.rows.length ? maxId + 1 : 0;
+
+  await client.query(`
+  INSERT INTO expenses
+  VALUES ('${id}','${userId}','${spentAt}','${title}','${amount}','${category}','${note}')
+  `);
+
+  const newExpense = await getExpensesById(id);
 
   return newExpense;
 };
 
-const deleteExpense = (expenseId) => {
-  expenses = expenses
-    .filter(expense => expense.id !== Number(expenseId));
+const deleteExpense = async(expenseId) => {
+  await client.query(`
+  DELETE FROM expenses
+  WHERE id='${expenseId}'
+  `);
 };
 
-const updateExpense = (foundExpense, reqBody) => {
-  return Object.assign(foundExpense, reqBody);
+const updateExpense = async(foundExpense, reqBody) => {
+  const { userId, spentAt, title, amount, category, note } = reqBody;
+
+  await client.query(`
+  UPDATE expenses
+  SET user_id='${userId}', spent_at='${spentAt}', title='${title}', amount='${amount}', category='${category}', note='${note}'
+  WHERE id='${foundExpense.id}'
+  `);
+
+  const updatedExpenses = await getExpensesById(foundExpense.id);
+
+  return updatedExpenses;
 };
 
 module.exports = {

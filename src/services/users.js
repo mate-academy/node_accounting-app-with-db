@@ -1,40 +1,76 @@
 'use strict';
 
-let users = [];
+const { Client } = require('pg');
+const client = new Client({
+  host: 'localhost',
+  user: 'postgres',
+  password: '1110',
+});
+
+client.connect();
 
 const initialUsers = () => {
-  users = [];
+  // eslint-disable-next-line no-console
+  console.log('hello');
 };
 
-const getAllUsers = () => {
-  return users;
+const getAllUsers = async() => {
+  const allUsers = await client.query(`
+  SELECT *
+  FROM users
+  ORDER BY id
+  `);
+
+  return allUsers.rows;
 };
 
-const getUserById = (userId) => {
-  const foundUser = users.find(user => user.id === Number(userId));
+const getUserById = async(userId) => {
+  const allUsers = await client.query(`
+  SELECT *
+  FROM users
+  WHERE id='${userId}'
+  `);
 
-  return foundUser || null;
+  return allUsers.rows[0] || null;
 };
 
-const addUser = (name) => {
-  const maxId = Math.max(...users.map(user => user.id));
+const addUser = async(name) => {
+  const allUsers = await client.query(`
+  SELECT *
+  FROM users
+  `);
 
-  const newUser = {
-    id: users.length ? maxId + 1 : 0,
-    name,
-  };
+  const maxId = await Math.max(...allUsers.rows.map(user => user.id));
 
-  users.push(newUser);
+  const id = await allUsers.rows.length ? maxId + 1 : 0;
+
+  await client.query(`
+  INSERT INTO users (id, name)
+  VALUES ('${id}','${name}')
+  `);
+
+  const newUser = await getUserById(id);
 
   return newUser;
 };
 
-const deleteUser = (userId) => {
-  users = users.filter(user => user.id !== Number(userId));
+const deleteUser = async(userId) => {
+  await client.query(`
+  DELETE FROM users
+  WHERE id='${userId}'
+  `);
 };
 
-const updateUser = (foundUser, name) => {
-  return Object.assign(foundUser, { name });
+const updateUser = async(foundUser, name) => {
+  await client.query(`
+  UPDATE users
+  SET name='${name}'
+  WHERE id='${foundUser.id}'
+  `);
+
+  const updatedUser = await getUserById(foundUser.id);
+
+  return updatedUser;
 };
 
 module.exports = {

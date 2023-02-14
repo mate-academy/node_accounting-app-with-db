@@ -2,15 +2,15 @@
 
 const usersService = require('../services/users');
 
-const getAllUsers = (req, res) => {
-  const users = usersService.getAllUsers();
+const getAllUsers = async(req, res) => {
+  const users = await usersService.getAllUsers();
 
   res.send(users);
 };
 
-const getUserById = (req, res) => {
+const getUserById = async(req, res) => {
   const { userId } = req.params;
-  const findedUser = usersService.getUserById(userId);
+  const findedUser = await usersService.getUserById(userId);
 
   if (!findedUser) {
     res.sendStatus(404);
@@ -21,7 +21,7 @@ const getUserById = (req, res) => {
   res.send(findedUser);
 };
 
-const addUser = (req, res) => {
+const addUser = async(req, res) => {
   const { name } = req.body;
 
   if (!name) {
@@ -30,16 +30,16 @@ const addUser = (req, res) => {
     return;
   }
 
-  const newUser = usersService.addUser(name);
+  const newUser = await usersService.addUser(name);
 
   res.statusCode = 201;
 
   res.send(newUser);
 };
 
-const deleteUser = (req, res) => {
+const deleteUser = async(req, res) => {
   const { userId } = req.params;
-  const findedUser = usersService.getUserById(userId);
+  const findedUser = await usersService.getUserById(userId);
 
   if (!findedUser) {
     res.sendStatus(404);
@@ -47,15 +47,15 @@ const deleteUser = (req, res) => {
     return;
   }
 
-  usersService.deleteUser(userId);
+  await usersService.deleteUser(userId);
 
   res.sendStatus(204);
 };
 
-const updateUser = (req, res) => {
+const updateUser = async(req, res) => {
   const { userId } = req.params;
 
-  const findedUser = usersService.getUserById(userId);
+  const findedUser = await usersService.getUserById(userId);
 
   if (!findedUser) {
     res.sendStatus(404);
@@ -65,7 +65,7 @@ const updateUser = (req, res) => {
 
   const { name } = req.body;
 
-  const updatedUser = usersService.updateUser(findedUser, name);
+  const updatedUser = await usersService.updateUser(findedUser, name);
 
   res.send(updatedUser);
 };
