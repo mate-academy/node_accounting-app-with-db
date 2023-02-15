@@ -1,76 +1,46 @@
 'use strict';
 
-const { Client } = require('pg');
-const client = new Client({
-  host: 'localhost',
-  user: 'postgres',
-  password: '1110',
-});
+const { User } = require('../models/users');
 
-client.connect();
+const getAllUsers = () => {
+  const allUsers = User.findAll({ order: ['id'] });
 
-const initialUsers = () => {
-  // eslint-disable-next-line no-console
-  console.log('hello');
+  return allUsers;
 };
 
-const getAllUsers = async() => {
-  const allUsers = await client.query(`
-  SELECT *
-  FROM users
-  ORDER BY id
-  `);
+const getUserById = (userId) => {
+  const neededUser = User.findByPk(userId);
 
-  return allUsers.rows;
-};
-
-const getUserById = async(userId) => {
-  const allUsers = await client.query(`
-  SELECT *
-  FROM users
-  WHERE id='${userId}'
-  `);
-
-  return allUsers.rows[0] || null;
+  return neededUser;
 };
 
 const addUser = async(name) => {
-  const allUsers = await client.query(`
-  SELECT *
-  FROM users
-  `);
+  const allUsers = await User.findAll({ order: ['id'] });
 
-  const maxId = await Math.max(...allUsers.rows.map(user => user.id));
+  const maxId = Math.max(...allUsers.map(user => user.id));
 
-  const id = await allUsers.rows.length ? maxId + 1 : 0;
+  const id = allUsers.length ? maxId + 1 : 0;
 
-  await client.query(`
-  INSERT INTO users (id, name)
-  VALUES ('${id}','${name}')
-  `);
-
-  const newUser = await getUserById(id);
-
-  return newUser;
+  return User.create({
+    id,
+    name,
+  });
 };
 
-const deleteUser = async(userId) => {
-  await client.query(`
-  DELETE FROM users
-  WHERE id='${userId}'
-  `);
+const deleteUser = (userId) => {
+  return User.destroy({
+    where: { id: Number(userId) },
+  });
 };
 
-const updateUser = async(foundUser, name) => {
-  await client.query(`
-  UPDATE users
-  SET name='${name}'
-  WHERE id='${foundUser.id}'
-  `);
+const updateUser = (foundUser, name) => {
+  const id = foundUser.id;
 
-  const updatedUser = await getUserById(foundUser.id);
-
-  return updatedUser;
+  return User.update({ name }, {
+    where: { id },
+    returning: true,
+    plain: true,
+  });
 };
 
 module.exports = {
@@ -79,5 +49,4 @@ module.exports = {
   addUser,
   deleteUser,
   updateUser,
-  initialUsers,
 };
