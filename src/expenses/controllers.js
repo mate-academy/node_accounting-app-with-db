@@ -88,7 +88,9 @@ module.exports.updateExpense = async(req, res) => {
   const body = req.body;
 
   try {
-    const newExpense = await expensesServices.updateExpense(numId, body);
+    await expensesServices.updateExpense(numId, body);
+
+    const newExpense = expensesServices.getExpense(numId);
 
     res.send(newExpense);
   } catch (err) {
