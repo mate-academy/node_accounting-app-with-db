@@ -17,15 +17,15 @@ const getOne = async(request, response) => {
     return;
   }
 
-  const foundUser = await userService.findById(userId);
+  const user = await userService.findById(userId);
 
-  if (!foundUser) {
+  if (!user) {
     response.sendStatus(404);
 
     return;
   }
 
-  response.send(foundUser);
+  response.send(user);
 };
 
 const create = async(request, response) => {
@@ -45,9 +45,9 @@ const create = async(request, response) => {
 
 const remove = async(request, response) => {
   const userId = Number(request.params.userId);
-  const foundUser = await userService.findById(userId);
+  const user = await userService.findById(userId);
 
-  if (!foundUser) {
+  if (!user) {
     response.sendStatus(404);
 
     return;
@@ -60,9 +60,9 @@ const remove = async(request, response) => {
 
 const update = async(request, response) => {
   const userId = Number(request.params.userId);
-  const foundUser = await userService.findById(userId);
+  const user = await userService.findById(userId);
 
-  if (!foundUser) {
+  if (!user) {
     response.sendStatus(404);
 
     return;

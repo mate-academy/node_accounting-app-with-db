@@ -6,16 +6,16 @@ const { userService } = require('../services/users.service');
 const getAll = async(request, response) => {
   const params = request.query;
 
-  const foundExpenses = await expenseService
+  const expenses = await expenseService
     .getAll(params);
 
-  response.send(foundExpenses);
+  response.send(expenses);
 };
 
 const create = async(request, response) => {
   const params = request.body;
 
-  const foundUser = await userService.findById(params.userId);
+  const user = await userService.findById(params.userId);
 
   const isCorrectParams = !(
     params.userId
@@ -26,7 +26,7 @@ const create = async(request, response) => {
     || typeof params.spentAt !== 'string'
   );
 
-  if (!foundUser || isCorrectParams) {
+  if (!user || isCorrectParams) {
     response.sendStatus(400);
 
     return;
@@ -61,7 +61,7 @@ const remove = async(request, response) => {
   }
 
   try {
-    await expenseService.remove(id);
+    expenseService.remove(id);
 
     response.sendStatus(204);
   } catch (error) {
