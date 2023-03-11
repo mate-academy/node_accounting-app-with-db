@@ -7,12 +7,12 @@ const router = express.Router();
 
 router.get('/', expenseController.getAll);
 
-router.get('/:expensesId', expenseController.getOne);
+router.get('/:expenseId', expenseController.getOne);
 
 router.post('/', expenseController.add);
 
-router.patch('/:expensesId', expenseController.update);
+router.patch('/:expenseId', expenseController.update);
 
-router.delete('/:expensesId', expenseController.remove);
+router.delete('/:expenseId', expenseController.remove);
 
 module.exports = { router };

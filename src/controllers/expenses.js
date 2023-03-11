@@ -11,15 +11,15 @@ const getAll = async(req, res) => {
 
     res.send(expenses);
   } catch (error) {
-    res.send(400);
+    res.sendStatus(400);
   }
 };
 
 const getOne = async(req, res) => {
-  const { expensesId } = req.params;
+  const { expenseId } = req.params;
 
   try {
-    const expense = await expenseService.getById(expensesId);
+    const expense = await expenseService.getById(expenseId);
 
     if (!expense) {
       res.sendStatus(404);
@@ -37,29 +37,29 @@ const add = async(req, res) => {
   const data = req.body;
 
   try {
-    const isUser = userService.getById(data.userId);
+    const user = userService.getById(data.userId);
 
-    if (!isUser) {
+    if (!user) {
       res.sendStatus(400);
 
       return;
     }
 
-    const newExpenses = await expenseService.create(data);
+    const newExpense = await expenseService.create(data);
 
     res.statusCode = 201;
-    res.send(newExpenses);
+    res.send(newExpense);
   } catch (error) {
     res.sendStatus(400);
   }
 };
 
 const update = async(req, res) => {
-  const { expensesId } = req.params;
+  const { expenseId } = req.params;
   const data = req.body;
 
   try {
-    const foundExpense = await expenseService.getById(expensesId);
+    const foundExpense = await expenseService.getById(expenseId);
 
     if (!foundExpense) {
       res.sendStatus(404);
@@ -67,9 +67,9 @@ const update = async(req, res) => {
       return;
     }
 
-    await expenseService.update(expensesId, data);
+    await expenseService.update(expenseId, data);
 
-    const updatedExpanse = await expenseService.getById(expensesId);
+    const updatedExpanse = await expenseService.getById(expenseId);
 
     res.send(updatedExpanse);
   } catch (error) {
@@ -78,10 +78,10 @@ const update = async(req, res) => {
 };
 
 const remove = async(req, res) => {
-  const { expensesId } = req.params;
+  const { expenseId } = req.params;
 
   try {
-    const foundExpense = await expenseService.getById(expensesId);
+    const foundExpense = await expenseService.getById(expenseId);
 
     if (!foundExpense) {
       res.sendStatus(404);
@@ -89,7 +89,7 @@ const remove = async(req, res) => {
       return;
     }
 
-    await expenseService.remove(expensesId);
+    await expenseService.remove(expenseId);
 
     res.sendStatus(204);
   } catch (error) {

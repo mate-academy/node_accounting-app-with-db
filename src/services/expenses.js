@@ -10,34 +10,20 @@ async function getAll() {
 
 function getAllByQuery(query) {
   const select = { ...query };
-  const hasDateSelect = select.hasOwnProperty('from')
-    || select.hasOwnProperty('to');
 
-  if (hasDateSelect) {
-    Object.entries(select).forEach(([key, value]) => {
-      switch (key) {
-        case 'from':
-          select.spentAt = {
-            ...select.spentAt,
-            [Op.gte]: dateNormalize(value),
-          };
+  if (select.hasOwnProperty('from')) {
+    select.spentAt = {
+      [Op.gte]: dateNormalize(select.from),
+    };
+    delete select.from;
+  }
 
-          delete select.from;
-          break;
-
-        case 'to':
-          select.spentAt = {
-            ...select.spentAt,
-            [Op.lte]: dateNormalize(value),
-          };
-
-          delete select.to;
-          break;
-
-        default:
-          break;
-      }
-    });
+  if (select.hasOwnProperty('to')) {
+    select.spentAt = {
+      ...select.spentAt,
+      [Op.lte]: dateNormalize(select.to),
+    };
+    delete select.to;
   }
 
   return Expense.findAll({

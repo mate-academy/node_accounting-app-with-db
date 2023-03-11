@@ -43,9 +43,9 @@ const update = async(req, res) => {
   const { userId } = req.params;
 
   try {
-    const userInBase = await userService.getById(userId);
+    const user = await userService.getById(userId);
 
-    if (!userInBase) {
+    if (!user) {
       res.sendStatus(404);
 
       return;
@@ -55,9 +55,9 @@ const update = async(req, res) => {
 
     await userService.update(userId, name);
 
-    const user = await userService.getById(userId);
+    const updatedUser = await userService.getById(userId);
 
-    res.send(user);
+    res.send(updatedUser);
   } catch (error) {
     res.sendStatus(400);
   }
