@@ -2,12 +2,9 @@
 
 const { sequelize } = require('../utils/db');
 const { DataTypes } = require('sequelize');
+const { User } = require('./User');
 
 const Expense = sequelize.define('Expense', {
-  userId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
   spentAt: {
     type: DataTypes.DATE,
     allowNull: false,
@@ -32,5 +29,7 @@ const Expense = sequelize.define('Expense', {
   updatedAt: false,
   createdAt: false,
 });
+
+Expense.belongsTo(User, { foreignKey: 'userId' });
 
 module.exports = { Expense };

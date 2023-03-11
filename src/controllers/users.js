@@ -1,6 +1,7 @@
 'use strict';
 
 const usersService = require('../services/users');
+const { ApiError } = require('../exceptions/ApiError');
 
 const getAll = async(req, res) => {
   const users = await usersService.getAll();
@@ -10,71 +11,44 @@ const getAll = async(req, res) => {
 
 const getById = async(req, res) => {
   const { id } = req.params;
+  const user = await usersService.getById(id);
 
-  try {
-    const user = await usersService.getById(id);
-
-    if (!user) {
-      res.sendStatus(404);
-
-      return;
-    }
-
-    res.send(user);
-  } catch (err) {
-    res.sendStatus(400);
+  if (!user) {
+    throw ApiError.NotFound();
   }
+
+  res.send(user);
 };
 
 const add = async(req, res) => {
-  const { name } = req.body;
+  const data = req.body;
+  const user = await usersService.add(data);
 
-  try {
-    const user = await usersService.add(name);
-
-    res.statusCode = 201;
-    res.send(user);
-  } catch (err) {
-    res.sendStatus(400);
-  }
+  res.status(201).send(user);
 };
 
 const remove = async(req, res) => {
   const { id } = req.params;
+  const user = await usersService.getById(id);
 
-  try {
-    if (!await usersService.getById(id)) {
-      res.sendStatus(404);
-
-      return;
-    }
-
-    await usersService.remove(id);
-    res.sendStatus(204);
-  } catch (err) {
-    res.sendStatus(400);
+  if (!user) {
+    throw ApiError.NotFound();
   }
+
+  await usersService.remove(id);
+  res.sendStatus(204);
 };
 
 const update = async(req, res) => {
   const { id } = req.params;
   const data = req.body;
+  const user = await usersService.update(id, data);
 
-  try {
-    if (!await usersService.getById(id)) {
-      res.sendStatus(404);
-
-      return;
-    }
-
-    await usersService.update(id, data);
-
-    const user = await usersService.getById(id);
-
-    res.send(user);
-  } catch (err) {
-    res.sendStatus(400);
+  if (!user) {
+    throw ApiError.NotFound();
   }
+
+  res.send(user);
 };
 
 module.exports = {

@@ -3,19 +3,19 @@
 const { Expense } = require('../models/Expense');
 const { Op } = require('sequelize');
 
-const getWhereFromQuery = query => {
-  const where = {};
-
-  Object.entries(query).forEach(([key, value]) => {
+const prepareWhere = query => (
+  Object.entries(query).reduce((where, [key, value]) => {
     switch (key) {
       case 'from':
         where.spentAt = {
+          ...where.spentAt,
           [Op.gt]: value,
         };
         break;
 
       case 'to':
         where.spentAt = {
+          ...where.spentAt,
           [Op.lt]: value,
         };
         break;
@@ -23,22 +23,20 @@ const getWhereFromQuery = query => {
       default:
         where[key] = value;
     }
-  });
 
-  return where;
-};
+    return where;
+  }, {})
+);
 
-const getAll = (query) => {
-  const where = getWhereFromQuery(query);
+const getAll = query => {
+  const where = prepareWhere(query);
 
   return Expense.findAll({ where });
 };
 
 const getById = id => Expense.findByPk(id);
 
-const add = (data) => {
-  return Expense.create(data);
-};
+const add = data => Expense.create(data);
 
 const remove = async(id) => {
   await Expense.destroy({
@@ -47,9 +45,12 @@ const remove = async(id) => {
 };
 
 const update = async(id, data) => {
-  await Expense.update(data, {
+  const [, [expense]] = await Expense.update(data, {
     where: { id },
+    returning: true,
   });
+
+  return expense;
 };
 
 module.exports = {

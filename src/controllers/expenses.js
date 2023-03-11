@@ -1,90 +1,53 @@
 'use strict';
 
 const expensesService = require('../services/expenses');
-const usersService = require('../services/users');
+const { ApiError } = require('../exceptions/ApiError');
 
 const getAll = async(req, res) => {
-  try {
-    const users = await expensesService.getAll(req.query);
+  const expenses = await expensesService.getAll(req.query);
 
-    res.send(users);
-  } catch (err) {
-    res.sendStatus(400);
-  }
+  res.send(expenses);
 };
 
 const getById = async(req, res) => {
   const { id } = req.params;
+  const expense = await expensesService.getById(id);
 
-  try {
-    const expense = await expensesService.getById(id);
-
-    if (!expense) {
-      res.sendStatus(404);
-
-      return;
-    }
-
-    res.send(expense);
-  } catch (err) {
-    res.sendStatus(400);
+  if (!expense) {
+    throw ApiError.NotFound();
   }
+
+  res.send(expense);
 };
 
 const add = async(req, res) => {
-  const data = req.body;
+  const expense = await expensesService.add(req.body);
 
-  try {
-    if (!await usersService.getById(data.userId)) {
-      res.sendStatus(404);
-
-      return;
-    }
-
-    const expense = await expensesService.add(data);
-
-    res.statusCode = 201;
-    res.send(expense);
-  } catch (err) {
-    res.sendStatus(400);
-  }
+  res.status(201).send(expense);
 };
 
 const remove = async(req, res) => {
   const { id } = req.params;
+  const expense = await expensesService.getById(id);
 
-  try {
-    if (!await expensesService.getById(id)) {
-      res.sendStatus(404);
-
-      return;
-    }
-
-    await expensesService.remove(id);
-    res.sendStatus(204);
-  } catch (err) {
-    res.sendStatus(400);
+  if (!expense) {
+    throw ApiError.NotFound();
   }
+
+  await expensesService.remove(id);
+  res.sendStatus(204);
 };
 
 const update = async(req, res) => {
   const { id } = req.params;
+  const data = req.body;
+  const expense = await expensesService.update(id, data);
 
-  try {
-    if (!await expensesService.getById(id)) {
-      res.sendStatus(404);
-
-      return;
-    }
-
-    await expensesService.update(id, req.body);
-
-    const expense = await expensesService.getById(id);
-
-    res.send(expense);
-  } catch (err) {
-    res.sendStatus(400);
+  if (!expense) {
+    throw ApiError.NotFound();
   }
+
+  res.send(expense);
 };
 
 module.exports = {
