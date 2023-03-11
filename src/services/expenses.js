@@ -45,29 +45,6 @@ function getAllByQuery(query) {
   });
 };
 
-function filterAllByUserId(userId) {
-  return Expense.findAll({
-    where: { userId },
-  });
-}
-
-function filterAllByDate(from, to) {
-  return Expense.findAll({
-    where: {
-      spentAt: {
-        [Op.gte]: from,
-        [Op.lte]: to,
-      },
-    },
-  });
-}
-
-function filterAllByCategory(category) {
-  return Expense.findAll({
-    where: { category },
-  });
-}
-
 function getById(expensesId) {
   return Expense.findByPk(expensesId);
 }
@@ -95,7 +72,4 @@ module.exports = {
   remove,
   update,
   getAllByQuery,
-  filterAllByCategory,
-  filterAllByDate,
-  filterAllByUserId,
 };

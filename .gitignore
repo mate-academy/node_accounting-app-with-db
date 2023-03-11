@@ -2,6 +2,9 @@
 .idea
 .vscode
 
+# PRIVATE
+.env
+
 # Node
 node_modules
 
