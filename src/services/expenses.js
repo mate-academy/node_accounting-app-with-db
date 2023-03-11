@@ -2,7 +2,6 @@
 
 const { Expense } = require('../models/Expense.js');
 const { Op } = require('sequelize');
-const { dateNormalize } = require('../utils/dateNormalize.js');
 
 async function getAll() {
   return Expense.findAll();
@@ -13,7 +12,7 @@ function getAllByQuery(query) {
 
   if (select.hasOwnProperty('from')) {
     select.spentAt = {
-      [Op.gte]: dateNormalize(select.from),
+      [Op.gte]: select.from,
     };
     delete select.from;
   }
@@ -21,7 +20,7 @@ function getAllByQuery(query) {
   if (select.hasOwnProperty('to')) {
     select.spentAt = {
       ...select.spentAt,
-      [Op.lte]: dateNormalize(select.to),
+      [Op.lte]: select.to,
     };
     delete select.to;
   }
