@@ -22,6 +22,7 @@ const Expenses = sequelize.define('Expense', {
   spentAt: {
     type: DataTypes.DATE,
     allowNull: false,
+    defaultValue: DataTypes.NOW,
   },
   note: {
     type: DataTypes.INTEGER,
