@@ -21,11 +21,11 @@ const Expenses = sequelize.define('Expense', {
     allowNull: false,
   },
   spentAt: {
-    type: DataTypes.STRING,
+    type: DataTypes.DATE,
     allowNull: false,
   },
   note: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
   },
 }, {
   tableName: 'expenses',
