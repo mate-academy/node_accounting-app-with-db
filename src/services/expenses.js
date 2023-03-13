@@ -3,7 +3,7 @@
 const { Expense } = require('../models/Expense.js');
 const { Op } = require('sequelize');
 
-async function getAll() {
+function getAll() {
   return Expense.findAll();
 }
 
@@ -47,6 +47,8 @@ async function remove(id) {
 function update(id, body) {
   return Expense.update(body, {
     where: { id },
+  }, {
+    returning: true,
   });
 }
 
