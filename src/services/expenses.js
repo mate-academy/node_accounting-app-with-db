@@ -20,10 +20,10 @@ function normalizeExpense({
   };
 }
 
-function getFilteredExpenses(params) {
+async function getFilteredExpenses(params) {
   const { userId, categories, from, to } = params;
 
-  const expenses = Expenses.findAll();
+  const expenses = await Expenses.findAll();
 
   return expenses.filter(expense => {
     const isUserIdMatch = userId
@@ -46,27 +46,30 @@ function getFilteredExpenses(params) {
   });
 }
 
-function getExpenseById(expenseId) {
-  return Expenses.findByPk(+expenseId);
+async function getExpenseById(expenseId) {
+  const expense = await Expenses.findByPk(+expenseId);
+
+  return expense;
 }
 
-function createExpense(expense) {
-  return Expenses.create(expense);
+async function createExpense(expense) {
+  await Expenses.create(expense);
 }
 
-function deleteExpense(expenseId) {
-  return Expenses.destroy({
+async function deleteExpense(expenseId) {
+  await Expenses.destroy({
     where: {
       id: +expenseId,
     },
   });
 }
 
-function updateExpense(expenseId, dataToUpdate) {
-  return Expenses.destroy(dataToUpdate, {
+async function updateExpense(expenseId, dataToUpdate) {
+  await Expenses.update(dataToUpdate, {
     where: {
       id: +expenseId,
     },
+    returning: true,
   });
 }
 

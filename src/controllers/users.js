@@ -2,13 +2,13 @@
 
 const usersServices = require('../services/users');
 
-function getAll(req, res) {
-  const users = usersServices.getAll();
+async function getAll(req, res) {
+  const users = await usersServices.getAll();
 
   res.send(users.map(usersServices.normalizeUser));
 }
 
-function getOne(req, res) {
+async function getOne(req, res) {
   const { userId } = req.params;
 
   if (!userId) {
@@ -17,7 +17,7 @@ function getOne(req, res) {
     return;
   }
 
-  const foundUser = usersServices.getUserById(userId);
+  const foundUser = await usersServices.getUserById(userId);
 
   if (!foundUser) {
     res.sendStatus(404);
@@ -28,7 +28,7 @@ function getOne(req, res) {
   res.send(usersServices.normalizeUser(foundUser));
 }
 
-function addNewUser(req, res) {
+async function addNewUser(req, res) {
   const { name } = req.body;
 
   if (!name) {
@@ -37,13 +37,13 @@ function addNewUser(req, res) {
     return;
   }
 
-  const newUser = usersServices.createNewUser(name);
+  const newUser = await usersServices.createNewUser(name);
 
   res.statusCode = 201;
   res.send(usersServices.normalizeUser(newUser));
 }
 
-function deleteUser(req, res) {
+async function deleteUser(req, res) {
   const { userId } = req.params;
 
   if (!userId) {
@@ -52,7 +52,7 @@ function deleteUser(req, res) {
     return;
   }
 
-  const foundUser = usersServices.getUserById(userId);
+  const foundUser = await usersServices.getUserById(userId);
 
   if (!foundUser) {
     res.sendStatus(404);
@@ -60,11 +60,11 @@ function deleteUser(req, res) {
     return;
   }
 
-  usersServices.deleteUser(userId);
+  await usersServices.deleteUser(userId);
   res.sendStatus(204);
 }
 
-function updateUserInfo(req, res) {
+async function updateUserInfo(req, res) {
   const { userId } = req.params;
   const { name } = req.body;
   const hasInvalidData = !name || (typeof name !== 'string');
@@ -75,7 +75,7 @@ function updateUserInfo(req, res) {
     return;
   }
 
-  const userToUpdate = usersServices.getUserById(userId);
+  const userToUpdate = await usersServices.getUserById(userId);
 
   if (!userToUpdate) {
     res.sendStatus(404);
@@ -83,7 +83,7 @@ function updateUserInfo(req, res) {
     return;
   }
 
-  const updatedUser = usersServices.updateUserInfo({
+  const updatedUser = await usersServices.updateUserInfo({
     id: userId,
     name,
   });

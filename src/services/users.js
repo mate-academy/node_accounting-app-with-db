@@ -8,35 +8,40 @@ function normalizeUser({ id, name }) {
   };
 }
 
-function getAll() {
-  return Users.findAll();
+async function getAll() {
+  const users = await Users.findAll();
+
+  return users;
 }
 
-function getUserById(userId) {
-  return Users.findByPk(+userId);
+async function getUserById(userId) {
+  const user = await Users.findByPk(+userId);
+
+  return user;
 }
 
-function createNewUser(name) {
+async function createNewUser(name) {
   if (typeof name !== 'string') {
     throw new Error('The name must be a string');
   }
 
-  return Users.create({ name });
+  await Users.create({ name });
 }
 
-function deleteUser(userId) {
-  return Users.destroy({
+async function deleteUser(userId) {
+  await Users.destroy({
     where: {
       id: +userId,
     },
   });
 }
 
-function updateUserInfo({ id, name }) {
-  return Users.destroy({ name }, {
+async function updateUserInfo({ id, name }) {
+  await Users.update({ name }, {
     where: {
       id,
     },
+    returning: true,
   });
 }
 

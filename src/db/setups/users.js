@@ -2,4 +2,4 @@
 
 const Users = require('../models/users');
 
-Users.sync({ force: true });
+Users.sync({ alter: true });

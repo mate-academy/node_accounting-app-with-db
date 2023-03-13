@@ -3,14 +3,14 @@
 const expensesServices = require('../services/expenses');
 const { getUserById } = require('../services/users');
 
-function getAll(req, res) {
+async function getAll(req, res) {
   const params = req.query;
-  const expenses = expensesServices.getFilteredExpenses(params);
+  const expenses = await expensesServices.getFilteredExpenses(params);
 
   res.send(expenses.map(expensesServices.normalizeExpense));
 }
 
-function getOne(req, res) {
+async function getOne(req, res) {
   const { expenseId } = req.params;
 
   if (!expenseId) {
@@ -19,7 +19,7 @@ function getOne(req, res) {
     return;
   }
 
-  const foundExpense = expensesServices.getExpenseById(expenseId);
+  const foundExpense = await expensesServices.getExpenseById(expenseId);
 
   if (!foundExpense) {
     res.sendStatus(404);
@@ -30,7 +30,7 @@ function getOne(req, res) {
   res.send(expensesServices.normalizeExpense(foundExpense));
 }
 
-function addNewExpense(req, res) {
+async function addNewExpense(req, res) {
   const {
     userId,
     spentAt,
@@ -39,7 +39,7 @@ function addNewExpense(req, res) {
     category,
   } = req.body;
 
-  const foundUser = getUserById(userId);
+  const foundUser = await getUserById(userId);
 
   const isAllDataProvided = (foundUser
     && userId
@@ -56,13 +56,13 @@ function addNewExpense(req, res) {
   }
 
   const expenseData = req.body;
-  const newExpense = expensesServices.createExpense(expenseData);
+  const newExpense = await expensesServices.createExpense(expenseData);
 
   res.statusCode = 201;
   res.send(expensesServices.normalizeExpense(newExpense));
 }
 
-function deleteExpense(req, res) {
+async function deleteExpense(req, res) {
   const { expenseId } = req.params;
 
   if (!expenseId) {
@@ -71,7 +71,7 @@ function deleteExpense(req, res) {
     return;
   }
 
-  const expenseToDelete = expensesServices.getExpenseById(expenseId);
+  const expenseToDelete = await expensesServices.getExpenseById(expenseId);
 
   if (!expenseToDelete) {
     res.sendStatus(404);
@@ -79,11 +79,11 @@ function deleteExpense(req, res) {
     return;
   }
 
-  expensesServices.deleteExpense(expenseId);
+  await expensesServices.deleteExpense(expenseId);
   res.sendStatus(204);
 }
 
-function updateExpense(req, res) {
+async function updateExpense(req, res) {
   const { expenseId } = req.params;
   const dataToUpdate = req.body;
 
@@ -93,7 +93,7 @@ function updateExpense(req, res) {
     return;
   }
 
-  const expenseToUpdate = expensesServices.getExpenseById(expenseId);
+  const expenseToUpdate = await expensesServices.getExpenseById(expenseId);
 
   if (!expenseToUpdate) {
     res.sendStatus(404);
@@ -101,7 +101,7 @@ function updateExpense(req, res) {
     return;
   }
 
-  const updatedExpense = expensesServices.updateExpense(
+  const updatedExpense = await expensesServices.updateExpense(
     expenseId,
     dataToUpdate,
   );

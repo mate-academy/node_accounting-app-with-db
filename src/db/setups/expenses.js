@@ -2,4 +2,4 @@
 
 const Expenses = require('../models/expenses');
 
-Expenses.sync({ force: true });
+Expenses.sync({ alter: true });
