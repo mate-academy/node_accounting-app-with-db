@@ -24,16 +24,16 @@ const create = async(req, res) => {
 };
 
 const getAll = async(req, res) => {
-  const expenses = await expensesService.findAll();
+  try {
+    const expenses = await expensesService.findAll();
 
-  if (!expenses) {
+    res.statusCode = 200;
+    res.send(expenses);
+  } catch (error) {
     res.sendStatus(404);
 
-    return;
+    return error;
   }
-
-  res.statusCode = 200;
-  res.send(expenses);
 };
 
 const getById = async(req, res) => {
