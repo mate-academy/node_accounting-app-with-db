@@ -95,7 +95,14 @@ const remove = async(req, res) => {
 
 const update = async(req, res) => {
   const { expenseId } = req.params;
+  const { title, spentAt } = req.body;
   const foundExpense = await expensesService.getById(expenseId);
+
+  if (!title || !spentAt) {
+    res.sendStatus(400);
+
+    return;
+  }
 
   if (!foundExpense) {
     res.sendStatus(404);

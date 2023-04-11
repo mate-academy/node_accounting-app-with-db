@@ -56,6 +56,12 @@ const update = async(req, res) => {
 
   const foundUser = await usersService.getById(userId);
 
+  if (!name) {
+    res.sendStatus(400);
+
+    return;
+  }
+
   if (!foundUser) {
     res.sendStatus(404);
 
