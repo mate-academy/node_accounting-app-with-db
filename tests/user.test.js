@@ -2,14 +2,16 @@
 
 const supertest = require('supertest');
 const { createServer } = require('../src/createServer');
+const { setupDatabase } = require('../src/database/setup');
 
 describe('User', () => {
   let server;
   let api;
 
-  beforeEach(() => {
+  beforeEach(async() => {
     server = createServer();
     api = supertest(server);
+    await setupDatabase();
   });
 
   describe('createUser', () => {

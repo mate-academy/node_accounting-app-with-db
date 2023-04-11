@@ -2,15 +2,15 @@
 
 const userService = require('../services/users.js');
 
-const getAll = (req, res) => {
-  const allUsers = userService.getALl();
+const getAll = async(req, res) => {
+  const allUsers = await userService.getALl();
 
-  res.send(allUsers);
+  res.send(allUsers.map(userService.normalize));
 };
 
-const getOne = (req, res) => {
+const getOne = async(req, res) => {
   const { userId } = req.params;
-  const foundUser = userService.getById(userId);
+  const foundUser = await userService.getById(userId);
 
   if (!foundUser) {
     res.sendStatus(404);
@@ -18,10 +18,10 @@ const getOne = (req, res) => {
     return;
   }
 
-  res.send(foundUser);
+  res.send(userService.normalize(foundUser));
 };
 
-const add = (req, res) => {
+const add = async(req, res) => {
   const { name } = req.body;
 
   if (!name) {
@@ -30,15 +30,15 @@ const add = (req, res) => {
     return;
   }
 
-  const newUser = userService.create(name);
+  const newUser = await userService.create(name);
 
   res.statusCode = 201;
-  res.send(newUser);
+  res.send(userService.normalize(newUser));
 };
 
-const remove = (req, res) => {
+const remove = async(req, res) => {
   const { userId } = req.params;
-  const foundUser = userService.getById(userId);
+  const foundUser = await userService.getById(userId);
 
   if (!foundUser) {
     res.sendStatus(404);
@@ -50,7 +50,7 @@ const remove = (req, res) => {
   res.sendStatus(204);
 };
 
-const update = (req, res) => {
+const update = async(req, res) => {
   const { userId } = req.params;
   const { name } = req.body;
   const foundUser = userService.getById(userId);
@@ -67,12 +67,14 @@ const update = (req, res) => {
     return;
   }
 
-  userService.update(foundUser, name);
-  res.send(foundUser);
+  await userService.update(userId, name);
+
+  const updatedUser = await userService.getById(userId);
+
+  res.send(updatedUser);
 };
 
 module.exports = {
-  initUsers: () => userService.resetAll(),
   getAll,
   getOne,
   add,

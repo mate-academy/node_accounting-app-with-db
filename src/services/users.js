@@ -1,19 +1,45 @@
 'use strict';
 
-const { users } = require('../models/users');
+const User = require('../models/User');
 
-const getALl = () => users.getAll();
+const getALl = async() => {
+  return User.findAll({
+    order: ['id'],
+  });
+};
 
-const getById = (userId) => users.getById(userId);
+const getById = (userId) => {
+  return User.findByPk(Number(userId));
+};
 
-const create = (name) => users.create(name);
+const create = (name) => {
+  return User.create({ name });
+};
 
-const remove = (userId) => users.remove(userId);
+const remove = (userId) => {
+  return User.destroy({ where: { id: userId } });
+};
 
-const update = (user, name) => users.update(user, name);
+const update = (userId, name) => {
+  return User.update(
+    { name },
+    {
+      where: {
+        id: Number(userId),
+      },
+    },
+  );
+};
+
+const normalize = ({ id, name }) => {
+  return {
+    id,
+    name,
+  };
+};
 
 module.exports = {
-  resetAll: () => users.resetAll(),
+  normalize,
   getALl,
   getById,
   create,

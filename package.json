@@ -27,8 +27,11 @@
   "dependencies": {
     "@mate-academy/scripts": "^1.2.8",
     "@types/node": "^18.15.11",
+    "@types/sequelize": "^4.28.14",
     "cors": "^2.8.5",
     "express": "^4.18.2",
-    "uuid": "^9.0.0"
+    "pg": "^8.10.0",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.31.0"
   }
 }
