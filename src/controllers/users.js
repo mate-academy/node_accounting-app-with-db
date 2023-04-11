@@ -1,16 +1,16 @@
 'use strict';
 
-const userService = require('../services/users.js');
+const usersService = require('../services/users.js');
 
 const getAll = async(req, res) => {
-  const allUsers = await userService.getALl();
+  const allUsers = await usersService.getALl();
 
-  res.send(allUsers.map(userService.normalize));
+  res.send(allUsers);
 };
 
 const getOne = async(req, res) => {
   const { userId } = req.params;
-  const foundUser = await userService.getById(userId);
+  const foundUser = await usersService.getById(userId);
 
   if (!foundUser) {
     res.sendStatus(404);
@@ -18,7 +18,7 @@ const getOne = async(req, res) => {
     return;
   }
 
-  res.send(userService.normalize(foundUser));
+  res.send(foundUser);
 };
 
 const add = async(req, res) => {
@@ -30,15 +30,15 @@ const add = async(req, res) => {
     return;
   }
 
-  const newUser = await userService.create(name);
+  const newUser = await usersService.create(name);
 
   res.statusCode = 201;
-  res.send(userService.normalize(newUser));
+  res.send(newUser);
 };
 
 const remove = async(req, res) => {
   const { userId } = req.params;
-  const foundUser = await userService.getById(userId);
+  const foundUser = await usersService.getById(userId);
 
   if (!foundUser) {
     res.sendStatus(404);
@@ -46,14 +46,14 @@ const remove = async(req, res) => {
     return;
   }
 
-  userService.remove(userId);
+  usersService.remove(userId);
   res.sendStatus(204);
 };
 
 const update = async(req, res) => {
   const { userId } = req.params;
   const { name } = req.body;
-  const foundUser = userService.getById(userId);
+  const foundUser = usersService.getById(userId);
 
   if (!foundUser) {
     res.sendStatus(404);
@@ -67,9 +67,9 @@ const update = async(req, res) => {
     return;
   }
 
-  await userService.update(userId, name);
+  await usersService.update(userId, name);
 
-  const updatedUser = await userService.getById(userId);
+  const updatedUser = await usersService.getById(userId);
 
   res.send(updatedUser);
 };

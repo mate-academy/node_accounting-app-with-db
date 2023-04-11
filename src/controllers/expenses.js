@@ -1,47 +1,46 @@
 'use strict';
 
-const expenses = require('../services/expenses.js');
 const expensesService = require('../services/expenses.js');
 const usersService = require('../services/users.js');
+const { Op } = require('sequelize');
 
-const getAll = (req, res) => {
+const getAll = async(req, res) => {
   const {
-    userId,
-    categories,
-    from,
-    to,
+    userId = null,
+    categories = null,
+    from = new Date(0),
+    to = new Date(),
   } = req.query;
 
-  let allExpenses = expensesService.getALl();
+  const where = {
+    spentAt: {
+      [Op.between]: [from, to],
+    },
+    category: {
+      [Op.not]: null,
+    },
+  };
 
   if (userId) {
-    allExpenses = allExpenses.filter((expense) => (
-      expense.userId === Number(userId))
-    );
+    where.userId = Number(userId);
   }
 
   if (categories) {
-    allExpenses = allExpenses.filter(({ category }) => (
-      categories.includes(category)
-    ));
+    where.category = {
+      [Op.in]: Array.isArray(categories)
+        ? categories
+        : [categories],
+    };
   }
 
-  if (from && to) {
-    allExpenses = allExpenses.filter(({ spentAt }) => {
-      const current = new Date(spentAt).getTime();
-      const fromDate = new Date(from).getTime();
-      const toDate = new Date(to).getTime();
+  const expenses = await expensesService.getAll({ where });
 
-      return fromDate < current && current < toDate;
-    });
-  }
-
-  res.send(allExpenses);
+  res.send(expenses);
 };
 
-const getOne = (req, res) => {
+const getOne = async(req, res) => {
   const { expenseId } = req.params;
-  const foundExpense = expensesService.getById(expenseId);
+  const foundExpense = await expensesService.getById(expenseId);
 
   if (!foundExpense) {
     res.sendStatus(404);
@@ -50,18 +49,24 @@ const getOne = (req, res) => {
   }
 };
 
-const add = (req, res) => {
+const add = async(req, res) => {
   const { userId, title, spentAt, amount, category, note } = req.body;
 
-  const user = usersService.getById(userId);
-
-  if (!userId || !title || !amount || !category || !user) {
+  if (!userId || !title || !spentAt || !amount || !category || !note) {
     res.sendStatus(400);
 
     return;
   }
 
-  const newExpense = expensesService.create({
+  const foundUser = await usersService.getById(userId);
+
+  if (!foundUser) {
+    res.sendStatus(400);
+
+    return;
+  }
+
+  const newExpense = await expensesService.create({
     userId,
     title,
     spentAt,
@@ -74,9 +79,9 @@ const add = (req, res) => {
   res.send(newExpense);
 };
 
-const remove = (req, res) => {
+const remove = async(req, res) => {
   const { expenseId } = req.params;
-  const foundUser = expensesService.getById(expenseId);
+  const foundUser = await expensesService.getById(expenseId);
 
   if (!foundUser) {
     res.sendStatus(404);
@@ -84,14 +89,13 @@ const remove = (req, res) => {
     return;
   }
 
-  expensesService.remove(expenseId);
+  await expensesService.remove(expenseId);
   res.sendStatus(204);
 };
 
-const update = (req, res) => {
+const update = async(req, res) => {
   const { expenseId } = req.params;
-
-  const foundExpense = expensesService.getById(expenseId);
+  const foundExpense = await expensesService.getById(expenseId);
 
   if (!foundExpense) {
     res.sendStatus(404);
@@ -99,12 +103,14 @@ const update = (req, res) => {
     return;
   }
 
-  expensesService.update(foundExpense, { ...req.body });
-  res.send(foundExpense);
+  await expensesService.update(expenseId, { ...req.body });
+
+  const updatedExpense = await expensesService.getById(expenseId);
+
+  res.send(updatedExpense);
 };
 
 module.exports = {
-  initExpenses: () => expenses.resetAll(),
   getAll,
   getOne,
   add,

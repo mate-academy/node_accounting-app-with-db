@@ -1,21 +1,45 @@
 'use strict';
 
-const { expenses } = require('../models/expenses.js');
+const Expense = require('../models/Expense');
 
-const getALl = () => expenses.getAll();
+const getAll = (filter) => {
+  if (filter) {
+    return Expense.findAll({
+      ...filter,
+      order: ['id'],
+    });
+  }
 
-const getById = (expenseId) => expenses.getById(expenseId);
+  return Expense.findAll({
+    order: ['id'],
+  });
+};
 
-const create = (expenseData) => expenses.create(expenseData);
+const getById = (expenseId) => {
+  return Expense.findByPk(Number(expenseId));
+};
 
-const remove = (expenseId) => expenses.remove(expenseId);
+const create = (expenseData) => {
+  return Expense.create({ ...expenseData });
+};
 
-const update = (expense, newExpenseData) =>
-  expenses.update(expense, newExpenseData);
+const remove = (expenseId) => {
+  return Expense.destroy({ where: { id: expenseId } });
+};
+
+const update = (expenseId, newExpenseData) => {
+  return Expense.update(
+    { ...newExpenseData },
+    {
+      where: {
+        id: Number(expenseId),
+      },
+    },
+  );
+};
 
 module.exports = {
-  resetAll: () => expenses.resetAll(),
-  getALl,
+  getAll,
   getById,
   create,
   remove,
