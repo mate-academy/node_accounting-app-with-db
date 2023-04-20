@@ -4,19 +4,13 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../utils/db.js');
 
 const Expense = sequelize.define('Expense', {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-  },
   userId: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  createdAt: {
+  spentAt: {
     type: DataTypes.DATE,
     allowNull: false,
-    field: 'spentAt',
-    defaultValue: DataTypes.NOW,
   },
   title: {
     type: DataTypes.STRING,

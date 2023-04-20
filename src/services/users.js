@@ -2,14 +2,6 @@
 
 const { User } = require('../models/User.js');
 
-let users = [];
-
-function getInitialValue() {
-  users = [];
-
-  return users;
-}
-
 async function getAll() {
   await User.findAll({
     order: [ 'createdAt' ],
@@ -21,14 +13,7 @@ function getById(userId) {
 }
 
 function create(name) {
-  const maxId = Math.max(users.map(user => user.id), 0);
-
-  const newUser = {
-    id: maxId + 1,
-    name,
-  };
-
-  return User.create(newUser);
+  return User.create({ name });
 }
 
 function remove(userId) {
@@ -44,7 +29,6 @@ function update({ id, name }) {
 }
 
 module.exports = {
-  getInitialValue,
   getAll,
   getById,
   create,

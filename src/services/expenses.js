@@ -2,64 +2,40 @@
 
 const { Expense } = require('../models/Expense.js');
 
-let expenses = [];
-
-function getInitialValue() {
-  expenses = [];
-
-  return expenses;
-}
-
 async function getAll({ userId, categories, from, to }) {
-  expenses = await Expense.findAll({
+  const expenses = await Expense.findAll({
     order: [ 'createdAt' ],
   });
 
-  if (userId) {
-    expenses = expenses.filter(expense => expense.userId === +userId);
-  }
+  const filteredExpenses = expenses.filter(expense => {
+    const byUserId = userId
+      ? expense.userId === +userId
+      : true;
 
-  if (categories) {
-    expenses = expenses
-      .filter(expense => categories.includes(expense.category));
-  }
+    const byCategories = categories
+      ? categories.includes(expense.category)
+      : true;
 
-  if (from) {
-    expenses = expenses.filter(expense => expense.spentAt > from);
-  }
+    const byFrom = from
+      ? expense.spentAt > from
+      : true;
 
-  if (to) {
-    expenses = expenses.filter(expense => expense.spentAt < to);
-  }
+    const byTo = to
+      ? expense.spentAt < to
+      : true;
 
-  return expenses;
+    return byUserId && byCategories && byFrom && byTo;
+  });
+
+  return filteredExpenses;
 }
 
 function getById(expenseId) {
   return Expense.findByPk(+expenseId);
 }
 
-function create({
-  userId,
-  spentAt,
-  title,
-  amount,
-  category,
-  note,
-}) {
-  const maxId = Math.max(expenses.map(expense => expense.id), 0);
-
-  const newExpense = {
-    id: maxId + 1,
-    userId,
-    spentAt,
-    title,
-    amount,
-    category,
-    note,
-  };
-
-  return Expense.create(newExpense);
+function create(expense) {
+  return Expense.create(expense);
 }
 
 function remove(expenseId) {
@@ -75,7 +51,6 @@ function update({ expenseId, data }) {
 }
 
 module.exports = {
-  getInitialValue,
   getAll,
   getById,
   create,
