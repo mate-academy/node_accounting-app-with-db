@@ -1,30 +1,45 @@
 'use strict';
 
+const { Op } = require('sequelize');
 const { Expense } = require('../models/Expense.js');
 
+function normalize({ id, userId, spentAt, title, amount, category, note }) {
+  return {
+    id,
+    userId,
+    spentAt,
+    title,
+    amount,
+    category,
+    note,
+  };
+}
+
 async function getAll({ userId, categories, from, to }) {
-  const expenses = await Expense.findAll({
+  const whereObj = {};
+
+  if (userId) {
+    whereObj.userId = userId;
+  }
+
+  if (categories) {
+    whereObj.category = { [Op.or]: categories };
+  }
+
+  if (from) {
+    whereObj.spentAt = { [Op.gt]: from };
+  }
+
+  if (to) {
+    whereObj.spentAt = {
+      ...whereObj.spentAt,
+      [Op.lt]: to,
+    };
+  }
+
+  const filteredExpenses = await Expense.findAll({
     order: [ 'createdAt' ],
-  });
-
-  const filteredExpenses = expenses.filter(expense => {
-    const byUserId = userId
-      ? expense.userId === +userId
-      : true;
-
-    const byCategories = categories
-      ? categories.includes(expense.category)
-      : true;
-
-    const byFrom = from
-      ? expense.spentAt > from
-      : true;
-
-    const byTo = to
-      ? expense.spentAt < to
-      : true;
-
-    return byUserId && byCategories && byFrom && byTo;
+    where: whereObj,
   });
 
   return filteredExpenses;
@@ -51,6 +66,7 @@ function update({ expenseId, data }) {
 }
 
 module.exports = {
+  normalize,
   getAll,
   getById,
   create,

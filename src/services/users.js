@@ -2,6 +2,13 @@
 
 const { User } = require('../models/User.js');
 
+function normalize({ id, name }) {
+  return {
+    id,
+    name,
+  };
+}
+
 async function getAll() {
   await User.findAll({
     order: [ 'createdAt' ],
@@ -29,6 +36,7 @@ function update({ id, name }) {
 }
 
 module.exports = {
+  normalize,
   getAll,
   getById,
   create,

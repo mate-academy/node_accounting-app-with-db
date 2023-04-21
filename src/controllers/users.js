@@ -6,7 +6,9 @@ const getAll = async(req, res) => {
   try {
     const users = await usersService.getAll();
 
-    res.send(users);
+    res.send(
+      users.map(usersService.normalize)
+    );
   } catch (error) {
     res.sendStatus(400);
   }
@@ -30,7 +32,9 @@ const getOne = async(req, res) => {
       return;
     }
 
-    res.send(foundUser);
+    res.send(
+      usersService.normalize(foundUser)
+    );
   } catch (error) {
     res.sendStatus(400);
   }
@@ -49,7 +53,10 @@ const add = async(req, res) => {
     const newUser = await usersService.create(name);
 
     res.statusCode = 201;
-    res.send(newUser);
+
+    res.send(
+      usersService.normalize(newUser)
+    );
   } catch (error) {
     res.sendStatus(400);
   }
@@ -111,7 +118,9 @@ const update = async(req, res) => {
       name,
     });
 
-    res.send(updatedUser);
+    res.send(
+      usersService.normalize(updatedUser)
+    );
   } catch (error) {
     res.sendStatus(404);
   }

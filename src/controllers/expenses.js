@@ -9,7 +9,9 @@ const getAll = async(req, res) => {
 
     const expenses = await expensesService.getAll(query);
 
-    res.send(expenses);
+    res.send(
+      expenses.map(expensesService.normalize)
+    );
   } catch (error) {
     res.sendStatus(400);
   }
@@ -33,7 +35,9 @@ const getOne = async(req, res) => {
       return;
     }
 
-    res.send(foundExpense);
+    res.send(
+      expensesService.normalize(foundExpense)
+    );
   } catch (error) {
     res.sendStatus(400);
   }
@@ -54,7 +58,10 @@ const add = async(req, res) => {
     const newExpense = await expensesService.create(expense);
 
     res.statusCode = 201;
-    res.send(newExpense);
+
+    res.send(
+      expensesService.normalize(newExpense)
+    );
   } catch (error) {
     res.sendStatus(400);
   }
@@ -110,7 +117,9 @@ const update = async(req, res) => {
       data,
     });
 
-    res.send(updatedExpense);
+    res.send(
+      expensesService.normalize(updatedExpense)
+    );
   } catch (error) {
     res.sendStatus(400);
   }
