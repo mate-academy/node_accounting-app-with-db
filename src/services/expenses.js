@@ -38,8 +38,8 @@ function create(expense) {
   return Expense.create(expense);
 }
 
-function remove(expenseId) {
-  Expense.destroy({
+async function remove(expenseId) {
+  await Expense.destroy({
     where: { id: +expenseId },
   });
 }

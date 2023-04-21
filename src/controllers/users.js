@@ -1,10 +1,10 @@
 'use strict';
 
-const usersServise = require('../services/users.js');
+const usersService = require('../services/users.js');
 
-const getAll = (req, res) => {
+const getAll = async(req, res) => {
   try {
-    const users = usersServise.getAll();
+    const users = await usersService.getAll();
 
     res.send(users);
   } catch (error) {
@@ -12,7 +12,7 @@ const getAll = (req, res) => {
   }
 };
 
-const getOne = (req, res) => {
+const getOne = async(req, res) => {
   try {
     const { userId } = req.params;
 
@@ -22,7 +22,7 @@ const getOne = (req, res) => {
       return;
     }
 
-    const foundUser = usersServise.getById(userId);
+    const foundUser = await usersService.getById(userId);
 
     if (!foundUser) {
       res.sendStatus(404);
@@ -36,7 +36,7 @@ const getOne = (req, res) => {
   }
 };
 
-const add = (req, res) => {
+const add = async(req, res) => {
   try {
     const { name } = req.body;
 
@@ -46,7 +46,7 @@ const add = (req, res) => {
       return;
     }
 
-    const newUser = usersServise.create(name);
+    const newUser = await usersService.create(name);
 
     res.statusCode = 201;
     res.send(newUser);
@@ -55,7 +55,7 @@ const add = (req, res) => {
   }
 };
 
-const remove = (req, res) => {
+const remove = async(req, res) => {
   try {
     const { userId } = req.params;
 
@@ -65,7 +65,7 @@ const remove = (req, res) => {
       return;
     }
 
-    const foundUser = usersServise.getById(userId);
+    const foundUser = await usersService.getById(userId);
 
     if (!foundUser) {
       res.sendStatus(404);
@@ -73,14 +73,14 @@ const remove = (req, res) => {
       return;
     }
 
-    usersServise.remove(userId);
+    await usersService.remove(userId);
     res.sendStatus(204);
   } catch (error) {
     res.sendStatus(400);
   }
 };
 
-const update = (req, res) => {
+const update = async(req, res) => {
   try {
     const { userId } = req.params;
 
@@ -90,7 +90,7 @@ const update = (req, res) => {
       return;
     }
 
-    const foundUser = usersServise.getById(userId);
+    const foundUser = await usersService.getById(userId);
 
     if (!foundUser) {
       res.sendStatus(404);
@@ -106,7 +106,7 @@ const update = (req, res) => {
       return;
     }
 
-    const updatedUser = usersServise.update({
+    const updatedUser = await usersService.update({
       id: userId,
       name,
     });
