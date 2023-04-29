@@ -2,6 +2,26 @@
 
 const Expense = require('../models/expenses');
 
+const normalize = ({
+  id,
+  userId,
+  title,
+  category,
+  spentAt,
+  amount,
+  note,
+}) => {
+  return {
+    id,
+    userId,
+    title,
+    category,
+    spentAt,
+    amount,
+    note,
+  };
+};
+
 const getAll = async() => {
   const expenses = await Expense.findAll();
 
@@ -37,6 +57,7 @@ const remove = async(id) => {
 };
 
 module.exports = {
+  normalize,
   getAll,
   getOne,
   add,

@@ -2,6 +2,16 @@
 
 const User = require('../models/users');
 
+const normalize = ({
+  id,
+  name,
+}) => {
+  return {
+    id,
+    name,
+  };
+};
+
 const getAll = async() => {
   const users = await User.findAll();
 
@@ -40,6 +50,7 @@ const remove = async(id) => {
 };
 
 module.exports = {
+  normalize,
   getAll,
   getOne,
   add,
