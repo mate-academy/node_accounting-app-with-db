@@ -22,7 +22,6 @@ const getAll = async(req, res) => {
 
   const foundExpenses = await expenseService.getAll(filterOptions);
 
-  res.statusCode = 200;
   res.send(foundExpenses);
 };
 
@@ -43,7 +42,6 @@ const getOne = async(req, res) => {
     return;
   }
 
-  res.statusCode = 200;
   res.send(foundExpense);
 };
 
@@ -140,7 +138,6 @@ const update = async(req, res) => {
 
   const updatedExpense = await expenseService.getById(expenseId);
 
-  res.statusCode = 200;
   res.send(updatedExpense);
 };
 
