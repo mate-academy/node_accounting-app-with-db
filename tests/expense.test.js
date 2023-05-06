@@ -7,8 +7,8 @@ describe('Expense', () => {
   let server;
   let api;
 
-  beforeEach(() => {
-    server = createServer();
+  beforeEach(async() => {
+    server = await createServer();
     api = supertest(server);
   });
 

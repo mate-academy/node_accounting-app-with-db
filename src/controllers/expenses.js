@@ -3,13 +3,21 @@
 const userService = require('../services/users');
 const expensesService = require('../services/expenses');
 
-const getAll = (req, res) => {
-  const expenses = expensesService.getAll(req.query);
+const getAll = async(req, res) => {
+  if (Object.keys(req.query).length > 0) {
+    const filteredExpenses = await expensesService.getAllWithFilter(req.query);
+
+    res.send(filteredExpenses);
+
+    return;
+  }
+
+  const expenses = await expensesService.getAll();
 
   res.send(expenses);
 };
 
-const getOne = (req, res) => {
+const getOne = async(req, res) => {
   const expenseId = Number(req.params.expenseId);
 
   if (isNaN(expenseId)) {
@@ -18,7 +26,7 @@ const getOne = (req, res) => {
     return;
   }
 
-  const foundExpense = expensesService.getById(expenseId);
+  const foundExpense = await expensesService.getById(expenseId);
 
   if (!foundExpense) {
     res.sendStatus(404);
@@ -29,7 +37,7 @@ const getOne = (req, res) => {
   res.send(foundExpense);
 };
 
-const create = (req, res) => {
+const create = async(req, res) => {
   const {
     userId,
     spentAt,
@@ -45,7 +53,7 @@ const create = (req, res) => {
     return;
   }
 
-  const foundUser = userService.getById(userId);
+  const foundUser = await userService.getById(userId);
 
   if (!foundUser) {
     res.sendStatus(400);
@@ -53,16 +61,28 @@ const create = (req, res) => {
     return;
   }
 
-  const newExpense
-    = expensesService.create(userId, spentAt, title, amount, category, note);
+  try {
+    const newExpense = await expensesService.create(
+      userId,
+      spentAt,
+      title,
+      amount,
+      category,
+      note
+    );
 
-  res.statusCode = 201;
-  res.send(newExpense);
+    res.statusCode = 201;
+    res.send(newExpense);
+  } catch (exception) {
+    global.console.log('Error', exception);
+
+    res.sendStatus(404);
+  }
 };
 
-const remove = (req, res) => {
+const remove = async(req, res) => {
   const expenseId = Number(req.params.expenseId);
-  const foundExpense = expensesService.getById(expenseId);
+  const foundExpense = await expensesService.getById(expenseId);
 
   if (!foundExpense) {
     res.sendStatus(404);
@@ -70,12 +90,12 @@ const remove = (req, res) => {
     return;
   }
 
-  expensesService.remove(expenseId);
+  await expensesService.remove(expenseId);
 
   res.sendStatus(204);
 };
 
-const update = (req, res) => {
+const update = async(req, res) => {
   const expenseId = Number(req.params.expenseId);
 
   if (isNaN(expenseId)) {
@@ -84,7 +104,7 @@ const update = (req, res) => {
     return;
   }
 
-  const foundExpense = expensesService.getById(expenseId);
+  const foundExpense = await expensesService.getById(expenseId);
 
   if (!foundExpense) {
     res.sendStatus(404);
@@ -92,32 +112,20 @@ const update = (req, res) => {
     return;
   }
 
-  const {
-    userId = foundExpense.userId,
-    spentAt = foundExpense.spentAt,
-    title = foundExpense.title,
-    amount = foundExpense.amount,
-    category = foundExpense.category,
-    note = foundExpense.note,
-  } = req.body;
+  const { userId } = req.body;
 
-  if (!userService.getById(userId)) {
+  if (userId && !await userService.getById(userId)) {
     res.sendStatus(400);
 
     return;
   }
 
-  expensesService.update({
+  const [, updatedExpense] = await expensesService.update({
     id: expenseId,
-    userId,
-    spentAt,
-    title,
-    amount,
-    category,
-    note,
+    ...req.body,
   });
 
-  res.send(foundExpense);
+  res.send(updatedExpense);
 };
 
 module.exports = {

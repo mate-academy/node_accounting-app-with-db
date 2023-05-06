@@ -1,16 +1,13 @@
 'use strict';
 
-const { idGenerator } = require('../tools/idGenerator');
+const { Expense } = require('../models/expenses');
+const { Op } = require('sequelize');
 
-let expenses = [];
-
-const getNextId = idGenerator(expenses);
-
-function reset() {
-  expenses = [];
+async function getAll() {
+  return Expense.findAll();
 }
 
-function getAll(options) {
+function getAllWithFilter(options) {
   const {
     userId,
     categories,
@@ -18,73 +15,61 @@ function getAll(options) {
     to,
   } = options;
 
-  const filteredExpenses = expenses.filter(expense => {
-    if (userId && expense.userId !== Number(userId)) {
-      return false;
-    }
+  const filterCondition = {};
 
-    if (categories && expense.category !== categories) {
-      return false;
-    }
+  if (userId) {
+    filterCondition.userId = { [Op.eq]: userId };
+  }
 
-    if (from && to) {
-      const spentAt = new Date(expense.spentAt).getTime();
-      const fromDate = new Date(from).getTime();
-      const toDate = new Date(to).getTime();
+  if (categories) {
+    filterCondition.category = { [Op.eq]: categories };
+  }
 
-      return (spentAt >= fromDate) && (spentAt <= toDate);
-    }
+  if (from && to) {
+    const fromDate = new Date(from).toISOString();
+    const toDate = new Date(to).toISOString();
 
-    return true;
-  });
+    filterCondition.spentAt = { [Op.between]: [fromDate, toDate] };
+  }
 
-  return filteredExpenses;
+  return Expense.findAll({ where: filterCondition });
 }
 
 function getById(id) {
-  const foundExpense = expenses.find(expense => expense.id === id);
-
-  return foundExpense || null;
+  return Expense.findByPk(id);
 }
 
-function getByUserId(userId) {
-  const filteredExpenses
-    = expenses.filter(expense => expense.userId === userId);
-
-  return filteredExpenses;
-}
-
-function create(userId, spentAt, title, amount, category, note) {
-  const newExpense = {
-    id: getNextId(),
+async function create(userId, spentAt, title, amount, category, note) {
+  return Expense.create({
     userId,
-    spentAt,
+    spentAt: isNaN(new Date(spentAt))
+      ? undefined
+      : new Date(spentAt).toISOString(),
     title,
     amount,
     category,
     note,
-  };
-
-  expenses.push(newExpense);
-
-  return newExpense;
+  });
 }
 
-function remove(id) {
-  expenses = expenses.filter(expense => expense.id !== id);
+async function remove(id) {
+  await Expense.destroy({
+    where: { id },
+  });
 }
 
-function update({ id, ...expenseData }) {
-  const expense = getById(id);
-
-  Object.assign(expense, expenseData);
+async function update({ id, ...expenseData }) {
+  return Expense.update({ ...expenseData }, {
+    where: { id },
+    returning: true,
+    plain: true,
+  });
 }
 
 module.exports = {
-  reset,
   getAll,
+  getAllWithFilter,
   getById,
-  getByUserId,
   create,
   remove,
   update,
