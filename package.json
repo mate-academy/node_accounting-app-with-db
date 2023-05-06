@@ -5,9 +5,9 @@
   "main": "src/index.js",
   "scripts": {
     "init": "mate-scripts init",
-    "start": "mate-scripts start",
+    "start": "nodemon main.js",
     "lint": "mate-scripts lint",
-    "test:only": "mate-scripts test",
+    "test:only": "mocha",
     "update": "mate-scripts update",
     "postinstall": "npm run update",
     "test": "npm run lint && npm run test:only"
@@ -20,14 +20,18 @@
     "eslint": "^5.16.0",
     "eslint-plugin-jest": "^22.4.1",
     "eslint-plugin-node": "^8.0.1",
-    "jest": "^24.9.0",
-    "jest-cli": "^24.9.0",
     "supertest": "^6.3.3"
   },
   "mateAcademy": {
     "projectType": "javascript"
   },
   "dependencies": {
-    "express": "^4.18.2"
+    "expect": "^29.5.0",
+    "express": "^4.18.2",
+    "mocha": "^10.2.0",
+    "nodemon": "^2.0.22",
+    "pg": "^8.10.0",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.31.1"
   }
 }

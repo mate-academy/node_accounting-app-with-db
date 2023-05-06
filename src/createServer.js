@@ -1,15 +1,17 @@
 'use strict';
 
 const express = require('express');
-const { reset: resetUsers } = require('./services/users');
+
+const { recreateTable } = require('./utils/recreateTables');
+
 const { reset: resetExpenses } = require('./services/expenses');
 const { router: userRouter } = require('./routes/users');
 const { router: expensesRouter } = require('./routes/expenses');
 
-function createServer() {
+async function createServer() {
   const app = express();
 
-  resetUsers();
+  await recreateTable();
   resetExpenses();
 
   app.use('/users', express.json(), userRouter);

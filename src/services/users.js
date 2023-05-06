@@ -1,48 +1,34 @@
 'use strict';
 
-const { idGenerator } = require('../tools/idGenerator');
+const { User } = require('../models/users');
 
-let users = [];
-
-const getNextId = idGenerator(users);
-
-function reset() {
-  users = [];
+async function getAll() {
+  return User.findAll();
 }
 
-function getAll() {
-  return users;
+async function getById(id) {
+  return User.findByPk(id);
 }
 
-function getById(id) {
-  const foundUser = users.find(user => user.id === id);
-
-  return foundUser || null;
+async function create(name) {
+  return User.create({ name });
 }
 
-function create(name) {
-  const newUser = {
-    id: getNextId(),
-    name,
-  };
-
-  users.push(newUser);
-
-  return newUser;
+async function remove(id) {
+  User.destroy({
+    where: { id },
+  });
 }
 
-function remove(id) {
-  users = users.filter(user => user.id !== id);
-}
-
-function update({ id, name }) {
-  const user = getById(id);
-
-  Object.assign(user, { name });
+async function update({ id, name }) {
+  return User.update({ name }, {
+    where: { id },
+    returning: true,
+    plain: true,
+  });
 }
 
 module.exports = {
-  reset,
   getAll,
   getById,
   create,
