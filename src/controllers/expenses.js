@@ -36,8 +36,7 @@ async function addExpenseAction(req, res) {
     const users = await getAllUsers();
 
     if (
-      !users.length
-    || !users.filter((el) => el.id === expense.userId).length
+      !users.length || !users.filter((el) => el.id === expense.userId).length
     || !missingFields) {
       res.sendStatus(400);
 
