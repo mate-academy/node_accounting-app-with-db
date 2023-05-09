@@ -6,13 +6,17 @@ const {
   getUser,
   deleteUser,
   updateUser,
+  normalize,
 } = require('../services/usersServer');
-const { normalize } = require('../models/user');
 
 async function getAllUsersAction(req, res) {
-  const users = await getAllUsers();
+  try {
+    const users = await getAllUsers();
 
-  res.send(users.map(user => normalize(user)));
+    res.send(users.map(user => normalize(user)));
+  } catch (error) {
+    res.sendStatus(404);
+  }
 };
 
 async function addUserAction(req, res) {
@@ -24,10 +28,14 @@ async function addUserAction(req, res) {
     return;
   }
 
-  const user = await addUser(name);
+  try {
+    const user = await addUser(name);
 
-  res.statusCode = 201;
-  res.send(normalize(user));
+    res.statusCode = 201;
+    res.send(normalize(user));
+  } catch (error) {
+    res.sendStatus(404);
+  }
 }
 
 async function getUserAction(req, res) {
@@ -39,30 +47,29 @@ async function getUserAction(req, res) {
     return;
   }
 
-  const user = await getUser(id);
+  try {
+    const user = await getUser(id);
 
-  if (!user) {
+    res.statusCode = 200;
+    res.send(normalize(user));
+  } catch (error) {
     res.sendStatus(404);
   }
-
-  res.statusCode = 200;
-  res.send(normalize(user));
 }
 
-function deleteUserAction(req, res) {
+async function deleteUserAction(req, res) {
   const { id } = req.params;
 
-  if (!id) {
+  try {
+    await getUser(id);
+    deleteUser(id);
+    res.sendStatus(204);
+  } catch (error) {
     res.sendStatus(404);
-
-    return;
   }
-
-  deleteUser(id);
-  res.sendStatus(204);
 };
 
-function updateUserAction(req, res) {
+async function updateUserAction(req, res) {
   const { id } = req.params;
   const { name } = req.body;
 
@@ -72,9 +79,15 @@ function updateUserAction(req, res) {
     return;
   }
 
-  updateUser(id, name);
+  try {
+    await getUser(id);
 
-  res.sendStatus(200);
+    updateUser(id, name);
+
+    res.sendStatus(200);
+  } catch (error) {
+    res.sendStatus(404);
+  }
 }
 
 module.exports = {

@@ -38,6 +38,12 @@ function updateUser(id, name) {
   return newUser;
 };
 
+function normalize({ id, name }) {
+  return {
+    id, name,
+  };
+};
+
 module.exports = {
-  getAllUsers, addUser, getUser, deleteUser, updateUser,
+  getAllUsers, addUser, getUser, deleteUser, updateUser, normalize,
 };

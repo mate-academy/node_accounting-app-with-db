@@ -24,12 +24,4 @@ const User = sequelize.define('User', {
   updatedAt: false,
 });
 
-function normalize({ id, name }) {
-  return {
-    id, name,
-  };
-};
-
-module.exports = {
-  User, normalize,
-};
+module.exports = { User };
