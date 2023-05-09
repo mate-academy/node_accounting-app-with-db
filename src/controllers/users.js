@@ -15,7 +15,7 @@ async function getAllUsersAction(req, res) {
 
     res.send(users.map(user => normalize(user)));
   } catch (error) {
-    res.sendStatus(404);
+    res.sendStatus(400);
   }
 };
 
