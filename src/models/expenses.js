@@ -11,23 +11,18 @@ const Expense = sequelize.define('expense', {
   },
   userId: {
     type: DataTypes.UUID,
-    primaryKey: true,
   },
   title: {
     type: DataTypes.STRING,
-    primaryKey: false,
   },
   amount: {
-    type: DataTypes.NUMBER,
-    primaryKey: false,
+    type: DataTypes.INTEGER,
   },
   category: {
     type: DataTypes.STRING,
-    primaryKey: false,
   },
   note: {
     type: DataTypes.STRING,
-    primaryKey: false,
   },
   createdAt: {
     type: DataTypes.DATE,

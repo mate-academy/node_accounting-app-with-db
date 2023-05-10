@@ -7,7 +7,7 @@ const {
   deleteExpense,
   updateExpense,
 } = require('../services/exprensesService');
-const { getAllUsers } = require('../services/usersServer.js');
+const { getAllUsers } = require('../services/userService');
 
 async function getAllExpensesAction(req, res) {
   try {
@@ -15,7 +15,7 @@ async function getAllExpensesAction(req, res) {
 
     res.json(expenses);
   } catch (error) {
-    res.sendStatus(500);
+    res.sendStatus(500).send('Error message');
   }
 };
 
@@ -38,17 +38,17 @@ async function addExpenseAction(req, res) {
     if (
       !users.length || !users.filter((el) => el.id === expense.userId).length
     || !missingFields) {
-      res.sendStatus(400);
+      res.sendStatus(400).send('Error message');
 
       return;
     }
 
     const newExpense = await addExpense(expense);
 
-    res.json(newExpense);
     res.status(201);
+    res.json(newExpense);
   } catch (error) {
-    res.sendStatus(500);
+    res.sendStatus(500).send('Error message');
   }
 };
 
@@ -62,7 +62,7 @@ async function getExpenseAction(req, res) {
 
     res.json(expense);
   } catch (error) {
-    res.sendStatus(404);
+    res.sendStatus(404).send(error.message);
   }
 };
 
@@ -72,11 +72,11 @@ async function deleteExpenseAction(req, res) {
   try {
     await getExpense(id);
 
-    deleteExpense(id);
+    await deleteExpense(id);
 
     res.sendStatus(204);
   } catch (error) {
-    res.sendStatus(404);
+    res.sendStatus(404).send(error.message);
   }
 };
 
@@ -85,7 +85,7 @@ async function updateExpenseAction(req, res) {
   const expense = req.body;
   const allowedKeys = [
     'title',
-    'mount',
+    'amount',
     'category',
     'note',
     'spentAt',
@@ -96,17 +96,16 @@ async function updateExpenseAction(req, res) {
   const missingFields = keysExpense.every(key => allowedKeys.includes(key));
 
   if (!missingFields) {
-    res.sendStatus(400);
+    res.sendStatus(400).send('Error message');
 
     return;
   }
 
   try {
     await getExpense(id);
-    res.sendStatus(200);
-    res.send(updateExpense(id, expense));
+    res.send(await updateExpense(id, expense));
   } catch (error) {
-    res.sendStatus(404);
+    res.sendStatus(404).send(error.message);
   }
 };
 

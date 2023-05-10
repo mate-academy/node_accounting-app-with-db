@@ -4,7 +4,7 @@ const { Expense } = require('../models/expenses');
 
 function getAllExpenses() {
   return Expense.findAll({
-    order: ['created_at'],
+    order: ['createdAt'],
   });
 };
 

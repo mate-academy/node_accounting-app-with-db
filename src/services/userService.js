@@ -38,7 +38,9 @@ function updateUser(id, name) {
   return newUser;
 };
 
-function normalize({ id, name }) {
+function normalize(user) {
+  const { id, name } = user;
+
   return {
     id, name,
   };

@@ -7,7 +7,7 @@ const {
   deleteUser,
   updateUser,
   normalize,
-} = require('../services/usersServer');
+} = require('../services/userService');
 
 async function getAllUsersAction(req, res) {
   try {
@@ -15,7 +15,7 @@ async function getAllUsersAction(req, res) {
 
     res.send(users.map(user => normalize(user)));
   } catch (error) {
-    res.sendStatus(400);
+    res.sendStatus(400).send(error.message);
   }
 };
 
@@ -34,18 +34,12 @@ async function addUserAction(req, res) {
     res.statusCode = 201;
     res.send(normalize(user));
   } catch (error) {
-    res.sendStatus(404);
+    res.sendStatus(404).send(error.message);
   }
 }
 
 async function getUserAction(req, res) {
   const { id } = req.params;
-
-  if (!id) {
-    res.sendStatus(404);
-
-    return;
-  }
 
   try {
     const user = await getUser(id);
@@ -53,7 +47,7 @@ async function getUserAction(req, res) {
     res.statusCode = 200;
     res.send(normalize(user));
   } catch (error) {
-    res.sendStatus(404);
+    res.sendStatus(404).send(error.message);
   }
 }
 
@@ -62,10 +56,10 @@ async function deleteUserAction(req, res) {
 
   try {
     await getUser(id);
-    deleteUser(id);
+    await deleteUser(id);
     res.sendStatus(204);
   } catch (error) {
-    res.sendStatus(404);
+    res.sendStatus(404).send(error.message);
   }
 };
 
@@ -82,11 +76,11 @@ async function updateUserAction(req, res) {
   try {
     await getUser(id);
 
-    updateUser(id, name);
+    await updateUser(id, name);
 
     res.sendStatus(200);
   } catch (error) {
-    res.sendStatus(404);
+    res.sendStatus(404).send(error.message);
   }
 }
 
