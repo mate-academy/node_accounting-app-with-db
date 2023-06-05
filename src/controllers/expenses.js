@@ -3,9 +3,9 @@
 const usersService = require('../services/users');
 const expenseService = require('../services/expenses');
 const getAll = async(req, res) => {
-  const filteredExpenses = await expenseService.getAllExpenses(req.query);
+  const expenses = await expenseService.getAllExpenses(req.query);
 
-  res.send(filteredExpenses);
+  res.send(expenses);
 };
 
 const getOne = async(req, res) => {
@@ -75,3 +75,4 @@ module.exports = {
   update,
   remove,
 };
+

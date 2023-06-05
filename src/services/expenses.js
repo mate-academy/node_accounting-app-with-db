@@ -21,7 +21,7 @@ const getAllExpenses = (filters) => {
   }
 
   return Expense.findAll();
-};
+}
 
 const getOneExpense = (expenseId) => {
   return Expense.findByPk(expenseId);
