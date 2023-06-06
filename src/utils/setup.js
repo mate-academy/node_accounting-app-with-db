@@ -1,5 +1,7 @@
 'use strict';
 
 const { User } = require('../models/Users');
+const { Expense } = require('../models/Expenses');
 
-User.sync({ force: true });
+User.sync();
+Expense.sync();

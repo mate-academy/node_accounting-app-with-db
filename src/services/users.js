@@ -14,7 +14,7 @@ const findAll = () => {
   });
 };
 
-const getById = (id) => {
+const findById = (id) => {
   return User.findByPk(id);
 };
 
@@ -37,7 +37,7 @@ const updateUser = ({ id, name }) => {
 module.exports = {
   normalize,
   findAll,
-  getById,
+  findById,
   create,
   removeUser,
   updateUser,

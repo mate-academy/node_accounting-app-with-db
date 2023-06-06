@@ -4,6 +4,7 @@ const { Expense } = require('../models/Expenses');
 
 const normalize = ({
   id,
+  userId,
   spentAt,
   title,
   amount,
@@ -12,6 +13,7 @@ const normalize = ({
 }) => {
   return {
     id,
+    userId,
     spentAt,
     title,
     amount,
@@ -26,7 +28,7 @@ const findAll = () => {
   });
 };
 
-const getById = (id) => {
+const findById = (id) => {
   return Expense.findByPk(id);
 };
 
@@ -62,7 +64,7 @@ const updateExpense = ({
 module.exports = {
   normalize,
   findAll,
-  getById,
+  findById,
   create,
   removeExpense,
   updateExpense,

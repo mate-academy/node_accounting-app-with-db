@@ -3,21 +3,20 @@
 const {
   normalize,
   findAll,
-  getById,
+  findById,
   create,
   removeExpense,
   updateExpense,
 } = require('../services/expenses');
 
-const { getAllUsers } = require('./users');
+const { findAll: findAllUsers } = require('../services/users');
 
 const getAll = async(req, res) => {
   const { userId, categories, from, to } = req.query;
-
   let expenses = await findAll();
 
   if (userId) {
-    expenses = expenses.filter(expense => expense.userId === +userId);
+    expenses = expenses.filter(expense => expense.userId === userId);
   }
 
   if (categories) {
@@ -36,12 +35,12 @@ const getAll = async(req, res) => {
     });
   };
 
-  res.send(normalize(expenses));
+  res.send(expenses.map(normalize));
 };
 
 const getOne = async(req, res) => {
   const { expenseId } = req.params;
-  const foundExpense = await getById(expenseId);
+  const foundExpense = await findById(expenseId);
 
   if (!foundExpense) {
     res.sendStatus(404);
@@ -52,10 +51,11 @@ const getOne = async(req, res) => {
   res.send(normalize(foundExpense));
 };
 
-const add = (req, res) => {
+const add = async(req, res) => {
   const { userId, spentAt, title, amount, category, note } = req.body;
   const hasAllData = userId && title && amount && category && note;
-  const hasUser = getAllUsers().map(user => user.id).includes(userId);
+  const users = await findAllUsers();
+  const hasUser = users.map(user => user.id).includes(userId);
 
   if (!hasUser || !hasAllData) {
     res.sendStatus(400);

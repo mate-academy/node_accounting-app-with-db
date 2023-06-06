@@ -5,7 +5,7 @@ const { sequelize } = require('../utils/db');
 
 const Expense = sequelize.define('Expense', {
   id: {
-    type: DataTypes.UUID,
+    type: DataTypes.UUIDV4,
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
   },
@@ -14,23 +14,33 @@ const Expense = sequelize.define('Expense', {
     allowNull: false,
   },
   spentAt: {
-    type: DataTypes.STRING,
+    type: DataTypes.DATE,
     allowNull: false,
   },
   title: {
     type: DataTypes.STRING,
+    allowNull: false,
   },
   amount: {
-    type: DataTypes.NUMBER,
+    type: DataTypes.FLOAT,
+    allowNull: false,
   },
   category: {
     type: DataTypes.STRING,
+    allowNull: false,
   },
   note: {
     type: DataTypes.STRING,
+    allowNull: false,
+  },
+  createdAt: {
+    type: DataTypes.TIME,
+    allowNull: false,
   },
 }, {
   tableName: 'expenses',
+  updatedAt: false,
+  createdAt: false,
 });
 
 module.exports = {

@@ -3,26 +3,21 @@
 const {
   normalize,
   findAll,
-  getById,
+  findById,
   create,
   removeUser,
   updateUser,
 } = require('../services/users');
 
-const getAllUsers = async(req, res) => {
+const getAll = async(req, res) => {
   const users = await findAll();
-  const normalizeUsers = users.map(normalize);
 
-  if (res) {
-    res.send(normalizeUsers);
-  }
-
-  return normalizeUsers;
+  res.send(users.map(normalize));
 };
 
 const getOne = async(req, res) => {
   const { userId } = req.params;
-  const foundUser = await getById(userId);
+  const foundUser = await findById(userId);
 
   if (!foundUser) {
     res.sendStatus(404);
@@ -72,7 +67,7 @@ const update = (req, res) => {
 };
 
 module.exports = {
-  getAllUsers,
+  getAll,
   getOne,
   add,
   remove,

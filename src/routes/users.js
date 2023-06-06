@@ -2,7 +2,7 @@
 
 const express = require('express');
 const {
-  getAllUsers,
+  getAll,
   getOne,
   add,
   remove,
@@ -11,7 +11,7 @@ const {
 
 const usersRouter = express.Router();
 
-usersRouter.get('/', getAllUsers);
+usersRouter.get('/', getAll);
 usersRouter.get('/:userId', getOne);
 usersRouter.post('/', add);
 usersRouter.delete('/:userId', remove);

@@ -13,8 +13,14 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  createdAt: {
+    type: DataTypes.TIME,
+    allowNull: false,
+  },
 }, {
   tableName: 'users',
+  updatedAt: false,
+  createdAt: false,
 });
 
 module.exports = {
