@@ -1,9 +1,17 @@
 'use strict';
 
-const { sequelize } = require('../utils/db.js');
 const { DataTypes } = require('sequelize');
+const { dbInit } = require('../utils/db.js');
 
-const User = sequelize.define('User', {
+const db = dbInit();
+
+const User = db.define('User', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+
   name: {
     type: DataTypes.STRING,
     allowNull: false,

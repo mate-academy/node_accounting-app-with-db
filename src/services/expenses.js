@@ -1,58 +1,34 @@
 'use strict';
 
-const { Op } = require('sequelize');
 const { Expense } = require('../models/expense.js');
+const { filterExpenses } = require('../helpers/helpers.js');
 
-function getAll({ userId, categories, from, to }) {
-  const where = {};
-
-  if (userId) {
-    where.userId = userId;
-  }
-
-  if (categories) {
-    where.category = { [Op.in]: [categories] };
-  }
-
-  if (from && to) {
-    where.spentAt = { [Op.between]: [from, to] };
-  }
+function getAll(queryParams) {
+  const conditions = filterExpenses(queryParams);
 
   return Expense.findAll({
-    where,
-    order: ['id'],
+    where: conditions,
   });
 }
 
-async function getById(id) {
-  const expense = await Expense.findByPk(id);
-
-  return expense;
+function getById(expenseId) {
+  return Expense.findByPk(expenseId);
 }
 
-async function create(expense) {
-  const newExpense = await Expense.create({ ...expense });
-
-  return newExpense;
+function create(data) {
+  return Expense.create({ ...data });
 }
 
-async function remove(id) {
-  const result = await Expense.destroy({
-    where: {
-      id: {
-        [Op.eq]: id,
-      },
-    },
+function remove(expenseId) {
+  return Expense.destroy({
+    where: { expenseId },
   });
-
-  return result;
 }
 
-async function update({ id, ...data }) {
-  const expense = Expense.findByPk(id);
-  const updatedExpense = await expense.update({ ...data });
-
-  return updatedExpense;
+function update({ id, body }) {
+  return Expense.update({ ...body }, {
+    where: { id },
+  });
 }
 
 module.exports = {

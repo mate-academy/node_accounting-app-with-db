@@ -3,7 +3,7 @@
 const { getNewId } = require('../helpers/helpers.js');
 const { User } = require('../models/user.js');
 const { Expense } = require('../models/expense.js');
-const { sequelize } = require('../utils/db.js');
+const { dbInit: sequelize } = require('../utils/db.js');
 const { Op } = require('sequelize');
 
 async function getUsers() {

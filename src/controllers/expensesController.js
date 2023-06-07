@@ -3,33 +3,25 @@
 const userService = require('../services/users.js');
 const expensesService = require('../services/expenses.js');
 
-const getAll = (req, res) => {
-  const expenses = expensesService.getAll(req.query);
+const getAll = async(req, res) => {
+  const expenses = await expensesService.getAll(req.query);
 
   res.send(expenses);
 };
 
-const getOne = (req, res) => {
+const getOne = async(req, res) => {
   const expenseId = Number(req.params.expenseId);
 
-  if (isNaN(expenseId)) {
-    res.sendStatus(400);
+  try {
+    const foundedExpense = await expensesService.getById(expenseId);
 
-    return;
-  }
-
-  const foundedExpense = expensesService.getById(expenseId);
-
-  if (!foundedExpense) {
+    res.send(foundedExpense);
+  } catch (error) {
     res.sendStatus(404);
-
-    return;
   }
-
-  res.send(foundedExpense);
 };
 
-const createExpense = (req, res) => {
+const createExpense = async(req, res) => {
   const {
     userId,
     spentAt,
@@ -39,30 +31,28 @@ const createExpense = (req, res) => {
     note,
   } = req.body;
 
-  if (!userId || !spentAt || !title || !amount || !category) {
+  if (!userService.getUser(userId)) {
     res.sendStatus(400);
 
     return;
   }
 
-  const foundUser = userService.getUser(userId);
+  const newExpense = await expensesService.create({
+    userId,
+    spentAt,
+    title,
+    amount,
+    category,
+    note,
+  });
 
-  if (!foundUser) {
-    res.sendStatus(400);
-
-    return;
-  }
-
-  const newExpense = expensesService
-    .create(userId, spentAt, title, amount, category, note);
-
-  res.statusCode = 201;
+  res.status(201);
   res.send(newExpense);
 };
 
-const remove = (req, res) => {
+const remove = async(req, res) => {
   const expenseId = Number(req.params.expenseId);
-  const foundExpense = expensesService.getById(expenseId);
+  const foundExpense = await expensesService.getById(expenseId);
 
   if (!foundExpense) {
     res.sendStatus(404);
@@ -70,12 +60,12 @@ const remove = (req, res) => {
     return;
   }
 
-  expensesService.remove(expenseId);
+  await expensesService.remove(expenseId);
 
   res.sendStatus(204);
 };
 
-const update = (req, res) => {
+const update = async(req, res) => {
   const expenseId = Number(req.params.expenseId);
 
   if (isNaN(expenseId)) {
@@ -84,7 +74,7 @@ const update = (req, res) => {
     return;
   }
 
-  const foundExpense = expensesService.getById(expenseId);
+  const foundExpense = await expensesService.getById(expenseId);
 
   if (!foundExpense) {
     res.sendStatus(404);
@@ -107,7 +97,7 @@ const update = (req, res) => {
     return;
   }
 
-  expensesService.update({
+  await expensesService.update({
     id: expenseId,
     userId,
     spentAt,

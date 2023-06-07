@@ -1,13 +1,22 @@
+/* eslint-disable no-console */
 'use strict';
 
 const { Sequelize } = require('sequelize');
 const { password } = require('../password');
 
-const sequelize = new Sequelize('postgres', 'postgres', password, {
-  host: 'localhost',
-  dialect: 'postgres',
-});
+const dbInit = () => {
+  try {
+    const db = new Sequelize('postgres', 'postgres', password, {
+      host: 'localhost',
+      dialect: 'postgres',
+    });
 
-sequelize.sync({ force: true });
+    console.log('Connection has been established successfully.');
 
-module.exports = { sequelize };
+    return db;
+  } catch (error) {
+    console.error('Unable to connect to the database:', error);
+  }
+};
+
+module.exports = { dbInit };

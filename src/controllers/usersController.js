@@ -2,22 +2,16 @@
 
 const userService = require('../services/users');
 
-const getAll = (req, res) => {
-  const users = userService.getUsers();
+const getAll = async(req, res) => {
+  const users = await userService.getUsers();
 
   res.send(users);
 };
 
-const getOne = (req, res) => {
-  const userId = Number(req.params.userId);
+const getOne = async(req, res) => {
+  const { userId } = req.params;
 
-  if (isNaN(userId)) {
-    res.sendStatus(400);
-
-    return;
-  }
-
-  const foundUser = userService.getUser(userId);
+  const foundUser = await userService.getUser(userId);
 
   if (!foundUser) {
     res.sendStatus(404);
@@ -25,10 +19,11 @@ const getOne = (req, res) => {
     return;
   }
 
+  res.sendStatus(200);
   res.send(foundUser);
 };
 
-const create = (req, res) => {
+const create = async(req, res) => {
   const { name } = req.body;
 
   if (!name) {
@@ -37,15 +32,16 @@ const create = (req, res) => {
     return;
   }
 
-  userService.createUser(name);
+  const newUser = await userService.createUser(name);
 
-  res.statusCode = 201;
-  res.send(name);
+  res.sendStatus(201);
+  res.send(newUser);
 };
 
-const remove = (req, res) => {
-  const userId = Number(req.params.userId);
-  const foundUser = userService.getUser(userId);
+const remove = async(req, res) => {
+  const { userId } = req.params;
+
+  const foundUser = await userService.getUser(userId);
 
   if (!foundUser) {
     res.sendStatus(404);
@@ -53,21 +49,16 @@ const remove = (req, res) => {
     return;
   }
 
-  userService.remove(userId);
+  await userService.remove(userId);
 
   res.sendStatus(204);
 };
 
-const update = (req, res) => {
-  const userId = Number(req.params.userId);
-  const foundUser = userService.getUser(userId);
+const update = async(req, res) => {
+  const { userId } = req.params;
   const { name } = req.body;
 
-  if (!name || isNaN(userId) || typeof name !== 'string') {
-    res.sendStatus(400);
-
-    return;
-  }
+  const foundUser = await userService.getUser(userId);
 
   if (!foundUser) {
     res.sendStatus(404);
@@ -75,11 +66,13 @@ const update = (req, res) => {
     return;
   }
 
-  userService.update({
+  const updateUser = await userService.update({
     id: userId,
     name,
   });
-  res.send(foundUser);
+
+  res.sendStatus(200);
+  res.send(updateUser);
 };
 
 module.exports = {

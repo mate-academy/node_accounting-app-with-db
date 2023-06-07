@@ -1,17 +1,19 @@
 'use strict';
 
-const { sequelize } = require('../utils/db.js');
 const { DataTypes } = require('sequelize');
+const { dbInit } = require('../utils/db.js');
 
-const Expense = sequelize.define('Expense', {
-  userId: {
+const db = dbInit();
+
+const Expense = db.define('Expense', {
+  id: {
     type: DataTypes.INTEGER,
-    allowNull: false,
     primaryKey: true,
+    autoIncrement: true,
   },
 
-  spentAt: {
-    type: DataTypes.DATE,
+  userId: {
+    type: DataTypes.INTEGER,
     allowNull: false,
   },
 

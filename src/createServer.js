@@ -6,6 +6,7 @@ const cors = require('cors');
 
 const { userRouter } = require('./routes/usersRoute');
 const { expensesRouter } = require('./routes/expensesRoute');
+const { sync } = require('./sync.js');
 
 function createServer() {
   const app = express();
@@ -22,6 +23,7 @@ function createServer() {
 }
 
 createServer();
+sync();
 
 module.exports = {
   createServer,
