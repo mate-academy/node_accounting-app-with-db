@@ -22,4 +22,14 @@ const filterExpenses = (expenses, options) => {
   });
 };
 
-module.exports = { filterExpenses };
+const normalizeExpense = ({ id, userId, title, spentAt, amount, category, note }) => ({
+  id, userId, title, spentAt, amount, category, note,
+});
+
+const normalizeUser = ({ id, email }) => ({ id, email });
+
+module.exports = {
+  filterExpenses,
+  normalizeExpenses,
+  normalizeUsers,
+};

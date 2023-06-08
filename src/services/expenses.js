@@ -1,66 +1,67 @@
 'use strict';
 
-const { filterExpenses } = require('../helpers');
+const { Op } = require('sequelize');
+const { Expense } = require('../models/expenses');
+const { normalizeExpense } = require('../helpers');
 
-class Expenses {
-  constructor() {
-    this.expenses = [];
-  }
+async function getAll({
+  userId,
+  categories,
+  from,
+  to,
+}) {
+  const expenses = await Expense.findAll({
+    where: {
+      userId,
+      category: {
+        [Op.in]: categories,
+      },
+      createdAt: {
+        [Op.between]: [from, to],
+      },
+    },
+    order: ['userId', 'createdAt'],
+  });
 
-  reset() {
-    this.expenses = [];
-  }
-
-  getAll({ userId, categories, from, to }) {
-    const expenses = filterExpenses(
-      this.expenses,
-      {
-        userId,
-        categories,
-        from,
-        to,
-      }
-    );
-
-    if (expenses.length === 0) {
-      return [];
-    }
-
-    return expenses;
-  }
-
-  getById(id) {
-    return this.expenses.find(expense => expense.id === +id);
-  }
-
-  create(expense) {
-    const newExpense = {
-      id: this.expenses.length + 1,
-      ...expense,
-    };
-
-    this.expenses.push(newExpense);
-
-    return newExpense;
-  }
-
-  removeById(id) {
-    const expense = this.getById(id);
-
-    if (!expense) {
-      return null;
-    }
-
-    this.expenses = this.expenses.filter(exp => exp.id !== +id);
-
-    return expense;
-  }
-
-  update(expense, partsToUpdate) {
-    Object.assign(expense, partsToUpdate);
-  }
+  return expenses.map(normalizeExpense);
 }
 
-const expensesService = new Expenses();
+async function getById(id) {
+  const expense = await Expense.findByPk(id);
 
-module.exports = { expensesService };
+  return normalizeExpense(expense);
+}
+
+async function create(expense) {
+  const newExpense = await Expense.create(expense);
+
+  return normalizeExpense(newExpense);
+}
+
+async function removeById(id) {
+  await Expense.destroy({
+    where: {
+      id,
+    },
+  });
+}
+
+async function update(id, partsToUpdate) {
+  const updatedExpense = await Expense.update(partsToUpdate, {
+    where: {
+      id,
+    },
+  });
+
+  return normalizeExpense(updatedExpense);
+}
+
+module.exports = {
+  expensesService: {
+    getAll,
+    getById,
+    create,
+    removeById,
+    update,
+  },
+};

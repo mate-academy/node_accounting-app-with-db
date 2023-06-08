@@ -3,97 +3,81 @@
 const { expensesService } = require('../services/expenses');
 const { usersService } = require('../services/users');
 
-const getAll = (req, res) => {
-  const { userId, categories, from, to } = req.query;
-
-  const expenses = expensesService.getAll(
-    {
-      userId,
-      categories,
-      from,
-      to,
-    }
-  );
+const getAll = async(req, res) => {
+  const expenses = await expensesService.getAll(req.query);
 
   res.status(200).send(expenses);
 };
 
-const getOne = (req, res) => {
+const getOne = async(req, res) => {
   const { expenseId } = req.params;
 
   if (!expenseId) {
     return res.sendStatus(400);
   }
 
-  const expense = expensesService.getById(expenseId);
+  const expense = await expensesService.getById(expenseId);
 
-  if (!expense) {
-    return res
-      .status(404).send({ message: `Expense with id ${expenseId} not found` });
-  }
-
-  res.status(200).send(expense);
+  return expense
+    ? res.status(200).send(expense)
+    : res
+      .status(404)
+      .send({ message: `Expense with id ${expenseId} not found` });
 };
 
-const add = (req, res) => {
-  const {
-    userId,
-    spentAt,
-    title,
-    amount,
-    category,
-    note,
-  } = req.body;
+const add = async(req, res) => {
+  const { userId, spentAt, title, amount, category, note } = req.body;
 
   if (!userId || !spentAt || !title || !amount || !category) {
     return res.sendStatus(400);
   }
 
-  const user = usersService.getById(userId);
+  const [user, expense] = await Promise.all([
+    usersService.getById(userId),
+    expensesService.create({
+      userId,
+      spentAt,
+      title,
+      amount,
+      category,
+      note,
+    }),
+  ]);
 
   if (!user) {
     return res.sendStatus(400);
   }
 
-  const expense = expensesService.create({
-    userId,
-    spentAt,
-    title,
-    amount,
-    category,
-    note,
-  });
-
   res.status(201).send(expense);
 };
 
-const remove = (req, res) => {
+const remove = async(req, res) => {
   const { expenseId } = req.params;
 
   if (!expenseId) {
     return res.sendStatus(400);
   }
 
-  const expense = expensesService.getById(expenseId);
+  const expense = await expensesService.getById(expenseId);
 
   if (!expense) {
     return res
       .status(404).send({ message: `Expense with id ${expenseId} not found` });
   }
 
-  expensesService.removeById(expenseId);
+  await expensesService.removeById(expenseId);
 
   res.sendStatus(204);
 };
 
-const update = (req, res) => {
+const update = async(req, res) => {
   const { expenseId } = req.params;
 
   if (!expenseId) {
     return res.sendStatus(400);
   }
 
-  const expense = expensesService.getById(expenseId);
+  const expense = await expensesService.getById(expenseId);
 
   if (!expense) {
     return res
@@ -101,19 +85,19 @@ const update = (req, res) => {
   }
 
   const {
+    spentAt = expense.spentAt,
+    title = expense.title,
+    amount = expense.amount,
+    category = expense.category,
+    note = expense.note,
+  } = req.body;
+
+  await expensesService.update(expense, {
     spentAt,
     title,
     amount,
     category,
     note,
-  } = req.body;
-
-  expensesService.update(expense, {
-    spentAt: spentAt || expense.spentAt,
-    title: title || expense.title,
-    amount: amount || expense.amount,
-    category: category || expense.category,
-    note: note || expense.note,
   });
 
   res.status(200).send(expense);
