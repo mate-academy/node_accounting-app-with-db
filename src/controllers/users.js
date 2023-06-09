@@ -3,9 +3,18 @@
 const { usersService } = require('../services/users');
 
 const getAll = async(req, res) => {
-  const users = await usersService.getAll();
+  try {
+    const users = await usersService.getAll();
 
-  res.status(200).send(users);
+    res.status(200).send(users);
+  } catch (error) {
+    res
+      .status(500)
+      .send({
+        message: 'Error retrieving users',
+        error,
+      });
+  }
 };
 
 const getOne = async(req, res) => {

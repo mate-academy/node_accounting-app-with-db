@@ -2,6 +2,7 @@
 
 const { Op } = require('sequelize');
 const { Expense } = require('../models/expenses');
+const { Category } = require('../models/categories');
 const { normalizeExpense } = require('../helpers');
 
 async function getAll({
@@ -13,13 +14,18 @@ async function getAll({
   const expenses = await Expense.findAll({
     where: {
       userId,
-      category: {
-        [Op.in]: categories,
-      },
       createdAt: {
         [Op.between]: [from, to],
       },
     },
+    include: [{
+      model: Category,
+      where: {
+        id: {
+          [Op.in]: categories,
+        },
+      },
+    }],
     order: ['userId', 'createdAt'],
   });
 

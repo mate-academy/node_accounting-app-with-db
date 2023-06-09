@@ -17,7 +17,13 @@ const normalizeUsers = ({ id, email }) => ({
   email,
 });
 
+const normalizeCategories = ({ id, name }) => ({
+  id,
+  name,
+});
+
 module.exports = {
   normalizeExpenses,
   normalizeUsers,
+  normalizeCategories,
 };

@@ -4,9 +4,16 @@ const { expensesService } = require('../services/expenses');
 const { usersService } = require('../services/users');
 
 const getAll = async(req, res) => {
-  const expenses = await expensesService.getAll(req.query);
+  try {
+    const expenses = await expensesService.getAll(req.query);
 
-  res.status(200).send(expenses);
+    res.status(200).send(expenses);
+  } catch (error) {
+    res.status(500).send({
+      message: 'An error occurred.',
+      error,
+    });
+  }
 };
 
 const getOne = async(req, res) => {
