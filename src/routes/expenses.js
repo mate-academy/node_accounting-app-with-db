@@ -10,11 +10,11 @@ expensesRouter.get('/', expensesControlers.getAll);
 
 expensesRouter.get('/:expensesId', expensesControlers.getOne);
 
-expensesRouter.post('/', express.json(), expensesControlers.create);
+expensesRouter.post('/', expensesControlers.create);
 
 expensesRouter.delete('/:expensesId', expensesControlers.remove);
 
 expensesRouter
-  .patch('/:expensesId', express.json(), expensesControlers.update);
+  .patch('/:expensesId', expensesControlers.update);
 
 module.exports = expensesRouter;

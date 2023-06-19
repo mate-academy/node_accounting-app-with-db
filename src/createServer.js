@@ -9,16 +9,13 @@ function createServer() {
   const app = express();
 
   app.use(cors());
+  app.use(express.json());
 
   app.use('/users', usersRouter);
   app.use('/expenses', expensesRouter);
 
-  app.listen(3000);
-
   return app;
 }
-
-createServer();
 
 module.exports = {
   createServer,

@@ -96,71 +96,10 @@ const update = async(req, res) => {
   );
 };
 
-const removeMany = (req, res) => {
-  const { ids } = req.query;
-
-  if (!Array.isArray(ids)) {
-    res.sendStatus(422);
-
-    return;
-  }
-
-  try {
-    userServices.removeMany(ids);
-  } catch (error) {
-    res.sendStatus(404);
-
-    return;
-  }
-
-  res.sendStatus(204);
-};
-
-const updateMany = (req, res) => {
-  const { items } = req.body;
-
-  if (!Array.isArray(items)) {
-    res.sendStatus(422);
-
-    return;
-  }
-
-  const results = [];
-  const errors = [];
-
-  for (const { id, name } of items) {
-    const foundUser = userServices.getById(id);
-
-    if (foundUser) {
-      userServices.update({
-        id,
-        name,
-      });
-
-      results.push({
-        id,
-        status: 'OK',
-      });
-    } else {
-      errors.push({
-        id,
-        status: 'NOT FOUND',
-      });
-    }
-  }
-
-  res.sendStatus({
-    results,
-    errors,
-  });
-};
-
 module.exports = {
   getAll,
   getOne,
   add,
   remove,
   update,
-  removeMany,
-  updateMany,
 };

@@ -10,10 +10,10 @@ usersRouter.get('/', userControlers.getAll);
 
 usersRouter.get('/:userId', userControlers.getOne);
 
-usersRouter.post('/', express.json(), userControlers.add);
+usersRouter.post('/', userControlers.add);
 
 usersRouter.delete('/:userId', userControlers.remove);
 
-usersRouter.patch('/:userId', express.json(), userControlers.update);
+usersRouter.patch('/:userId', userControlers.update);
 
 module.exports = usersRouter;

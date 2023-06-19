@@ -1,8 +1,7 @@
 'use strict';
 
-const { sequelize } = require('../database/db');
 const { Expenses } = require('../models/Expenses');
-const { Op, QueryTypes } = require('sequelize');
+const { Op } = require('sequelize');
 
 function normalize({ id, userId, spentAt, title, amount, category, note }) {
   return {
@@ -66,17 +65,6 @@ function remove(expenseId) {
   });
 }
 
-function removeMany(ids) {
-  return sequelize.query(
-    `DELETE FROM expenses
-    WHERE id IN (?)`,
-    {
-      replacements: [ids],
-      type: QueryTypes.BULKDELETE,
-    },
-  );
-}
-
 function update({ id, ...body }) {
   return Expenses.update({ ...body }, {
     where: { id },
@@ -89,6 +77,5 @@ module.exports = {
   create,
   remove,
   update,
-  removeMany,
   normalize,
 };

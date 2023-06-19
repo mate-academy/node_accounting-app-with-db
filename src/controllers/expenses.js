@@ -44,6 +44,9 @@ const create = async(req, res) => {
     note,
   } = req.body;
 
+  const isHasAllData = !Number.isInteger(userId) || !spentAt || !title
+    || !Number.isInteger(amount) || !category || !note;
+
   const foundUser = await userServices.getById(Number(userId));
 
   if (!foundUser) {
@@ -52,8 +55,7 @@ const create = async(req, res) => {
     return;
   }
 
-  if (!Number.isInteger(userId) || !spentAt || !title
-    || !Number.isInteger(amount) || !category || !note) {
+  if (isHasAllData) {
     res.sendStatus(400);
 
     return;
@@ -100,20 +102,20 @@ const update = async(req, res) => {
   }
 
   await expenseServices.update({
-    id: +expensesId,
+    id: Number(expensesId),
     ...body,
   });
 
-  const foundExpense = await expenseServices.getById(Number(expensesId));
+  const updatedExpense = await expenseServices.getById(Number(expensesId));
 
-  if (!foundExpense) {
+  if (!updatedExpense) {
     res.sendStatus(404);
 
     return;
   }
 
   res.send(
-    expenseServices.normalize(foundExpense),
+    expenseServices.normalize(updatedExpense),
   );
 };
 

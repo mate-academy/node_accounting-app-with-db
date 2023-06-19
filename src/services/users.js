@@ -1,8 +1,6 @@
 'use strict';
 
-const { sequelize } = require('../database/db');
 const { User } = require('../models/User');
-const { QueryTypes } = require('sequelize');
 
 function normalize({ id, name }) {
   return {
@@ -49,31 +47,9 @@ async function remove(userId) {
   });
 }
 
-async function removeMany(ids) {
-  return sequelize.query(
-    `DELETE FROM users
-    WHERE id IN (?)`,
-    {
-      replacements: [ids],
-      type: QueryTypes.BULKDELETE,
-    },
-  );
-}
-
 async function update({ id, name }) {
   return User.update({ name }, {
     where: { id },
-  });
-}
-
-async function updateMany(users) {
-  return sequelize.transaction(async(t) => {
-    for (const { id, name } of users) {
-      await User.update({ name }, {
-        where: { id },
-        transaction: t,
-      });
-    }
   });
 }
 
@@ -83,7 +59,5 @@ module.exports = {
   create,
   remove,
   update,
-  removeMany,
-  updateMany,
   normalize,
 };
