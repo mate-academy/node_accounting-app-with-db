@@ -2,7 +2,7 @@
   "name": "node_accounting-app-with-db",
   "version": "1.0.0",
   "description": "Node.js accounting app with PostgreSQL",
-  "main": "src/index.js",
+  "main": "server.js",
   "scripts": {
     "init": "mate-scripts init",
     "start": "mate-scripts start",
