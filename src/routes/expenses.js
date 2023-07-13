@@ -38,7 +38,7 @@ router.get('/', (req, res) => {
     ));
   }
 
-  res.send(filteredExpenses);
+  res.json(filteredExpenses);
 });
 
 router.get('/:expenseId', (req, res) => {
@@ -47,12 +47,10 @@ router.get('/:expenseId', (req, res) => {
   const findExpense = expenses.find(expense => expense.id === +expenseId);
 
   if (!findExpense) {
-    res.sendStatus(404);
-
-    return;
+    return res.sendStatus(404);
   }
 
-  res.send(findExpense);
+  res.json(findExpense);
 });
 
 router.post('/', (req, res) => {
@@ -69,7 +67,7 @@ router.post('/', (req, res) => {
 
   if (!findUser) {
     res.status(400);
-    res.send({});
+    res.json({ error: 'User not found' });
 
     return;
   }
@@ -86,7 +84,7 @@ router.post('/', (req, res) => {
 
   expenses.push(newExpense);
   res.status(201);
-  res.send(newExpense);
+  res.json(newExpense);
 });
 
 router.delete('/:expenseId', (req, res) => {
@@ -96,9 +94,7 @@ router.delete('/:expenseId', (req, res) => {
   ));
 
   if (filteredExpenses.length === expenses.length) {
-    res.sendStatus(404);
-
-    return;
+    return res.sendStatus(404);
   }
 
   expenses = filteredExpenses;
@@ -110,9 +106,7 @@ router.patch('/:expenseId', (req, res) => {
   const findExpense = expenses.find(expense => expense.id === +expenseId);
 
   if (!findExpense) {
-    res.sendStatus(404);
-
-    return;
+    return res.sendStatus(404);
   }
 
   const updatedExpense = {
@@ -122,7 +116,7 @@ router.patch('/:expenseId', (req, res) => {
 
   Object.assign(findExpense, updatedExpense);
 
-  res.send(findExpense);
+  res.json(findExpense);
 });
 
 module.exports = { router };

@@ -6,7 +6,7 @@ const router = express.Router();
 let users = [];
 
 router.get('/', (req, res) => {
-  res.send(users);
+  res.json(users);
 });
 
 router.get('/:userId', (req, res) => {
@@ -14,12 +14,10 @@ router.get('/:userId', (req, res) => {
   const findUser = users.find(user => user.id === +userId);
 
   if (!findUser) {
-    res.sendStatus(404);
-
-    return;
+    return res.sendStatus(404);
   }
 
-  res.send(findUser);
+  res.json(findUser);
 });
 
 router.post('/', (req, res) => {
@@ -27,7 +25,7 @@ router.post('/', (req, res) => {
 
   if (!name) {
     res.status(400);
-    res.send({});
+    res.json({ error: 'Name is required' });
 
     return;
   }
@@ -40,7 +38,7 @@ router.post('/', (req, res) => {
   users.push(newUser);
 
   res.status(201);
-  res.send(newUser);
+  res.json(newUser);
 });
 
 router.delete('/:userId', (req, res) => {
@@ -48,9 +46,7 @@ router.delete('/:userId', (req, res) => {
   const filteredUsers = users.filter(user => user.id !== +userId);
 
   if (filteredUsers.length === users.length) {
-    res.sendStatus(404);
-
-    return;
+    return res.sendStatus(404);
   }
 
   users = filteredUsers;
@@ -62,9 +58,12 @@ router.patch('/:userId', (req, res) => {
   const { userId } = req.params;
   const findUser = users.find(user => user.id === +userId);
 
-  Object.assign(findUser, { name });
+  if (!findUser) {
+    return res.sendStatus(404);
+  }
 
-  res.send(findUser);
+  Object.assign(findUser, { name });
+  res.json(findUser);
 });
 
 module.exports = {
