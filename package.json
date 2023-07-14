@@ -26,6 +26,9 @@
     "projectType": "javascript"
   },
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "moment": "^2.29.4",
+    "pg": "^8.11.1",
+    "sequelize": "^6.32.1"
   }
 }
