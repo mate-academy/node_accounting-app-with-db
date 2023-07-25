@@ -1,8 +1,20 @@
 'use strict';
 
-const Expense = require('../models/Expense');
+const { Expense } = require('../models/Expense');
 
 class ExpenseService {
+  normalize(expense) {
+    return {
+      id: expense.id,
+      userId: expense.userId,
+      spentAt: expense.spentAt,
+      title: expense.title,
+      amount: expense.amount,
+      category: expense.category,
+      note: expense.note,
+    };
+  }
+
   async getExpenses(searchParams) {
     const { userId, categories, from, to } = searchParams;
 

@@ -3,6 +3,13 @@
 const { User } = require('../models/User');
 
 class UserService {
+  normalize(user) {
+    return {
+      id: user.id,
+      name: user.name,
+    };
+  }
+
   async getUsers() {
     const users = await User.findAll({ order: ['createdAt'] });
 
