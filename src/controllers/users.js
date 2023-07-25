@@ -6,7 +6,15 @@ class UserController {
   async getUsers(req, res) {
     const users = await usersService.getUsers();
 
-    res.status(200).json(users);
+    if (!users) {
+      res.status(500).json({ message: 'Failed to get users' });
+
+      return;
+    }
+
+    const normalizedUsers = users.map(usersService.normalize);
+
+    res.status(200).json(normalizedUsers);
   };
 
   async addUser(req, res) {
@@ -20,7 +28,15 @@ class UserController {
 
     const user = await usersService.addUser(name);
 
-    res.status(201).json(user);
+    if (!user) {
+      res.status(500).json({ message: 'Failed to add user' });
+
+      return;
+    }
+
+    const normalizedUser = usersService.normalize(user);
+
+    res.status(201).json(normalizedUser);
   };
 
   async getUserById(req, res) {
@@ -40,7 +56,9 @@ class UserController {
       return;
     }
 
-    res.status(200).json(user);
+    const normalizedUser = usersService.normalize(user);
+
+    res.status(200).json(normalizedUser);
   };
 
   async deleteUser(req, res) {
@@ -88,8 +106,12 @@ class UserController {
       return;
     }
 
-    res.status(200).json(user);
+    const normalizedUser = usersService.normalize(user);
+
+    res.status(200).json(normalizedUser);
   };
 }
 
-module.exports = { usersController: new UserController() };
+const usersController = new UserController();
+
+module.exports = { usersController };

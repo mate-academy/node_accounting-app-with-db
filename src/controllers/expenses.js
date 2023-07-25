@@ -7,13 +7,21 @@ class ExpenseController {
   async getExpenses(req, res) {
     const expenses = await expensesService.getExpenses(req.query);
 
-    res.status(200).json(expenses);
+    if (!expenses) {
+      res.status(500).json({ message: 'Failed to get expenses' });
+
+      return;
+    }
+
+    const normalizedExpenses = expenses.map(expensesService.normalize);
+
+    res.status(200).json(normalizedExpenses);
   };
 
   async addExpense(req, res) {
-    const { userId, spentAt, title, amount, category } = req.body;
+    const { userId, title, amount, category } = req.body;
 
-    if (!userId || !spentAt || !title || !amount || !category) {
+    if (!userId || !title || !amount || !category) {
       res.status(400).json({ message: 'Missing required fields' });
 
       return;
@@ -29,7 +37,15 @@ class ExpenseController {
 
     const expense = await expensesService.addExpense(req.body);
 
-    res.status(201).json(expense);
+    if (!expense) {
+      res.status(500).json({ message: 'Failed to add expense' });
+
+      return;
+    }
+
+    const normalizedExpense = expensesService.normalize(expense);
+
+    res.status(201).json(normalizedExpense);
   };
 
   async getExpenseById(req, res) {
@@ -49,7 +65,9 @@ class ExpenseController {
       return;
     }
 
-    res.status(200).json(expense);
+    const normalizedExpense = expensesService.normalize(expense);
+
+    res.status(200).json(normalizedExpense);
   };
 
   async deleteExpense(req, res) {
@@ -107,8 +125,12 @@ class ExpenseController {
       expense.note = note;
     }
 
-    res.status(200).json(expense);
+    const normalizedExpense = expensesService.normalize(expense);
+
+    res.status(200).json(normalizedExpense);
   };
 }
 
-module.exports = { expensesController: new ExpenseController() };
+const expensesController = new ExpenseController();
+
+module.exports = { expensesController };
