@@ -14,15 +14,15 @@ const Expense = sequelize.define('Expense', {
     allowNull: false,
   },
   spentAt: {
-    type: DataTypes.DATE,
-    allowNull: false,
+    type: DataTypes.TIME,
+    allowNull: true,
   },
   title: {
     type: DataTypes.STRING,
     allowNull: false,
   },
   amount: {
-    type: DataTypes.DECIMAL(10, 2),
+    type: DataTypes.INTEGER,
     allowNull: false,
   },
   category: {
