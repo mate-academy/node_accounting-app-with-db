@@ -2,22 +2,20 @@
 
 const User = require('../models/user');
 
-let users = [];
+const getAll = async() => {
+  const users = await User.findAll();
 
-const init = () => {
-  users = [];
-};
-
-const getAll = () => {
-  return User.findAll();
+  return users;
 };
 
 const getUserById = (id) => {
   return User.findOne({ where: { id } });
 };
 
-const create = (name) => {
-  return User.create({ name });
+const create = async(name) => {
+  const newUser = await User.create({ name });
+
+  return newUser;
 };
 
 const remove = (id) => {
@@ -36,7 +34,6 @@ const update = async(id, name) => {
 };
 
 module.exports = {
-  init,
   getAll,
   getUserById,
   create,

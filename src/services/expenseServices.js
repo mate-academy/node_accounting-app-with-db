@@ -1,12 +1,6 @@
 'use strict';
 
-let expenses = [];
-
-const init = () => {
-  expenses = [];
-};
-
-const { getUserById } = require('../services/userServices');
+const Expense = require('../models/expense');
 
 const validateData = (request) => {
   const requiredFields = [
@@ -23,9 +17,7 @@ const validateData = (request) => {
     requestFields.includes(field)
   ));
 
-  const user = getUserById(request.userId);
-
-  if (!user || !hasRequiredFields || !requiredFields.length) {
+  if (!hasRequiredFields || !requiredFields.length) {
     return false;
   }
 
@@ -50,13 +42,15 @@ const validateData = (request) => {
   return true;
 };
 
-const getAllExpenses = ({
+const getAllExpenses = async({
   userId,
   categories,
   from,
   to,
 }) => {
-  expenses = expenses.filter(expense => {
+  const expenses = await Expense.findAll({ order: ['spentAt'] });
+
+  const filteredExpenses = expenses.filter(expense => {
     const userIdMatch = userId
       ? +expense.userId === Number(userId)
       : true;
@@ -72,53 +66,33 @@ const getAllExpenses = ({
     return userIdMatch && categoryMatch && datesMatch;
   });
 
-  return expenses;
+  return filteredExpenses;
 };
 
-const create = ({ userId,
-  spentAt,
-  title,
-  amount,
-  category,
-  note }) => {
-  const maxId = expenses.length > 0
-    ? Math.max(...expenses.map(({ id }) => id))
-    : 0;
-
-  const newExpense = {
-    id: maxId + 1,
-    userId,
-    spentAt,
-    title,
-    amount,
-    category,
-    note,
-  };
-
-  expenses.push(newExpense);
+const create = async(expenseData) => {
+  const newExpense = await Expense.create({ ...expenseData });
 
   return newExpense;
 };
 
-const getExpenseById = (expenseId) => {
-  return expenses.find(({ id }) => id === Number(expenseId)) || null;
+const getExpenseById = async(expenseId) => {
+  const expense = await Expense.findByPk(expenseId);
+
+  return expense;
 };
 
-const removeExpense = (expenseId) => (
-  expenses = expenses.filter(({ id }) => Number(id) !== +expenseId
-  )
-);
+const removeExpense = async(expenseId) => {
+  await Expense.destroy({ where: { id: expenseId } });
+};
 
-const updateExpense = (expenseId, newData) => {
-  const expenseToUpdate = getExpenseById(Number(expenseId));
-
-  Object.assign(expenseToUpdate, newData);
+const updateExpense = async(expenseId, newData) => {
+  const expenseToUpdate = await Expense
+    .update(newData, { where: { id: expenseId } });
 
   return expenseToUpdate;
 };
 
 module.exports = {
-  init,
   validateData,
   getAllExpenses,
   create,

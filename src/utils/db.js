@@ -1,16 +1,20 @@
 'use strict';
 
-require('dotenv').config();
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 const { Sequelize } = require('sequelize');
 
-const sequelize = new Sequelize({
-  host: 'localhost',
-  database: 'postgres',
-  username: 'postgres',
-  password: '11223344',
-  dialect: 'postgres',
-  logging: false,
-});
+const sequelize = new Sequelize(
+  process.env.PG_DB,
+  process.env.PG_USER,
+  process.env.PG_PASS,
+  {
+    host: process.env.PG_HOST,
+    dialect: 'postgres',
+    logging: false,
+  }
+);
 
 module.exports = { sequelize };

@@ -1,73 +1,116 @@
 'use strict';
 
 const expenseServices = require('../services/expenseServices');
+const userServices = require('../services/userServices');
 
-const getAll = (req, res) => {
-  const expenses = expenseServices.getAllExpenses(req.query);
+const getAll = async(req, res) => {
+  try {
+    const expenses = await expenseServices.getAllExpenses(req.query);
 
-  res.status(200).send(expenses);
+    res.status(200).send(expenses);
+  } catch (error) {
+    res.sendStatus(400);
+  }
 };
 
-const createExpense = (req, res) => {
-  const isValidRequest = expenseServices.validateData(req.body);
+const createExpense = async(req, res) => {
+  try {
+    const { userId } = req.body;
 
-  if (!isValidRequest) {
-    res.status(400).send({ message: 'Validation error' });
+    const user = await userServices.getUserById(Number(userId));
 
-    return;
+    if (!user) {
+      res.status(400).json({ message: 'User not found' });
+
+      return;
+    }
+
+    const isValidRequest = expenseServices.validateData(req.body);
+
+    if (!isValidRequest) {
+      res.status(422).send({ message: 'Validation error' });
+
+      return;
+    }
+
+    const newExpense = await expenseServices.create(req.body);
+
+    res.status(201).send(newExpense);
+  } catch (error) {
+    res.sendStatus(400);
   }
-
-  const newExpense = expenseServices.create(req.body);
-
-  res.status(201).send(newExpense);
 };
 
-const getOneExpense = (req, res) => {
-  const { expenseId } = req.params;
-  const foundExpense = expenseServices.getExpenseById(+expenseId);
+const getOneExpense = async(req, res) => {
+  try {
+    const { expenseId } = req.params;
 
-  if (!foundExpense) {
-    res.sendStatus(404);
+    if (!expenseId) {
+      res.sendStatus(404);
 
-    return;
+      return;
+    }
+
+    const foundExpense = await expenseServices
+      .getExpenseById(Number(expenseId));
+
+    if (!foundExpense) {
+      res.sendStatus(404);
+
+      return;
+    }
+    res.send(foundExpense);
+  } catch (error) {
+    res.sendStatus(400);
   }
-
-  res.send(foundExpense);
 };
 
-const removeExpense = (req, res) => {
-  const { expenseId } = req.params;
+const removeExpense = async(req, res) => {
+  try {
+    const { expenseId } = req.params;
 
-  const existingExpense = expenseServices.getExpenseById(+expenseId);
+    if (!expenseId) {
+      res.sendStatus(404);
 
-  if (!existingExpense) {
-    res.sendStatus(404);
+      return;
+    }
 
-    return;
+    await expenseServices.removeExpense(Number(expenseId));
+
+    res.sendStatus(204);
+  } catch (error) {
+    res.sendStatus(400);
   }
-
-  expenseServices.removeExpense(+expenseId);
-
-  res.sendStatus(204);
 };
 
-const updateExpense = (req, res) => {
-  const expense = req.body;
-  const { expenseId } = req.params;
+const updateExpense = async(req, res) => {
+  try {
+    const { expenseId } = req.params;
 
-  const existingExpense = expenseServices.getExpenseById(+expenseId);
+    if (!expenseId) {
+      res.sendStatus(404);
 
-  if (!existingExpense) {
-    res
-      .status(404)
-      .send({ message: 'Expense not found' });
+      return;
+    }
 
-    return;
+    const existingExpense = await expenseServices
+      .getExpenseById(Number(expenseId));
+
+    if (!existingExpense) {
+      res
+        .status(404)
+        .send({ message: 'Expense not found' });
+
+      return;
+    }
+
+    const updatedExpense = await expenseServices
+      .updateExpense(Number(expenseId), req.body);
+
+    res.send(updatedExpense);
+  } catch (error) {
+    res.sendStatus(400);
   }
-
-  const updatedExpense = expenseServices.updateExpense(+expenseId, expense);
-
-  res.send(updatedExpense);
 };
 
 module.exports = {

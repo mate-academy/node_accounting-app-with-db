@@ -5,8 +5,14 @@ const { DataTypes } = require('sequelize');
 const User = require('./user');
 
 const Expense = sequelize.define('expense', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+
   spentAt: {
-    type: DataTypes.DATE,
+    type: DataTypes.STRING,
     allowNull: false,
   },
 
@@ -27,8 +33,11 @@ const Expense = sequelize.define('expense', {
 
   note: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
+}, {
+  tableName: 'expenses',
+  timestamps: false,
 });
 
 Expense.belongsTo(User);

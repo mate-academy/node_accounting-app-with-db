@@ -3,16 +3,20 @@
 const userServices = require('../services/userServices');
 
 const getAll = async(req, res) => {
-  const users = await userServices.getAll();
+  try {
+    const users = await userServices.getAll();
 
-  res.send(users);
+    res.send(users);
+  } catch (error) {
+    res.sendStatus(400);
+  }
 };
 
 const create = async(req, res) => {
   const { name } = req.body;
 
   if (!name) {
-    res.sendStatus(400);
+    res.status(400).json({ message: 'Name is required.' });
 
     return;
   }
@@ -47,9 +51,12 @@ const remove = async(req, res) => {
     return;
   }
 
-  await userServices.remove(id);
-
-  res.status(204).send({ message: 'User has been deleted successfully' });
+  try {
+    await userServices.remove(id);
+    res.status(204).send({ message: 'User has been deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error occurred while removing the user' });
+  }
 };
 
 const update = async(req, res) => {

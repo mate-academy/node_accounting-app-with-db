@@ -9,21 +9,10 @@ const {
 } = require('./routes/usersRouter');
 
 const {
-  init: usersInit,
-} = require('./services/userServices');
-
-const {
   expensesRouter,
 } = require('./routes/expensesRouter');
 
-const {
-  init: expensesInit,
-} = require('./services/expenseServices');
-
 function createServer() {
-  usersInit();
-  expensesInit();
-
   const app = express();
 
   app.use(cors());
