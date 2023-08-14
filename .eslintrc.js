@@ -1,10 +1,16 @@
 module.exports = {
-  extends: '@mate-academy/eslint-config',
+  extends: "ts-standard",
   env: {
     jest: true
   },
   rules: {
-    'no-proto': 0
+    "no-proto": 0,
+    "no-useless-constructor": 0
   },
-  plugins: ['jest']
-};
+  plugins: ["jest"],
+  parserOptions: {
+    project: "./tsconfig.json",
+    sourceType: "module",
+    allowImportExportEverywhere: true
+  }
+}
