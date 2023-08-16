@@ -9,7 +9,7 @@ const getAll = async(req, res) => {
 
     res.status(200).send(expenses);
   } catch (error) {
-    throw new Error(error);
+    res.status(500).send({ message: error });
   }
 };
 
@@ -37,7 +37,7 @@ const createExpense = async(req, res) => {
 
     res.status(201).send(newExpense);
   } catch (error) {
-    throw new Error(error);
+    res.status(500).send({ message: error });
   }
 };
 
@@ -46,7 +46,7 @@ const getExpense = async(req, res) => {
     const { expenseId } = req.params;
 
     if (!expenseId) {
-      res.status(404).message({ message: 'Expense Id not found' });
+      res.status(404).json({ message: 'Expense Id not found' });
 
       return;
     }
@@ -54,14 +54,14 @@ const getExpense = async(req, res) => {
     const foundExpense = await expenseServices.getExpenseById(expenseId);
 
     if (!foundExpense) {
-      res.sendStatus(404);
+      res.status(404);
 
       return;
     }
 
     res.send(foundExpense);
   } catch (error) {
-    throw new Error(error);
+    res.status(500).send({ message: error });
   }
 };
 
@@ -70,7 +70,7 @@ const removeExpense = async(req, res) => {
     const { expenseId } = req.params;
 
     if (!expenseId) {
-      res.status(404).message({ message: 'Expense Id not found' });
+      res.status(404).json({ message: 'Expense Id not found' });
 
       return;
     }
@@ -83,11 +83,11 @@ const removeExpense = async(req, res) => {
       return;
     }
 
-    expenseServices.removeExpense(expenseId);
+    await expenseServices.removeExpense(expenseId);
 
     res.sendStatus(204);
   } catch (error) {
-    throw new Error(error);
+    res.status(500).send({ message: error });
   }
 };
 
@@ -96,7 +96,7 @@ const updateExpense = async(req, res) => {
     const { expenseId } = req.params;
 
     if (!expenseId) {
-      res.status(404).message({ message: 'Expense Id not found' });
+      res.status(404).json({ message: 'Expense Id not found' });
 
       return;
     }
@@ -109,11 +109,12 @@ const updateExpense = async(req, res) => {
       return;
     };
 
-    const updatedExpense = expenseServices.updateExpense(expenseId, req.body);
+    const updatedExpense
+      = await expenseServices.updateExpense(expenseId, req.body);
 
     res.send(updatedExpense);
   } catch (error) {
-    throw new Error(error);
+    res.status(500).send({ message: error });
   }
 };
 

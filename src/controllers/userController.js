@@ -8,7 +8,7 @@ const getAll = async(req, res) => {
 
     res.send(users);
   } catch (error) {
-    throw new Error(error);
+    res.status(500).send({ message: error });
   }
 };
 
@@ -16,7 +16,7 @@ const create = async(req, res) => {
   const { name } = req.body;
 
   if (!name) {
-    res.sendStatus(400).json({ message: 'Name is required.' });
+    res.status(400).json({ message: 'Name is required.' });
 
     return;
   }
@@ -31,7 +31,7 @@ const getOne = async(req, res) => {
   const foundUser = await userServices.getUserById(id);
 
   if (!foundUser) {
-    res.sendStatus(404).send({ message: 'User not found' });
+    res.status(404).json({ message: 'User not found' });
 
     return;
   }
@@ -45,13 +45,13 @@ const remove = async(req, res) => {
   const existingUser = await userServices.getUserById(id);
 
   if (!existingUser) {
-    res.sendStatus(404).send({ message: 'User not found' });
+    res.status(404).json({ message: 'User not found' });
 
     return;
   }
 
   await userServices.remove(id);
-  res.sendStatus(204);
+  res.status(204);
 };
 
 const update = async(req, res) => {
@@ -61,20 +61,18 @@ const update = async(req, res) => {
   const existingUser = await userServices.getUserById(id);
 
   if (!existingUser) {
-    res.sendStatus(404).send({ message: 'User not found' });
+    res.status(404).json({ message: 'User not found' });
 
     return;
   };
 
   if (!name) {
-    res.sendStatus(422).send({ message: 'Name is required' });
+    res.status(422).json({ message: 'Name is required' });
 
     return;
   };
 
   const updatedUser = await userServices.update(id, name);
-
-  userServices.update(id, name);
 
   res.status(200).send(updatedUser);
 };

@@ -6,8 +6,9 @@ const User = require('./user');
 
 const Expense = sequelize.define('Expense', {
   id: {
-    type: DataTypes.STRING,
+    type: DataTypes.UUIDV4,
     primaryKey: true,
+    defaultValue: DataTypes.UUIDV4,
   },
 
   spentAt: {
@@ -39,7 +40,7 @@ const Expense = sequelize.define('Expense', {
   timestamps: false,
 });
 
-Expense.belongsTo(User);
-User.hasMany(Expense);
+Expense.belongsTo(User, { foreignKey: 'userId' });
+User.hasMany(Expense, { foreignKey: 'userId' });
 
 module.exports = Expense;

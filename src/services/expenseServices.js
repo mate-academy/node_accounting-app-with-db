@@ -47,25 +47,25 @@ const getAllExpenses = async({
   from,
   to,
 }) => {
-  const expenses = await Expense.findAll({ order: ['spentAt'] });
+  const expenses = await Expense
+    .findAll({ order: ['spentAt'] })
+    .filter(expense => {
+      const userIdMatch = userId
+        ? expense.userId === userId
+        : true;
 
-  const filteredExpenses = expenses.filter(expense => {
-    const userIdMatch = userId
-      ? expense.userId === userId
-      : true;
+      const categoryMatch = categories
+        ? categories.includes(expense.category)
+        : true;
 
-    const categoryMatch = categories
-      ? categories.includes(expense.category)
-      : true;
+      const datesMatch = (from && to)
+        ? expense.spentAt >= from && expense.spentAt <= to
+        : true;
 
-    const datesMatch = (from && to)
-      ? expense.spentAt >= from && expense.spentAt <= to
-      : true;
+      return userIdMatch && categoryMatch && datesMatch;
+    });
 
-    return userIdMatch && categoryMatch && datesMatch;
-  });
-
-  return filteredExpenses;
+  return expenses;
 };
 
 const create = async(expenseData) => {
