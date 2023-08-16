@@ -23,5 +23,14 @@ CREATE TABLE "Expense" (
     CONSTRAINT "Expense_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateIndex
+CREATE INDEX "User_id_idx" ON "User"("id");
+
+-- CreateIndex
+CREATE INDEX "Expense_id_idx" ON "Expense"("id");
+
+-- CreateIndex
+CREATE INDEX "Expense_userId_id_category_title_amount_spentAt_note_idx" ON "Expense"("userId", "id", "category", "title", "amount", "spentAt", "note");
+
 -- AddForeignKey
 ALTER TABLE "Expense" ADD CONSTRAINT "Expense_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

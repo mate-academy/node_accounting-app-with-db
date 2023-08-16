@@ -9,6 +9,8 @@ model User {
   updatedAt DateTime  @updatedAt
   name      String    @db.Text
   Expense   Expense[]
+
+  @@index([id])
 }
 
 model Expense {
@@ -22,6 +24,11 @@ model Expense {
   spentAt   DateTime @db.Timestamp
   note      String?  @db.Text
   user      User     @relation(fields: [userId], references: [id])
+
+  @@index([id])
+
+  // for getAll query 
+  @@index([userId, id, category, title, amount, spentAt, note])
 }
 
 generator client {

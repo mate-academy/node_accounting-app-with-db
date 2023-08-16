@@ -1,33 +1,14 @@
 'use strict'
 
-import { Expense } from '@prisma/client'
 import { ExpensesStorage } from '../storages'
 import { ServiceRegistry } from './serviceRegistry'
 import { isValidDateString } from '../shared/validation'
 import { ensure } from '../utils'
-
-interface ExpensesFilter {
-  userId: number;
-  categories?: string[];
-  from?: string;
-  to?: string;
-}
-
-interface FilterLike {
-  userId: any;
-  categories?: any;
-  from?: any;
-  to?: any;
-}
-
-interface ExpensesInput {
-  userId: number;
-  title: string;
-  category: string;
-  amount: string;
-  spentAt: string;
-  note: string | null;
-}
+import type {
+  RawExpensesFilter,
+  ExpensesFilter,
+  ExpensesInput
+} from '../types'
 
 export default class ExpensesService {
   private constructor (
@@ -37,14 +18,26 @@ export default class ExpensesService {
     serviceRegistry.register('ExpensesService', this)
   }
 
-  public static create (storage: ExpensesStorage, serviceRegistry: ServiceRegistry) {
+  public static create (
+    storage: ExpensesStorage,
+    serviceRegistry: ServiceRegistry
+  ) {
     return new ExpensesService(storage, serviceRegistry)
   }
 
-  public async getAll (filter: FilterLike) {
+  public async getAll (filter: RawExpensesFilter) {
     this.validateExpenseFilter(filter)
 
     return this.storage.findMany({
+      select: {
+        id: true,
+        userId: true,
+        spentAt: true,
+        title: true,
+        amount: true,
+        category: true,
+        note: true
+      },
       where: {
         userId: { equals: filter.userId },
         spentAt: { gte: filter.from, lte: filter.to },
@@ -54,7 +47,18 @@ export default class ExpensesService {
   }
 
   public async getById (id: number) {
-    return this.storage.findUnique({ where: { id } })
+    return this.storage.findUnique({
+      select: {
+        id: true,
+        userId: true,
+        spentAt: true,
+        title: true,
+        amount: true,
+        category: true,
+        note: true
+      },
+      where: { id }
+    })
   }
 
   public async create (expenseData: ExpensesInput) {
@@ -89,7 +93,9 @@ export default class ExpensesService {
     }
   }
 
-  private validateExpenseFilter (filter: FilterLike): asserts filter is ExpensesFilter {
+  private validateExpenseFilter (
+    filter: RawExpensesFilter
+  ): asserts filter is ExpensesFilter {
     ensure(filter.userId)
 
     if (filter.categories) {

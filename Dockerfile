@@ -19,8 +19,6 @@ COPY . .
 
 RUN npm install
 
-# RUN npx prisma generate
-
 RUN npx prisma migrate dev
 
 EXPOSE 3000
