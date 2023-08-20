@@ -4,20 +4,11 @@
 import { Sequelize } from 'sequelize';
 
 export const sequelize = new Sequelize(
-  'accounting_app',
-  'postgres',
-  'postgres',
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASS,
   {
-    host: 'localhost',
+    host: process.env.DB_HOST,
     dialect: 'postgres',
   },
 );
-
-// const sequelize = new Sequelize({
-//   dialect: 'postgres',
-//   host: 'localhost',
-//   database: 'accounting_app',
-//   username: 'postgres',
-//   password: 'postgres',
-//   logging: false,
-// });

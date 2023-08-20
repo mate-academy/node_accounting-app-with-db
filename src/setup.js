@@ -4,15 +4,7 @@ import { sequelize } from './utils/db.js';
 import { User } from './models/User.js';
 import { Expense } from './models/Expense.js';
 
-// export const setupNewDatabase = async () => {
-//   await sequelize.sync({ force: true });
-// };
-
-// setupNewDatabase().then(() => {
-//   console.log('Database setup complete');
-// });
-
-export const setupDatabase = async() => {
+export const setupDatabase = async () => {
   await sequelize.sync({ force: true });
 
   await User.create({ name: 'John' });
