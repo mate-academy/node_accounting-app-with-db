@@ -3,6 +3,7 @@ import 'dotenv/config';
 import { sequelize } from './utils/db.js';
 import { User } from './models/User.js';
 import { Expense } from './models/Expense.js';
+import { Category } from './models/Category.js';
 
 export const setupDatabase = async () => {
   await sequelize.sync({ force: true });
@@ -36,6 +37,11 @@ export const setupDatabase = async () => {
     category: 'Food',
     note: 'Burger and fries',
   });
+
+  await Category.create({ name: 'Food' });
+  await Category.create({ name: 'Education' });
+  await Category.create({ name: 'Transportation' });
+  await Category.create({ name: 'Entertainment' });
 };
 
 setupDatabase().then(() => {

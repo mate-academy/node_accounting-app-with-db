@@ -4,8 +4,9 @@ import createError from 'http-errors';
 import cors from 'cors';
 import { router as expensesRouter } from './routes/expenses.router.js';
 import { router as usersRouter } from './routes/users.router.js';
+import { router as categoriesRouter } from './routes/categories.router.js';
 
-const createServer = async() => {
+const createServer = async () => {
   const app = express();
 
   app.use(cors());
@@ -13,6 +14,7 @@ const createServer = async() => {
 
   app.use('/users', usersRouter);
   app.use('/expenses', expensesRouter);
+  app.use('/categories', categoriesRouter);
 
   app.get('/', (req, res) => {
     res.send('Hello World!');
