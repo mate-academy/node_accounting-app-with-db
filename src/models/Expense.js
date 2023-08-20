@@ -1,6 +1,7 @@
 import { sequelize } from '../utils/db.js';
 import { DataTypes } from 'sequelize';
 import { User } from './User.js';
+import { Category } from './Category.js';
 
 const Expense = sequelize.define(
   'expense',
@@ -71,29 +72,27 @@ const Expense = sequelize.define(
       },
     },
 
-    category: {
-      type: DataTypes.STRING,
+    categoryId: {
+      type: DataTypes.INTEGER,
       allowNull: false,
       validate: {
         notNull: {
-          msg: 'Category is required',
+          msg: 'Category ID is required',
         },
-
-        notEmpty: {
-          msg: 'Category cannot be empty',
+        isInt: {
+          msg: 'Category ID must be an integer',
         },
-
-        isString(value) {
-          if (typeof value !== 'string') {
-            throw new Error('Category must be a string');
-          }
-        },
+      },
+      references: {
+        model: Category,
+        key: 'id',
       },
     },
 
     note: {
       type: DataTypes.STRING,
       allowNull: true,
+      defaultValue: '',
     },
   },
   {
@@ -110,6 +109,11 @@ User.hasMany(Expense, {
 Expense.belongsTo(User, {
   foreignKey: 'userId',
   as: 'user',
+});
+
+Category.hasMany(Expense, {
+  foreignKey: 'categoryId',
+  as: 'expenses',
 });
 
 export { Expense };

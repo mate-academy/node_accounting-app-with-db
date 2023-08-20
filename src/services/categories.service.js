@@ -2,6 +2,7 @@ import { Category } from '../models/Category.js';
 
 async function getAll() {
   const categories = await Category.findAll();
+
   return categories;
 }
 

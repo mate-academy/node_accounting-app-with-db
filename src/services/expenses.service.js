@@ -9,14 +9,24 @@ async function getAll({ userId, categories, from, to }) {
   }
 
   if (categories) {
-    where.category = categories;
+    const categoriesIds = categories.map(Number);
+
+    where.categoryId = { [Op.in]: categoriesIds };
   }
 
-  if (from && to) {
-    where.spentAt = { [Op.between]: [from, to] };
+  if (from) {
+    where.spentAt = { [Op.gte]: from };
   }
 
-  return Expense.findAll({ where });
+  if (to) {
+    where.spentAt = { [Op.lte]: to };
+  }
+
+  return Expense.findAll({
+    where,
+    attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
+    order: [['spentAt', 'DESC']],
+  });
 }
 
 async function getOne(ExpensesId) {
@@ -35,7 +45,7 @@ async function createOne(body) {
     id: newExpense.id,
     title: newExpense.title,
     amount: newExpense.amount,
-    category: newExpense.category,
+    categoryId: newExpense.categoryId,
     note: newExpense.note,
     spentAt: newExpense.spentAt,
   };

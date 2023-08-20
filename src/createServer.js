@@ -6,7 +6,7 @@ import { router as expensesRouter } from './routes/expenses.router.js';
 import { router as usersRouter } from './routes/users.router.js';
 import { router as categoriesRouter } from './routes/categories.router.js';
 
-const createServer = async () => {
+const createServer = async() => {
   const app = express();
 
   app.use(cors());

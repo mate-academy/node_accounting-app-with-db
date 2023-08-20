@@ -3,7 +3,7 @@ import pkg from 'http-errors';
 
 const { NotFound } = pkg;
 
-const getAllCategories = async (req, res, next) => {
+const getAllCategories = async(req, res, next) => {
   try {
     const categories = await categoryService.getAll();
 
@@ -13,7 +13,7 @@ const getAllCategories = async (req, res, next) => {
   }
 };
 
-const getCategoryById = async (req, res, next) => {
+const getCategoryById = async(req, res, next) => {
   const { categoryId } = req.params;
 
   try {
@@ -29,7 +29,7 @@ const getCategoryById = async (req, res, next) => {
   }
 };
 
-const createCategory = async (req, res, next) => {
+const createCategory = async(req, res, next) => {
   const { name } = req.body;
 
   try {
@@ -41,7 +41,7 @@ const createCategory = async (req, res, next) => {
   }
 };
 
-const updateCategory = async (req, res, next) => {
+const updateCategory = async(req, res, next) => {
   const { categoryId } = req.params;
   const { name } = req.body;
 
@@ -54,7 +54,7 @@ const updateCategory = async (req, res, next) => {
   }
 };
 
-const deleteCategory = async (req, res, next) => {
+const deleteCategory = async(req, res, next) => {
   const { categoryId } = req.params;
 
   try {

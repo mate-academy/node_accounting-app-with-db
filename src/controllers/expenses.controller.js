@@ -35,9 +35,14 @@ const createExpense = async(req, res, next) => {
 
   try {
     const user = await usersService.getOne(body.userId);
+    const category = await expensesService.getOne(body.categoryId);
 
     if (!user) {
       next(new NotFound('User not found'));
+    }
+
+    if (!category) {
+      next(new NotFound('Category does not exist'));
     }
 
     const newExpense = await expensesService.createOne(body);
