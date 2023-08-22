@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 'use strict';
 
 const expenseService = require('../services/expenses.js');
@@ -43,8 +42,6 @@ const add = async(req, res) => {
 
   const foundUser = await userService.getById(+userId);
   const foundCategory = await categoryService.getById(+categoryId);
-
-  console.log(foundCategory);
 
   if (!foundUser) {
     res.statusCode = 400;

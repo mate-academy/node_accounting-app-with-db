@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 'use strict';
 
 const { DataTypes } = require('sequelize');
@@ -89,29 +88,19 @@ const create = async({ userId, spentAt, title, amount, categoryId, note }) => {
 };
 
 const remove = async(expenseId) => {
-  try {
-    const expenseToRemove = await Expense.destroy({
-      where: { id: +expenseId },
-    });
+  const expenseToRemove = await Expense.destroy({
+    where: { id: +expenseId },
+  });
 
-    return expenseToRemove;
-  } catch (error) {
-    console.log(error);
-  }
+  return expenseToRemove;
 };
 
 const update = async(expenseId, body) => {
-  try {
-    console.log(body, expenseId);
+  await Expense.update(body, {
+    where: { id: +expenseId },
+  });
 
-    await Expense.update(body, {
-      where: { id: +expenseId },
-    });
-
-    return getById(expenseId);
-  } catch (error) {
-    console.log(error);
-  }
+  return getById(expenseId);
 };
 
 module.exports = {
