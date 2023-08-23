@@ -14,7 +14,7 @@ const getUsers = async(req, res) => {
 
 const getUser = async(req, res) => {
   const { id } = req.params;
-  const findUser = userServices.getUser(id);
+  const findUser = await userServices.getUser(id);
 
   if (!findUser) {
     res.sendStatus(404);
@@ -27,7 +27,7 @@ const getUser = async(req, res) => {
 
 const deleteUser = async(req, res) => {
   const { id } = req.params;
-  const removeUser = userServices.getUser(id);
+  const removeUser = await userServices.getUser(id);
 
   if (!removeUser) {
     res.sendStatus(404);
