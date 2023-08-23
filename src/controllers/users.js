@@ -25,6 +25,10 @@ const getOne = async(req, res) => {
 };
 
 const add = async(req, res) => {
+  if (!req.body) {
+    return res.status(400).send('Body is required');
+  }
+
   const { name } = req.body;
 
   if (!name) {

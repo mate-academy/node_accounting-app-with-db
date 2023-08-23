@@ -2,21 +2,7 @@
 
 const expensesService = require('../services/expenses');
 const userService = require('../services/users');
-
-const expenseInterface = {
-  userId: 0,
-  title: '',
-  amount: 0,
-  category: '',
-  note: '',
-};
-
-const checkExpense = (expense) => {
-  const interfaceKeys = JSON.stringify(Object.keys(expenseInterface).sort());
-  const expenseKeys = JSON.stringify(Object.keys(expense).sort());
-
-  return interfaceKeys === expenseKeys;
-};
+const { checkExpense } = require('../services/checkExpense');
 
 const getAll = async(req, res) => {
   const expenses = await expensesService.getAll(req.query);
@@ -55,6 +41,10 @@ const add = async(req, res) => {
 const update = async(req, res) => {
   const { id } = req.params;
   const expenseData = { ...req.body };
+
+  if (!checkExpense(expenseData) || !userService.getOne(expenseData.userId)) {
+    return res.status(400).send('Bad request');
+  }
 
   const expense = await expensesService.update(parseInt(id), expenseData);
 

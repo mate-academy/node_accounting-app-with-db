@@ -1,6 +1,7 @@
 'use strict';
 
-const { Expense } = require('./db');
+const { Op } = require('sequelize');
+const { Expense } = require('../models/Expense');
 
 const getAll = async(params) => {
   const {
@@ -10,27 +11,28 @@ const getAll = async(params) => {
     to,
   } = params;
 
-  let expensesToReturn = await Expense.findAll();
+  const prepairedParams = {};
 
   if (userId) {
-    expensesToReturn = expensesToReturn
-      .filter((expense) => expense.userId === parseInt(userId));
+    prepairedParams.userId = userId;
   }
 
   if (categories) {
-    expensesToReturn = expensesToReturn
-      .filter((expense) => categories.includes(expense.category));
+    prepairedParams.category = {
+      [Op.in]: categories,
+    };
   }
 
-  if (from) {
-    expensesToReturn = expensesToReturn
-      .filter((expense) => expense.spentAt >= from);
+  if (from && to) {
+    prepairedParams.spentAt = {
+      [Op.gte]: from,
+      [Op.lte]: to,
+    };
   }
 
-  if (to) {
-    expensesToReturn = expensesToReturn
-      .filter((expense) => expense.spentAt <= to);
-  }
+  const expensesToReturn = await Expense.findAll({
+    where: prepairedParams,
+  });
 
   return expensesToReturn;
 };

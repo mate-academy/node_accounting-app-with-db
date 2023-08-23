@@ -1,14 +1,7 @@
 'use strict';
 
-const express = require('express');
-const { router: expensesRouter } = require('./routers/expenses');
-const { router: usersRouter } = require('./routers/users');
+const { createServer } = require('./services/createServer');
 
-const app = express();
+const PORT = 3000;
 
-app.use(express.json());
-
-app.use('/expenses', expensesRouter);
-app.use('/users', usersRouter);
-
-app.listen(3000);
+createServer(PORT);
