@@ -1,0 +1,36 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  name      String    @db.Text
+  Expense   Expense[]
+
+  @@index([id])
+}
+
+model Expense {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  title     String   @db.Text
+  category  String   @db.Text
+  amount    Decimal  @db.Decimal
+  spentAt   DateTime @db.Timestamp
+  note      String?  @db.Text
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([id])
+
+  // for getAll query 
+  @@index([userId, id, category, title, amount, spentAt, note])
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
