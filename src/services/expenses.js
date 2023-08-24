@@ -1,59 +1,19 @@
 'use strict';
 
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../utils/db.js');
-
-const Expense = sequelize.define('Expense',
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    userId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    spentAt: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    title: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    amount: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    categoryId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    note: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-  },
-  {
-    tableName: 'expenses',
-    updatedAt: false,
-    createdAt: false,
-  },
-);
+const Expense = require('../models/expenses.js');
 
 const getAll = async({ userId, categoryId, from, to }) => {
   let expensesFromDB = await Expense.findAll();
 
   if (categoryId) {
     expensesFromDB = expensesFromDB.filter((exp) => {
-      return exp.categoryId === +categoryId;
+      return exp.categoryId === categoryId;
     });
   }
 
   if (userId) {
     expensesFromDB = expensesFromDB.filter((exp) => {
-      return exp.userId === +userId;
+      return exp.userId === userId;
     });
   }
 
@@ -67,7 +27,7 @@ const getAll = async({ userId, categoryId, from, to }) => {
 };
 
 const getById = async(expenseId) => {
-  const expense = await Expense.findByPk(+expenseId);
+  const expense = await Expense.findByPk(expenseId);
 
   return expense;
 };
@@ -89,7 +49,7 @@ const create = async({ userId, spentAt, title, amount, categoryId, note }) => {
 
 const remove = async(expenseId) => {
   const expenseToRemove = await Expense.destroy({
-    where: { id: +expenseId },
+    where: { id: expenseId },
   });
 
   return expenseToRemove;
@@ -97,7 +57,7 @@ const remove = async(expenseId) => {
 
 const update = async(expenseId, body) => {
   await Expense.update(body, {
-    where: { id: +expenseId },
+    where: { id: expenseId },
   });
 
   return getById(expenseId);

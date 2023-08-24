@@ -1,26 +1,6 @@
 'use strict';
 
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../utils/db.js');
-
-const User = sequelize.define('User',
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-  },
-  {
-    tableName: 'users',
-    updatedAt: false,
-    createdAt: false,
-  },
-);
+const User = require('../models/users.js');
 
 const getAll = async() => {
   const users = await User.findAll();
@@ -29,7 +9,7 @@ const getAll = async() => {
 };
 
 const getById = async(userId) => {
-  const user = await User.findByPk(+userId);
+  const user = await User.findByPk(userId);
 
   return user;
 };
@@ -42,7 +22,7 @@ const create = async(name) => {
 
 const remove = async(userId) => {
   const userToRemove = await User.destroy({
-    where: { id: +userId },
+    where: { id: userId },
   });
 
   return userToRemove;
@@ -50,7 +30,7 @@ const remove = async(userId) => {
 
 const update = async(userId, name) => {
   await User.update({ name }, {
-    where: { id: +userId },
+    where: { id: userId },
   });
 
   return getById(userId);

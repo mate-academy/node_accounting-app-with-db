@@ -10,7 +10,7 @@ expensesRouter.get('/:expenseId', expenceController.getOne);
 
 expensesRouter.post('/', expenceController.add);
 
-expensesRouter.patch('/:expenseId', expenceController.updateExpense);
+expensesRouter.patch('/:expenseId', expenceController.update);
 
 expensesRouter.delete('/:expenseId', expenceController.remove);
 

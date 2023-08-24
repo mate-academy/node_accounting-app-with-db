@@ -16,8 +16,7 @@ const getOne = async(req, res) => {
   const foundExpense = await expenseService.getById(expenseId);
 
   if (!foundExpense) {
-    res.statusCode = 404;
-    res.send('Not Found');
+    res.status(404).send('Not Found');
 
     return;
   }
@@ -29,30 +28,27 @@ const add = async(req, res) => {
   const { userId, spentAt, title, amount, categoryId, note } = req.body;
 
   if (typeof title !== 'string'
-  || typeof userId !== 'number'
-  || typeof categoryId !== 'number'
+  || typeof userId !== 'string'
+  || typeof categoryId !== 'string'
   || typeof note !== 'string'
   || typeof amount !== 'number'
   || typeof spentAt !== 'string') {
-    res.statusCode = 400;
-    res.send('Pass all required fields');
+    res.status(400).send('Pass all required fields');
 
     return;
   }
 
-  const foundUser = await userService.getById(+userId);
-  const foundCategory = await categoryService.getById(+categoryId);
+  const foundUser = await userService.getById(userId);
+  const foundCategory = await categoryService.getById(categoryId);
 
   if (!foundUser) {
-    res.statusCode = 400;
-    res.send('User is not found');
+    res.status(400).send('User is not found');
 
     return;
   }
 
   if (!foundCategory) {
-    res.statusCode = 400;
-    res.send('Category is not found');
+    res.status(400).send('Category is not found');
 
     return;
   }
@@ -66,27 +62,30 @@ const add = async(req, res) => {
     note,
   });
 
-  res.statusCode = 201;
-  res.send(newExpense);
+  res.status(201).send(newExpense);
 };
 
-const updateExpense = async(req, res) => {
+const update = async(req, res) => {
   const { expenseId } = req.params;
   const foundExpense = await expenseService.getById(expenseId);
 
   if (!foundExpense) {
-    res.statusCode = 404;
-    res.send('Expense is not found');
+    res.status(404).send('Expense is not found');
 
     return;
   }
 
   const { body } = req;
 
+  if (!body) {
+    res.status(400).send('No data to update');
+
+    return;
+  }
+
   const updatedExpense = await expenseService.update(expenseId, body);
 
-  res.statusCode = 200;
-  res.send(updatedExpense);
+  res.status(200).send(updatedExpense);
 };
 
 const remove = async(req, res) => {
@@ -94,8 +93,7 @@ const remove = async(req, res) => {
   const foundExpense = await expenseService.getById(expenseId);
 
   if (!foundExpense) {
-    res.statusCode = 404;
-    res.send('Not Found');
+    res.status(404).send('Not Found');
 
     return;
   }
@@ -109,6 +107,6 @@ module.exports = {
   getAll,
   getOne,
   add,
-  updateExpense,
+  update,
   remove,
 };

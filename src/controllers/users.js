@@ -13,48 +13,49 @@ const getOne = async(req, res) => {
   const foundUser = await userService.getById(userId);
 
   if (!foundUser) {
-    res.statusCode = 404;
-    res.send('User not found');
+    res.status(404).send('User not found');
 
     return;
   }
 
-  res.statusCode = 200;
-  res.send(foundUser);
+  res.status(200).send(foundUser);
 };
 
 const add = async(req, res) => {
   const { name } = req.body;
 
   if (!name) {
-    res.statusCode = 400;
-    res.send('Fill required fileds');
+    res.status(400).send('Fill required fileds');
 
     return;
   }
 
   const newUser = await userService.create(name);
 
-  res.statusCode = 201;
-  res.send(newUser);
+  res.status(201).send(newUser);
 };
 
 const update = async(req, res) => {
   const { userId } = req.params;
-  const foundUser = userService.getById(userId);
+  const foundUser = await userService.getById(userId);
 
   if (!foundUser) {
-    res.statusCode = 404;
-    res.end('User not found');
+    res.status(404).end('User not found');
 
     return;
   }
 
   const { name } = req.body;
 
+  if (!name) {
+    res.status(400).send('No name to update');
+
+    return;
+  }
+
   const updatedUser = await userService.update(userId, name);
 
-  res.send(updatedUser);
+  res.status(200).send(updatedUser);
 };
 
 const remove = async(req, res) => {
@@ -62,8 +63,7 @@ const remove = async(req, res) => {
   const foundUser = await userService.getById(userId);
 
   if (!foundUser) {
-    res.statusCode = 404;
-    res.end('User not found');
+    res.status(404).end('User not found');
 
     return;
   }

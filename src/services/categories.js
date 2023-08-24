@@ -1,26 +1,6 @@
 'use strict';
 
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../utils/db.js');
-
-const Category = sequelize.define('Category',
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-  },
-  {
-    tableName: 'categories',
-    updatedAt: false,
-    createdAt: false,
-  },
-);
+const Category = require('../models/categories.js');
 
 const getAll = async() => {
   const categories = await Category.findAll();
@@ -29,7 +9,7 @@ const getAll = async() => {
 };
 
 const getById = async(categoryId) => {
-  const category = await Category.findByPk(+categoryId);
+  const category = await Category.findByPk(categoryId);
 
   return category;
 };
@@ -42,7 +22,7 @@ const create = async(name) => {
 
 const remove = async(categoryId) => {
   const categoryToRemove = await Category.destroy({
-    where: { id: +categoryId },
+    where: { id: categoryId },
   });
 
   return categoryToRemove;
@@ -50,9 +30,8 @@ const remove = async(categoryId) => {
 
 const update = async(categoryId, name) => {
   await Category.update({ name }, {
-    where: { id: +categoryId },
-  }
-  );
+    where: { id: categoryId },
+  });
 
   return getById(categoryId);
 };
