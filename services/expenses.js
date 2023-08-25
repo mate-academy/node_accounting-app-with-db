@@ -39,12 +39,12 @@ const createEpxense = async (data) => {
   return newExpense;
 };
 
-const removeExpense = (expenseId) => {
-  Expense.destroy({ where: { id: expenseId } });
+const removeExpense = async (expenseId) => {
+  await Expense.destroy({ where: { id: expenseId } });
 };
 
-const updateExpense = (expenseId, data) => {
-  Expense.update({
+const updateExpense = async (expenseId, data) => {
+  await Expense.update({
     ...data,
   }, {
     where: {
