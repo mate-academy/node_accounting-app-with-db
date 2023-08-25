@@ -55,7 +55,7 @@ const getExpenseById = async (req, res) => {
     return;
   }
 
-  res.send(normalize(foundExpense));
+  res.sendStatus(200).send(normalize(foundExpense));
 };
 
 const addExpense = async (req, res) => {

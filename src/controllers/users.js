@@ -13,7 +13,7 @@ const {
 const getAllUsers = async (req, res) => {
   const users = await getAll();
 
-  res.send(users.map(user => normalize(user)));
+  res.send(users.map(normalize));
 };
 
 const getOne = async (req, res) => {

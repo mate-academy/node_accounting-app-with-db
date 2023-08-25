@@ -1,7 +1,7 @@
 'use strict';
 
 const { DataTypes } = require('sequelize');
-const sequelize = require('../utils/db.js');
+const { sequelize } = require('../utils/db.js');
 
 const User = sequelize.define('User', {
   id: {
@@ -21,7 +21,8 @@ const User = sequelize.define('User', {
 }, {
   tableName: 'users',
   updatedAt: false,
-});
+}
+);
 
 module.exports = {
   User,

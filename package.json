@@ -4,6 +4,7 @@
   "description": "Node.js accounting app with PostgreSQL",
   "main": "src/index.js",
   "scripts": {
+    "dev": "nodemon src/main.js",
     "init": "mate-scripts init",
     "start": "mate-scripts start",
     "lint": "mate-scripts lint",
@@ -26,6 +27,8 @@
     "projectType": "javascript"
   },
   "dependencies": {
+    "express": "^4.18.2",
+    "nodemon": "^3.0.1",
     "pg": "^8.11.3",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.32.1",
