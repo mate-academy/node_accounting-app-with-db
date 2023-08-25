@@ -15,16 +15,16 @@ const getAllExpenses = async(searchParams) => {
   let foundExpenses = expenses;
 
   if (userId) {
-    foundExpenses = expenses.filter(expense => expense.userId === +userId);
+    foundExpenses = foundExpenses.filter(expense => expense.userId === +userId);
   }
 
   if (categories) {
-    foundExpenses = expenses
+    foundExpenses = foundExpenses
       .filter(expense => categories.includes(expense.category));
   }
 
   if (from && to) {
-    foundExpenses = expenses
+    foundExpenses = foundExpenses
       .filter(expense => expense.spentAt >= from && expense.spentAt <= to);
   }
 

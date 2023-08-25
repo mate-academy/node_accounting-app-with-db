@@ -124,23 +124,41 @@ const updateExpense = async(req, res) => {
     note,
   } = req.body;
 
-  if (title) {
-    expense.title = title;
+  const updatedData = {};
+
+  if (title || amount || category || note) {
+    if (title) {
+      updatedData.title = title;
+    }
+
+    if (amount) {
+      updatedData.amount = amount;
+    }
+
+    if (category) {
+      updatedData.category = category;
+    }
+
+    if (note) {
+      updatedData.note = note;
+    }
+  } else {
+    res.sendStatus(400);
+
+    return;
   }
 
-  if (amount) {
-    expense.amount = amount;
+  const isUpdated = expensesService.updateExpense(expenseId, updatedData);
+
+  if (!isUpdated) {
+    res.sendStatus(500);
+
+    return;
   }
 
-  if (category) {
-    expense.category = category;
-  }
+  const updatedExpense = await expensesService.getExpenseById(expenseId);
 
-  if (note) {
-    expense.note = note;
-  }
-
-  const normalizedExpense = expensesService.normalize(expense);
+  const normalizedExpense = expensesService.normalize(updatedExpense);
 
   res
     .status(200)
