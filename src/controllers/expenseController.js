@@ -49,9 +49,9 @@ const deleteExpense = async(req, res) => {
     return;
   }
 
-  const isDeleteExpense = expensesService.deleteExpense(expenseId);
+  const isDeletedExpense = expensesService.deleteExpense(expenseId);
 
-  if (!isDeleteExpense) {
+  if (!isDeletedExpense) {
     res.sendStatus(404);
 
     return;
