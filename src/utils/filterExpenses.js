@@ -1,6 +1,6 @@
 'use strict';
 
-const { BadRequest, NotFound } = require('http-errors');
+const { BadRequest } = require('http-errors');
 const usersService = require('../services/users');
 
 async function filterExpensesByUserId({
@@ -14,7 +14,7 @@ async function filterExpensesByUserId({
   const foundUser = await usersService.getById(+userId);
 
   if (!foundUser) {
-    throw new NotFound('User not found');
+    return [];
   }
 
   return expenses.filter(
@@ -47,12 +47,17 @@ function filterExpensesByCategory({
   expenses,
   categories,
 }) {
-  if (typeof categories !== 'string') {
-    throw new BadRequest('Category must be a string');
+  if (typeof categories === 'string') {
+    return expenses.filter(
+      expense => expense.category === categories);
   }
 
-  return expenses.filter(
-    expense => expense.category === categories);
+  if (Array.isArray(categories)) {
+    return expenses.filter(
+      expense => categories.includes(expense.category));
+  }
+
+  return [];
 }
 
 module.exports = {

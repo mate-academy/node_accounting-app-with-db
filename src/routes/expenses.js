@@ -23,10 +23,16 @@ router.get('/', async(req, res, next) => {
   let responseBody = await expensesService.getAll();
 
   if (userId) {
-    responseBody = filterExpenses.filterExpensesByUserId({
+    const filteredData = await filterExpenses.filterExpensesByUserId({
       expenses: responseBody,
       userId,
     });
+
+    if (filteredData) {
+      responseBody = filteredData;
+    } else {
+      responseBody = [];
+    }
   }
 
   if (from && to) {
