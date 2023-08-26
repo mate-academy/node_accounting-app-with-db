@@ -4,9 +4,9 @@
 const { Sequelize } = require('sequelize');
 
 const HOST_NAME = 'localhost';
-const DATABASE_NAME = 'accounting_app';
+const DATABASE_NAME = '';
 const DATABASE_LOGIN = 'postgres';
-const DATABASE_PASSWORD = 'nalunaIlona';
+const DATABASE_PASSWORD = '';
 const DATABASE_DIALECT = 'postgres';
 
 const sequelize = new Sequelize(
