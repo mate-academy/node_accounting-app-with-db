@@ -1,47 +1,43 @@
 'use strict';
 
-let users = [];
+const { User } = require('../models/user.model');
 
-function getAll() {
-  return users;
+async function getAll() {
+  const result = await User.findAll({
+    order: ['id'],
+  });
+
+  return result;
 }
 
-function getUserById(userId) {
-  const foundUser = users.find(({ id }) => id === +userId);
-
-  return foundUser || null;
+function getUserById(id) {
+  return User.findByPk(id);
 }
 
 function createUser(name) {
-  const newUser = {
-    id: +Date.now(),
-    name,
-  };
-
-  users.push(newUser);
-
-  return newUser;
+  return User.create({ name });
 }
 
-function removeUser(userId) {
-  users = users.filter(user => user.id !== +userId);
+async function updateUser(id, editedName) {
+  await User.update({ name: editedName }, {
+    where: {
+      id,
+    },
+  });
+
+  return getUserById(id);
 }
 
-function updateUser(currentUser, editedName) {
-  currentUser.name = editedName;
-
-  return currentUser;
-}
-
-function removeAllUsers() {
-  users = [];
+function removeUser(id) {
+  return User.destroy({
+    where: { id },
+  });
 }
 
 module.exports = {
   getAll,
   getUserById,
   createUser,
-  removeUser,
   updateUser,
-  removeAllUsers,
+  removeUser,
 };

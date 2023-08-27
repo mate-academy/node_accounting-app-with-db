@@ -6,13 +6,13 @@ const userController = require('../controllers/user.controller');
 
 router.get('/', userController.getAll);
 
-router.get('/:userId', userController.getOne);
+router.get('/:id', userController.getOne);
 
 router.post('/', userController.add);
 
-router.delete('/:userId', userController.remove);
+router.delete('/:id', userController.remove);
 
-router.patch('/:userId', userController.update);
+router.patch('/:id', userController.update);
 
 module.exports = {
   router,

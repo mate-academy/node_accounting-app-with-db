@@ -6,13 +6,13 @@ const expenseController = require('../controllers/expense.controller');
 
 router.get('/', expenseController.getAll);
 
-router.get('/:expenseId', expenseController.getOne);
+router.get('/:id', expenseController.getOne);
 
 router.post('/', expenseController.add);
 
-router.delete('/:expenseId', expenseController.remove);
+router.delete('/:id', expenseController.remove);
 
-router.patch('/:expenseId', expenseController.update);
+router.patch('/:id', expenseController.update);
 
 module.exports = {
   router,

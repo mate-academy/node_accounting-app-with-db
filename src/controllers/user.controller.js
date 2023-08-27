@@ -2,15 +2,15 @@
 
 const userService = require('../services/user.service');
 
-const getAll = (req, res) => {
-  const users = userService.getAll();
+const getAll = async(req, res) => {
+  const users = await userService.getAll();
 
   res.send(users);
 };
 
-const getOne = (req, res) => {
-  const { userId } = req.params;
-  const foundUser = userService.getUserById(userId);
+const getOne = async(req, res) => {
+  const { id } = req.params;
+  const foundUser = await userService.getUserById(id);
 
   if (!foundUser) {
     res.sendStatus(404);
@@ -21,7 +21,7 @@ const getOne = (req, res) => {
   res.send(foundUser);
 };
 
-const add = (req, res) => {
+const add = async(req, res) => {
   const { name } = req.body;
 
   if (!name) {
@@ -30,36 +30,14 @@ const add = (req, res) => {
     return;
   }
 
-  const newUser = userService.createUser(name);
+  const newUser = await userService.createUser(name);
 
   res.status(201).send(newUser);
 };
 
-const remove = (req, res) => {
-  const { userId } = req.params;
-  const foundUser = userService.getUserById(userId);
-
-  if (!foundUser) {
-    res.sendStatus(404);
-
-    return;
-  }
-
-  userService.removeUser(userId);
-
-  res.sendStatus(204);
-};
-
-const update = (req, res) => {
-  const { userId } = req.params;
+const update = async(req, res) => {
+  const { id } = req.params;
   const { name: editedName } = req.body;
-  const foundUser = userService.getUserById(userId);
-
-  if (!foundUser) {
-    res.sendStatus(404);
-
-    return;
-  }
 
   if (typeof editedName !== 'string' || !editedName) {
     res.sendStatus(400);
@@ -67,15 +45,36 @@ const update = (req, res) => {
     return;
   }
 
-  userService.updateUser(foundUser, editedName);
+  const updatedUser = await userService.updateUser(id, editedName);
 
-  res.send(foundUser);
+  if (!updatedUser) {
+    res.sendStatus(404);
+
+    return;
+  }
+
+  res.send(updatedUser);
+};
+
+const remove = async(req, res) => {
+  const { id } = req.params;
+  const foundUser = await userService.getUserById(id);
+
+  if (!foundUser) {
+    res.sendStatus(404);
+
+    return;
+  }
+
+  await userService.removeUser(id);
+
+  res.sendStatus(204);
 };
 
 module.exports = {
   getAll,
   getOne,
   add,
-  remove,
   update,
+  remove,
 };

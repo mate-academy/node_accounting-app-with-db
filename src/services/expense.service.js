@@ -1,94 +1,57 @@
 'use strict';
 
-let expenses = [];
+const { Op } = require('sequelize');
+const { Expense } = require('../models/expense.model');
 
-function getAll({
+async function getAll({
   userId,
   categories,
   from,
   to,
 }) {
+  const queryParameters = {};
+
   if (userId) {
-    expenses = expenses.filter(
-      (expense) => expense.userId === +userId,
-    );
+    queryParameters.userId = userId;
   }
 
   if (categories) {
-    expenses = expenses.filter(
-      (expense) => categories.includes(expense.category),
-    );
+    queryParameters.category = categories;
   }
 
-  if (from) {
-    expenses = expenses.filter(
-      (expense) => expense.spentAt >= from,
-    );
+  if (from && to) {
+    queryParameters.spentAt = {
+      [Op.between]: [from, to],
+    };
   }
 
-  if (to) {
-    expenses = expenses.filter(
-      (expense) => expense.spentAt <= to,
-    );
-  }
+  const expenses = await Expense.findAll({
+    where: queryParameters,
+  });
 
   return expenses;
 }
 
-function getExpenseById(expenseId) {
-  const foundExpense = expenses.find(({ id }) => id === +expenseId);
-
-  return foundExpense || null;
+function getExpenseById(id) {
+  return Expense.findByPk(id);
 }
 
-function createExpense({
-  userId,
-  spentAt,
-  title,
-  amount,
-  category,
-  note,
-}) {
-  const newExpense = {
-    id: +Date.now(),
-    userId,
-    spentAt,
-    title,
-    amount,
-    category,
-    note,
-  };
-
-  expenses.push(newExpense);
-
-  return newExpense;
+function createExpense(expense) {
+  return Expense.create(expense);
 }
 
-function removeExpense(expenseId) {
-  expenses = expenses.filter(
-    expense => expense.id !== +expenseId,
-  );
+async function updateExpense(id, params) {
+  await Expense.update(params, {
+    where: { id },
+  });
+
+  return Expense.getExpenseById(id);
 }
 
-function updateExpense(expenseId, params) {
-  const currentExpense = getExpenseById(expenseId);
-
-  const validKeys = Object.keys(currentExpense);
-
-  for (const [key, value] of Object.entries(params)) {
-    if (
-      validKeys.includes(key)
-      && typeof value === typeof currentExpense[key]
-    ) {
-      Object.assign(currentExpense, { [key]: value });
-    }
-  }
-
-  return currentExpense;
-}
-
-function removeAllExpenses() {
-  expenses = [];
+function removeExpense(id) {
+  return Expense.destroy({
+    where: { id },
+  });
 }
 
 module.exports = {
@@ -97,5 +60,4 @@ module.exports = {
   createExpense,
   removeExpense,
   updateExpense,
-  removeAllExpenses,
 };
