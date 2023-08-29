@@ -2,7 +2,9 @@
 
 const { Sequelize } = require('sequelize');
 
-const sequelize = new Sequelize('postgres', 'postgres', 'oleh', {
+const DB_NAME = 'postgres';
+
+const sequelize = new Sequelize(DB_NAME, 'postgres', 'oleh', {
   host: 'localhost',
   dialect: 'postgres',
 });

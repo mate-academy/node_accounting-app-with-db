@@ -2,6 +2,7 @@
 
 const { DataTypes, UUIDV4 } = require('sequelize');
 const { sequelize } = require('../sequelize/db');
+const User = require('./user');
 
 const Expense = sequelize.define('Expense',
   {
@@ -47,5 +48,7 @@ const Expense = sequelize.define('Expense',
     createdAt: false,
   }
 );
+
+Expense.belongsTo(User, { foreignKey: 'userId' });
 
 module.exports = Expense;

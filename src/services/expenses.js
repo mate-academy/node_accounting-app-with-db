@@ -1,29 +1,30 @@
 'use strict';
 
+const { Op } = require('sequelize');
 const Expense = require('../models/expenses.js');
 
-const getAll = async({ userId, categoryId, from, to }) => {
-  let expensesFromDB = await Expense.findAll();
-
-  if (categoryId) {
-    expensesFromDB = expensesFromDB.filter((exp) => {
-      return exp.categoryId === categoryId;
-    });
-  }
+const getAll = async({ userId, categories, from, to }) => {
+  const query = {};
 
   if (userId) {
-    expensesFromDB = expensesFromDB.filter((exp) => {
-      return exp.userId === userId;
-    });
+    query.userId = userId;
+  }
+
+  if (categories) {
+    query.category = categories;
   }
 
   if (from && to) {
-    expensesFromDB = expensesFromDB.filter((exp) => {
-      return exp.spentAt >= from && exp.spentAt <= to;
-    });
+    query.spentAt = {
+      [Op.between]: [from, to],
+    };
   }
 
-  return expensesFromDB;
+  const expenses = await Expense.findAll({
+    where: query,
+  });
+
+  return expenses;
 };
 
 const getOne = async(expenseId) => {
