@@ -1,58 +1,52 @@
 'use strict';
 
+const { Op } = require('sequelize');
 const expensesService = require('../services/expenses');
-const usersService = require('../services/users');
 
 const create = async(req, res) => {
-  const { title, userId } = req.body;
-  const foundUser = await usersService.getById(userId);
+  try {
+    const expense = await expensesService.create(req.body);
 
-  if (!title || !foundUser) {
-    res.sendStatus(400);
-
-    return;
+    res.statusCode = 201;
+    res.send(expense);
+  } catch (error) {
+    res.statusCode = 400;
+    res.send('Enter all fields');
   }
-
-  const expense = await expensesService.create(req.body);
-
-  res.statusCode = 201;
-  res.send(expense);
 };
 
 const getAll = async(req, res) => {
   const { userId, categories, from, to } = req.query;
-  let expenses = await expensesService.getAll();
+  const filters = {};
 
   if (userId) {
-    expenses = expenses.filter(expense => expense.userId === +userId);
+    filters.userId = userId;
   }
 
   if (categories) {
-    expenses = expenses.filter(expense => (
-      categories.includes(expense.category)
-    ));
+    filters.category = categories;
   }
 
-  if (from) {
-    expenses = expenses.filter(expense => (
-      new Date(expense.spentAt) >= new Date(from)
-    ));
+  if (from && to) {
+    filters.createdAt = { [Op.between]: [from, to] };
   }
 
-  if (to) {
-    expenses = expenses.filter(expense => (
-      new Date(expense.spentAt) <= new Date(to)
-    ));
-  }
+  try {
+    const expenses = await expensesService.getAll(filters);
 
-  res.send(expenses);
+    res.send(expenses);
+  } catch (error) {
+    res.statusCode = 400;
+    res.send('There are error in parameters');
+  }
 };
 
 const getById = async(req, res) => {
   const foundExpense = await expensesService.getById(req.params.expenseId);
 
   if (!foundExpense) {
-    res.sendStatus(404);
+    res.statusCode = 404;
+    res.send('Expense not found');
 
     return;
   }
@@ -65,7 +59,8 @@ const remove = async(req, res) => {
   const foundExpense = await expensesService.getById(expenseId);
 
   if (!foundExpense) {
-    res.sendStatus(404);
+    res.statusCode = 404;
+    res.send('Expense not found');
 
     return;
   }
@@ -80,14 +75,20 @@ const update = async(req, res) => {
   const foundExpense = await expensesService.getById(expenseId);
 
   if (!foundExpense) {
-    res.sendStatus(404);
+    res.statusCode = 404;
+    res.send('Expense not found');
 
     return;
   }
 
-  const updatedExpense = await expensesService.update(expenseId, req.body);
+  try {
+    const updatedExpense = await expensesService.update(expenseId, req.body);
 
-  res.send(updatedExpense);
+    res.send(updatedExpense);
+  } catch (error) {
+    res.statusCode = 400;
+    res.send('There are error in request body');
+  }
 };
 
 module.exports = {

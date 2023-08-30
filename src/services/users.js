@@ -13,18 +13,18 @@ const getAll = () => {
 };
 
 const getById = (userId) => {
-  return User.findByPk(+userId);
+  return User.findByPk(userId);
 };
 
 const remove = (userId) => {
   User.destroy({
-    where: { id: +userId },
+    where: { id: userId },
   });
 };
 
 const update = (userId, data) => {
   return User.update(data, {
-    where: { id: +userId },
+    where: { id: userId },
   });
 };
 

@@ -3,18 +3,15 @@
 const usersService = require('../services/users');
 
 const create = async(req, res) => {
-  const { name } = req.body;
+  try {
+    const user = await usersService.create(req.body);
 
-  if (!name) {
-    res.sendStatus(400);
-
-    return;
+    res.statusCode = 201;
+    res.send(user);
+  } catch (error) {
+    res.statusCode = 400;
+    res.send('Enter all fields');
   }
-
-  const user = await usersService.create(req.body);
-
-  res.statusCode = 201;
-  res.send(user);
 };
 
 const getAll = async(req, res) => {
@@ -27,7 +24,8 @@ const getById = async(req, res) => {
   const foundUser = await usersService.getById(req.params.userId);
 
   if (!foundUser) {
-    res.sendStatus(404);
+    res.statusCode = 404;
+    res.send('User not found');
 
     return;
   }
@@ -40,7 +38,8 @@ const remove = async(req, res) => {
   const foundUser = await usersService.getById(userId);
 
   if (!foundUser) {
-    res.sendStatus(404);
+    res.statusCode = 404;
+    res.send('User not found');
 
     return;
   }
@@ -55,14 +54,20 @@ const update = async(req, res) => {
   const foundUser = await usersService.getById(userId);
 
   if (!foundUser) {
-    res.sendStatus(404);
+    res.statusCode = 404;
+    res.send('User not found');
 
     return;
   }
 
-  const updatedUser = await usersService.update(userId, req.body);
+  try {
+    const updatedUser = await usersService.update(userId, req.body);
 
-  res.send(updatedUser);
+    res.send(updatedUser);
+  } catch (error) {
+    res.statusCode = 400;
+    res.send('There are error in request body');
+  }
 };
 
 module.exports = {
