@@ -1,18 +1,18 @@
 'use strict';
 
-const { Sequelize } = require("sequelize");
-const Expenses = require("../models/expenses");
-const sequelize = require("../utils/db");
+const Expenses = require('../models/expenses');
+const sequelize = require('../utils/db');
 
-
-async function getAll() {
-  return await Expenses.findAll();
+function getAll() {
+  return Expenses.findAll();
 };
 
 async function getById(id) {
-  return await Expenses.findByPk({
+  const expense = await Expenses.findByPk({
     where: { id },
-  })
+  });
+
+  return expense;
 };
 
 async function create({ userId, title, amount, category, note }) {
@@ -24,25 +24,31 @@ async function create({ userId, title, amount, category, note }) {
     note,
   };
 
-  await Expenses.create(newExpenses);
+  const createExpenses = await Expenses.create(newExpenses);
 
-  return await getById({
-    where: newExpenses,
-  });
+  return createExpenses;
 };
 
 async function remove(id) {
-  await sequelize.transaction(() => {
+  const t = await sequelize.transaction();
+
+  try {
     Expenses.delete({
       where: { id },
     });
-  });
+
+    t.commit();
+  } catch (error) {
+    t.rollback();
+  }
 };
 
 async function update(body, id) {
-  return await Expenses.update(body, {
+  const updateExpense = await Expenses.update(body, {
     where: { id },
   });
+
+  return updateExpense;
 };
 
 module.exports = {

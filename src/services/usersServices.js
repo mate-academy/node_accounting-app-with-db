@@ -1,24 +1,30 @@
 'use strict';
+
 const Users = require('../models/users');
 const sequelize = require('../utils/db');
 
-
 function normalize({ id, name }) {
-  return { id, name };
+  return {
+    id, name,
+  };
 }
 
 async function getAll() {
-  return await Users.findAll({
-    order: [['createdAt', 'desc']]
+  const users = await Users.findAll({
+    order: [['createdAt', 'desc']],
   });
+
+  return users;
 };
 
 async function getById(id) {
-  return await Users.findByPk(id);
+  const user = await Users.findByPk(id);
+
+  return user;
 };
 
-function create({ name }) {
-  const user = Users.create({
+async function create({ name }) {
+  const user = await Users.create({
     name,
   });
 
@@ -26,21 +32,35 @@ function create({ name }) {
 };
 
 async function remove(id) {
-  await sequelize.transaction(() => {
+  const t = await sequelize.transaction();
+
+  try {
     Users.delete({
       where: { id },
     });
-  });
+
+    t.commit();
+  } catch (error) {
+    t.rollback();
+  }
 };
 
 async function update({ id, name }) {
-  await Users.update({ name }, {
-    where: { id },
-  });
+  const t = await sequelize.transaction();
 
-  return await getById(id);
+  try {
+    const updateUser = await Users.update({ name }, {
+      where: { id },
+    });
+
+    t.commit();
+
+    return updateUser;
+  } catch (error) {
+    t.rollback();
+  }
 };
 
 module.exports = {
-  getAll, getById, create, remove, update, normalize
+  getAll, getById, create, remove, update, normalize,
 };

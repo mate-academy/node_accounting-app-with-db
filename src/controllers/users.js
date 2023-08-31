@@ -19,6 +19,8 @@ const createUser = (req, res) => {
 
   if (!name) {
     res.sendStatus(400);
+
+    return;
   }
 
   const newUser = create(name);
@@ -33,10 +35,14 @@ const getOneUser = (req, res) => {
 
   if (typeof id !== 'number') {
     res.sendStatus(400);
+
+    return;
   }
 
   if (!foundUser) {
     res.sendStatus(404);
+
+    return;
   }
 
   res.sendStatus(200);
@@ -49,6 +55,8 @@ const removeUser = (req, res) => {
 
   if (!foundUser) {
     res.sendStatus(404);
+
+    return;
   }
 
   remove(id);
@@ -63,12 +71,16 @@ const updateUser = (res, req) => {
 
   if (!foundUser) {
     res.sendStatus(404);
+
+    return;
   }
 
   const { name } = req.body;
 
   if (typeof name !== 'string') {
     res.sendStatus(400);
+
+    return;
   }
 
   update({

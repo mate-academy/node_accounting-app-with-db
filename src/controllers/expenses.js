@@ -34,14 +34,16 @@ const getExpenses = (req, res) => {
   }
 };
 
-const createExpense = (req, res) => {
+const createExpense = async(req, res) => {
   const { userId, amount, category, note } = req.body;
 
   if (!userId || !amount || !category || !note) {
     res.sendStatus(400);
+
+    return;
   }
 
-  const newExpences = create({
+  const newExpences = await create({
     userId, amount, category, note,
   });
 
@@ -49,24 +51,28 @@ const createExpense = (req, res) => {
   res.end(newExpences);
 };
 
-const getExpense = (req, res) => {
+const getExpense = async(req, res) => {
   const { id } = req.params;
-  const foundExpenses = getById(id);
+  const foundExpenses = await getById(id);
 
   if (!foundExpenses) {
     res.sendStatus(404);
+
+    return;
   }
 
   res.sendStatus(200);
   res.end(foundExpenses);
 };
 
-const deleteExpense = (req, res) => {
+const deleteExpense = async(req, res) => {
   const { id } = req.params;
-  const foundExpenses = getById(id);
+  const foundExpenses = await getById(id);
 
   if (!foundExpenses) {
     res.sendStatus(404);
+
+    return;
   }
 
   remove(id);
@@ -74,17 +80,21 @@ const deleteExpense = (req, res) => {
   res.end();
 };
 
-const updateExpense = (res, req) => {
+const updateExpense = async(res, req) => {
   const { id } = req.params;
   const reqBody = req.body;
-  const foundExpenses = getById(id);
+  const foundExpenses = await getById(id);
 
   if (!foundExpenses) {
     res.sendStatus(404);
+
+    return;
   }
 
   if (Object.keys(reqBody).length === 0) {
     res.sendStatus(400);
+
+    return;
   }
 
   res.sendStatus(200);
