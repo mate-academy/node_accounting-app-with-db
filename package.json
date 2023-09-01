@@ -31,5 +31,14 @@
     "pg": "^8.11.3",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.32.1"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AndruhaMan/node_accounting-app-with-db.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/AndruhaMan/node_accounting-app-with-db/issues"
+  },
+  "homepage": "https://github.com/AndruhaMan/node_accounting-app-with-db#readme"
 }
