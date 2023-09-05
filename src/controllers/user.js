@@ -13,9 +13,12 @@ async function getAllUsersAction(req, res) {
   try {
     const users = await getAllUsers();
 
+    if (!users) {
+      res.sendStatus(400).send('No users');
+    }
     res.send(users.map(user => normalize(user)));
   } catch (error) {
-    res.sendStatus(400).send(error.message);
+    res.sendStatus(500).send(error.message);
   }
 };
 
