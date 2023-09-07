@@ -11,7 +11,7 @@ function normalize({ id, name }) {
 
 async function getAll() {
   const users = await Users.findAll({
-    order: [['createdAt', 'desc']],
+    order: [[ 'createdAt', 'desc' ]],
   });
 
   return users;
@@ -23,7 +23,7 @@ async function getById(id) {
   return user;
 };
 
-async function create({ name }) {
+async function create(name) {
   const user = await Users.create({
     name,
   });
@@ -31,34 +31,18 @@ async function create({ name }) {
   return user;
 };
 
-async function remove(id) {
-  const t = await sequelize.transaction();
-
-  try {
-    Users.delete({
-      where: { id },
-    });
-
-    t.commit();
-  } catch (error) {
-    t.rollback();
-  }
+function remove(id) {
+  sequelize.transaction(async(t) => {
+    Users.destroy({ where: { id } }, { transaction: t });
+  });
 };
 
 async function update({ id, name }) {
-  const t = await sequelize.transaction();
-
-  try {
-    const updateUser = await Users.update({ name }, {
+  await sequelize.transaction(async(t) => {
+    await Users.update({ name }, {
       where: { id },
-    });
-
-    t.commit();
-
-    return updateUser;
-  } catch (error) {
-    t.rollback();
-  }
+    }, { transaction: t });
+  });
 };
 
 module.exports = {

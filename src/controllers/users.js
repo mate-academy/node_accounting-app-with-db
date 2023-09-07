@@ -8,13 +8,13 @@ const {
   update,
 } = require('../services/usersServices.js');
 
-const getAllUsers = (req, res) => {
-  const users = getAll();
+async function getUsers(req, res) {
+  const users = await getAll();
 
-  res.end(users);
+  res.status(200).send(users);
 };
 
-const createUser = (req, res) => {
+async function createUser(req, res) {
   const { name } = req.body;
 
   if (!name) {
@@ -23,21 +23,15 @@ const createUser = (req, res) => {
     return;
   }
 
-  const newUser = create(name);
+  const newUser = await create(name);
 
-  res.sendStatus(201);
-  res.end(newUser);
+  res.status(201).send(newUser);
 };
 
-const getOneUser = (req, res) => {
+async function getUser(req, res) {
   const { id } = req.params;
-  const foundUser = getById(id);
 
-  if (typeof id !== 'number') {
-    res.sendStatus(400);
-
-    return;
-  }
+  const foundUser = await getById(id);
 
   if (!foundUser) {
     res.sendStatus(404);
@@ -45,13 +39,13 @@ const getOneUser = (req, res) => {
     return;
   }
 
-  res.sendStatus(200);
-  res.end(foundUser);
+  res.status(200).send(foundUser);
 };
 
-const removeUser = (req, res) => {
+async function deleteUser(req, res) {
   const { id } = req.params;
-  const foundUser = getById(id);
+
+  const foundUser = await getById(id);
 
   if (!foundUser) {
     res.sendStatus(404);
@@ -61,13 +55,12 @@ const removeUser = (req, res) => {
 
   remove(id);
   res.sendStatus(204);
-  res.end();
 };
 
-const updateUser = (res, req) => {
+async function updateUser(req, res) {
   const { id } = req.params;
 
-  const foundUser = getById(id);
+  const foundUser = await getById(id);
 
   if (!foundUser) {
     res.sendStatus(404);
@@ -77,20 +70,24 @@ const updateUser = (res, req) => {
 
   const { name } = req.body;
 
-  if (typeof name !== 'string') {
+  if (!name && typeof name !== 'string') {
     res.sendStatus(400);
 
     return;
   }
 
-  update({
-    id, name,
+  await update({
+    id,
+    name,
   });
 
-  res.sendStatus(200);
-  res.end();
+  res.status(200).send(await getById(id));
 };
 
 module.exports = {
-  getAllUsers, createUser, getOneUser, removeUser, updateUser,
+  getUsers,
+  createUser,
+  getUser,
+  deleteUser,
+  updateUser,
 };

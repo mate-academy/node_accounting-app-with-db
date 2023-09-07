@@ -7,52 +7,61 @@ const {
   remove,
   update,
 } = require('../services/expensesServices.js');
+const { getById: getByUserId } = require('../services/usersServices.js');
 
-const getExpenses = (req, res) => {
-  const body = req.body;
-  const users = getAll();
+async function getExpenses(req, res) {
+  const body = req.query;
+  const expenses = await getAll();
+  const keysBody = Object.keys(body);
 
-  res.sendStatus(200);
+  if (keysBody.length > 0) {
+    const filteredExpenses = expenses.filter(expense => {
+      return keysBody.every(key => {
+        switch (key) {
+          case 'userId':
+            return expense.userId === +body.userId;
+          case 'categories':
+            return expense.category === body.categories;
+          case 'from':
+            const fromDate = new Date(body.from);
 
-  switch (Object.keys(body)) {
-    case 'userId':
-      res.end(users.filter(user => user.id === body.userId));
-      break;
-    case 'categories':
-      res.end(users.filter(user => user.categories === body.categories));
-      break;
-    case 'from':
-      res.end(users
-        .filter(user => new Date(user.spentAt) >= new Date(body.from)));
-      break;
-    case 'to':
-      res.end(users
-        .filter(user => new Date(user.spentAt) <= new Date(body.to)));
-      break;
-    default:
-      res.end(users);
+            return new Date(expense.spentAt) >= fromDate;
+          case 'to':
+            const toDate = new Date(body.to);
+
+            return new Date(expense.spentAt) <= toDate;
+          default:
+            return true;
+        }
+      });
+    });
+
+    res.status(200).send(filteredExpenses);
   }
+
+  res.status(200).send(expenses);
 };
 
-const createExpense = async(req, res) => {
-  const { userId, amount, category, note } = req.body;
+async function createExpense(req, res) {
+  const { userId, amount, category, note, title } = req.body;
+  const foundUser = await getByUserId(userId);
 
-  if (!userId || !amount || !category || !note) {
+  if (!foundUser || !amount || !category || !note || !title) {
     res.sendStatus(400);
 
     return;
   }
 
   const newExpences = await create({
-    userId, amount, category, note,
+    userId, amount, category, note, title,
   });
 
-  res.sendStatus(201);
-  res.end(newExpences);
+  res.status(201).send(newExpences);
 };
 
-const getExpense = async(req, res) => {
+async function getExpense(req, res) {
   const { id } = req.params;
+
   const foundExpenses = await getById(id);
 
   if (!foundExpenses) {
@@ -61,13 +70,13 @@ const getExpense = async(req, res) => {
     return;
   }
 
-  res.sendStatus(200);
-  res.end(foundExpenses);
+  res.status(200).send(foundExpenses);
 };
 
-const deleteExpense = async(req, res) => {
+const deleteExpense = (req, res) => {
   const { id } = req.params;
-  const foundExpenses = await getById(id);
+
+  const foundExpenses = getById(id);
 
   if (!foundExpenses) {
     res.sendStatus(404);
@@ -77,12 +86,11 @@ const deleteExpense = async(req, res) => {
 
   remove(id);
   res.sendStatus(204);
-  res.end();
 };
 
-const updateExpense = async(res, req) => {
+async function updateExpense(req, res) {
   const { id } = req.params;
-  const reqBody = req.body;
+
   const foundExpenses = await getById(id);
 
   if (!foundExpenses) {
@@ -91,14 +99,17 @@ const updateExpense = async(res, req) => {
     return;
   }
 
+  const reqBody = req.body;
+
   if (Object.keys(reqBody).length === 0) {
     res.sendStatus(400);
 
     return;
   }
 
-  res.sendStatus(200);
-  res.end(update(reqBody, id));
+  await update(reqBody, id);
+
+  res.status(200).send(await getById(id));
 };
 
 module.exports = {

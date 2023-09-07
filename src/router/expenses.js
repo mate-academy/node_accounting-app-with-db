@@ -11,10 +11,10 @@ const {
 
 const router = express.Router();
 
-router.get('/expenses', getExpenses);
-router.post('/expenses', express.json(), createExpense);
-router.get('/expenses/:id', getExpense);
-router.delete('/expenses/:id', deleteExpense);
-router.patch('/expenses/:id', express.json(), updateExpense);
+router.get('/', getExpenses);
+router.post('/', createExpense);
+router.get('/:id', getExpense);
+router.delete('/:id', deleteExpense);
+router.patch('/:id', updateExpense);
 
 module.exports = router;

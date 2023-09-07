@@ -9,14 +9,6 @@ const Expenses = sequelize.define('Expenses', {
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
   },
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  userId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
   title: {
     type: DataTypes.STRING,
     allowNull: false,

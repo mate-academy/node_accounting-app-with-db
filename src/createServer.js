@@ -8,12 +8,14 @@ const expensesRouter = require('./router/expenses.js');
 const app = express();
 
 function createServer() {
+  app.use(cors());
+  app.use(express.json());
+
+  app.use('/users', usersRouter);
+  app.use('/expenses', expensesRouter);
+
   return app;
 }
-
-app.use(cors());
-app.use('/users', usersRouter);
-app.use('/expenses', expensesRouter);
 
 module.exports = {
   createServer,
