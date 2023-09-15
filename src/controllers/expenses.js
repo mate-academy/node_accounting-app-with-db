@@ -25,41 +25,55 @@ const expenseControllers = {
     res.send(expense);
   },
   create: async(req, res) => {
-    const params = req.body;
+    try {
+      const {
+        userId,
+        title,
+        amount,
+        spentAt,
+      } = req.body;
 
-    const user = await usersService.findById(params.userId);
+      const user = await usersService.findById(userId);
 
-    const isCorrectParams = !(
-      params.userId
-      || params.userId
-      || typeof params.userId !== 'number'
-      || typeof params.title !== 'string'
-      || typeof params.amount !== 'number'
-      || typeof params.spentAt !== 'string'
-    );
+      const isCorrectParams = !(
+        userId
+        || title
+        || typeof userId !== 'number'
+        || typeof title !== 'string'
+        || typeof amount !== 'number'
+        || typeof spentAt !== 'string'
+      );
 
-    if (!user || isCorrectParams) {
-      res.sendStatus(400);
+      if (!user || isCorrectParams) {
+        res.sendStatus(400);
 
-      return;
+        return;
+      }
+
+      const newExpense = await expenseService.create({
+        userId,
+        title,
+        amount,
+        spentAt,
+      });
+
+      res.statusCode = 201;
+      res.send(newExpense);
+    } catch (error) {
+      res.sendStatus(500);
     }
-
-    const newExpense = await expenseService.create(params);
-
-    res.statusCode = 201;
-    res.send(newExpense);
   },
   remove: async(req, res) => {
     const { id } = req.params;
 
-    if (isNaN(id)) {
+    if (!id) {
       res.sendStatus(400);
 
       return;
     }
 
     try {
-      expenseService.remove(id);
+      await expenseService.remove(id);
 
       res.sendStatus(204);
     } catch (error) {

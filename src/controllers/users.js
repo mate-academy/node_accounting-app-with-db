@@ -32,44 +32,57 @@ const usersControllers = {
       return;
     }
 
-    const newUser = await usersService.create(name);
+    try {
+      const newUser = await usersService.create(name);
 
-    res.statusCode = 201;
-    res.send(usersService.normalize(newUser));
+      res.statusCode = 201;
+      res.send(usersService.normalize(newUser));
+    } catch (error) {
+      res.sendStatus(500);
+    }
   },
   remove: async(req, res) => {
     const { userId } = req.params;
-    const findUserById = await usersService.getById(userId);
 
-    if (!findUserById) {
-      res.sendStatus(404);
+    try {
+      const findUserById = await usersService.getById(userId);
 
-      return;
+      if (!findUserById) {
+        res.sendStatus(404);
+
+        return;
+      }
+
+      await usersService.remove(userId);
+      res.sendStatus(204);
+    } catch (error) {
+      res.sendStatus(500);
     }
-
-    await usersService.remove(userId);
-    res.sendStatus(204);
   },
   update: async(req, res) => {
     const { userId } = req.params;
     const { name } = req.body;
 
-    const foundUser = await usersService.getById(userId);
+    try {
+      const foundUser = await usersService.getById(userId);
 
-    if (!foundUser) {
-      res.sendStatus(404);
+      if (!foundUser) {
+        res.sendStatus(404);
 
-      return;
+        return;
+      }
+
+      if (!name) {
+        res.sendStatus(422);
+
+        return;
+      }
+
+      await usersService.update(userId, name);
+      res.send(usersService.normalize(foundUser));
+    } catch (error) {
+      res.sendStatus(500);
     }
-
-    if (typeof name !== 'string') {
-      res.sendStatus(422);
-
-      return;
-    }
-
-    await usersService.update(userId, name);
-    res.send(usersService.normalize(foundUser));
   },
 };
 

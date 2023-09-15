@@ -4,11 +4,13 @@ const express = require('express');
 const { userRouter } = require('./routes/users.js');
 const { expensesRouter } = require('./routes/expenses.js');
 
+const jsonMiddleware = express.json();
+
 function createServer() {
   const app = express();
 
-  app.use('/users', express.json(), userRouter);
-  app.use('/expenses', express.json(), expensesRouter);
+  app.use('/users', jsonMiddleware, userRouter);
+  app.use('/expenses', jsonMiddleware, expensesRouter);
 
   return app;
 }
