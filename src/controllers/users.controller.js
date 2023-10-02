@@ -2,14 +2,14 @@
 
 const usersServices = require('../services/users.service');
 
-const get = async (req, res) => {
+const get = async(req, res) => {
   const users = await usersServices.getAllUsers();
 
   res.send(users
     .map(user => usersServices.normalizeUser(user)));
 };
 
-const getOne = async (req, res) => {
+const getOne = async(req, res) => {
   const { id } = req.params;
 
   if (!id) {
@@ -27,7 +27,7 @@ const getOne = async (req, res) => {
   res.send(usersServices.normalizeUser(user));
 };
 
-const create = async (req, res) => {
+const create = async(req, res) => {
   const { name } = req.body;
 
   if (!name) {
@@ -40,7 +40,7 @@ const create = async (req, res) => {
   res.send(usersServices.normalizeUser(user));
 };
 
-const update = async (req, res) => {
+const update = async(req, res) => {
   const { id } = req.params;
   const { name } = req.body;
 
@@ -61,7 +61,7 @@ const update = async (req, res) => {
   res.send(usersServices.normalizeUser(updatedUser));
 };
 
-const remove = async (req, res) => {
+const remove = async(req, res) => {
   const { id } = req.params;
 
   if (!id) {
