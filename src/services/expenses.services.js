@@ -1,4 +1,3 @@
-/* eslint-disable space-before-function-paren */
 'use strict';
 
 const { sequelize } = require('../database/db');
@@ -53,17 +52,17 @@ const normalize = ({
   };
 };
 
-const getAllExpenses = async () => {
+const getAllExpenses = async() => {
   return Expense.findAll({
     order: [['createdAt', 'DESC']],
   });
 };
 
-const getByIdExpense = async (id) => {
+const getByIdExpense = async(id) => {
   return Expense.findByPk(id);
 };
 
-const getByQueryExpenses = async (query) => {
+const getByQueryExpenses = async(query) => {
   const {
     from,
     to,
@@ -91,33 +90,19 @@ const getByQueryExpenses = async (query) => {
     });
 };
 
-const createExpense = async ({
-  userId,
-  spentAt,
-  title,
-  amount,
-  category,
-  note,
-}) => {
-  const expense = {
-    userId,
-    spentAt,
-    title,
-    amount,
-    category,
-    note,
-  };
-
-  return Expense.create({ ...expense });
+const createExpense = async(newExpense) => {
+  return Expense.create(newExpense);
 };
 
-const updateExpense = async (id, paramToUpdate) => {
+const updateExpense = async(id, paramToUpdate) => {
   await Expense.update({
     ...paramToUpdate,
   }, { where: { id } });
+
+  return getByIdExpense(id);
 };
 
-const deleteExpense = async (id) => {
+const deleteExpense = async(id) => {
   await Expense.destroy({
     where: { id },
   });

@@ -2,7 +2,7 @@
 
 const express = require('express');
 const usersRouter = express.Router();
-const userControllers = require('../controllers/users.controllers');
+const userControllers = require('../controllers/users.controller');
 
 usersRouter.get('/', userControllers.get);
 usersRouter.get('/:id', userControllers.getOne);

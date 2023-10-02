@@ -1,4 +1,3 @@
-/* eslint-disable space-before-function-paren */
 'use strict';
 
 const { sequelize } = require('../database/db');
@@ -20,7 +19,7 @@ const normalizeUser = ({ id, name }) => {
   };
 };
 
-const getAllUsers = async () => {
+const getAllUsers = async() => {
   return User.findAll({
     order: [['createdAt', 'DESC']],
   });
@@ -34,11 +33,13 @@ const createUser = (name) => {
   return User.create({ name });
 };
 
-const updateUser = async (id, name) => {
+const updateUser = async(id, name) => {
   await User.update({ name }, { where: { id } });
+
+  return getByIdUser(id);
 };
 
-const deleteUser = async (id) => {
+const deleteUser = async(id) => {
   await User.destroy({
     where: { id },
   });
