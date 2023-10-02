@@ -1,19 +1,23 @@
+/* eslint-disable space-before-function-paren */
 'use strict';
 
 const usersServices = require('../services/users.services');
 
-const get = (req, res) => {
-  res.send(usersServices.getAllUsers());
+const get = async (req, res) => {
+  const users = await usersServices.getAllUsers();
+
+  res.send(users
+    .map(user => usersServices.normalizeUser(user)));
 };
 
-const getOne = (req, res) => {
+const getOne = async (req, res) => {
   const { id } = req.params;
 
   if (!id) {
     res.sendStatus(400);
   }
 
-  const user = usersServices.getByIdUser(id);
+  const user = await usersServices.getByIdUser(id);
 
   if (!user) {
     res.sendStatus(404);
@@ -21,28 +25,28 @@ const getOne = (req, res) => {
     return;
   }
 
-  res.send(user);
+  res.send(usersServices.normalizeUser(user));
 };
 
-const create = (req, res) => {
+const create = async (req, res) => {
   const { name } = req.body;
 
   if (!name) {
     res.sendStatus(400);
   }
 
-  const user = usersServices.createUser(name);
+  const user = await usersServices.createUser(name);
+  const normalizedUser = usersServices.normalizeUser(user);
 
   res.statusCode = 201;
-  res.send(user);
+  res.send(normalizedUser);
 };
 
-const update = (req, res) => {
+const update = async (req, res) => {
   const { id } = req.params;
   const { name } = req.body;
-  const user = usersServices.getByIdUser(id);
 
-  if (!user) {
+  if (!await usersServices.getByIdUser(id)) {
     res.sendStatus(404);
 
     return;
@@ -54,12 +58,15 @@ const update = (req, res) => {
     return;
   }
 
-  usersServices.updateUser(id, name);
+  await usersServices.updateUser(id, name);
 
-  res.send(user);
+  const updatedTodo = await usersServices.getByIdUser(id);
+  const normalizedUser = usersServices.normalizeUser(updatedTodo);
+
+  res.send(normalizedUser);
 };
 
-const remove = (req, res) => {
+const remove = async (req, res) => {
   const { id } = req.params;
 
   if (!id) {
@@ -68,15 +75,13 @@ const remove = (req, res) => {
     return;
   }
 
-  const user = usersServices.getByIdUser(id);
-
-  if (!user) {
+  if (!await usersServices.getByIdUser(id)) {
     res.sendStatus(404);
 
     return;
   }
 
-  usersServices.deleteUser(id);
+  await usersServices.deleteUser(id);
 
   res.sendStatus(204);
 };

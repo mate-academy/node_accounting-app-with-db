@@ -38,7 +38,7 @@ const getOne = (req, res) => {
   res.send(expense);
 };
 
-const create = (req, res) => {
+const create = async(req, res) => {
   const {
     userId,
     spentAt,
@@ -48,7 +48,7 @@ const create = (req, res) => {
     note,
   } = req.body;
 
-  const isUserExist = usersServices.getByIdUser(userId);
+  const isUserExist = await usersServices.getByIdUser(userId);
   const allValueExist = String(userId)
     && spentAt
     && title

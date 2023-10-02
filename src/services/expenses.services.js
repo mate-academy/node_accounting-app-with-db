@@ -1,7 +1,5 @@
 'use strict';
 
-const { generateUniqueId: uniqId } = require('../utils/_genUniqId');
-
 let expenses = [];
 
 const getAllExpenses = () => {
@@ -56,7 +54,7 @@ const createExpense = ({
   note,
 }) => {
   const expense = {
-    id: uniqId(),
+    id: 1,
     userId,
     spentAt,
     title,

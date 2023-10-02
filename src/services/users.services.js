@@ -1,42 +1,47 @@
+/* eslint-disable space-before-function-paren */
 'use strict';
 
-const { generateUniqueId: uniqId } = require('../utils/_genUniqId');
+const { sequelize } = require('./db');
+const { DataTypes } = require('sequelize');
 
-let users = [];
+const User = sequelize.define('User', {
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+}, {
+  tableName: 'users',
+});
 
-const getAllUsers = () => {
-  return users;
+const normalizeUser = ({ id, name }) => {
+  return {
+    id,
+    name,
+  };
+};
+
+const getAllUsers = async () => {
+  return User.findAll({
+    order: [['createdAt', 'DESC']],
+  });
 };
 
 const getByIdUser = (id) => {
-  return users.find(user => user.id === +id);
+  return User.findByPk(id);
 };
 
 const createUser = (name) => {
-  const user = {
-    id: uniqId(),
-    name,
-  };
-
-  users.push(user);
-
-  return user;
+  return User.create({ name });
 };
 
-const updateUser = (id, name) => {
-  const user = getByIdUser(id);
-
-  Object.assign(user, { name });
-
-  return user;
+const updateUser = async (id, name) => {
+  await User.update({ name }, { where: { id } });
 };
 
-const deleteUser = (id) => {
-  users = users.filter(user => user.id !== Number(id));
-};
-
-const clear = () => {
-  users.length = 0;
+const deleteUser = async (id) => {
+  await User.destroy({
+    where: { id },
+  });
 };
 
 module.exports = {
@@ -45,5 +50,6 @@ module.exports = {
   createUser,
   updateUser,
   deleteUser,
-  clear,
+  User,
+  normalizeUser,
 };
