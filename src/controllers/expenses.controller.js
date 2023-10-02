@@ -1,9 +1,9 @@
 'use strict';
 
-const expensesServices = require('../services/expenses.services');
-const usersServices = require('../services/users.services');
+const expensesServices = require('../services/expenses.service');
+const usersServices = require('../services/users.service');
 
-const get = async(req, res) => {
+const get = async (req, res) => {
   const query = req.query;
   let expenses = [];
 
@@ -22,7 +22,7 @@ const get = async(req, res) => {
     .map(expense => expensesServices.normalize(expense)));
 };
 
-const getOne = async(req, res) => {
+const getOne = async (req, res) => {
   const { id } = req.params;
 
   if (!id) {
@@ -42,7 +42,7 @@ const getOne = async(req, res) => {
   res.send(expense);
 };
 
-const create = async(req, res) => {
+const create = async (req, res) => {
   const {
     userId,
     spentAt,
@@ -77,7 +77,7 @@ const create = async(req, res) => {
   res.send(expensesServices.normalize(expense));
 };
 
-const update = async(req, res) => {
+const update = async (req, res) => {
   const { id } = req.params;
   const newValues = req.body;
 
@@ -100,7 +100,7 @@ const update = async(req, res) => {
   res.send(expensesServices.normalize(newExpense));
 };
 
-const remove = async(req, res) => {
+const remove = async (req, res) => {
   const { id } = req.params;
 
   if (!id) {
