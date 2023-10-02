@@ -2,23 +2,21 @@
 'use strict';
 
 const express = require('express');
+const cors = require('cors');
 const { usersRouter } = require('./routes/users.route');
 const { expensesRouter } = require('./routes/expenses.route');
 
 function createServer() {
   const app = express();
 
-  app.use('/users', express.json(), usersRouter);
-  app.use('/expenses', express.json(), expensesRouter);
+  app.use(cors());
+  app.use(express.json());
 
-  app.listen(3000, () => {
-    console.log('Server on port 3000');
-  });
+  app.use('/users', usersRouter);
+  app.use('/expenses', expensesRouter);
 
   return app;
 }
-
-createServer();
 
 module.exports = {
   createServer,

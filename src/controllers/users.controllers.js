@@ -36,10 +36,9 @@ const create = async (req, res) => {
   }
 
   const user = await usersServices.createUser(name);
-  const normalizedUser = usersServices.normalizeUser(user);
 
   res.statusCode = 201;
-  res.send(normalizedUser);
+  res.send(usersServices.normalizeUser(user));
 };
 
 const update = async (req, res) => {
@@ -61,9 +60,8 @@ const update = async (req, res) => {
   await usersServices.updateUser(id, name);
 
   const updatedTodo = await usersServices.getByIdUser(id);
-  const normalizedUser = usersServices.normalizeUser(updatedTodo);
 
-  res.send(normalizedUser);
+  res.send(usersServices.normalizeUser(updatedTodo));
 };
 
 const remove = async (req, res) => {

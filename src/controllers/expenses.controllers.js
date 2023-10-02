@@ -1,24 +1,30 @@
+/* eslint-disable space-before-function-paren */
 /* eslint-disable no-console */
 'use strict';
 
 const expensesServices = require('../services/expenses.services');
 const usersServices = require('../services/users.services');
 
-const get = (req, res) => {
+const get = async (req, res) => {
   const query = req.query;
+  let expenses = [];
 
   if (!query) {
-    res.send(expensesServices.getAllExpenses());
+    expenses = await expensesServices.getAllExpenses();
+
+    res.send(expenses
+      .map(expense => expensesServices.normalize(expense)));
 
     return;
   }
 
-  const expense = expensesServices.getByQueryExpenses(query);
+  expenses = await expensesServices.getByQueryExpenses(query);
 
-  res.send(expense);
+  res.send(expenses
+    .map(expense => expensesServices.normalize(expense)));
 };
 
-const getOne = (req, res) => {
+const getOne = async (req, res) => {
   const { id } = req.params;
 
   if (!id) {
@@ -27,7 +33,7 @@ const getOne = (req, res) => {
     return;
   }
 
-  const expense = expensesServices.getByIdExpense(id);
+  const expense = await expensesServices.getByIdExpense(id);
 
   if (!expense) {
     res.sendStatus(404);
@@ -38,7 +44,7 @@ const getOne = (req, res) => {
   res.send(expense);
 };
 
-const create = async(req, res) => {
+const create = async (req, res) => {
   const {
     userId,
     spentAt,
@@ -49,7 +55,7 @@ const create = async(req, res) => {
   } = req.body;
 
   const isUserExist = await usersServices.getByIdUser(userId);
-  const allValueExist = String(userId)
+  const allValueExist = userId
     && spentAt
     && title
     && String(amount)
@@ -60,7 +66,7 @@ const create = async(req, res) => {
     res.sendStatus(400);
   }
 
-  const expense = expensesServices.createExpense({
+  const expense = await expensesServices.createExpense({
     userId,
     spentAt,
     title,
@@ -70,14 +76,12 @@ const create = async(req, res) => {
   });
 
   res.statusCode = 201;
-  res.send(expense);
+  res.send(expensesServices.normalize(expense));
 };
 
-const update = (req, res) => {
+const update = async (req, res) => {
   const { id } = req.params;
   const newValues = req.body;
-
-  console.log(newValues);
 
   if (!newValues) {
     res.sendStatus(400);
@@ -85,7 +89,7 @@ const update = (req, res) => {
     return;
   }
 
-  const expense = expensesServices.getByIdExpense(id);
+  const expense = await expensesServices.getByIdExpense(id);
 
   if (!expense) {
     res.sendStatus(404);
@@ -93,12 +97,14 @@ const update = (req, res) => {
     return;
   }
 
-  const newExpense = expensesServices.updateExpense(id, newValues);
+  await expensesServices.updateExpense(id, newValues);
 
-  res.send(newExpense);
+  const newExpense = await expensesServices.getByIdExpense(id);
+
+  res.send(expensesServices.normalize(newExpense));
 };
 
-const remove = (req, res) => {
+const remove = async (req, res) => {
   const { id } = req.params;
 
   if (!id) {
@@ -107,7 +113,7 @@ const remove = (req, res) => {
     return;
   }
 
-  const expense = expensesServices.getByIdExpense(id);
+  const expense = await expensesServices.getByIdExpense(id);
 
   if (!expense) {
     res.sendStatus(404);
@@ -115,7 +121,7 @@ const remove = (req, res) => {
     return;
   }
 
-  expensesServices.deleteExpense(id);
+  await expensesServices.deleteExpense(id);
 
   res.sendStatus(204);
 };

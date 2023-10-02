@@ -1,7 +1,7 @@
 /* eslint-disable space-before-function-paren */
 'use strict';
 
-const { sequelize } = require('./db');
+const { sequelize } = require('../database/db');
 const { DataTypes } = require('sequelize');
 
 const User = sequelize.define('User', {
