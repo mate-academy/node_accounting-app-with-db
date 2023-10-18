@@ -11,11 +11,19 @@ const getAllExpenses = async(req, res) => {
     categories,
   } = req.query;
 
-  let expenses = await service.getAll();
+  const conditions = {};
 
   if (userId) {
-    expenses = expenses.filter(expense => expense.userId === +userId);
+    conditions.userId = userId;
   }
+
+  if (categories) {
+    conditions.category = categories;
+  }
+
+  let expenses = await service.getAll(
+    conditions,
+  );
 
   if (from) {
     expenses = expenses.filter(expense => {
@@ -27,12 +35,6 @@ const getAllExpenses = async(req, res) => {
     expenses = expenses.filter(expense => {
       return new Date(expense.spentAt).valueOf() <= new Date(to).valueOf();
     });
-  }
-
-  if (categories) {
-    expenses = expenses.filter(
-      expense => categories.includes(expense.category)
-    );
   }
 
   res.statusCode = 200;

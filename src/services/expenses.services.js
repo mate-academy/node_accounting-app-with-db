@@ -37,8 +37,10 @@ const Expense = sequelize.define('Expense', {
   createdAt: false,
 });
 
-const getAll = async() => {
-  const expenses = await Expense.findAll();
+const getAll = async(conditions) => {
+  const expenses = await Expense.findAll({
+    where: conditions,
+  });
 
   return expenses;
 };
