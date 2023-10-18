@@ -50,7 +50,7 @@ const getAllByQuery = async(query) => {
     };
   }
 
-  if (query.categoriesArray.length) {
+  if (query.categoriesArray && query.categoriesArray.length) {
     options.where = {
       ...options.where,
       category: {

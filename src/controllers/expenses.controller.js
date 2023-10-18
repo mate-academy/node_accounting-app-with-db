@@ -17,9 +17,13 @@ const getAllByQuery = async(req, res) => {
     categories,
   } = req.query;
 
-  const categoriesArray = Array.isArray(categories)
-    ? [...categories]
-    : [categories];
+  let categoriesArray;
+
+  if (categories) {
+    categoriesArray = Array.isArray(categories)
+      ? [...categories]
+      : [categories];
+  }
 
   const expenses = await expensesService.getAllByQuery({
     userId,
