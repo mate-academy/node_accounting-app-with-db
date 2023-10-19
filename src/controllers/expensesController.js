@@ -37,8 +37,8 @@ async function get(req, res) {
     }
   }
 
-  const userId = +query.userId;
-  const user = query.userId ? await getUserById(userId) : true;
+  const userId = query.userId ? Number(query.userId) : undefined;
+  const user = await getUserById(userId);
 
   if (!user) {
     res.sendStatus(INVALID_PARAMETERS_CODE);

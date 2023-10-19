@@ -7,11 +7,7 @@ async function getAllUsers() {
 }
 
 async function getUserById(id) {
-  return User.findOne({
-    where: {
-      id: id,
-    },
-  });
+  return User.findByPk(id);
 }
 
 async function createUser(data) {
