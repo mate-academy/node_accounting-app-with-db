@@ -2,12 +2,6 @@
 
 const { User } = require('../models/userModel');
 
-async function resetUsers() {
-  await User.destroy({
-    truncate: true,
-  });
-}
-
 async function getAllUsers() {
   return User.findAll();
 }
@@ -50,5 +44,4 @@ module.exports = {
   deleteUser,
   updateUser,
   createUser,
-  resetUsers,
 };

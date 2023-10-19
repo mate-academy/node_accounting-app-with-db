@@ -3,12 +3,6 @@
 const { Op } = require('sequelize');
 const { Expense } = require('../models/ExpenseModel');
 
-async function resetExpenses() {
-  await Expense.destroy({
-    truncate: true,
-  });
-}
-
 async function getAll() {
   return Expense.findAll({
     order: ['id'],
@@ -82,7 +76,6 @@ async function updateExpense(data) {
 
 module.exports = {
   getAll,
-  resetExpenses,
   getFilteredExpenses,
   getExpenseById,
   deleteExpense,
