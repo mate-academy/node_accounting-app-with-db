@@ -2,6 +2,7 @@
 
 const expenseService = require('../services/expense.service');
 const userService = require('../services/user.service');
+const httpStatusCodes = require('../utils/httpStatusCodes');
 
 const getAll = async(req, res) => {
   const {
@@ -45,7 +46,7 @@ const getById = async(req, res) => {
   const searchedExpense = await expenseService.getById(id);
 
   if (!searchedExpense) {
-    res.sendStatus(404);
+    res.sendStatus(httpStatusCodes.NOT_FOUND);
 
     return;
   }
@@ -63,13 +64,13 @@ const create = async(req, res) => {
     || !category
     || !note
   ) {
-    res.sendStatus(400);
+    res.sendStatus(httpStatusCodes.BAD_REQUEST);
 
     return;
   }
 
   if (!(await userService.getById(userId))) {
-    res.sendStatus(400);
+    res.sendStatus(httpStatusCodes.BAD_REQUEST);
 
     return;
   }
@@ -83,7 +84,7 @@ const create = async(req, res) => {
     note,
   });
 
-  res.statusCode = 201;
+  res.statusCode = httpStatusCodes.CREATED;
   res.send(newExpense);
 };
 
@@ -94,14 +95,14 @@ const update = async(req, res) => {
   const expense = await expenseService.getById(id);
 
   if (!expense) {
-    res.sendStatus(404);
+    res.sendStatus(httpStatusCodes.NOT_FOUND);
 
     return;
   }
 
   const updatedExpense = await expenseService.update(id, body);
 
-  res.statusCode = 200;
+  res.statusCode = httpStatusCodes.OK;
   res.send(updatedExpense);
 };
 
@@ -110,13 +111,13 @@ const remove = async(req, res) => {
   const expense = await expenseService.getById(id);
 
   if (!expense) {
-    res.sendStatus(404);
+    res.sendStatus(httpStatusCodes.NOT_FOUND);
 
     return;
   }
 
   await expenseService.remove(id);
-  res.sendStatus(204);
+  res.sendStatus(httpStatusCodes.NO_CONTENT);
 };
 
 module.exports = {
