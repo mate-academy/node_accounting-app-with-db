@@ -1,7 +1,7 @@
 'use strict';
 
 const { DataTypes } = require('sequelize');
-const sequelize = require('../dataBase/db');
+const { sequelize } = require('../dataBase/db');
 
 const Expense = sequelize.define('Expense', {
   id: {
@@ -33,6 +33,8 @@ const Expense = sequelize.define('Expense', {
   },
 }, {
   tableName: 'users',
+  updatedAt: false,
+  createdAt: false,
 });
 
 const getAll = async(query) => {
@@ -49,12 +51,14 @@ const getById = async(id) => {
   return expense;
 };
 
-const add = expense => {
-  return Expense.create(expense);
+const add = async(expense) => {
+  const newExpense = await Expense.create(expense);
+
+  return newExpense;
 };
 
-const remove = id => {
-  Expense.destroy(id);
+const remove = async(id) => {
+  await Expense.destroy(id);
 };
 
 const update = async(id, body) => {

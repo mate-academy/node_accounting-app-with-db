@@ -10,7 +10,7 @@ const {
 const service = require('../services/expenses.services');
 const userService = require('../services/users.services');
 
-const getExpenses = (req, res) => {
+const getExpenses = async(req, res) => {
   const {
     userId,
     from,
@@ -18,7 +18,7 @@ const getExpenses = (req, res) => {
     categories,
   } = req.query;
 
-  let expenses = service.getAll();
+  let expenses = await service.getAll();
 
   if (userId) {
     expenses = expenses.filter(
@@ -83,7 +83,7 @@ const postExpense = (req, res) => {
   res.send(newExpense);
 };
 
-const getOneExpense = (req, res) => {
+const getOneExpense = async(req, res) => {
   const id = Number(req.params.id);
 
   if (!id) {
@@ -92,7 +92,7 @@ const getOneExpense = (req, res) => {
     return;
   }
 
-  const expense = service.getById(id);
+  const expense = await service.getById(id);
 
   if (!expense) {
     res.sendStatus(NOT_FOUND);

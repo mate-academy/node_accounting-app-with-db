@@ -1,7 +1,7 @@
 'use strict';
 
 const { DataTypes } = require('sequelize');
-const sequelize = require('../dataBase/db');
+const { sequelize } = require('../dataBase/db');
 
 const User = sequelize.define('User', {
   id: {
@@ -14,6 +14,8 @@ const User = sequelize.define('User', {
   },
 }, {
   tableName: 'users',
+  updatedAt: false,
+  createdAt: false,
 });
 
 const getAll = async() => {
@@ -28,12 +30,14 @@ const getById = async(id) => {
   return user;
 };
 
-const add = (user) => {
-  return User.create(user);
+const add = async(user) => {
+  const newUser = await User.create(user);
+
+  return newUser;
 };
 
-const remove = id => {
-  User.destroy({ where: { id } });
+const remove = async(id) => {
+  await User.destroy({ where: { id } });
 };
 
 const update = async(id, name) => {

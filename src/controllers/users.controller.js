@@ -9,12 +9,14 @@ const {
 } = require('../constants/statusCodes');
 const service = require('../services/users.services');
 
-const getAllUsers = (req, res) => {
+const getAllUsers = async(req, res) => {
+  const users = await service.getAll();
+
   res.statusCode = OK;
-  res.send(service.getAll());
+  res.send(users);
 };
 
-const getUser = (req, res) => {
+const getUser = async(req, res) => {
   const id = Number(req.params.id);
 
   if (!id) {
@@ -23,7 +25,7 @@ const getUser = (req, res) => {
     return;
   }
 
-  const user = service.getById(id);
+  const user = await service.getById(id);
 
   if (!user) {
     res.sendStatus(NOT_FOUND);
@@ -68,7 +70,7 @@ const deleteUser = (req, res) => {
   res.sendStatus(NO_CONTENT);
 };
 
-const updateUser = (req, res) => {
+const updateUser = async(req, res) => {
   const id = Number(req.params.id);
   const { name } = req.body;
 
@@ -78,7 +80,7 @@ const updateUser = (req, res) => {
     return;
   }
 
-  const updatedUser = service.update(id, name);
+  const updatedUser = await service.update(id, name);
 
   if (!updatedUser) {
     res.sendStatus(NOT_FOUND);
