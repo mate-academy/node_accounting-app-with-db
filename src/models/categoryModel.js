@@ -1,24 +1,23 @@
-'use strict';
+// IM NOT SURE IF THIS MIGHT BE NEEDED IN THE FUTURE SO I'M KILLING IT FOR NOW
 
-const pool = require('../dbConfig');
+// 'use strict';
 
-const getCategories = async() => {
-  const res = await pool.query('SELECT * FROM categories');
+// const pool = require('../dbConfig');
 
-  return res.rows;
-};
+// const getCategories = async() => {
+//   const res = await pool.query('SELECT * FROM categories');
 
-const createCategory = async(name) => {
-  const res = await pool
-    .query('INSERT INTO categories (name) VALUES ($1) RETURNING *', [name]);
+//   return res.rows;
+// };
 
-  return res.rows[0];
-};
+// const createCategory = async(name) => {
+//   const res = await pool
+//     .query('INSERT INTO categories (name) VALUES ($1) RETURNING *', [name]);
 
-// Implement remaining CRUD functions...
+//   return res.rows[0];
+// };
 
-module.exports = {
-  getCategories,
-  createCategory,
-  // ...
-};
+// module.exports = {
+//   getCategories,
+//   createCategory,
+// };

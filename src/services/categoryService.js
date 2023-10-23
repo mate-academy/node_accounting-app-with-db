@@ -30,6 +30,8 @@ module.exports = {
   deleteCategoryService,
 };
 
+// IM NOT SURE IF THIS MIGHT BE NEEDED IN THE FUTURE SO I'M KILLING IT FOR NOW
+
 // let currentCategoryId = 0;
 
 // const createCategory = (categories, name) => {

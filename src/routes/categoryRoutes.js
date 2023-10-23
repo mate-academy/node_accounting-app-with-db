@@ -56,6 +56,8 @@ router.delete('/:id', async(req, res) => {
 
 module.exports = router;
 
+// I'M NOT SURE IF THIS MIGHT BE NEEDED IN THE FUTURE SO I'M KILLING IT FOR NOW
+
 // 'use strict';
 
 // const express = require('express');
