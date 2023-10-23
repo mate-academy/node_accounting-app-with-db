@@ -36,12 +36,14 @@ const Expenses = sequelize.define('Expenses', {
   createdAt: {
     type: DataTypes.DATE,
     field: 'created_at',
+    underscored: false,
     allowNull: false,
     defaultValue: DataTypes.NOW,
   },
   updatedAt: {
     type: DataTypes.DATE,
     field: 'updated_at',
+    underscored: false,
     allowNull: false,
     defaultValue: DataTypes.NOW,
   },
