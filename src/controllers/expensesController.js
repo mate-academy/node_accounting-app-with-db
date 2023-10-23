@@ -1,91 +1,69 @@
 'use strict';
 
 const expensesServices = require('../services/expensesServices.js');
-const userServices = require('../services/userServices.js');
 
 const getAll = async(req, res) => {
-  const expenses = await expensesServices.getAll(req.query);
+  try {
+    const expenses = await expensesServices.getAll(req.query);
 
-  res.status(200).send(expensesServices.normalize(expenses));
+    res.status(200).send(expensesServices.normalize(expenses));
+  } catch (error) {
+    res.sendStatus(500);
+  }
 };
 
 const add = async(req, res) => {
-  const {
-    userId,
-    spentAt,
-    title,
-    amount,
-    category,
-    note,
-  } = req.body;
+  try {
+    const newExpense = await expensesServices.createExpense(req.body);
 
-  if (!userId
-    || !spentAt
-    || !title
-    || !amount
-    || !category
-    || !note
-    || !userServices.getUserById(userId)) {
-    res.sendStatus(400);
-
-    return;
+    res.status(201).send(expensesServices.normalize(newExpense));
+  } catch (error) {
+    res.sendStatus(500);
   }
-
-  const newExpense = await expensesServices.createExpense(req.body);
-
-  res.status(201).send(expensesServices.normalize(newExpense));
 };
 
 const getCurrentExpense = async(req, res) => {
   const { expenseId } = req.params;
 
-  if (!expenseId) {
-    res.sendStatus(400);
+  try {
+    const currentExpense = await expensesServices.getExpenseById(expenseId);
 
-    return;
+    if (!currentExpense) {
+      res.sendStatus(404);
+
+      return;
+    }
+
+    res.status(200).send(expensesServices.normalize(currentExpense));
+  } catch (error) {
+    res.sendStatus(500);
   }
-
-  const currentExpense = await expensesServices.getExpenseById(expenseId);
-
-  if (!currentExpense) {
-    res.sendStatus(404);
-
-    return;
-  }
-
-  res.status(200).send(expensesServices.normalize(currentExpense));
 };
 
 const remove = async(req, res) => {
   const { expenseId } = req.params;
-  const currentExpense = await expensesServices.getExpenseById(expenseId);
 
-  if (!currentExpense) {
-    res.sendStatus(404);
+  try {
+    await expensesServices.removeExpense(expenseId);
 
-    return;
+    res.sendStatus(204);
+  } catch (error) {
+    res.sendStatus(500);
   }
-
-  await expensesServices.removeExpense(expenseId);
-
-  res.sendStatus(204);
 };
 
 const update = async(req, res) => {
   const { expenseId } = req.params;
-  const currentExpense = await expensesServices.getExpenseById(expenseId);
 
-  if (!currentExpense) {
-    res.sendStatus(404);
+  try {
+    await expensesServices.updateExpense(expenseId, req.body);
 
-    return;
+    const updatedExpense = await expensesServices.getExpenseById(expenseId);
+
+    res.status(200).send(expensesServices.normalize(updatedExpense));
+  } catch (error) {
+    res.sendStatus(500);
   }
-
-  await expensesServices.updateExpense(expenseId, req.body);
-
-  const updatedExpense = await expensesServices.getExpenseById(expenseId);
-
-  res.status(200).send(expensesServices.normalize(updatedExpense));
 };
 
 module.exports = {

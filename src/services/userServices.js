@@ -35,7 +35,14 @@ const removeUser = async(userId) => {
 };
 
 const updateUser = async(userId, name) => {
-  await User.update({ name }, { where: { id: userId } });
+  await User.update({
+    name,
+    updatedAt: new Date(),
+  }, {
+    where: {
+      id: userId,
+    },
+  });
 };
 
 module.exports = {

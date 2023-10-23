@@ -39,9 +39,14 @@ const Expenses = sequelize.define('Expenses', {
     allowNull: false,
     defaultValue: DataTypes.NOW,
   },
+  updatedAt: {
+    type: DataTypes.DATE,
+    field: 'updated_at',
+    allowNull: false,
+    defaultValue: DataTypes.NOW,
+  },
 }, {
   tableName: 'expenses',
-  updatedAt: false,
 });
 
 module.exports = {

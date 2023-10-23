@@ -10,6 +10,7 @@ const normalize = (resultObj) => {
 
     return newResultObj.map(obj => {
       delete obj.dataValues.createdAt;
+      delete obj.dataValues.updatedAt;
 
       return obj;
     });
@@ -17,6 +18,7 @@ const normalize = (resultObj) => {
     const newResultObj = { ...resultObj };
 
     delete newResultObj.dataValues.createdAt;
+    delete newResultObj.dataValues.updatedAt;
 
     return newResultObj.dataValues;
   }
@@ -66,14 +68,21 @@ const getExpenseById = async(expenseId) => {
 
 const removeExpense = async(expenseId) => {
   await sequelize.transaction(async(t) => {
-    await await Expenses.destroy({
+    await Expenses.destroy({
       where: { id: expenseId },
     });
   });
 };
 
 const updateExpense = async(expenseId, params) => {
-  await Expenses.update(params, { where: { id: expenseId } });
+  await Expenses.update({
+    ...params,
+    updatedAt: new Date(),
+  }, {
+    where: {
+      id: expenseId,
+    },
+  });
 };
 
 module.exports = {

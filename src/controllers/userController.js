@@ -3,76 +3,70 @@
 const userServices = require('../services/userServices.js');
 
 const getAll = async(_req, res) => {
-  const users = await userServices.getAll();
+  try {
+    const users = await userServices.getAll();
 
-  res.send(users.map(user => userServices.normalize(user)));
+    res.send(users.map(user => userServices.normalize(user)));
+  } catch (error) {
+    res.sendStatus(500);
+  }
 };
 
 const add = async(req, res) => {
   const { name } = req.body;
 
-  if (!name) {
-    res.sendStatus(400);
+  try {
+    const newUser = await userServices.createUser(name);
 
-    return;
+    res.status(201).send(userServices.normalize(newUser));
+  } catch (error) {
+    res.sendStatus(500);
   }
-
-  const newUser = await userServices.createUser(name);
-
-  res.status(201).send(userServices.normalize(newUser));
 };
 
 const getCurrentUser = async(req, res) => {
   const { userId } = req.params;
-  const foundUser = await userServices.getUserById(userId);
 
-  if (!foundUser) {
-    res.sendStatus(404);
+  try {
+    const foundUser = await userServices.getUserById(userId);
 
-    return;
+    if (!foundUser) {
+      res.sendStatus(404);
+
+      return;
+    }
+
+    res.send(userServices.normalize(foundUser));
+  } catch (error) {
+    res.sendStatus(500);
   }
-
-  res.send(userServices.normalize(foundUser));
 };
 
 const remove = async(req, res) => {
   const { userId } = req.params;
-  const foundUser = await userServices.getUserById(userId);
 
-  if (!foundUser) {
-    res.sendStatus(404);
+  try {
+    await userServices.removeUser(userId);
 
-    return;
+    res.sendStatus(204);
+  } catch (error) {
+    res.sendStatus(500);
   }
-
-  await userServices.removeUser(userId);
-
-  res.sendStatus(204);
 };
 
 const update = async(req, res) => {
   const { userId } = req.params;
   const { name } = req.body;
 
-  if (!name || typeof name !== 'string') {
-    res.sendStatus(400);
+  try {
+    await userServices.updateUser(userId, name);
 
-    return;
+    const updateUser = await userServices.getUserById(userId);
+
+    res.send(userServices.normalize(updateUser));
+  } catch (error) {
+    res.sendStatus(500);
   }
-
-  const foundUser = await userServices.getUserById(userId);
-
-  if (!foundUser) {
-    res.sendStatus(404);
-
-    return;
-  }
-
-  await userServices.updateUser(userId, name);
-
-  const updateUser = await userServices.getUserById(userId);
-
-  res.send(userServices.normalize(updateUser));
 };
 
 module.exports = {
