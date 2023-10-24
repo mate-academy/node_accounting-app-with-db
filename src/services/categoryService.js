@@ -7,77 +7,19 @@ const {
   deleteCategory,
 } = require('../dbQueries');
 
-const createCategoryService = async(name) => {
-  return createCategory(name);
+const categoryService = {
+  createCategory: async(name) => {
+    return createCategory(name);
+  },
+  getCategoryById: async(id) => {
+    return getCategoryById(id);
+  },
+  updateCategory: async(id, name) => {
+    return updateCategory(id, name);
+  },
+  deleteCategory: async(id) => {
+    return deleteCategory(id);
+  },
 };
 
-const getCategoryByIdService = async(id) => {
-  return getCategoryById(id);
-};
-
-const updateCategoryService = async(id, name) => {
-  return updateCategory(id, name);
-};
-
-const deleteCategoryService = async(id) => {
-  return deleteCategory(id);
-};
-
-module.exports = {
-  createCategoryService,
-  getCategoryByIdService,
-  updateCategoryService,
-  deleteCategoryService,
-};
-
-// IM NOT SURE IF THIS MIGHT BE NEEDED IN THE FUTURE SO I'M KILLING IT FOR NOW
-
-// let currentCategoryId = 0;
-
-// const createCategory = (categories, name) => {
-//   currentCategoryId++;
-
-//   const newCategory = {
-//     id: currentCategoryId,
-//     name,
-//   };
-
-//   categories.push(newCategory);
-
-//   return newCategory;
-// };
-
-// const getCategoryById = (categories, id) => {
-//   return categories.find(c => c.id === parseInt(id));
-// };
-
-// const updateCategory = (categories, id, name) => {
-//   const category = categories.find(c => c.id === parseInt(id));
-
-//   if (category && name) {
-//     category.name = name;
-
-//     return category;
-//   }
-
-//   return null;
-// };
-
-// const deleteCategory = (categories, categoryId) => {
-//   const index = categories.findIndex(c => c.id === categoryId);
-
-//   if (index === -1) {
-//     return null;
-//   }
-
-//   categories.splice(index, 1);
-
-//   return true;
-// };
-
-// module.exports = {
-//   createCategory,
-//   getCategoryById,
-//   updateCategory,
-//   deleteCategory,
-// };
+module.exports = categoryService;
