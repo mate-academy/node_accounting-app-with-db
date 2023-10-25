@@ -30,12 +30,12 @@ const getAllExpenses = (req, res) => {
   res.send(filteredResponse);
 };
 
-const createNewExpense = (req, res) => {
+const createNewExpense = async(req, res) => {
   const { userId, spentAt, title, amount, category, note } = req.body;
 
-  const index = usersService.userIndex(+userId);
+  const user = await usersService.getUser(+userId);
 
-  if (index === -1) {
+  if (!user) {
     res.sendStatus(400);
 
     return;

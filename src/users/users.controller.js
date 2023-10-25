@@ -1,64 +1,68 @@
+/* eslint-disable no-console */
 'use strict';
 
-const { usersService }
-  = require('./users.service');
+const { usersService } = require('./users.service');
 
-const getAllUsers = (req, res) => {
-  res.send(usersService.getUsers());
+const getAllUsers = async(req, res) => {
+  try {
+    const users = await usersService.getUsers();
+
+    res.status(200).send(users);
+  } catch (error) {
+    console.error('Błąd podczas pobierania użytkowników:', error);
+    res.sendStatus(500);
+  }
 };
 
-const getUserbyId = (req, res) => {
+const getUserbyId = async(req, res) => {
   const { id } = req.params;
-  const userToSend = usersService.getUser(id);
+  const userToSend = await usersService.getUser(id);
 
   if (!userToSend) {
     res.sendStatus(404);
-
-    return;
+  } else {
+    res.status(200).send(userToSend);
   }
-
-  res.send(userToSend);
 };
 
-const createUser = (req, res) => {
+const createUser = async(req, res) => {
   const { name } = req.body;
 
   if (!name) {
-    res.sendStatus(400);
+    res.status(422);
+    res.send('Required field missing');
 
     return;
   }
 
-  const user = {
-    id: Date.now(),
+  const user = await usersService.addNewUser({
     name,
-  };
+  });
 
-  usersService.addNewUser(user);
-  res.statusCode = 201;
+  if (!user) {
+    res.sendStatus(500);
+  }
 
+  res.status(201);
   res.send(user);
 };
 
-const deleteUser = (req, res) => {
+const deleteUser = async(req, res) => {
   const { id } = req.params;
-  const index = usersService.userIndex(id);
+  const userToDelete = await usersService.getUser(id);
 
-  if (index === -1) {
+  if (userToDelete) {
+    await usersService.deleteOneUser(id);
+    res.sendStatus(204);
+  } else {
     res.sendStatus(404);
-
-    return;
   }
-  usersService.deleteOneUser(index);
-
-  res.sendStatus(204);
 };
 
-const updateUser = (req, res) => {
+const updateUser = async(req, res) => {
   const { id } = req.params;
-
   const { name } = req.body;
-  const index = usersService.userIndex(id);
+  const userToUpdate = await usersService.getUser(id);
 
   if (!name) {
     res.sendStatus(400);
@@ -66,15 +70,17 @@ const updateUser = (req, res) => {
     return;
   }
 
-  if (index === -1) {
+  if (!userToUpdate) {
     res.sendStatus(404);
-
-    return;
+  } else {
+    try {
+      await usersService.updateUserName(id, name);
+      res.status(200).send(usersService.getUser(id));
+    } catch (error) {
+      console.error('Błąd podczas aktualizacji użytkownika:', error);
+      res.sendStatus(500);
+    }
   }
-
-  res.status(200);
-
-  res.send(usersService.updateUserName(index, name));
 };
 
 const usersController = {
