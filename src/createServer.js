@@ -3,24 +3,23 @@
 const express = require('express');
 const cors = require('cors');
 const { usersRouter } = require('./users/users.router');
-const { expensesService } = require('./expenses/expenses.service');
 const { expensesRouter } = require('./expenses/expenses.router');
 
+require('dotenv').config();
+
 function createServer() {
-  const server = express();
-  const corsOptions = {
-    origin: 'http://localhost:3001', // Określenie dozwolonej domeny źródła
-    credentials: true, // Włącz obsługę cookies i nagłówków autoryzacyjnych
-  };
+  const app = express();
 
-  server.use(cors(corsOptions));
+  app.use(
+    cors({
+      origin: process.env.CLIENT_URL,
+    })
+  );
 
-  expensesService.clearExpenses();
+  app.use('/users', express.json(), usersRouter);
+  app.use('/expenses', express.json(), expensesRouter);
 
-  server.use('/users', express.json(), usersRouter);
-  server.use('/expenses', express.json(), expensesRouter);
-
-  return server;
+  return app;
 }
 
 module.exports = {

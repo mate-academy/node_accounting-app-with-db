@@ -1,38 +1,127 @@
+/* eslint-disable max-len */
+/* eslint-disable no-console */
 'use strict';
 
-const expenses = [];
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../utils/db');
 
-const getExpenses = () => expenses;
+const Expenses = sequelize.define('Expense', {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true,
+  },
+  userId: {
+    type: DataTypes.UUID,
+    allowNull: false,
+  },
+  spentAt: {
+    type: DataTypes.DATE,
+    allowNull: false,
+  },
+  title: {
+    type: DataTypes.STRING,
+  },
+  amount: {
+    type: DataTypes.DECIMAL(10, 2),
+  },
+  category: {
+    type: DataTypes.STRING,
+  },
+  note: {
+    type: DataTypes.STRING,
+  },
+}, {
 
-const getUserById = (expenceId) => expenses.find(e => e.id === +expenceId);
+});
 
-const addNewExpense = (newExpense) => expenses.push(newExpense);
+Expenses.sync();
 
-const expenseIndex = (id) => expenses.findIndex(e => e.id === +id);
+const getExpenses = async() => {
+  try {
+    const expenses = await Expenses.findAll();
 
-const updateExpenseValues = (index, spentAt, title, amount, category, note) => (
-  expenses[index] = {
-    ...expenses[index],
-    spentAt: spentAt || expenses[index].spentAt,
-    title: title || expenses[index].title,
-    amount: amount || expenses[index].amount,
-    category: category || expenses[index].category,
-    note: note || expenses[index].note,
+    return expenses;
+  } catch (error) {
+    throw new Error('Error while fetching expenses: ' + error.message);
   }
-);
+};
 
-const deleteOneExpense = (index) => expenses.splice(index, 1);
+const getExpenseById = async(expenseId) => {
+  try {
+    const expense = await Expenses.findByPk(expenseId);
 
-const clearExpenses = () => expenses.splice(0);
+    return expense;
+  } catch (error) {
+    throw new Error('Error while fetching expense: ' + error.message);
+  }
+};
+
+const addNewExpense = async(newExpense) => {
+  try {
+    const createdExpense = await Expenses.create(newExpense);
+
+    return createdExpense;
+  } catch (error) {
+    throw new Error('Error while creating a new expense: ' + error.message);
+  }
+};
+
+const updateExpenseValues = async(id, spentAt, title, amount, category, note) => {
+  try {
+    const expense = await Expenses.findByPk(id);
+
+    if (expense) {
+      if (spentAt) {
+        expense.spentAt = spentAt;
+      }
+
+      if (title) {
+        expense.title = title;
+      }
+
+      if (amount) {
+        expense.amount = amount;
+      }
+
+      if (category) {
+        expense.category = category;
+      }
+
+      if (note) {
+        expense.note = note;
+      }
+      await expense.save();
+
+      return true;
+    }
+
+    return false;
+  } catch (error) {
+    throw new Error('Error while updating the expense: ' + error.message);
+  }
+};
+
+const deleteOneExpense = async(id) => {
+  try {
+    await Expenses.destroy({
+      where: {
+        id: id,
+      },
+    });
+  } catch (error) {
+    return {
+      success: false, error: error.message,
+    };
+  }
+};
 
 const expensesService = {
   getExpenses,
-  getUserById,
+  getExpenseById,
   addNewExpense,
-  expenseIndex,
   updateExpenseValues,
   deleteOneExpense,
-  clearExpenses,
 };
 
 module.exports = {
