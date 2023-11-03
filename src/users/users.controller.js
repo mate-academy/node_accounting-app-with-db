@@ -9,7 +9,7 @@ const getAllUsers = async(req, res) => {
 
     res.status(200).send(users);
   } catch (error) {
-    console.error('Błąd podczas pobierania użytkowników:', error);
+    console.error('Error while retrieving users:', error);
     res.sendStatus(500);
   }
 };
@@ -77,7 +77,7 @@ const updateUser = async(req, res) => {
       await usersService.updateUserName(id, name);
       res.status(200).send(usersService.getUser(id));
     } catch (error) {
-      console.error('Błąd podczas aktualizacji użytkownika:', error);
+      console.error('Error while updating the user:', error);
       res.sendStatus(500);
     }
   }
