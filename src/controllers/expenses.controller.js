@@ -11,9 +11,14 @@ const expensesController = {
   },
   getById: async(req, res) => {
     const { id } = req.params;
+
+    if (!id) {
+      res.sendStatus(404);
+    }
+
     const expense = await expensesService.getById(id);
 
-    if (id && expense) {
+    if (expense) {
       res.send(expense);
     } else {
       res.sendStatus(404);
@@ -21,9 +26,10 @@ const expensesController = {
   },
   addExpense: async(req, res) => {
     const { userId, spentAt, title, amount, category, note } = req.body;
-    const allUsers = await userService.getAll();
 
-    if (!allUsers.some(user => user.dataValues.id === userId)) {
+    const user = await userService.getById(userId);
+
+    if (!user) {
       res.sendStatus(400);
 
       return;
@@ -45,7 +51,7 @@ const expensesController = {
       }
     }
 
-    const expenseWithId = expensesService.createExpense(newExpense);
+    const expenseWithId = await expensesService.createExpense(newExpense);
 
     res.statusCode = 201;
     res.send(expenseWithId);
@@ -78,7 +84,7 @@ const expensesController = {
       return;
     }
 
-    const updatedExpenses = expensesService.update(body, id);
+    const updatedExpenses = await expensesService.update(body, id);
 
     res.send(updatedExpenses);
   },

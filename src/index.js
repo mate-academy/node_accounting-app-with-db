@@ -1,4 +1,5 @@
 'use strict';
+require('dotenv').config();
 
 const express = require('express');
 const usersRouter = require('./routes/users.router');
@@ -6,10 +7,11 @@ const expensesRouter = require('./routes/expenses.router');
 
 const app = express();
 
-app.use('/users', express.json(), usersRouter);
-app.use('/expenses', express.json(), expensesRouter);
+app.use(express.json());
+app.use('/users', usersRouter);
+app.use('/expenses', expensesRouter);
 
-app.listen('3000', () => {
+app.listen(process.env.PORT, () => {
   // eslint-disable-next-line
   console.log('server is running on localhost:3000');
 });
