@@ -12,8 +12,9 @@ const app = express();
 usersService.clearUsers();
 expensesService.clearExpenses();
 
-app.use('/users', express.json(), usersRouter);
-app.use('/expenses', express.json(), expensesRouter);
+app.use(express.json());
+app.use('/users', usersRouter);
+app.use('/expenses', expensesRouter);
 
 app.listen(3005, () => {
   console.log(`Example app listening on port 3005`);
