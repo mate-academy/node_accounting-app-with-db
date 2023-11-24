@@ -3,16 +3,7 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../db');
 
-// id: 123,
-// userId: 1,
-// spentAt: '2022-10-19T11:01:43.462Z',
-// title: 'Buy a new laptop',
-// amount: 999,
-// category: 'Electronics',
-// note: 'I need a new laptop',
-
 const Expense = sequelize.define('Expense', {
-  // Model attributes are defined here
   id: {
     type: DataTypes.STRING,
     primaryKey: true,

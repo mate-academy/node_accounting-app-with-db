@@ -1,28 +1,7 @@
 'use strict';
 
-// const { Client } = require('pg');
 const { Op } = require('sequelize');
 const { Expense } = require('../controllers/db/models/expense.model');
-
-// function getRandomInt(max) {
-//   return Math.floor(Math.random() * max);
-// }
-
-// const expenses = [
-//   {
-//     id: 123,
-//     userId: 1,
-//     spentAt: '2022-10-19T11:01:43.462Z',
-//     title: 'Buy a new laptop',
-//     amount: 999,
-//     category: 'Electronics',
-//     note: 'I need a new laptop',
-//   },
-// ];
-
-// const clearExpenses = () => {
-//   expenses = [];
-// };
 
 const getAllExpenses = (querys) => {
   const queryEntries = Object.entries(querys);
@@ -35,25 +14,9 @@ const getAllExpenses = (querys) => {
     where: {
       [Op.or]: queryEntries
         .map(query => Object.fromEntries([query])),
-      // },
-      // someAttribute: {
-      //   [Op.in]: [
-      //     { title: 'new bike-2' },
-
-      //   ],
-      // },
-      // [Op.or]: [
-      //   { title: 'new bike-2' },
-
-      // ],
     },
   });
 };
-
-// [Op.all]: Object
-// .entries(querys)
-// .map(query => Object.fromEntries([query])),
-// },
 
 const createExpenses = ({
   id,
@@ -73,18 +36,9 @@ const createExpenses = ({
     amount,
     note,
   });
-  // const newExpense = {
-  //   id: getRandomInt(9000),
-  //   ...expense,
-  // };
-
-  // expenses.push(newExpense);
-
-  // return newExpense;
 };
 
 const getExpensesById = (id) => {
-  // return expenses.find(expense => expense.id === id) || null;
   return Expense.findByPk(id);
 };
 
@@ -94,15 +48,6 @@ const deleteExpensesById = (id) => {
       id,
     },
   });
-  // const user = expenses.find(person => person.id === id) || null;
-
-  // if (!user) {
-  //   return null;
-  // }
-
-  // expenses = expenses.filter(person => person.id !== id);
-
-  // return user;
 };
 
 const updateExpensesById = (id, fields) => {
@@ -119,15 +64,6 @@ const updateExpensesById = (id, fields) => {
       id,
     },
   });
-  // const user = expenses.find(person => person.id === id) || null;
-
-  // if (!user) {
-  //   return null;
-  // }
-
-  // Object.assign(user, fields);
-
-  // return user;
 };
 
 module.exports = {
@@ -136,5 +72,4 @@ module.exports = {
   getExpensesById,
   deleteExpensesById,
   updateExpensesById,
-  // clearExpenses,
 };
