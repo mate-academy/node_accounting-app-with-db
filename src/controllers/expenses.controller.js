@@ -2,7 +2,6 @@
 
 /* eslint no-console: ["error", { allow: ["warn", "error"] }] */
 
-const { v4: uuidv4 } = require('uuid');
 const expensesService = require('../services/expenses.service');
 const usersService = require('../services/user.service');
 const { Expense } = require('../controllers/db/models/expense.model');
@@ -25,7 +24,7 @@ const getById = async(req, res) => {
       return;
     }
 
-    res.send(result);
+    res.send(expensesService.normalizeExpenseData(result));
   } catch (err) {
     console.error('Error executing query:', err);
 
@@ -47,7 +46,9 @@ const gerAllIncludesQuery = async(req, res) => {
   try {
     const result = await expensesService.getAllExpenses(querys);
 
-    res.send(result);
+    res.send(result
+      .map(expense => expensesService.normalizeExpenseData(expense))
+    );
   } catch (err) {
     console.error('Error executing query:', err);
 
@@ -77,11 +78,8 @@ const createExpense = async(req, res) => {
     return;
   }
 
-  const id = uuidv4();
-
   try {
-    await expensesService.createExpenses({
-      id,
+    const createdExpense = await expensesService.createExpenses({
       userId,
       spentAt,
       title,
@@ -89,8 +87,6 @@ const createExpense = async(req, res) => {
       amount,
       note,
     });
-
-    const createdExpense = await expensesService.getExpensesById(id);
 
     res.send(createdExpense);
   } catch (err) {

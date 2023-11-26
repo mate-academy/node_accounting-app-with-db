@@ -3,13 +3,12 @@
 /* eslint no-console: ["error", { allow: ["warn", "error"] }] */
 
 const usersService = require('../services/user.service');
-const { v4: uuidv4 } = require('uuid');
 
 const getAll = async(req, res) => {
   try {
     const result = await usersService.getAllUsers();
 
-    res.send(result);
+    res.send(result.map(user => usersService.normalizeUserData(user)));
   } catch (err) {
     console.error('Error executing query:', err);
 
@@ -35,7 +34,7 @@ const getParticular = async(req, res) => {
       return;
     }
 
-    res.send(result);
+    res.send(usersService.normalizeUserData(result));
   } catch (err) {
     console.error('Error executing query:', err);
 
@@ -100,14 +99,8 @@ const createUser = async(req, res) => {
     return;
   }
 
-  const id = uuidv4();
-
   try {
-    await usersService.createUser({
-      id, name,
-    });
-
-    const createdUser = await usersService.getUserById(id);
+    const createdUser = await usersService.createUser({ name });
 
     res.send(createdUser);
   } catch (err) {

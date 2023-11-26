@@ -3,13 +3,19 @@
 /* eslint no-console: ["error", { allow: ["warn", "error"] }] */
 
 const { User } = require('../controllers/db/models/user.model');
+
+const normalizeUserData = ({ id, name }) => ({
+  id, name,
+});
+
 const getAllUsers = () => {
-  return User.findAll();
+  return User.findAll({
+    order: ['name'],
+  });
 };
 
-const createUser = ({ id, name }) => {
+const createUser = ({ name }) => {
   return User.create({
-    id,
     name,
   });
 };
@@ -42,4 +48,5 @@ module.exports = {
   createUser,
   deleteUserById,
   updateUserById,
+  normalizeUserData,
 };

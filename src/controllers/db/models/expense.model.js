@@ -1,13 +1,13 @@
 'use strict';
 
-const { DataTypes } = require('sequelize');
+const { DataTypes, UUIDV4 } = require('sequelize');
 const { sequelize } = require('../db');
 
 const Expense = sequelize.define('Expense', {
   id: {
-    type: DataTypes.STRING,
+    type: DataTypes.UUID,
+    defaultValue: UUIDV4,
     primaryKey: true,
-    require: true,
   },
   userId: {
     type: DataTypes.STRING,

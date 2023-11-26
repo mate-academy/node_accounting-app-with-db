@@ -3,11 +3,31 @@
 const { Op } = require('sequelize');
 const { Expense } = require('../controllers/db/models/expense.model');
 
+const normalizeExpenseData = ({
+  id,
+  userId,
+  spentAt,
+  title,
+  category,
+  amount,
+  note,
+}) => ({
+  id,
+  userId,
+  spentAt,
+  title,
+  category,
+  amount,
+  note,
+});
+
 const getAllExpenses = (querys) => {
   const queryEntries = Object.entries(querys);
 
   if (!queryEntries.length) {
-    return Expense.findAll();
+    return Expense.findAll({
+      order: ['spentAt'],
+    });
   }
 
   return Expense.findAll({
@@ -15,6 +35,7 @@ const getAllExpenses = (querys) => {
       [Op.or]: queryEntries
         .map(query => Object.fromEntries([query])),
     },
+    order: ['spentAt'],
   });
 };
 
@@ -72,4 +93,5 @@ module.exports = {
   getExpensesById,
   deleteExpensesById,
   updateExpensesById,
+  normalizeExpenseData,
 };
