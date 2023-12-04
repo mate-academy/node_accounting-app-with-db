@@ -1,5 +1,6 @@
 'use strict';
 
+const validateQuery = require('../validation/expensesValidate');
 const expensesService = require('../services/expenses.service');
 const userService = require('../services/users.service');
 
@@ -23,40 +24,44 @@ const normalize = ({
 
 // eslint-disable-next-line space-before-function-paren
 const get = async (req, res) => {
-  const {
-    userId,
-    from,
-    to,
-    categories,
-  } = req.query;
+  // Use the validateQuery middleware before processing the request
+  // eslint-disable-next-line space-before-function-paren
+  validateQuery(req, res, async () => {
+    const {
+      userId,
+      from,
+      to,
+      categories,
+    } = req.query;
 
-  let expenses = (await expensesService.getAll())
-    .map(value => normalize(value));
+    let expenses = (await expensesService.getAll())
+      .map(value => normalize(value));
 
-  if (userId) {
-    expenses = expenses.filter(expense => expense.userId === Number(userId));
-  }
+    if (userId) {
+      expenses = expenses.filter(expense => expense.userId === Number(userId));
+    }
 
-  if (categories) {
-    expenses = expenses
-      .filter(expense => categories.includes(expense.category));
-  }
+    if (categories) {
+      expenses = expenses
+        .filter(expense => categories.includes(expense.category));
+    }
 
-  if (from) {
-    expenses = expenses
-      .filter(expense => (
-        new Date(expense.spentAt).valueOf() > new Date(from).valueOf())
-      );
-  }
+    if (from) {
+      expenses = expenses
+        .filter(expense => (
+          new Date(expense.spentAt).valueOf() > new Date(from).valueOf())
+        );
+    }
 
-  if (to) {
-    expenses = expenses
-      .filter(expense => (
-        new Date(expense.spentAt).valueOf() < new Date(to).valueOf())
-      );
-  }
+    if (to) {
+      expenses = expenses
+        .filter(expense => (
+          new Date(expense.spentAt).valueOf() < new Date(to).valueOf())
+        );
+    }
 
-  res.send(expenses);
+    res.send(expenses);
+  });
 };
 
 // eslint-disable-next-line space-before-function-paren

@@ -1,6 +1,7 @@
 'use strict';
 
 const service = require('../services/users.service');
+const validateUserRequest = require('../validation/usersValidate');
 
 const normalize = ({ id, name }) => ({
   id, name,
@@ -8,9 +9,12 @@ const normalize = ({ id, name }) => ({
 
 // eslint-disable-next-line space-before-function-paren
 const get = async (req, res) => {
-  const data = (await service.getAll()).map(value => normalize(value));
+  // eslint-disable-next-line space-before-function-paren
+  validateUserRequest(req, res, async () => {
+    const data = (await service.getAll()).map(value => normalize(value));
 
-  res.send(data);
+    res.send(data);
+  });
 };
 
 // eslint-disable-next-line space-before-function-paren
@@ -31,50 +35,53 @@ const post = async (req, res) => {
 
 // eslint-disable-next-line space-before-function-paren
 const getUser = async (req, res) => {
-  const searchedUser = await service.getById(+req.params.id);
+  // eslint-disable-next-line space-before-function-paren
+  validateUserRequest(req, res, async () => {
+    const searchedUser = await service.getById(+req.params.id);
 
-  if (!searchedUser) {
-    res.sendStatus(404);
+    if (!searchedUser) {
+      res.sendStatus(404);
 
-    return;
-  }
+      return;
+    }
 
-  if (!req.params.id) {
-    res.sendStatus(400);
-
-    return;
-  }
-
-  res.send(normalize(searchedUser));
+    res.send(normalize(searchedUser));
+  });
 };
 
 // eslint-disable-next-line space-before-function-paren
 const removeUser = async (req, res) => {
-  try {
-    await service.remove(+req.params.id);
-    res.sendStatus(204);
-  } catch (error) {
-    res.status(404).send({ message: error });
-  }
+  // eslint-disable-next-line space-before-function-paren
+  validateUserRequest(req, res, async () => {
+    try {
+      await service.remove(+req.params.id);
+      res.sendStatus(204);
+    } catch (error) {
+      res.status(404).send({ message: error });
+    }
+  });
 };
 
 // eslint-disable-next-line space-before-function-paren
 const updateUser = async (req, res) => {
-  if (!req.body || !req.params.id) {
-    res.sendStatus(400);
+  // eslint-disable-next-line space-before-function-paren
+  validateUserRequest(req, res, async () => {
+    if (!req.body || !req.params.id) {
+      res.sendStatus(400);
 
-    return;
-  }
+      return;
+    }
 
-  const data = await service.update(+req.params.id, req.body.name);
+    const data = await service.update(+req.params.id, req.body.name);
 
-  if (!data) {
-    res.sendStatus(404);
+    if (!data) {
+      res.sendStatus(404);
 
-    return;
-  }
+      return;
+    }
 
-  res.send(normalize(data));
+    res.send(normalize(data));
+  });
 };
 
 module.exports = {
