@@ -1,20 +1,19 @@
 import * as userService from '../services/user.service.js';
 
-export const get = (req, res) => {
-  res.statusCode = 200;
-  res.send(userService.getAll());
+export const get = async(req, res) => {
+  try {
+    const result = await userService.getAll();
+
+    res.statusCode = 200;
+    res.send(result);
+  } catch (error) {
+    res.sendStatus(500);
+  }
 };
 
-export const getOne = (req, res) => {
+export const getOne = async(req, res) => {
   const { id } = req.params;
-
-  if (!id) {
-    res.sendStatus(400);
-
-    return;
-  }
-
-  const user = userService.getById(Number(id));
+  const user = await userService.getById(id);
 
   if (!user) {
     res.sendStatus(404);
@@ -25,7 +24,7 @@ export const getOne = (req, res) => {
   res.send(user);
 };
 
-export const create = (req, res) => {
+export const create = async(req, res) => {
   const { name } = req.body;
 
   if (!name) {
@@ -34,13 +33,13 @@ export const create = (req, res) => {
     return;
   }
 
-  const newUser = userService.create(name);
+  const newUser = await userService.create(name);
 
   res.statusCode = 201;
   res.send(newUser);
 };
 
-export const update = (req, res) => {
+export const update = async(req, res) => {
   const { id } = req.params;
   const { name } = req.body;
 
@@ -50,26 +49,26 @@ export const update = (req, res) => {
     return;
   }
 
-  if (!userService.getById(Number(id))) {
+  if (!(await userService.getById(id))) {
     res.sendStatus(404);
 
     return;
   }
 
-  const updatedUser = userService.update(Number(id), name);
+  const updatedUser = await userService.update(id, name);
 
   res.send(updatedUser);
 };
 
-export const remove = (req, res) => {
+export const remove = async(req, res) => {
   const { id } = req.params;
 
-  if (!userService.getById(Number(id))) {
+  if (!(await userService.getById(id))) {
     res.sendStatus(404);
 
     return;
   }
 
-  userService.remove(Number(id));
+  userService.remove(id);
   res.sendStatus(204);
 };

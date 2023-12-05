@@ -5,9 +5,9 @@ export const userRouter = express.Router();
 
 userRouter.get('/', userController.get);
 
-userRouter.post('/', express.json(), userController.create);
-
 userRouter.get('/:id', userController.getOne);
+
+userRouter.post('/', express.json(), userController.create);
 
 userRouter.patch('/:id', express.json(), userController.update);
 

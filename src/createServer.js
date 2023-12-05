@@ -3,13 +3,8 @@ import cors from 'cors';
 
 import { expenseRouter } from './routes/expense.route.js';
 import { userRouter } from './routes/user.route.js';
-import * as userService from './services/user.service.js';
-import * as expenseService from './services/expense.service.js';
 
 export function createServer() {
-  userService.reset();
-  expenseService.reset();
-
   const app = express();
 
   app.use(cors());
@@ -21,6 +16,9 @@ export function createServer() {
   return app;
 };
 
-// app.listen(5040, () => {
+// const server = createServer();
+
+// server.listen(5040, () => {
+//   // eslint-disable-next-line no-console
 //   console.log('server is running locally on 5040');
 // });

@@ -1,78 +1,71 @@
-let expenses = [];
-let expId = 1;
+import { DataTypes } from 'sequelize';
+import { sequelize } from '../db.js';
 
-const generateExpId = () => {
-  const newId = expId;
+const Expense = sequelize.define('Expense', {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true,
+    allowNull: false,
+  },
+  userId: {
+    type: DataTypes.UUID,
+    allowNull: false,
+  },
+  spentAt: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  title: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  amount: {
+    type: DataTypes.NUMBER,
+    defaultValue: 0,
+    allowNull: false,
+  },
+  category: {
+    type: DataTypes.STRING,
+  },
+  note: {
+    type: DataTypes.STRING,
+  },
+}, {
+  tableName: 'expenses',
+  createdAt: false,
+  updatedAt: false,
+});
 
-  expId++;
-
-  return newId;
-};
-
-export const getAll = () => {
-  return expenses;
-};
-
-export const getFiltered = (userId, categories, fromDate, toDate) => {
-  let filterData = [...expenses];
-
-  if (userId) {
-    filterData = filterData.filter(ex => ex.userId === Number(userId));
-  }
-
-  if (categories) {
-    filterData = filterData.filter(ex => categories.includes(ex.category));
-  }
-
-  if (fromDate) {
-    const dateFrom = new Date(fromDate);
-
-    filterData = filterData.filter(ex => new Date(ex.spentAt) >= dateFrom);
-  }
-
-  if (toDate) {
-    const dateTo = new Date(toDate);
-
-    filterData = filterData.filter(ex => new Date(ex.spentAt) <= dateTo);
-  }
-
-  return filterData;
+export const get = () => {
+  return Expense.findAll();
 };
 
 export const getById = (id) => {
-  return expenses.find(ex => ex.id === Number(id)) || null;
+  return Expense.findByPk(id);
 };
 
 export const create = (userId, spentAt, title, amount, category, note) => {
-  const newExpense = {
-    id: generateExpId(),
+  return Expense.create({
     userId,
     spentAt,
     title,
     amount,
     category,
     note,
-  };
-
-  expenses.push(newExpense);
-
-  return newExpense;
+  });
 };
 
-export const update = (id, updates) => {
-  const expense = getById(id);
-
-  Object.assign(expense, updates);
-
-  return expense;
+export const update = (id, spentAt, title, amount, category, note) => {
+  return Expense.update({
+    spentAt,
+    title,
+    amount,
+    category,
+    note,
+  }, { where: { id } });
 };
 
 export const remove = (id) => {
-  const newExpenses = expenses.filter(ex => ex.id !== id);
-
-  expenses = newExpenses;
-};
-
-export const reset = () => {
-  expenses = [];
+  return Expense.destroy({ where: { id } });
 };

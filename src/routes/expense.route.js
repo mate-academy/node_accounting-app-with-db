@@ -5,9 +5,9 @@ export const expenseRouter = express.Router();
 
 expenseRouter.get('/', expenseController.getExpences);
 
-expenseRouter.post('/', expenseController.create);
-
 expenseRouter.get('/:id', expenseController.getOne);
+
+expenseRouter.post('/', expenseController.create);
 
 expenseRouter.patch('/:id', expenseController.update);
 
