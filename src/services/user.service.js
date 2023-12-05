@@ -1,5 +1,3 @@
-'use strict';
-
 let users = [];
 let usersId = 1;
 
@@ -11,15 +9,15 @@ const generateUserId = () => {
   return newId;
 };
 
-const getAll = () => {
+export const getAll = () => {
   return users;
 };
 
-const getById = (id) => {
+export const getById = (id) => {
   return users.find(user => user.id === id) || null;
 };
 
-const create = (name) => {
+export const create = (name) => {
   const user = {
     id: generateUserId(),
     name,
@@ -30,7 +28,7 @@ const create = (name) => {
   return user;
 };
 
-const update = (id, name) => {
+export const update = (id, name) => {
   const user = getById(id);
 
   Object.assign(user, { name });
@@ -38,21 +36,12 @@ const update = (id, name) => {
   return user;
 };
 
-const remove = (id) => {
+export const remove = (id) => {
   const newUsers = users.filter(user => user.id !== id);
 
   users = newUsers;
 };
 
-const reset = () => {
+export const reset = () => {
   users = [];
-};
-
-module.exports = {
-  getAll,
-  getById,
-  create,
-  update,
-  remove,
-  reset,
 };

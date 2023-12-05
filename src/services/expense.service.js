@@ -1,5 +1,3 @@
-'use strict';
-
 let expenses = [];
 let expId = 1;
 
@@ -11,11 +9,11 @@ const generateExpId = () => {
   return newId;
 };
 
-const getAll = () => {
+export const getAll = () => {
   return expenses;
 };
 
-const getFiltered = (userId, categories, fromDate, toDate) => {
+export const getFiltered = (userId, categories, fromDate, toDate) => {
   let filterData = [...expenses];
 
   if (userId) {
@@ -41,11 +39,11 @@ const getFiltered = (userId, categories, fromDate, toDate) => {
   return filterData;
 };
 
-const getById = (id) => {
+export const getById = (id) => {
   return expenses.find(ex => ex.id === Number(id)) || null;
 };
 
-const create = (userId, spentAt, title, amount, category, note) => {
+export const create = (userId, spentAt, title, amount, category, note) => {
   const newExpense = {
     id: generateExpId(),
     userId,
@@ -61,7 +59,7 @@ const create = (userId, spentAt, title, amount, category, note) => {
   return newExpense;
 };
 
-const update = (id, updates) => {
+export const update = (id, updates) => {
   const expense = getById(id);
 
   Object.assign(expense, updates);
@@ -69,22 +67,12 @@ const update = (id, updates) => {
   return expense;
 };
 
-const remove = (id) => {
+export const remove = (id) => {
   const newExpenses = expenses.filter(ex => ex.id !== id);
 
   expenses = newExpenses;
 };
 
-const reset = () => {
+export const reset = () => {
   expenses = [];
-};
-
-module.exports = {
-  getAll,
-  getFiltered,
-  getById,
-  create,
-  update,
-  remove,
-  reset,
 };

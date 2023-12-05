@@ -1,9 +1,7 @@
-'use strict';
+import * as userService from '../services/user.service.js';
+import * as expenseService from '../services/expense.service.js';
 
-const expenseService = require('../services/expense.service');
-const userService = require('../services/user.service');
-
-const getExpences = (req, res) => {
+export const getExpences = (req, res) => {
   const { userId, categories, from, to } = req.query;
 
   if (userId || categories || from || to) {
@@ -24,7 +22,7 @@ const getExpences = (req, res) => {
   res.send(expenseService.getAll());
 };
 
-const getOne = (req, res) => {
+export const getOne = (req, res) => {
   const { id } = req.params;
 
   if (!id) {
@@ -45,7 +43,7 @@ const getOne = (req, res) => {
   res.send(expense);
 };
 
-const create = (req, res) => {
+export const create = (req, res) => {
   const {
     userId,
     spentAt,
@@ -73,7 +71,7 @@ const create = (req, res) => {
   res.send(newExpense);
 };
 
-const update = (req, res) => {
+export const update = (req, res) => {
   const { id } = req.params;
 
   const data = Object.fromEntries(Object.entries(req.body));
@@ -89,7 +87,7 @@ const update = (req, res) => {
   res.send(updatedExpense);
 };
 
-const remove = (req, res) => {
+export const remove = (req, res) => {
   const { id } = req.params;
 
   if (!expenseService.getById(Number(id))) {
@@ -100,12 +98,4 @@ const remove = (req, res) => {
 
   expenseService.remove(Number(id));
   res.sendStatus(204);
-};
-
-module.exports = {
-  getExpences,
-  getOne,
-  create,
-  update,
-  remove,
 };

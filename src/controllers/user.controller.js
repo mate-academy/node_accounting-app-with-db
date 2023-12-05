@@ -1,13 +1,11 @@
-'use strict';
+import * as userService from '../services/user.service.js';
 
-const userService = require('../services/user.service');
-
-const get = (req, res) => {
+export const get = (req, res) => {
   res.statusCode = 200;
   res.send(userService.getAll());
 };
 
-const getOne = (req, res) => {
+export const getOne = (req, res) => {
   const { id } = req.params;
 
   if (!id) {
@@ -27,7 +25,7 @@ const getOne = (req, res) => {
   res.send(user);
 };
 
-const create = (req, res) => {
+export const create = (req, res) => {
   const { name } = req.body;
 
   if (!name) {
@@ -42,7 +40,7 @@ const create = (req, res) => {
   res.send(newUser);
 };
 
-const update = (req, res) => {
+export const update = (req, res) => {
   const { id } = req.params;
   const { name } = req.body;
 
@@ -63,7 +61,7 @@ const update = (req, res) => {
   res.send(updatedUser);
 };
 
-const remove = (req, res) => {
+export const remove = (req, res) => {
   const { id } = req.params;
 
   if (!userService.getById(Number(id))) {
@@ -74,12 +72,4 @@ const remove = (req, res) => {
 
   userService.remove(Number(id));
   res.sendStatus(204);
-};
-
-module.exports = {
-  get,
-  getOne,
-  create,
-  update,
-  remove,
 };

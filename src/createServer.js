@@ -1,14 +1,12 @@
-'use strict';
+import express from 'express';
+import cors from 'cors';
 
-const express = require('express');
-const cors = require('cors');
-const userRouter = require('./routes/user.route');
+import { expenseRouter } from './routes/expense.route.js';
+import { userRouter } from './routes/user.route.js';
+import * as userService from './services/user.service.js';
+import * as expenseService from './services/expense.service.js';
 
-const userService = require('./services/user.service');
-const expenseService = require('./services/expense.service');
-const expenseRouter = require('./routes/expense.route');
-
-function createServer() {
+export function createServer() {
   userService.reset();
   expenseService.reset();
 
@@ -23,10 +21,6 @@ function createServer() {
   return app;
 };
 
-module.exports = {
-  createServer,
-};
-
 // app.listen(5040, () => {
-//   console.log('server i s rinning');
+//   console.log('server is running locally on 5040');
 // });
