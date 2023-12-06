@@ -1,15 +1,10 @@
 'use strict';
 
-// const getFilteredExpenses = require('./../helpers/getFilteredExpenses');
 const expenseService = require('./../services/expense.service');
 const userService = require('../services/user.service');
 const prepareQuery = require('../helpers/prepareQuery');
 
 const expenseController = {
-  // get: (req, res) => {
-  //   res.send(getFilteredExpenses(req.query, expenseService.getAll()));
-  // },
-
   get: async(req, res) => {
     const query = prepareQuery(req.query);
     const expenses = await expenseService.getAll(query);
