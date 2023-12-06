@@ -4,14 +4,14 @@ const userService = require('./../services/users.service');
 const { notFoundResponse } = require('./../helpers/notFoundResponse');
 const { badRequestResponse } = require('./../helpers/badRequestResponse');
 
-const get = (req, res) => {
-  res.send(userService.getAll());
+const get = async(req, res) => {
+  res.send(await userService.getAll());
 };
 
-const getOne = (req, res) => {
+const getOne = async(req, res) => {
   const { id } = req.params;
 
-  const user = userService.getById(id);
+  const user = await userService.getById(id);
 
   if (!user) {
     return notFoundResponse(res, 'User');
@@ -20,47 +20,45 @@ const getOne = (req, res) => {
   res.send(user);
 };
 
-const create = (req, res) => {
+const create = async(req, res) => {
   const { name } = req.body;
 
   if (!name || typeof name !== 'string') {
     return badRequestResponse(res, 'name', 'string');
   }
 
-  const newUser = userService.create(name);
+  const newUser = await userService.create(name);
 
   return res.status(201).json(newUser);
 };
 
-const remove = (req, res) => {
+const remove = async(req, res) => {
   const { id } = req.params;
 
-  if (!userService.getById(id)) {
+  if (!(await userService.getById(id))) {
     return notFoundResponse(res, 'User');
   }
 
-  userService.remove(id);
+  await userService.remove(id);
 
   res.sendStatus(204);
 };
 
-const update = (req, res) => {
+const update = async(req, res) => {
   const { id } = req.params;
   const { name } = req.body;
-
-  const user = userService.getById(id);
 
   if (!name || typeof name !== 'string') {
     return badRequestResponse(res, 'name', 'string');
   }
 
-  if (!user) {
+  if (!(await userService.getById(id))) {
     return notFoundResponse(res, 'User');
   }
 
-  userService.update(id, name);
+  await userService.update(id, name);
 
-  res.send(user);
+  res.send(await userService.getById(id));
 };
 
 module.exports = {

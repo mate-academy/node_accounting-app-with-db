@@ -1,40 +1,49 @@
 'use strict';
 
-let users = [];
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../db/db');
+const { uuid } = require('uuidv4');
 
-const resetUsers = () => {
-  users = [];
-};
+const User = sequelize.define('User', {
+  id: {
+    type: DataTypes.UUIDV4,
+    primaryKey: true,
+    defaultValue: uuid,
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+}, {
+  tableName: 'users',
+  updatedAt: false,
+  createdAt: false,
+});
 
 const getAll = () => {
-  return users;
+  return User.findAll();
 };
 
 const getById = (id) => {
-  return users.find(u => u.id === +id) || null;
+  return User.findByPk(id);
 };
 
 const create = (name) => {
-  const newUser = {
-    id: new Date().getTime(),
+  return User.create({
     name,
-  };
-
-  users.push(newUser);
-
-  return newUser;
+  });
 };
 
 const update = (id, name) => {
-  const user = getById(id);
-
-  Object.assign(user, { name });
-
-  return user;
+  return User.update({ name }, {
+    where: { id },
+  });
 };
 
 const remove = (id) => {
-  users = users.filter(user => user.id !== +id);
+  return User.destroy({
+    where: { id },
+  });
 };
 
 module.exports = {
@@ -43,5 +52,4 @@ module.exports = {
   create,
   update,
   remove,
-  resetUsers,
 };
