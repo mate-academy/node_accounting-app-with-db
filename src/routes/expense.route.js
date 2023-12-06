@@ -3,7 +3,7 @@ import * as expenseController from '../controllers/expense.controller.js';
 
 export const expenseRouter = express.Router();
 
-expenseRouter.get('/', expenseController.getExpences);
+expenseRouter.get('/', expenseController.getAll);
 
 expenseRouter.get('/:id', expenseController.getOne);
 

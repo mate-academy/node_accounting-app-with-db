@@ -1,30 +1,41 @@
 import * as userService from '../services/user.service.js';
 import * as expenseService from '../services/expense.service.js';
-import { getFiltered } from '../helpers/filterData.js';
+import { defineFilterQuery } from '../helpers/defineFilterQuery.js';
 
-export const getExpences = async(req, res) => {
-  const { userId, categories, from, to } = req.query;
-  const expenses = await expenseService.get();
+export const getAll = async (req, res) => {
+  const { userId, category, from, to } = req.query;
+  const filterParams = defineFilterQuery(userId, category, from, to);
 
-  if (userId || categories || from || to) {
-    const filterExpenses = getFiltered(expenses, userId, categories, from, to);
+  if (Object.keys(filterParams).length === 0) {
+    try {
+      const expenses = await expenseService.get();
 
-    if (filterExpenses.length) {
-      res.send(filterExpenses);
+      res.status(200).send(expenses);
+    } catch (err) {
+      res.status(500).send({
+        message: err.message,
+      });
+    }
+  } else {
+    try {
+      const filteredExpenses = await expenseService.getFiltered(filterParams);
 
-      return;
-    } else {
-      res.sendStatus(404);
+      if (!filteredExpenses.length) {
+        res.sendStatus(404);
 
-      return;
+        return;
+      }
+
+      res.status(200).send(filteredExpenses);
+    } catch (err) {
+      res.status(500).send({
+        message: err.message,
+      });
     }
   }
-
-  res.statusCode = 200;
-  res.send(expenses);
 };
 
-export const getOne = async(req, res) => {
+export const getOne = async (req, res) => {
   const { id } = req.params;
 
   const expense = await expenseService.getById(id);
@@ -39,7 +50,7 @@ export const getOne = async(req, res) => {
   res.send(expense);
 };
 
-export const create = async(req, res) => {
+export const create = async (req, res) => {
   const {
     userId,
     spentAt,
@@ -74,7 +85,7 @@ export const create = async(req, res) => {
   }
 };
 
-export const update = async(req, res) => {
+export const update = async (req, res) => {
   const { id } = req.params;
   const { spentAt, title, amount, category, note } = req.body;
 
@@ -90,7 +101,7 @@ export const update = async(req, res) => {
   res.send(upd);
 };
 
-export const remove = async(req, res) => {
+export const remove = async (req, res) => {
   const { id } = req.params;
 
   if (!expenseService.getById(id)) {

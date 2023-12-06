@@ -15,10 +15,3 @@ export function createServer() {
 
   return app;
 };
-
-// const server = createServer();
-
-// server.listen(5040, () => {
-//   // eslint-disable-next-line no-console
-//   console.log('server is running locally on 5040');
-// });
