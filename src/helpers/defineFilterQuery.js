@@ -1,4 +1,4 @@
-import { Op } from "sequelize";
+import { Op } from 'sequelize';
 
 export const defineFilterQuery = (userId, category, from, to) => {
   const filterParams = {};

@@ -43,7 +43,7 @@ export const get = () => {
 
 export const getFiltered = (filterParams) => {
   return Expense.findAll({ where: filterParams });
-}
+};
 
 export const getById = (id) => {
   return Expense.findByPk(id);

@@ -2,7 +2,7 @@ import * as userService from '../services/user.service.js';
 import * as expenseService from '../services/expense.service.js';
 import { defineFilterQuery } from '../helpers/defineFilterQuery.js';
 
-export const getAll = async (req, res) => {
+export const getAll = async(req, res) => {
   const { userId, category, from, to } = req.query;
   const filterParams = defineFilterQuery(userId, category, from, to);
 
@@ -35,7 +35,7 @@ export const getAll = async (req, res) => {
   }
 };
 
-export const getOne = async (req, res) => {
+export const getOne = async(req, res) => {
   const { id } = req.params;
 
   const expense = await expenseService.getById(id);
@@ -50,7 +50,7 @@ export const getOne = async (req, res) => {
   res.send(expense);
 };
 
-export const create = async (req, res) => {
+export const create = async(req, res) => {
   const {
     userId,
     spentAt,
@@ -85,7 +85,7 @@ export const create = async (req, res) => {
   }
 };
 
-export const update = async (req, res) => {
+export const update = async(req, res) => {
   const { id } = req.params;
   const { spentAt, title, amount, category, note } = req.body;
 
@@ -101,7 +101,7 @@ export const update = async (req, res) => {
   res.send(upd);
 };
 
-export const remove = async (req, res) => {
+export const remove = async(req, res) => {
   const { id } = req.params;
 
   if (!expenseService.getById(id)) {
