@@ -7,8 +7,8 @@ userRouter.get('/', userController.get);
 
 userRouter.get('/:id', userController.getOne);
 
-userRouter.post('/', express.json(), userController.create);
+userRouter.post('/', userController.create);
 
-userRouter.patch('/:id', express.json(), userController.update);
+userRouter.patch('/:id', userController.update);
 
 userRouter.delete('/:id', userController.remove);
