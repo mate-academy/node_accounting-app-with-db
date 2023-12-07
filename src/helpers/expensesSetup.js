@@ -1,7 +1,7 @@
 'use strict';
 
-const { User } = require('../services/users.service');
-const { Expense } = require('../services/expenses.service');
+const { User } = require('../models/userModel');
+const { Expense } = require('../models/expenseModel');
 
 User.hasMany(Expense, { foreignKey: 'userId' });
 Expense.belongsTo(User, { foreignKey: 'userId' });

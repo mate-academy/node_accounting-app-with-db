@@ -1,5 +1,5 @@
 'use strict';
 
-const { User } = require('../services/users.service');
+const { User } = require('../models/userModel');
 
 User.sync();

@@ -8,6 +8,14 @@ const expenseService = require('../services/expenses.service');
 const validateCreateExpense = (res, expenseData) => {
   const { spentAt, category, note, amount, title } = expenseData;
 
+  if (expenseData.id) {
+    return res
+      .status(400)
+      .json({
+        error: 'id for expense is generated automatically',
+      });
+  }
+
   if (!isDate(spentAt)) {
     return badRequestResponse(res, 'spentAt', 'Date');
   }

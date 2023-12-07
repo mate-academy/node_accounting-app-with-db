@@ -1,38 +1,7 @@
 'use strict';
 
-const { DataTypes, Op } = require('sequelize');
-const { sequelize } = require('../db/db');
-
-const Expense = sequelize.define('Expense', {
-  userId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  spentAt: {
-    type: DataTypes.DATE,
-    allowNull: false,
-  },
-  title: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  amount: {
-    type: DataTypes.FLOAT,
-    allowNull: false,
-  },
-  category: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  note: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-}, {
-  tableName: 'expenses',
-  updatedAt: false,
-  createdAt: false,
-});
+const { Op } = require('sequelize');
+const { Expense } = require('../models/expenseModel');
 
 const getExpenses = (userId, from, to, categories) => {
   const query = {
@@ -92,5 +61,4 @@ module.exports = {
   create,
   update,
   remove,
-  Expense,
 };
