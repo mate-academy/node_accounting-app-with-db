@@ -29,7 +29,7 @@ const createUser = (name) => {
   return User.create({ name });
 };
 
-const getUser = async(id) => {
+const getUser = (id) => {
   return User.findByPk(id);
 };
 

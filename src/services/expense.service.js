@@ -1,47 +1,83 @@
 'use strict';
 
-let expenses = [];
+const sequelize = require('./db');
+const { DataTypes, Op } = require('sequelize');
 
-const getAllExpenses = ({ userId, categories, from, to }) => {
-  const newExpenses = expenses.filter((item) => {
-    if (
-      (!userId || item.userId === +userId)
-        && (!categories || item.category === categories)
-        && (!from || !to || (
-          Date.parse(item.spentAt) < Date.parse(to)
-            && Date.parse(item.spentAt) > Date.parse(from)
-        ))
-    ) {
-      return true;
-    }
+const Expense = sequelize.define('Expense', {
+  spentAt: {
+    type: DataTypes.DATE,
+    allowNull: false,
+  },
+  title: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  amount: {
+    type: DataTypes.NUMBER,
+    allowNull: false,
+  },
+  category: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  note: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+}, {
+  tableName: 'expenses',
+});
 
-    return false;
+const normalize = ({ id, userId, spentAt, title, amount, category, note }) => {
+  return {
+    id,
+    userId,
+    spentAt,
+    title,
+    amount,
+    category,
+    note,
+  };
+};
+
+const getAllExpenses = async({ userId, categories, from, to }) => {
+  const where = {};
+
+  if (userId) {
+    where.userId = +userId;
+  }
+
+  if (categories) {
+    where.category = categories;
+  }
+
+  if (from && to) {
+    where.spentAt = {
+      [Op.between]: [new Date(from), new Date(to)],
+    };
+  }
+
+  const newExpenses = await Expense.findAll({
+    where,
   });
 
   return newExpenses;
 };
 
 const createExpense = (payload) => {
-  const expense = {
-    id: +new Date(),
-    ...payload,
-  };
-
-  expenses.push(expense);
-
-  return expense;
+  return Expense.create({ ...payload });
 };
 
 const getExpense = (id) => {
-  return expenses.find(expense => expense.id === +id) || null;
+  return Expense.findByPk(id);
 };
 
-const deleteExpense = (id) => {
-  expenses = expenses.filter(expense => expense.id !== +id);
+const deleteExpense = async(id) => {
+  await Expense.destroy({ where: { id } });
 };
 
-const updateExpense = ({ expense, payload }) => {
-  Object.assign(expense, payload);
+const updateExpense = async({ id, payload }) => {
+  await Expense.update({ ...payload }, { where: { id } });
 };
 
 module.exports = {
@@ -50,4 +86,6 @@ module.exports = {
   getExpense,
   deleteExpense,
   updateExpense,
+  Expense,
+  normalize,
 };

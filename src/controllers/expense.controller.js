@@ -16,15 +16,16 @@ const expenseKeys = [
   'note',
 ];
 
-const getAll = (req, res) => {
+const getAll = async(req, res) => {
   const { userId, categories, from, to } = req.query;
-
-  res.send(expenseService.getAllExpenses({
+  const expenses = await expenseService.getAllExpenses({
     userId,
     categories,
     from,
     to,
-  }));
+  });
+
+  res.send(expenses.map(expense => expenseService.normalize(expense)));
 };
 
 const create = (req, res) => {
@@ -57,7 +58,7 @@ const getOne = (req, res) => {
     return;
   }
 
-  res.send(expense);
+  res.send(expenseService.normalize(expense));
 };
 
 const remove = (req, res) => {
@@ -97,7 +98,7 @@ const update = (req, res) => {
     payload,
   });
 
-  res.send(expense);
+  res.send(expenseService.normalize(expense));
 };
 
 module.exports = {
