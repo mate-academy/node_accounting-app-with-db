@@ -1,63 +1,89 @@
 'use strict';
 
-let expenses = [];
+const { DataTypes, Op } = require('sequelize');
+const { sequelize } = require('../db/db');
 
-const resetExpenses = () => {
-  expenses = [];
-};
+const Expense = sequelize.define('Expense', {
+  userId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  spentAt: {
+    type: DataTypes.DATE,
+    allowNull: false,
+  },
+  title: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  amount: {
+    type: DataTypes.FLOAT,
+    allowNull: false,
+  },
+  category: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  note: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+}, {
+  tableName: 'expenses',
+  updatedAt: false,
+  createdAt: false,
+});
 
 const getExpenses = (userId, from, to, categories) => {
-  let expensesToDisplay = [...expenses];
+  const query = {
+    where: {},
+  };
 
   if (userId) {
-    expensesToDisplay = expensesToDisplay.filter(e => e.userId === +userId);
+    query.where.userId = userId;
   }
 
   if (categories) {
-    expensesToDisplay = expensesToDisplay
-      .filter(e => e.category === categories);
+    query.where.category = categories;
   }
 
-  if (from) {
-    expensesToDisplay = expensesToDisplay.filter(e => (
-      Date.parse(e.spentAt) > Date.parse(from)
-    ));
+  if (from && to) {
+    query.where.date = {
+      [Op.between]: [from, to],
+    };
+  } else if (from) {
+    query.where.date = {
+      [Op.gte]: from,
+    };
+  } else if (to) {
+    query.where.date = {
+      [Op.lte]: to,
+    };
   }
 
-  if (to) {
-    expensesToDisplay = expensesToDisplay.filter(e => (
-      Date.parse(e.spentAt) < Date.parse(to)
-    ));
-  }
-
-  return expensesToDisplay;
+  return Expense.findAll(query);
 };
 
 const getById = (id) => {
-  return expenses.find(e => e.id === +id) || null;
+  return Expense.findByPk(id);
 };
 
 const create = (expenseData) => {
-  const newExpense = {
-    id: new Date().getTime(),
+  return Expense.create({
     ...expenseData,
-  };
-
-  expenses.push(newExpense);
-
-  return newExpense;
+  });
 };
 
 const update = (id, dataToUpdate) => {
-  const expense = getById(id);
-
-  Object.assign(expense, { ...dataToUpdate });
-
-  return expense;
+  return Expense.update({ ...dataToUpdate }, {
+    where: { id },
+  });
 };
 
 const remove = (id) => {
-  expenses = expenses.filter(e => e.id !== +id);
+  return Expense.destroy({
+    where: { id },
+  });
 };
 
 module.exports = {
@@ -66,5 +92,5 @@ module.exports = {
   create,
   update,
   remove,
-  resetExpenses,
+  Expense,
 };
