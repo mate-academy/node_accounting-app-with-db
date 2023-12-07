@@ -1,36 +1,44 @@
 'use strict';
 
-let users = [];
+const sequelize = require('./db');
+const { DataTypes } = require('sequelize');
 
-const getAllUsers = () => {
-  return users;
+const User = sequelize.define('User', {
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+}, {
+  tableName: 'users',
+});
+
+const normalize = ({ id, name }) => {
+  return {
+    id,
+    name,
+  };
+};
+
+const getAllUsers = async() => {
+  const result = await User.findAll();
+
+  return result;
 };
 
 const createUser = (name) => {
-  const user = {
-    id: +new Date(),
-    name,
-  };
-
-  users.push(user);
-
-  return user;
+  return User.create({ name });
 };
 
-const getUser = (id) => {
-  return users.find(user => user.id === +id) || null;
+const getUser = async(id) => {
+  return User.findByPk(id);
 };
 
-const deleteUser = (id) => {
-  users = users.filter(user => user.id !== +id);
+const deleteUser = async(id) => {
+  await User.destroy({ where: { id } });
 };
 
-const updateUser = ({ user, name }) => {
-  Object.assign(user, { name });
-};
-
-const reset = () => {
-  users = [];
+const updateUser = async({ id, name }) => {
+  await User.update({ name }, { where: { id } });
 };
 
 module.exports = {
@@ -39,5 +47,6 @@ module.exports = {
   getUser,
   deleteUser,
   updateUser,
-  reset,
+  User,
+  normalize,
 };

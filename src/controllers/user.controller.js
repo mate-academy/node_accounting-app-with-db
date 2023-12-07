@@ -7,8 +7,10 @@ const NOT_FOUND_MESSAGE = 'Expected entity does not exist';
 const REQUIRED_CODE = 400;
 const REQUIRED_MESSAGE = 'Required parameter is not passed';
 
-const getAll = (req, res) => {
-  res.send(userService.getAllUsers());
+const getAll = async(req, res) => {
+  const users = await userService.getAllUsers();
+
+  res.send(users.map(user => userService.normalize(user)));
 };
 
 const create = (req, res) => {
@@ -35,7 +37,7 @@ const getOne = (req, res) => {
     return;
   }
 
-  res.send(user);
+  res.send(userService.normalize(user));
 };
 
 const remove = (req, res) => {
@@ -71,11 +73,11 @@ const update = (req, res) => {
   }
 
   userService.updateUser({
-    user,
+    id,
     name,
   });
 
-  res.send(user);
+  res.send(userService.normalize(user));
 };
 
 module.exports = {

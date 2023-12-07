@@ -44,15 +44,10 @@ const updateExpense = ({ expense, payload }) => {
   Object.assign(expense, payload);
 };
 
-const reset = () => {
-  expenses = [];
-};
-
 module.exports = {
   getAllExpenses,
   createExpense,
   getExpense,
   deleteExpense,
   updateExpense,
-  reset,
 };
