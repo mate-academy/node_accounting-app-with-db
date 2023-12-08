@@ -3,21 +3,15 @@
 const itemsFilter = (items, params) => {
   const { userId, categories, from, to } = params;
 
-  let copy = [...items];
+  return items.filter(item => {
+    const isUser = userId ? item.userId === +userId : true;
 
-  if (userId) {
-    copy = copy.filter(item => item.userId === +userId);
-  }
+    const isCategories = categories ? categories.includes(item.category) : true;
+    const isFrom = from ? item.spentAt > from : true;
+    const isTo = to ? item.spentAt < to : true;
 
-  if (categories) {
-    copy = copy.filter(item => categories.includes(item.category));
-  }
-
-  if (from || to) {
-    copy = copy.filter(item => item.spentAt > from && item.spentAt < to);
-  }
-
-  return copy;
+    return isUser && isCategories && isFrom && isTo;
+  });
 };
 
 module.exports = { itemsFilter };
