@@ -7,7 +7,7 @@ require('dotenv').config();
 const { usersRouter } = require('./routes/users.route');
 const { expensesRouter } = require('./routes/expenses.route');
 
-const PORT = process.env.API_PORT;
+const PORT = process.env.API_PORT || 3001;
 
 const app = express();
 
