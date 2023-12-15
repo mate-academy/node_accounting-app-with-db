@@ -8,7 +8,7 @@ const {
   deleteExpense,
   updateExpense,
 } = require('../controllers/expensesController');
-const { validateId } = require('../controllers/userController');
+const { validateId } = require('../utils/helpers');
 
 const expensesRoute = express.Router();
 

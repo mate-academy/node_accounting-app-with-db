@@ -8,18 +8,6 @@ const {
   updateOne,
 } = require('../services/userServices');
 
-const validateId = (req, res, next) => {
-  const { id } = req.params;
-
-  if (!id || Number.isNaN(Number.parseInt(id))) {
-    res.sendStatus(400);
-
-    return;
-  }
-
-  next();
-};
-
 const getAllUsers = async (_, res) => {
   try {
     const users2 = await getAll();
@@ -109,7 +97,6 @@ const updateUser = async (req, res) => {
 };
 
 module.exports = {
-  validateId,
   getAllUsers,
   createNewUser,
   getUser,

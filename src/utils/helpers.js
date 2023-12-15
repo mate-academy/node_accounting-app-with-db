@@ -10,11 +10,11 @@ const validateExpenseBody = (reqBody) => {
   const { spentAt, title, amount, category, note } = reqBody;
 
   if (
-    Number.isNaN(amount) ||
-    typeof title !== 'string' ||
-    typeof category !== 'string' ||
-    typeof note !== 'string' ||
-    !checkDate(spentAt)
+    Number.isNaN(amount)
+    || typeof title !== 'string'
+    || typeof category !== 'string'
+    || typeof note !== 'string'
+    || !checkDate(spentAt)
   ) {
     return false;
   }
@@ -22,6 +22,19 @@ const validateExpenseBody = (reqBody) => {
   return true;
 };
 
+const validateId = (req, res, next) => {
+  const { id } = req.params;
+
+  if (!id || Number.isNaN(Number.parseInt(id))) {
+    res.sendStatus(400);
+
+    return;
+  }
+
+  next();
+};
+
 module.exports = {
   validateExpenseBody,
+  validateId,
 };

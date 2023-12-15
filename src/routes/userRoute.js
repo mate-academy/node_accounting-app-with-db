@@ -5,10 +5,10 @@ const {
   getAllUsers,
   createNewUser,
   getUser,
-  validateId,
   deleteUser,
   updateUser,
 } = require('../controllers/userController');
+const { validateId } = require('../utils/helpers');
 
 const userRouter = express.Router();
 
