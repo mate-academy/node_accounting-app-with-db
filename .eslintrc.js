@@ -5,6 +5,7 @@ module.exports = {
   },
   rules: {
     'no-proto': 0,
+    'space-before-function-paren': ['off'],
   },
   plugins: ['jest'],
 };

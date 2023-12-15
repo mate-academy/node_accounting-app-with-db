@@ -16,7 +16,7 @@ const sequelize = new Sequelize(
   }
 );
 
-const testDB = async() => {
+const testDB = async () => {
   try {
     await sequelize.authenticate();
     console.log('Connection has been established successfully.');
@@ -25,7 +25,7 @@ const testDB = async() => {
   }
 };
 
-const synchronizeTable = async(model) => {
+const synchronizeTable = async (model) => {
   await model.sync({ force: true });
 };
 

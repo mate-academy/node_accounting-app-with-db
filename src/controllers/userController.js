@@ -1,16 +1,14 @@
 'use strict';
 
-let idTracker = 1;
+const {
+  getAll,
+  createUser,
+  getOne,
+  deleteOne,
+  updateOne,
+} = require('../services/userServices');
 
-let users = [];
-
-const resetUsers = () => {
-  users = [];
-};
-
-const isUser = (userId) => {
-  return users.some((user) => user.id === userId);
-};
+const isUser = (userId) => {};
 
 const validateId = (req, res, next) => {
   const { id } = req.params;
@@ -24,74 +22,91 @@ const validateId = (req, res, next) => {
   next();
 };
 
-const getAllUsers = (req, res) => {
-  res.json(users);
+const getAllUsers = async (_, res) => {
+  try {
+    const users2 = await getAll();
+
+    res.send(users2);
+  } catch (e) {
+    res.sendStatus(400);
+  }
 };
 
-const createNewUser = (req, res) => {
+const createNewUser = async (req, res) => {
   const { name } = req.body;
 
-  if (!name || typeof name !== 'string') {
+  try {
+    if (!name || typeof name !== 'string') {
+      throw new Error('Bad request');
+    }
+
+    const user = await createUser(name);
+
+    res.status(201).json(user);
+  } catch (e) {
     res.sendStatus(400);
-
-    return;
-  }
-
-  const newUser = {
-    id: idTracker,
-    name,
-  };
-
-  users.push(newUser);
-  idTracker++;
-  res.status(201).json(newUser);
-};
-
-const getUser = (req, res) => {
-  const { id } = req.params;
-
-  const foundUser = users.find((user) => user.id === Number.parseInt(id));
-
-  if (!foundUser) {
-    res.sendStatus(404);
-  } else {
-    res.json(foundUser);
   }
 };
 
-const deleteUser = (req, res) => {
+const getUser = async (req, res) => {
   const { id } = req.params;
 
-  const userIndex = users.findIndex((user) => user.id === Number.parseInt(id));
+  try {
+    const user = await getOne(id);
 
-  if (userIndex < 0) {
-    res.sendStatus(404);
-  } else {
-    users.splice(userIndex, 1);
+    if (user === null) {
+      res.sendStatus(404);
+
+      return;
+    }
+
+    res.send(user);
+  } catch (e) {
+    res.sendStatus(400);
+  }
+};
+
+const deleteUser = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const status = await deleteOne(id);
+
+    if (status === 0) {
+      res.sendStatus(404);
+
+      return;
+    }
+
     res.sendStatus(204);
+  } catch (e) {
+    res.sendStatus(400);
   }
 };
 
-const updateUser = (req, res) => {
+const updateUser = async (req, res) => {
   const { id } = req.params;
   const { name } = req.body;
 
-  if (!name || typeof name !== 'string') {
-    res.sendStatus(400);
+  try {
+    if (!name || typeof name !== 'string') {
+      throw new Error('Bad request');
+    }
 
-    return;
-  }
-
-  const userIndex = users.findIndex((user) => user.id === Number.parseInt(id));
-
-  if (userIndex < 0) {
-    res.sendStatus(404);
-  } else {
-    users.splice(userIndex, 1, {
-      id: Number.parseInt(id),
+    const [status, user] = await updateOne({
       name,
+      id,
     });
-    res.json(users[userIndex]);
+
+    if (status === 0) {
+      res.sendStatus(404);
+
+      return;
+    }
+
+    res.send(user);
+  } catch (e) {
+    res.sendStatus(400);
   }
 };
 
@@ -102,6 +117,5 @@ module.exports = {
   getUser,
   deleteUser,
   updateUser,
-  resetUsers,
   isUser,
 };
