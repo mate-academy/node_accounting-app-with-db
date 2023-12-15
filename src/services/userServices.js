@@ -2,21 +2,21 @@
 
 const { User } = require('../models/userModel');
 
-const getAll = async () => {
+const getAll = () => {
   return User.findAll({
     attributes: ['id', 'name'],
   });
 };
 
-const getOne = async (id) => {
+const getOne = (id) => {
   return User.findByPk(id);
 };
 
-const createUser = async (name) => {
+const createUser = (name) => {
   return User.create({ name });
 };
 
-const deleteOne = async (id) => {
+const deleteOne = (id) => {
   return User.destroy({
     where: {
       id,

@@ -8,8 +8,6 @@ const {
   updateOne,
 } = require('../services/userServices');
 
-const isUser = (userId) => {};
-
 const validateId = (req, res, next) => {
   const { id } = req.params;
 
@@ -117,5 +115,4 @@ module.exports = {
   getUser,
   deleteUser,
   updateUser,
-  isUser,
 };

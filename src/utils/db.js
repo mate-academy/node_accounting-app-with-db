@@ -25,12 +25,7 @@ const testDB = async () => {
   }
 };
 
-const synchronizeTable = async (model) => {
-  await model.sync({ force: true });
-};
-
 module.exports = {
   testDB,
   sequelize,
-  synchronizeTable,
 };
