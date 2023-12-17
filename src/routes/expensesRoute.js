@@ -7,6 +7,7 @@ const {
   getExpense,
   deleteExpense,
   updateExpense,
+  validateBody,
 } = require('../controllers/expensesController');
 const { validateId } = require('../utils/helpers');
 
@@ -16,10 +17,10 @@ expensesRoute.use('/:id', validateId);
 
 expensesRoute
   .get('/', getAllExpenses)
-  .post('/', createNewExpense)
   .get('/:id', getExpense)
+  .post('/', validateBody, createNewExpense)
   .delete('/:id', deleteExpense)
-  .patch('/:id', updateExpense);
+  .patch('/:id', validateBody, updateExpense);
 
 module.exports = {
   expensesRoute,

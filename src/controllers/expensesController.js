@@ -9,27 +9,33 @@ const {
 } = require('../services/expenseService');
 const { validateExpenseBody } = require('../utils/helpers');
 
+const validateBody = (req, res, next) => {
+  if (!validateExpenseBody(req.body)) {
+    res.sendStatus(400);
+
+    return;
+  }
+
+  next();
+};
+
 const getAllExpenses = async (req, res) => {
   try {
     const result = await getAll(req.query);
 
     res.send(result);
   } catch (e) {
-    res.sendStatus(400);
+    res.sendStatus(500);
   }
 };
 
 const createNewExpense = async (req, res) => {
   try {
-    if (!validateExpenseBody(req.body)) {
-      throw new Error('Bad request');
-    }
-
     const expense = await createExpense(req.body);
 
     res.status(201).json(expense);
   } catch (e) {
-    res.sendStatus(400);
+    res.sendStatus(500);
   }
 };
 
@@ -47,7 +53,7 @@ const getExpense = async (req, res) => {
 
     res.send(expense);
   } catch (e) {
-    res.sendStatus(400);
+    res.sendStatus(500);
   }
 };
 
@@ -65,7 +71,7 @@ const deleteExpense = async (req, res) => {
 
     res.sendStatus(204);
   } catch (e) {
-    res.sendStatus(400);
+    res.sendStatus(500);
   }
 };
 
@@ -73,10 +79,6 @@ const updateExpense = async (req, res) => {
   const { id } = req.params;
 
   try {
-    if (!validateExpenseBody(req.body)) {
-      throw new Error('Bad request');
-    }
-
     const [status, user] = await updateOne(id, req.body);
 
     if (status === 0) {
@@ -87,7 +89,7 @@ const updateExpense = async (req, res) => {
 
     res.send(user);
   } catch (e) {
-    res.sendStatus(400);
+    res.sendStatus(500);
   }
 };
 
@@ -97,4 +99,5 @@ module.exports = {
   getExpense,
   deleteExpense,
   updateExpense,
+  validateBody,
 };

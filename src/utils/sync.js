@@ -3,8 +3,9 @@
 'use strict';
 
 const { sequelize } = require('./db');
-const User = require('../models/userModel');
-const Expense = require('../models/expenseModel');
+
+require('../models/userModel');
+require('../models/expenseModel');
 
 // Synchronize the models with the database
 sequelize

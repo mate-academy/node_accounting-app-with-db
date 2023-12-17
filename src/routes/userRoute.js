@@ -7,6 +7,7 @@ const {
   getUser,
   deleteUser,
   updateUser,
+  validateBody,
 } = require('../controllers/userController');
 const { validateId } = require('../utils/helpers');
 
@@ -16,10 +17,10 @@ userRouter.use('/:id', validateId);
 
 userRouter
   .get('/', getAllUsers)
-  .post('/', createNewUser)
+  .post('/', validateBody, createNewUser)
   .get('/:id', getUser)
   .delete('/:id', deleteUser)
-  .patch('/:id', updateUser);
+  .patch('/:id', validateBody, updateUser);
 
 module.exports = {
   userRouter,

@@ -8,13 +8,25 @@ const {
   updateOne,
 } = require('../services/userServices');
 
+const validateBody = (req, res, next) => {
+  const { name } = req.body;
+
+  if (!name || typeof name !== 'string') {
+    res.sendStatus(400);
+
+    return;
+  }
+
+  next();
+};
+
 const getAllUsers = async (_, res) => {
   try {
     const users2 = await getAll();
 
     res.send(users2);
   } catch (e) {
-    res.sendStatus(400);
+    res.sendStatus(500);
   }
 };
 
@@ -22,15 +34,11 @@ const createNewUser = async (req, res) => {
   const { name } = req.body;
 
   try {
-    if (!name || typeof name !== 'string') {
-      throw new Error('Bad request');
-    }
-
     const user = await createUser(name);
 
     res.status(201).json(user);
   } catch (e) {
-    res.sendStatus(400);
+    res.sendStatus(500);
   }
 };
 
@@ -48,7 +56,7 @@ const getUser = async (req, res) => {
 
     res.send(user);
   } catch (e) {
-    res.sendStatus(400);
+    res.sendStatus(500);
   }
 };
 
@@ -66,7 +74,7 @@ const deleteUser = async (req, res) => {
 
     res.sendStatus(204);
   } catch (e) {
-    res.sendStatus(400);
+    res.sendStatus(500);
   }
 };
 
@@ -75,10 +83,6 @@ const updateUser = async (req, res) => {
   const { name } = req.body;
 
   try {
-    if (!name || typeof name !== 'string') {
-      throw new Error('Bad request');
-    }
-
     const [status, user] = await updateOne({
       name,
       id,
@@ -92,7 +96,7 @@ const updateUser = async (req, res) => {
 
     res.send(user);
   } catch (e) {
-    res.sendStatus(400);
+    res.sendStatus(500);
   }
 };
 
@@ -102,4 +106,5 @@ module.exports = {
   getUser,
   deleteUser,
   updateUser,
+  validateBody,
 };

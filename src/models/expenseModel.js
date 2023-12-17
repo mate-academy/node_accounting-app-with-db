@@ -5,7 +5,7 @@ const { sequelize } = require('../utils/db');
 const { User } = require('./userModel');
 
 const Expense = sequelize.define(
-  'Expense',
+  'expense',
   {
     spentAt: {
       type: DataTypes.DATE,
