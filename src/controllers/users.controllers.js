@@ -37,11 +37,9 @@ const remove = (req, res) => {
   }
 
   usersService.deleteUser(user).then(() => {
-    // eslint-disable-next-line no-console
     console.log('User was deleted successfully');
   })
     .catch((error) => {
-      // eslint-disable-next-line no-console
       console.error('Error occurred:', error);
     });
   res.sendStatus(204);
@@ -57,11 +55,9 @@ const create = (req, res) => {
   }
 
   usersService.addUser(name).then(() => {
-    // eslint-disable-next-line no-console
     console.log('User was added successfully');
   })
     .catch((error) => {
-      // eslint-disable-next-line no-console
       console.error('Error occurred:', error);
     });
 

@@ -13,7 +13,6 @@ function createServer() {
 }
 
 createServer().listen(3006, () => {
-  // eslint-disable-next-line no-console
   console.log('Server is running on localhost : 3006');
 });
 

@@ -51,7 +51,7 @@ const getExpenses = ({ userId, categories, from, to }) => {
           [Op.eq]: userId,
         },
       },
-    });
+    }).map(expense => normalize(expense));
   }
 
   if (categories) {
@@ -88,6 +88,7 @@ const getExpenses = ({ userId, categories, from, to }) => {
 const getExpenseById = (id) => {
   return Expense.findByPk(id);
 };
+
 const addExpense = (expense) => {
   const { userId, spentAt, title, amount, category, note } = expense;
   const id = uuidv4();

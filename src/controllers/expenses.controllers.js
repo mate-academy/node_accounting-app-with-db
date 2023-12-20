@@ -14,7 +14,7 @@ const get = async(req, res) => {
 
     return;
   }
-  res.send((await expenses).map(expense => expensesService.normalize(expense)));
+  res.send(expenses);
 };
 
 const getOne = (req, res) => {
@@ -41,11 +41,9 @@ const remove = (req, res) => {
   }
 
   expensesService.deleteExpense(expense).then(() => {
-    // eslint-disable-next-line no-console
     console.log('Expense was deleted successfully');
   })
     .catch((error) => {
-      // eslint-disable-next-line no-console
       console.error('Error occurred:', error);
     });
 
@@ -59,17 +57,15 @@ const create = (req, res) => {
     return;
   }
 
-  expensesService.addExpense(req.body).then(() => {
-    // eslint-disable-next-line no-console
+  const createdExpense = expensesService.addExpense(req.body).then(() => {
     console.log('Expense was added successfully');
   })
     .catch((error) => {
-      // eslint-disable-next-line no-console
       console.error('Error occurred:', error);
     });
 
   res.statusCode = 201;
-  res.send(204);
+  res.send(createdExpense);
 };
 
 const update = (req, res) => {
