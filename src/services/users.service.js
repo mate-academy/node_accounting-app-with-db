@@ -1,69 +1,72 @@
 /* eslint-disable no-console */
 'use strict';
 
-const client = require('../db');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../db');
 
-async function connect() {
-  await client.connect();
-}
+const User = sequelize.define('User', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+  },
 
-connect().then(async() => {
-  // Тут ви можете продовжити роботу з базою
-  //  даних або викликати інші асинхронні операції
-  // Наприклад, запуск вашого сервера Express, якщо це потрібно
-  console.log('Connected to the database');
-
-  const id = 1;
-
-  // const result = await client.query(`
-  //   SELECT * FROM expenses
-  // `);
-
-  const result1 = await client.query(`
-    SELECT title FROM expenses
-    WHERE id = $1
-  `, [id]);
-
-  console.log(result1.rows);
-}).catch((error) => {
-  console.error('Error connecting to the database:', error);
+  name: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  },
+}, {
+  tableName: 'users',
+  updatedAt: false,
+  createdAt: false,
 });
 
-let users = [];
+const getUsers = async() => {
+  return User.findAll();
+};
 
-const getUsers = () => users;
-
-const getUserById = (id) => {
+const getUserById = async(id) => {
   const normalizedId = parseInt(id);
 
-  return users.find(user => user.id === normalizedId) || null;
+  return User.findByPk(normalizedId);
 };
 
-const createUser = (name) => {
-  const getMaxId = users[users.length - 1].id || 0;
+const createUser = async(name) => {
+  try {
+    const lastUser = await User.findOne({
+      attributes: ['id'],
+      order: [['id', 'DESC']],
+    });
 
-  const user = {
-    id: getMaxId + 1,
-    name,
-  };
+    const getMaxId = lastUser ? lastUser.id : 0;
 
-  users.push(user);
+    const user = {
+      id: getMaxId + 1,
+      name,
+    };
 
-  return user;
+    return User.create(user);
+  } catch (error) {
+    console.error('Error creating user:', error);
+    throw error;
+  }
 };
 
-const deleteUser = (id) => {
+const deleteUser = async(id) => {
   const normalizedId = parseInt(id);
 
-  users = users.filter(user => user.id !== normalizedId);
+  return User.destroy({
+    where: {
+      id: normalizedId,
+    },
+  });
 };
 
-const updateUser = ({ id, name }) => {
-  const user = getUserById(id);
-
-  Object.assign(user, { name });
-
-  return user;
+const updateUser = async({ id, name }) => {
+  return User.update({ name: name }, {
+    where: {
+      id,
+    },
+  });
 };
 
 module.exports = {

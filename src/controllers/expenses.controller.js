@@ -2,18 +2,18 @@
 
 const expenseService = require('../services/expenses.service');
 
-const get = (req, res) => {
-  res.send(expenseService.getExpenses(req.body));
+const get = async(req, res) => {
+  res.send(await expenseService.getExpenses(req.body));
 };
 
-const getOne = (req, res) => {
+const getOne = async(req, res) => {
   const { id } = req.params;
 
   if (!id) {
     res.sendStatus(400);
   }
 
-  const expense = expenseService.getExpenseById(id);
+  const expense = await expenseService.getExpenseById(id);
 
   if (!expense) {
     res.sendStatus(404);
@@ -24,7 +24,7 @@ const getOne = (req, res) => {
   res.send(expense);
 };
 
-const add = (req, res) => {
+const add = async(req, res) => {
   const expense = req.body;
 
   if (!expense) {
@@ -33,33 +33,32 @@ const add = (req, res) => {
     return;
   }
 
-  const newExpense = expenseService.addExpense(expense);
+  try {
+    const newExpense = await expenseService.addExpense(expense);
 
-  res.sendStatus(201);
-  res.send(newExpense);
+    res.status(201).json(newExpense);
+  } catch (error) {
+    res.sendStatus(500);
+  }
 };
 
-const remove = (req, res) => {
+const remove = async(req, res) => {
   const { id } = req.params;
 
   if (!id) {
     res.sendStatus(400);
   }
 
-  const expense = expenseService.getExpenseById(id);
+  try {
+    await expenseService.deleteExpense(id);
 
-  if (!expense) {
-    res.sendStatus(404);
-
-    return;
+    res.sendStatus(204);
+  } catch (err) {
+    res.sendStatus(500);
   }
-
-  expenseService.deleteExpense(id);
-
-  res.sendStatus(204);
 };
 
-const update = (req, res) => {
+const update = async(req, res) => {
   const { id } = req.params;
   const newProperties = req.body;
 
@@ -67,13 +66,7 @@ const update = (req, res) => {
     res.sendStatus(400);
   }
 
-  if (!expenseService.getExpenseById(id)) {
-    res.sendStatus(404);
-
-    return;
-  }
-
-  const updatedExpense = expenseService
+  const updatedExpense = await expenseService
     .updateExpense(id, newProperties);
 
   res.send(updatedExpense);

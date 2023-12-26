@@ -1,55 +1,129 @@
+/* eslint-disable no-console */
 'use strict';
 
-let expenses = [];
+const sequelize = require('../db');
+const { DataTypes, Op } = require('sequelize');
 
-const getExpenses = (filterProperties) => {
+const Expense = sequelize.define('Expense', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+  },
+  userId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+
+  title: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  },
+
+  amount: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+
+  category: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  },
+
+  note: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  },
+
+  spendAt: {
+    type: DataTypes.DATE,
+    allowNull: false,
+    defaultValue: DataTypes.NOW,
+  },
+}, {
+  tableName: 'expenses',
+  updatedAt: false,
+  createdAt: false,
+});
+
+const getExpenses = async(filterProperties = {}) => {
   const { userId, categories, from, to } = filterProperties;
 
-  switch (true) {
-    case userId:
-      return expenses.find(expanse => expanse.userId === userId);
-    case categories:
-      return expenses.find(expanse => expanse.categories.includes(categories));
-    case from:
-      return expenses.find(expanse => expanse.spentAt >= from);
-    case to:
-      return expenses.find(expanse => expanse.spentAt <= to);
-    default:
-      return expenses;
+  const whereClause = {};
+
+  if (userId) {
+    whereClause.userId = userId;
+  }
+
+  if (categories) {
+    if (Array.isArray(categories) && categories.length > 0) {
+      whereClause.category = {
+        [Op.in]: categories,
+      };
+    } else {
+      whereClause.category = categories;
+    }
+  }
+
+  if (from && to) {
+    whereClause.spentAt = {
+      [Op.between]: [new Date(from), new Date(to)],
+    };
+  } else if (from) {
+    whereClause.spentAt = {
+      [Op.gte]: new Date(from),
+    };
+  } else if (to) {
+    whereClause.spentAt = {
+      [Op.lte]: new Date(to),
+    };
+  }
+
+  return Expense.findAll({ where: whereClause });
+};
+
+const getExpenseById = async(id) => {
+  const normalizedId = parseInt(id);
+
+  return Expense.findByPk(normalizedId);
+};
+
+const addExpense = async(expense) => {
+  try {
+    const lastExpense = await Expense.findOne({
+      attributes: ['id'],
+      order: [['id', 'DESC']],
+    });
+
+    const getMaxId = lastExpense ? lastExpense.id : 0;
+
+    const newExpense = {
+      id: getMaxId + 1,
+      ...expense,
+    };
+
+    return Expense.create(newExpense);
+  } catch (error) {
+    console.error('Error creating user:', error);
+    throw error;
   }
 };
 
-const getExpenseById = (id) => {
+const deleteExpense = async(id) => {
   const normalizedId = parseInt(id);
 
-  return expenses.find(expense => expense.id === normalizedId) || null;
+  return Expense.destroy({
+    where: {
+      id: normalizedId,
+    },
+  });
 };
 
-const addExpense = (expense) => {
-  const getMaxId = expenses[expenses.length - 1].id || 0;
-
-  const newExpense = {
-    id: getMaxId + 1,
-    ...expense,
-  };
-
-  expenses.push(newExpense);
-
-  return newExpense;
-};
-
-const deleteExpense = (id) => {
-  const normalizedId = parseInt(id);
-
-  expenses = expenses.filter(expense => expense.id !== normalizedId);
-};
-
-const updateExpense = (id, newProperties) => {
-  const expense = getExpenseById(id);
-
-  Object.assign(expense, newProperties);
-
-  return expense;
+const updateExpense = async(id, newProperties) => {
+  return Expense.update(newProperties, {
+    where: {
+      id,
+    },
+  });
 };
 
 module.exports = {

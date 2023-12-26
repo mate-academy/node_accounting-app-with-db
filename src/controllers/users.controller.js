@@ -2,18 +2,18 @@
 
 const userService = require('../services/users.service');
 
-const get = (req, res) => {
-  res.send(userService.getUsers());
+const get = async(req, res) => {
+  res.send(await userService.getUsers());
 };
 
-const getOne = (req, res) => {
+const getOne = async(req, res) => {
   const { id } = req.params;
 
   if (!id) {
     res.sendStatus(400);
   }
 
-  const user = userService.getUserById(id);
+  const user = await userService.getUserById(id);
 
   if (!user) {
     res.sendStatus(404);
@@ -24,7 +24,7 @@ const getOne = (req, res) => {
   res.send(user);
 };
 
-const create = (req, res) => {
+const create = async(req, res) => {
   const { name } = req.body;
 
   if (!name) {
@@ -33,13 +33,13 @@ const create = (req, res) => {
     return;
   }
 
-  const newUser = userService.createUser(name);
+  const newUser = await userService.createUser(name);
 
   res.sendStatus(201);
   res.send(newUser);
 };
 
-const remove = (req, res) => {
+const remove = async(req, res) => {
   const { id } = req.params;
 
   if (!id) {
@@ -54,7 +54,7 @@ const remove = (req, res) => {
     return;
   }
 
-  userService.deleteUser(id);
+  await userService.deleteUser(id);
 
   res.sendStatus(204);
 };
