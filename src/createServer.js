@@ -2,7 +2,8 @@
 
 const express = require('express');
 const cors = require('cors');
-const { UserRouter } = require('./modules/User/User.router');
+const { UserRouter } = require('./modules/User/user.router');
+const { ExpenseRouter } = require('./modules/Expense/Expense.router');
 
 function createServer() {
   const app = express();
@@ -16,6 +17,7 @@ function createServer() {
 
   app.use(express.json());
   app.use('/users', UserRouter);
+  app.use('/expenses', ExpenseRouter);
 
   return app;
 }
