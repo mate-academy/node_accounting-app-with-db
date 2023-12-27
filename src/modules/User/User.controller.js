@@ -2,7 +2,7 @@
 /* eslint-disable max-len */
 'use strict';
 
-const { UserService } = require('./User.service');
+const { UserService } = require('./user.service');
 
 class UserController {
   static async getAll(req, res) {
@@ -40,15 +40,16 @@ class UserController {
     try {
       const { name } = req.body;
 
-      if (name === undefined || name.length === 0) {
+      if (!name) {
         res.status(400).send('ERROR: Bad request. You must pass the username. Example:\n  { "name": "username" }');
 
         return;
       }
 
       const createdUser = await UserService.create(name);
+      const normalizedUser = UserService.normalize(createdUser);
 
-      return res.status(201).send(UserService.normalize(createdUser));
+      return res.status(201).send(normalizedUser);
     } catch (error) {
       console.log(error.message);
       res.status(500).send('Internal Server Error');
@@ -61,13 +62,13 @@ class UserController {
       const { name } = req.body;
       const user = await UserService.getById(id);
 
-      if (user === null) {
+      if (!user) {
         res.status(404).send(`ERROR: The user with id=${id} doesn't exist`);
 
         return;
       }
 
-      if (name === undefined || !name.length) {
+      if (!name) {
         res.status(400).send('ERROR: Bad request. You must pass the username. Example:\n  { "name": "username" }');
 
         return;
@@ -75,7 +76,10 @@ class UserController {
 
       await UserService.update(id, name);
 
-      res.status(200).send(UserService.normalize(await UserService.getById(id)));
+      const updatedUser = await UserService.getById(id);
+      const normalizedUser = UserService.normalize(updatedUser);
+
+      res.status(200).send(normalizedUser);
     } catch (error) {
       console.log(error.message);
       res.status(500).send('Internal Server Error');
