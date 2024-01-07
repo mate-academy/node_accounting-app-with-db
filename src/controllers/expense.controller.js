@@ -2,6 +2,7 @@
 
 const { expenseService } = require('../services/expense.service.js');
 const { userService } = require('../services/user.service.js');
+const { categoryService } = require('../services/category.service.js');
 
 const getAllFiltered = async(req, res) => {
   const { userId, categories, from, to } = req.query;
@@ -38,6 +39,8 @@ const create = async(req, res) => {
   }
 
   const expense = await expenseService.create(req.body);
+
+  await categoryService.checkCategory(category);
 
   res.statusCode = 201;
 
@@ -101,6 +104,10 @@ const update = async(req, res) => {
 
   if (!expense) {
     return res.status(404).send('Expense not found');
+  }
+
+  if (category) {
+    await categoryService.checkCategory(category);
   }
 
   const updatedExpense = await expenseService.update({
