@@ -14,47 +14,17 @@ const {
 
 const get = (req, res) => {
   const { userId, categories, from, to } = req.query;
-  const expenses = getAllExpenses();
-  let filteredExpenses = expenses;
+  const expenses = getAllExpenses(userId, categories, from, to);
 
-  if (userId) {
-    filteredExpenses
-      = filteredExpenses.filter((expense) => expense.userId === +userId);
-
-    if (!filteredExpenses.length) {
+  if (userId || categories || from || to) {
+    if (!expenses.length) {
       res.sendStatus(404);
 
       return;
     }
   }
 
-  if (categories) {
-    filteredExpenses = filteredExpenses.filter((expense) =>
-      categories.includes(expense.category)
-    );
-
-    if (!filteredExpenses.length) {
-      res.sendStatus(404);
-
-      return;
-    }
-  }
-
-  if (from && to) {
-    filteredExpenses = filteredExpenses.filter(
-      (expense) =>
-        new Date(expense.spentAt) >= new Date(from)
-        && new Date(expense.spentAt) <= new Date(to)
-    );
-
-    if (!filteredExpenses.length) {
-      res.sendStatus(404);
-
-      return;
-    }
-  }
-
-  res.send(filteredExpenses);
+  res.send(expenses);
 };
 
 const add = (req, res) => {
@@ -67,15 +37,20 @@ const add = (req, res) => {
     note,
   } = req.body;
 
-  const user = getUserById(+userId);
-
-  if (!user
-    || !spentAt
+  if (!spentAt
     || !title
     || !amount
     || !category
     || !note
   ) {
+    res.sendStatus(400);
+
+    return;
+  }
+
+  const user = getUserById(+userId);
+
+  if (!user) {
     res.sendStatus(400);
 
     return;
@@ -125,7 +100,6 @@ const removeOne = (req, res) => {
 const updateOne = (req, res) => {
   const { id } = req.params;
   const { spentAt, title, amount, note } = req.body;
-  const expense = getExpenseById(id);
 
   if (
     (spentAt && typeof spentAt !== 'string')
@@ -136,13 +110,15 @@ const updateOne = (req, res) => {
     res.sendStatus(404);
   }
 
+  const expense = getExpenseById(id);
+
   if (!expense) {
     res.sendStatus(404);
 
     return;
   }
 
-  updateExpense(id, title);
+  updateExpense(expense, title);
 
   res.send(expense);
 };

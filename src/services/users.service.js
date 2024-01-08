@@ -19,9 +19,9 @@ const User = sequelize.define('User', {
 });
 
 const getAllUsers = async() => {
-  const result = await User.findAll();
+  const users = await User.findAll();
 
-  return result;
+  return users;
 };
 
 const getUserById = (id) => User.findByPk(id);

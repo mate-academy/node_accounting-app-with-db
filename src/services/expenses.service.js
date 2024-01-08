@@ -39,10 +39,29 @@ const Expense = sequelize.define('Expense', {
   createdAt: false,
 });
 
-const getAllExpenses = async() => {
-  const result = await Expense.findAll();
+const getAllExpenses = async(userId, categories, from, to) => {
+  let filteredExpenses = await Expense.findAll();
 
-  return result;
+  if (userId) {
+    filteredExpenses
+      = filteredExpenses.filter((expense) => expense.userId === +userId);
+  }
+
+  if (categories) {
+    filteredExpenses = filteredExpenses.filter((expense) =>
+      categories.includes(expense.category)
+    );
+  }
+
+  if (from && to) {
+    filteredExpenses = filteredExpenses.filter(
+      (expense) =>
+        new Date(expense.spentAt) >= new Date(from)
+        && new Date(expense.spentAt) <= new Date(to)
+    );
+  }
+
+  return filteredExpenses;
 };
 
 const getExpenseById = (id) => Expense.findByPk(id);
