@@ -118,7 +118,7 @@ const updateOne = (req, res) => {
     return;
   }
 
-  updateExpense(expense, title);
+  updateExpense(id, title);
 
   res.send(expense);
 };
