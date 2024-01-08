@@ -1,28 +1,17 @@
 'use strict';
 
-const { DataTypes } = require('sequelize');
+const { Category } = require('../models/Category.js');
 
-const { sequelize } = require('./db.js');
-
-const Category = sequelize.define('Category', {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  },
-  categoryName: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-}, {
-  tableName: 'categories',
-  updatedAt: false,
-  createdAt: false,
-});
+const normalize = ({ id, categoryName }) => {
+  return {
+    id,
+    categoryName,
+  };
+};
 
 const getAll = async() => {
   const result = await Category.findAll({
-    order: ['id'],
+    order: ['createdAt'],
   });
 
   return result;
@@ -65,12 +54,12 @@ const checkCategory = async(categoryName) => {
 
 module.exports = {
   categoryService: {
+    normalize,
     getAll,
     create,
     getById,
     remove,
     update,
     checkCategory,
-    Category,
   },
 };

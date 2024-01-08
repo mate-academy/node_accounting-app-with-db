@@ -3,7 +3,9 @@
 const { userService } = require('../services/user.service.js');
 
 const getAll = async(req, res) => {
-  res.send(await userService.getAll());
+  const users = await userService.getAll();
+
+  res.send(users.map(user => userService.normalize(user)));
 };
 
 const create = async(req, res) => {
@@ -17,7 +19,7 @@ const create = async(req, res) => {
 
   res.statusCode = 201;
 
-  res.send(user);
+  res.send(userService.normalize(user));
 };
 
 const getOne = async(req, res) => {
@@ -33,7 +35,7 @@ const getOne = async(req, res) => {
     return res.status(404).send('User not found');
   }
 
-  res.send(user);
+  res.send(userService.normalize(user));
 };
 
 const remove = async(req, res) => {

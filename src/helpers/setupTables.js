@@ -1,9 +1,9 @@
 'use strict';
 
-const { userService } = require('../services/user.service.js');
-const { expenseService } = require('../services/expense.service.js');
-const { categoryService } = require('../services/category.service.js');
+const { User } = require('../models/User.js');
+const { Expense } = require('../models/Expense.js');
+const { Category } = require('../models/Category.js');
 
-userService.User.sync();
-expenseService.Expense.sync();
-categoryService.Category.sync();
+User.sync();
+Expense.sync();
+Category.sync();

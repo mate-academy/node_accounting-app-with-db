@@ -3,7 +3,11 @@
 const { categoryService } = require('../services/category.service.js');
 
 const getAll = async(req, res) => {
-  res.send(await categoryService.getAll());
+  const categories = await categoryService.getAll();
+
+  res.send(
+    categories.map(category => categoryService.normalize(category)),
+  );
 };
 
 const create = async(req, res) => {
@@ -18,7 +22,7 @@ const create = async(req, res) => {
 
   res.statusCode = 201;
 
-  res.send(category);
+  res.send(categoryService.normalize(category));
 };
 
 const getOne = async(req, res) => {
@@ -34,7 +38,7 @@ const getOne = async(req, res) => {
     return res.status(404).send('Category not found');
   }
 
-  res.send(category);
+  res.send(categoryService.normalize(category));
 };
 
 const remove = async(req, res) => {

@@ -1,28 +1,17 @@
 'use strict';
 
-const { DataTypes } = require('sequelize');
+const { User } = require('../models/User.js');
 
-const { sequelize } = require('./db.js');
-
-const User = sequelize.define('User', {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  },
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-}, {
-  tableName: 'users',
-  updatedAt: false,
-  createdAt: false,
-});
+const normalize = ({ id, name }) => {
+  return {
+    id,
+    name,
+  };
+};
 
 const getAll = async() => {
   const result = await User.findAll({
-    order: ['id'],
+    order: ['createdAt'],
   });
 
   return result;
@@ -57,11 +46,11 @@ const update = async({ id, name }) => {
 
 module.exports = {
   userService: {
+    normalize,
     getAll,
     create,
     getById,
     remove,
     update,
-    User,
   },
 };
