@@ -1,49 +1,23 @@
 'use strict';
 
-const { DataTypes } = require('sequelize');
-const sequelize = require('./../database');
-
-const User = sequelize.define('User', {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-  },
-  name: {
-    type: DataTypes.TEXT,
-    allowNull: false,
-  },
-}, {
-  tableName: 'users',
-  updatedAt: false,
-  createdAt: false,
-});
+const { userModel } = require('../models/userModel');
 
 const getAllUsers = async() => {
-  const users = await User.findAll();
+  const users = await userModel.findAll();
 
   return users;
 };
 
-const getUserById = (id) => User.findByPk(id);
+const getUserById = (id) => userModel.findByPk(id);
 
 const addNewUser = async(name) => {
-  const lastUser = await User.findOne({
-    attributes: ['id'],
-    order: [['id', 'DESC']],
-  });
+  const newUser = await userModel.create(name);
 
-  const getNewUserId = lastUser ? lastUser.id + 1 : 0;
-
-  const newUser = {
-    id: getNewUserId,
-    name,
-  };
-
-  User.create(newUser);
+  return newUser;
 };
 
 const removeUser = (id) => {
-  User.destroy({
+  userModel.destroy({
     where: {
       id,
     },
@@ -51,7 +25,7 @@ const removeUser = (id) => {
 };
 
 const updateUser = async(id, name) => {
-  await User.update({
+  await userModel.update({
     name,
   }, {
     where: { id },

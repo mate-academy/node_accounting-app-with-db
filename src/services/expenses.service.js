@@ -1,89 +1,38 @@
 'use strict';
 
-const { DataTypes } = require('sequelize');
-const sequelize = require('./../database');
-
-const Expense = sequelize.define('Expense', {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-  },
-  userId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  spentAt: {
-    type: DataTypes.DATE,
-    allowNull: false,
-    defaultValue: DataTypes.NOW,
-  },
-  title: {
-    type: DataTypes.TEXT,
-    allowNull: false,
-  },
-  amount: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  category: {
-    type: DataTypes.TEXT,
-    allowNull: false,
-  },
-  note: {
-    type: DataTypes.TEXT,
-    allowNull: false,
-  },
-}, {
-  tableName: 'expenses',
-  updatedAt: false,
-  createdAt: false,
-});
+const { Op } = require('sequelize');
+const { expenseModel } = require('../models/expenseModel');
 
 const getAllExpenses = async(userId, categories, from, to) => {
-  let filteredExpenses = await Expense.findAll();
+  const where = {};
 
   if (userId) {
-    filteredExpenses
-      = filteredExpenses.filter((expense) => expense.userId === +userId);
+    where.userId = userId;
   }
 
   if (categories) {
-    filteredExpenses = filteredExpenses.filter((expense) =>
-      categories.includes(expense.category)
-    );
+    where.categories = categories;
   }
 
   if (from && to) {
-    filteredExpenses = filteredExpenses.filter(
-      (expense) =>
-        new Date(expense.spentAt) >= new Date(from)
-        && new Date(expense.spentAt) <= new Date(to)
-    );
+    where.spentAt = {
+      [Op.between]: [new Date(from), new Date(to)],
+    };
   }
 
-  return filteredExpenses;
+  return expenseModel.findAll({ where });
 };
 
-const getExpenseById = (id) => Expense.findByPk(id);
+const getExpenseById = (id) => expenseModel.findByPk(id);
 
 const addNewExpense = async(expense) => {
-  const lastExpense = await Expense.findOne({
-    attributes: ['id'],
-    order: [['id', 'DESC']],
-  });
+  const newExpense = await expenseModel.create(expense);
 
-  const getNewExpenseId = lastExpense ? lastExpense.id + 1 : 0;
-
-  const newExpense = {
-    ...expense,
-    id: getNewExpenseId,
-  };
-
-  Expense.create(newExpense);
+  return newExpense;
 };
 
 const removeExpense = (id) => {
-  Expense.destroy({
+  expenseModel.destroy({
     where: {
       id,
     },
@@ -91,7 +40,7 @@ const removeExpense = (id) => {
 };
 
 const updateExpense = async(id, title) => {
-  await Expense.update({
+  await expenseModel.update({
     title,
   }, {
     where: { id },
