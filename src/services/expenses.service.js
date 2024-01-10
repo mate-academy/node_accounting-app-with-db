@@ -1,48 +1,8 @@
 /* eslint-disable no-console */
 'use strict';
 
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('./db.js');
-
-const Expenses = sequelize.define('Expenses', {
-  id: {
-    type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4,
-    primaryKey: true,
-    allowNull: false,
-  },
-  userId: {
-    type: DataTypes.UUID,
-    field: 'user_id',
-    allowNull: false,
-  },
-  spentAt: {
-    type: DataTypes.DATE,
-    field: 'spent_at',
-    allowNull: false,
-    defaultValue: Date.NOW,
-  },
-  title: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  amount: {
-    type: DataTypes.NUMBER,
-    allowNull: false,
-  },
-  category: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  note: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-}, {
-  tableName: 'expenses',
-  createdAt: false,
-  updatedAt: false,
-});
+const { Expenses } = require('../models/expenses.js');
+const Sequelize = require('sequelize');
 
 const getAll = async({
   userId,
@@ -50,43 +10,32 @@ const getAll = async({
   from,
   to,
 }) => {
-  let expenses = await Expenses.findAll();
+  const whereClause = {};
 
-  expenses = expenses.filter(expense => {
-    if (userId && expense.userId !== userId) {
-      return false;
+  if (userId) {
+    whereClause.userId = userId;
+  }
+
+  if (categories) {
+    if (Array.isArray(categories)) {
+      whereClause.category = { [Sequelize.Op.in]: categories };
+    } else {
+      whereClause.category = categories;
     }
+  }
 
-    if (categories) {
-      if (Array.isArray(categories)) {
-        if (!categories.includes(expense.category)) {
-          return false;
-        }
-      } else {
-        if (categories !== expense.category) {
-          return false;
-        }
-      }
-    }
+  if (from) {
+    whereClause.spentAt = { [Sequelize.Op.gte]: new Date(from) };
+  }
 
-    if (from) {
-      const fromDate = new Date(from);
+  if (to) {
+    whereClause.spentAt = {
+      ...whereClause.spentAt,
+      [Sequelize.Op.lte]: new Date(to),
+    };
+  }
 
-      if (new Date(expense.spentAt) < fromDate) {
-        return false;
-      }
-    }
-
-    if (to) {
-      const toDate = new Date(to);
-
-      if (new Date(expense.spentAt) > toDate) {
-        return false;
-      }
-    }
-
-    return true;
-  });
+  const expenses = await Expenses.findAll({ where: whereClause });
 
   return expenses;
 };
