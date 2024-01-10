@@ -11,29 +11,13 @@ const get = async(req, res) => {
 const getOne = async(req, res) => {
   const { id } = req.params;
 
-  let user;
-
-  try {
-    const userFromDB = await userService.getById(id);
-
-    user = userFromDB;
-  } catch (error) {
-    res.sendStatus(404);
-
-    return;
-  }
+  const user = await userService.getById(id);
 
   res.send(user);
 };
 
 const create = async(req, res) => {
   const { name } = req.body;
-
-  if (!name || typeof name !== 'string') {
-    res.sendStatus(400);
-
-    return;
-  }
 
   const user = await userService.create(name);
 
@@ -45,20 +29,6 @@ const create = async(req, res) => {
 const update = async(req, res) => {
   const { id } = req.params;
   const { name } = req.body;
-
-  const user = await userService.getById(id);
-
-  if (!user) {
-    res.sendStatus(404);
-
-    return;
-  }
-
-  if (typeof name !== 'string' || !name) {
-    res.sendStatus(422);
-
-    return;
-  }
 
   await userService.update({
     id,
@@ -72,12 +42,6 @@ const update = async(req, res) => {
 
 const remove = async(req, res) => {
   const { id } = req.params;
-
-  if (!(await userService.getById(id))) {
-    res.sendStatus(404);
-
-    return;
-  }
 
   await userService.remove(id);
 

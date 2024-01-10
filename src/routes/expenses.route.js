@@ -2,18 +2,19 @@
 
 const express = require('express');
 const { expensesController } = require('../controllers/expenses.controller.js');
+const { catchError } = require('../utils/catchError.js');
 
 const router = express.Router();
 
-router.get('/', expensesController.get);
+router.get('/', catchError(expensesController.get));
 
-router.get('/:id', expensesController.getOne);
+router.get('/:id', catchError(expensesController.getOne));
 
-router.post('/', expensesController.create);
+router.post('/', catchError(expensesController.create));
 
-router.delete('/:id', expensesController.remove);
+router.delete('/:id', catchError(expensesController.remove));
 
-router.patch('/:id', expensesController.update);
+router.patch('/:id', catchError(expensesController.update));
 
 module.exports = {
   router,
