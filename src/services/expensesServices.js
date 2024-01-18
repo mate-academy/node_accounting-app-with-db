@@ -1,28 +1,28 @@
 'use strict';
 
 const { Expense } = require('../db');
+const { Op } = require('sequelize');
 
 const getAllExpenses = async(userId, categories, from, to) => {
-  let filteredExpenses = await Expense.findAll();
+  const whereClause = {};
 
   if (userId) {
-    filteredExpenses
-      = filteredExpenses.filter((expense) => expense.userId === +userId);
+    whereClause.userId = +userId;
   }
 
   if (categories) {
-    filteredExpenses = filteredExpenses.filter((expense) =>
-      categories.includes(expense.category)
-    );
+    whereClause.category = { [Op.in]: categories };
   }
 
   if (from && to) {
-    filteredExpenses = filteredExpenses.filter(
-      (expense) =>
-        new Date(expense.spentAt) >= new Date(from)
-        && new Date(expense.spentAt) <= new Date(to)
-    );
+    whereClause.spentAt = {
+      [Op.between]: [new Date(from), new Date(to)],
+    };
   }
+
+  const filteredExpenses = await Expense.findAll({
+    where: whereClause,
+  });
 
   return filteredExpenses;
 };
@@ -38,9 +38,7 @@ const getExpenseById = async(id) => {
 };
 
 const addNewExpense = async expense => {
-  const newExpense = await Expense.create({
-    ...expense,
-  });
+  const newExpense = await Expense.create(expense);
 
   return newExpense;
 };
