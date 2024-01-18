@@ -8,32 +8,24 @@ const findAll = async(filterProperties) => {
 
   const whereClause = {};
 
-  if (userId) {
-    whereClause.userId = userId;
-  }
+  whereClause.userId = userId;
 
   if (categories) {
-    if (Array.isArray(categories) && categories.length > 0) {
-      whereClause.category = {
-        [Op.in]: categories,
-      };
-    } else {
-      whereClause.category = categories;
-    }
+    whereClause.category = Array.isArray(categories) && categories.length > 0
+      ? { [Op.in]: categories }
+      : categories;
   }
 
-  if (from && to) {
-    whereClause.spentAt = {
-      [Op.between]: [new Date(from), new Date(to)],
-    };
-  } else if (from) {
-    whereClause.spentAt = {
-      [Op.gte]: new Date(from),
-    };
-  } else if (to) {
-    whereClause.spentAt = {
-      [Op.lte]: new Date(to),
-    };
+  if (from || to) {
+    whereClause.spentAt = {};
+
+    if (from) {
+      whereClause.spentAt[Op.gte] = new Date(from);
+    }
+
+    if (to) {
+      whereClause.spentAt[Op.lte] = new Date(to);
+    }
   }
 
   return Expense.findAll({ where: whereClause });
