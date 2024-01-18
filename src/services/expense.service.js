@@ -4,15 +4,11 @@ const { Expense } = require('../../db');
 const { filterExpense } = require('../utils/filterExpense');
 
 const getAll = async(userId, categories, from, to) => {
-  const expenses = await Expense.findAll();
+  const filteredExpenses = await Expense.findAll({
+    where: filterExpense(userId, categories, from, to),
+  });
 
-  return filterExpense(expenses,
-    {
-      userId,
-      categories,
-      from,
-      to,
-    });
+  return filteredExpenses;
 };
 
 const getById = async(id) => {

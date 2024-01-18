@@ -1,29 +1,25 @@
 'use strict';
 
-const filterExpense = (expenses, { userId, categories, from, to }) => {
-  let filteredExpenses = [...expenses];
+const { Op } = require('sequelize');
+
+const filterExpense = (userId, categories, from, to) => {
+  const clauses = {};
 
   if (userId) {
-    filteredExpenses = filteredExpenses
-      .filter(expense => expense.userId === +userId);
+    clauses.userId = userId;
   }
 
   if (categories) {
-    filteredExpenses = filteredExpenses
-      .filter(expense => categories.includes(expense.category));
+    clauses.category = { [Op.in]: categories };
   }
 
-  if (from) {
-    filteredExpenses = filteredExpenses
-      .filter(expense => new Date(expense.spentAt) >= new Date(from));
+  if (from && to) {
+    clauses.spentAt = {
+      [Op.between]: [new Date(from), new Date(to)],
+    };
   }
 
-  if (to) {
-    filteredExpenses = filteredExpenses
-      .filter(expense => new Date(expense.spentAt) <= new Date(to));
-  }
-
-  return filteredExpenses;
+  return clauses;
 };
 
 module.exports = {
