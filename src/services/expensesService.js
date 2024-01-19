@@ -1,66 +1,26 @@
 'use strict';
 
-const { v4: uuidv4 } = require('uuid');
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../dataBase');
+const { Op } = require('sequelize');
+const { Expenses } = require('../DbInstances/expenses');
 
-const Expenses = sequelize.define('Expenses', {
-  id: {
-    type: DataTypes.STRING,
-    primaryKey: true,
-  },
-  userId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  spentAt: {
-    type: DataTypes.DATE,
-    allowNull: false,
-  },
-  title: {
-    type: DataTypes.TEXT,
-    allowNull: false,
-    defaultValue: DataTypes.NOW,
-  },
-  amount: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  category: {
-    type: DataTypes.TEXT,
-    allowNull: false,
-  },
-  note: {
-    type: DataTypes.TEXT,
-    allowNull: false,
-  },
-}, {
-  tableName: 'expenses',
-  updatedAt: false,
-  createdAt: false,
-});
-
-const getAllExpenses = async({ userId, categories, from, to }) => {
-  let allExpenses = await Expenses.findAll();
+const getAllExpenses = async(userId, categories, from, to) => {
+  const where = {};
 
   if (categories) {
-    allExpenses = allExpenses.filter(
-      expense => categories.includes(expense.category)
-    );
+    where.category = categories;
   }
 
   if (userId) {
-    allExpenses = allExpenses.filter(
-      expense => expense.userId === +userId
-    );
+    where.userId = Number(userId);
   }
 
   if (from && to) {
-    allExpenses = allExpenses.filter(
-      item => item.spentAt > from && item.spentAt < to);
+    where.spentAt = { [Op.between]: [from, to] };
   }
 
-  return allExpenses;
+  const expenses = await Expenses.findAll({ where });
+
+  return expenses;
 };
 
 const getExpenseById = async(id) => {
@@ -78,7 +38,6 @@ const createExpense = async({
   note,
 }) => {
   const newExpense = {
-    id: uuidv4(),
     userId,
     spentAt,
     title,
@@ -100,25 +59,14 @@ const updateExpense = async({
 }) => {
   const expenseToUpdate = await getExpenseById(id);
 
-  if (spentAt) {
-    await Expenses.update(spentAt, { where: { id } });
-  }
-
-  if (title) {
-    await Expenses.update(title, { where: { id } });
-  }
-
-  if (amount) {
-    await Expenses.update(amount, { where: { id } });
-  }
-
-  if (category) {
-    await Expenses.update(category, { where: { id } });
-  }
-
-  if (note) {
-    await Expenses.update(note, { where: { id } });
-  }
+  await Expenses.update(
+    spentAt,
+    title,
+    amount,
+    category,
+    note,
+    { where: { id } }
+  );
 
   return expenseToUpdate;
 };

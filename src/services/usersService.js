@@ -1,24 +1,6 @@
 'use strict';
 
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../dataBase');
-const { v4: uuidv4 } = require('uuid');
-
-const User = sequelize.define('User', {
-  id: {
-    type: DataTypes.STRING,
-    primaryKey: true,
-    allowNull: false,
-  },
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-}, {
-  tableName: 'users',
-  updatedAt: false,
-  createdAt: false,
-});
+const { User } = require('../DbInstances/user');
 
 const getAllUsers = async() => {
   const res = await User.findAll();
@@ -34,7 +16,6 @@ const getUserById = async(id) => {
 
 const createNewUser = async(name) => {
   const newUser = {
-    id: uuidv4(),
     name,
   };
 

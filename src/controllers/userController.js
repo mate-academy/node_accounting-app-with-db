@@ -92,15 +92,15 @@ const updateUser = async(req, res) => {
     res.sendStatus(400);
   }
 
+  if (typeof name !== 'string') {
+    res.sendStatus(422);
+  }
+
   try {
     const user = await getUserById(id);
 
     if (!user) {
       res.status(404);
-    }
-
-    if (typeof name !== 'string') {
-      res.sendStatus(422);
     }
 
     const updatedUser = await upgradeUser({
