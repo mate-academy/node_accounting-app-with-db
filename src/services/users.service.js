@@ -9,13 +9,9 @@ function getAllUsers() {
 }
 
 async function getUserById(id) {
-  try {
-    const user = await User.findByPk(id);
+  const user = await User.findByPk(id);
 
-    return user;
-  } catch (error) {
-    return error;
-  }
+  return user;
 };
 
 async function createUser(name) {
@@ -37,16 +33,12 @@ async function updateUser(id, name) {
 }
 
 async function removeUser(id) {
-  try {
-    await User.destroy({
-      where: {
-        id,
-      },
-    });
-  } catch (error) {
-    return error;
-  };
-}
+  await User.destroy({
+    where: {
+      id,
+    },
+  });
+};
 
 module.exports = {
   getAllUsers,

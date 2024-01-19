@@ -10,16 +10,8 @@ const {
 } = require('./../services/expenses.service');
 
 async function getExpenses(req, res) {
-  const { userId, categories, from, to } = req.query;
-  let searchedExpenses;
-
   try {
-    searchedExpenses = await getAllExpenses(
-      userId,
-      categories,
-      from,
-      to,
-    );
+    const searchedExpenses = await getAllExpenses(req.query);
 
     res.send(searchedExpenses);
   } catch (err) {

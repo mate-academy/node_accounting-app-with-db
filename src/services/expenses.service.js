@@ -1,34 +1,38 @@
 'use strict';
 
-const { filterExpenses } = require('../helpers/filterExpenses');
+const { Sequelize } = require('sequelize');
 const { Expense } = require('../models/Expense');
 
 async function getAllExpenses(userId, categories, from, to) {
-  const expensesFromDB = await Expense.findAll();
+  const where = {};
 
-  if (!userId && !categories && !from && !to) {
-    return expensesFromDB;
+  if (userId) {
+    where.userId = userId;
   }
 
-  try {
-    const filteredExpenses = filterExpenses(
-      expensesFromDB, categories, userId, from, to
-    );
-
-    return filteredExpenses;
-  } catch (error) {
-    return error;
+  if (categories && categories.length) {
+    where.category = categories;
   }
+
+  if (from) {
+    where.date = where.date || {};
+    where.date[Sequelize.Op.gte] = from;
+  }
+
+  if (to) {
+    where.date = where.date || {};
+    where.date[Sequelize.Op.lte] = to;
+  }
+
+  const filteredExpenses = await Expense.findAll({ where });
+
+  return filteredExpenses;
 }
 
 async function getExpenseById(id) {
-  try {
-    const expense = await Expense.findByPk(id);
+  const expense = await Expense.findByPk(id);
 
-    return expense;
-  } catch (error) {
-    return error;
-  }
+  return expense;
 }
 
 async function createExpense({
@@ -77,15 +81,11 @@ async function updateExpense({
 }
 
 async function removeExpense(id) {
-  try {
-    await Expense.destroy({
-      where: {
-        id,
-      },
-    });
-  } catch (error) {
-    return error;
-  }
+  await Expense.destroy({
+    where: {
+      id,
+    },
+  });
 }
 
 module.exports = {

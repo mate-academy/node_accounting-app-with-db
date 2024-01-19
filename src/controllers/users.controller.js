@@ -53,7 +53,7 @@ async function updateOneUser(req, res) {
   const { id } = req.params;
   const { name } = req.body;
 
-  if (typeof name !== 'string' || name.length === 0) {
+  if (typeof name !== 'string' || !name.length) {
     res.sendStatus(400);
 
     return;
