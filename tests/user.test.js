@@ -13,12 +13,17 @@ describe('User', () => {
   let serverInstance;
   let axiosInstance;
 
-  const HOST = 'http://localhost:7080';
+  const HOST = 'http://localhost:7080/';
 
   beforeAll(async() => {
-    await sequelize.sync({ force: true });
+    try {
+      await sequelize.sync({ force: true });
+    } catch (err) {
+      console.log(err);
+    }
 
     axiosInstance = axios.create({
+      baseURL: HOST,
       httpsAgent: new https.Agent({
         rejectUnauthorized: false,
       }),
@@ -49,12 +54,12 @@ describe('User', () => {
     it('should create a new user', async() => {
       const name = 'John Doe';
 
-      const res = await axiosInstance.post(`${HOST}/users`, { name });
+      const res = await axiosInstance.post('users', { name });
 
-      expect(res.status).toEqual(201);
+      expect(res.status).toBe(201);
 
       expect(res.headers['content-type'])
-        .toEqual('application/json; charset=utf-8');
+        .toBe('application/json; charset=utf-8');
 
       expect(res.data)
         .toEqual(
@@ -69,21 +74,21 @@ describe('User', () => {
       expect.assertions(1);
 
       try {
-        await axiosInstance.post(`${HOST}/users`);
+        await axiosInstance.post('users');
       } catch (err) {
-        expect(err.response.status).toEqual(400);
+        expect(err.response.status).toBe(400);
       }
     });
   });
 
   describe('getUsers', () => {
     it('should return empty array if no users', async() => {
-      const response = await axiosInstance.get(`${HOST}/users`);
+      const response = await axiosInstance.get('users');
 
-      expect(response.status).toEqual(200);
+      expect(response.status).toBe(200);
 
       expect(response.headers['content-type'])
-        .toEqual('application/json; charset=utf-8');
+        .toBe('application/json; charset=utf-8');
 
       expect(response.data)
         .toEqual([]);
@@ -102,24 +107,24 @@ describe('User', () => {
       const createdUsers = await Promise.all(
         users.map(
           async(user) => {
-            const res = await axiosInstance.post(`${HOST}/users`, user);
+            const res = await axiosInstance.post('users', user);
 
-            expect(res.status).toEqual(201);
+            expect(res.status).toBe(201);
 
             expect(res.headers['content-type'])
-              .toEqual('application/json; charset=utf-8');
+              .toBe('application/json; charset=utf-8');
 
             return res.data;
           },
         ),
       );
 
-      const response = await axiosInstance.get(`${HOST}/users`);
+      const response = await axiosInstance.get('users');
 
-      expect(response.status).toEqual(200);
+      expect(response.status).toBe(200);
 
       expect(response.headers['content-type'])
-        .toEqual('application/json; charset=utf-8');
+        .toBe('application/json; charset=utf-8');
 
       expect(response.data)
         .toEqual(
@@ -135,24 +140,24 @@ describe('User', () => {
       expect.assertions(1);
 
       try {
-        await axiosInstance.get(`${HOST}/users/1`);
+        await axiosInstance.get('users/1');
       } catch (err) {
-        expect(err.response.status).toEqual(404);
+        expect(err.response.status).toBe(404);
       }
     });
 
     it('should return user', async() => {
       const name = 'John Doe';
 
-      const createdUser = await axiosInstance.post(`${HOST}/users`, { name });
+      const createdUser = await axiosInstance.post('users', { name });
 
       const response = await axiosInstance
-        .get(`${HOST}/users/${createdUser.data.id}`);
+        .get(`users/${createdUser.data.id}`);
 
-      expect(response.status).toEqual(200);
+      expect(response.status).toBe(200);
 
       expect(response.headers['content-type'])
-        .toEqual('application/json; charset=utf-8');
+        .toBe('application/json; charset=utf-8');
 
       expect(response.data)
         .toEqual(
@@ -169,32 +174,31 @@ describe('User', () => {
       expect.assertions(1);
 
       try {
-        await axiosInstance.put(`${HOST}/users/1`, { name: 'John Doe' });
+        await axiosInstance.put('users/1', { name: 'John Doe' });
       } catch (err) {
-        expect(err.response.status).toEqual(404);
+        expect(err.response.status).toBe(404);
       }
     });
 
     it('should update user', async() => {
-      const name = 'John Doe';
-
-      const createdUser = await axiosInstance.post(`${HOST}/users`, { name });
-
-      const newName = 'Jane Doe';
+      const createdUser = await axiosInstance.post(
+        '/users',
+        { name: 'John Doe' },
+      );
 
       const response = await axiosInstance
-        .patch(`${HOST}/users/${createdUser.data.id}`, { name: newName });
+        .patch(`users/${createdUser.data.id}`, { name: 'Jane Doe' });
 
-      expect(response.status).toEqual(200);
+      expect(response.status).toBe(200);
 
       expect(response.headers['content-type'])
-        .toEqual('application/json; charset=utf-8');
+        .toBe('application/json; charset=utf-8');
 
       expect(response.data)
         .toEqual(
           expect.objectContaining({
             id: createdUser.data.id,
-            name: newName,
+            name: 'Jane Doe',
           }),
         );
     });
@@ -205,27 +209,27 @@ describe('User', () => {
       expect.assertions(1);
 
       try {
-        await axiosInstance.delete(`${HOST}/users/1'`);
+        await axiosInstance.delete('users/1');
       } catch (err) {
-        expect(err.response.status).toEqual(404);
+        expect(err.response.status).toBe(404);
       }
     });
 
     it('should delete user', async() => {
       const name = 'John Doe';
 
-      const createdUser = await axiosInstance.post(`${HOST}/users`, { name });
+      const createdUser = await axiosInstance.post('users', { name });
 
       const res = await axiosInstance
-        .delete(`${HOST}/users/${createdUser.data.id}`);
+        .delete(`users/${createdUser.data.id}`);
 
-      expect(res.status).toEqual(204);
+      expect(res.status).toBe(204);
 
       try {
         await axiosInstance
-          .get(`${HOST}/users/${createdUser.data.id}`);
+          .get(`users/${createdUser.data.id}`);
       } catch (err) {
-        expect(err.response.status).toEqual(404);
+        expect(err.response.status).toBe(404);
       }
     });
   });
