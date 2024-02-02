@@ -4,26 +4,47 @@ const { createServer } = require('../src/createServer');
 const { sequelize } = require('../src/db');
 const axios = require('axios');
 const https = require('https');
-const { models } = require('../src/models/models');
-const { User } = require('../src/models/User.model');
+const { models: { User, Expense } } = require('../src/models/models');
 
 describe('Expense', () => {
   let server;
   let serverInstance;
-  let axiosInstance;
+  let api;
   let user = null;
+  let secondUser = null;
+
+  const laptop = {
+    spentAt: '2022-10-19T11:01:43.462Z',
+    title: 'Buy a new laptop',
+    amount: 999,
+    category: 'Electronics',
+    note: 'I need a new laptop',
+  };
+
+  const tv = {
+    spentAt: '2022-10-19T11:01:43.462Z',
+    title: 'Buy a new TV',
+    amount: 999,
+    category: 'Electronics',
+    note: 'I need a new TV',
+  };
 
   const HOST = 'http://localhost:7080/';
 
   beforeAll(async() => {
     await sequelize.sync({ force: true });
 
-    axiosInstance = axios.create({
+    api = axios.create({
       baseURL: HOST,
       httpsAgent: new https.Agent({
         rejectUnauthorized: false,
       }),
     });
+
+    [user, secondUser] = await Promise.all([
+      User.create({ name: 'John Doe' }),
+      User.create({ name: 'Jane Doe' }),
+    ]);
   });
 
   beforeEach(async() => {
@@ -34,9 +55,7 @@ describe('Expense', () => {
       console.log(HOST);
     });
 
-    await Promise.all(models.map((model) => model.destroy({ truncate: true })));
-
-    user = await User.create({ name: 'John Doe' });
+    await Expense.destroy({ truncate: true });
   });
 
   afterEach(async() => {
@@ -51,17 +70,12 @@ describe('Expense', () => {
 
   describe('createExpense', () => {
     it('should create a new expense', async() => {
-      const expenseData = {
+      const data = {
+        ...laptop,
         userId: user.id,
-        spentAt: '2022-10-19T11:01:43.462Z',
-        title: 'Buy a new laptop',
-        amount: 999,
-        category: 'Electronics',
-        note: 'I need a new laptop',
       };
 
-      const response = await axiosInstance
-        .post('expenses', expenseData);
+      const response = await api.post('expenses', data);
 
       expect(response.status).toBe(201);
 
@@ -72,7 +86,7 @@ describe('Expense', () => {
         .toEqual(
           expect.objectContaining({
             id: expect.any(Number),
-            ...expenseData,
+            ...data,
           }),
         );
     });
@@ -80,36 +94,46 @@ describe('Expense', () => {
     it('should return 400 if required fields is not provided', async() => {
       expect.assertions(1);
 
-      try {
-        await axiosInstance.post('/expenses', {});
-      } catch (err) {
-        expect(err.response.status).toBe(400);
-      }
+      await api.post('/expenses', { note: 'Important note' })
+        .catch((err) => expect(err.response.status).toBe(400));
+    });
+
+    // eslint-disable-next-line max-len
+    it('should create a new expense if optional fields is not provided', async() => {
+      const data = {
+        spentAt: '2022-10-19T11:01:43.462Z',
+        title: 'Buy a new laptop',
+        amount: 999,
+        userId: user.id,
+      };
+
+      const response = await api.post('/expenses', data);
+
+      expect(response.data)
+        .toEqual(
+          expect.objectContaining({
+            id: expect.any(Number),
+            ...data,
+          }),
+        );
     });
 
     it('should return 400 if user not found', async() => {
       expect.assertions(1);
 
-      const expenseData = {
+      const data = {
+        ...laptop,
         userId: 0,
-        spentAt: '2022-10-19T11:01:43.462Z',
-        title: 'Buy a new laptop',
-        amount: 999,
-        category: 'Electronics',
-        note: 'I need a new laptop',
       };
 
-      try {
-        await axiosInstance.post('expenses', expenseData);
-      } catch (err) {
-        expect(err.response.status).toBe(400);
-      }
+      await api.post('expenses', data)
+        .catch((err) => expect(err.response.status).toBe(400));
     });
   });
 
   describe('getExpenses', () => {
     it('should return empty array if no expenses', async() => {
-      const response = await axiosInstance.get('expenses');
+      const response = await api.get('expenses');
 
       expect(response.status).toBe(200);
 
@@ -118,82 +142,65 @@ describe('Expense', () => {
     });
 
     it('should return all expenses', async() => {
-      const expenseData = {
+      const data = {
+        ...tv,
         userId: user.id,
-        spentAt: '2022-10-19T11:01:43.462Z',
-        title: 'Buy a new laptop',
-        amount: 999,
-        category: 'Electronics',
-        note: 'I need a new laptop',
       };
 
-      const { data: { id: expenseId } } = await axiosInstance
-        .post('expenses', expenseData);
+      const { data: { id: expenseId } } = await api.post('expenses', data);
 
-      const response = await axiosInstance.get('expenses');
+      const response = await api.get('expenses');
 
       expect(response.data)
-        .toEqual([
-          {
-            id: expenseId,
-            ...expenseData,
-          },
-        ]);
+        .toEqual([{
+          id: expenseId,
+          ...data,
+        }]);
     });
 
     it('should return all expenses for a user', async() => {
-      const { data: { id: userId2 } } = await axiosInstance
-        .post('users', { name: 'Jane Doe' });
-
-      const expenseData = {
+      const data = {
+        ...laptop,
         userId: user.id,
-        spentAt: '2022-10-19T11:01:43.462Z',
-        title: 'Buy a new laptop',
-        amount: 999,
-        category: 'Electronics',
-        note: 'I need a new laptop',
       };
 
-      const { data: { id: expenseId } } = await axiosInstance
-        .post('expenses', expenseData);
+      const { data: { id: expenseId } } = await api.post('expenses', data);
 
-      await axiosInstance
-        .post('expenses', {
-          ...expenseData,
-          userId: userId2,
-        });
+      await api.post('expenses', {
+        ...data, userId: secondUser.id,
+      });
 
-      const response = await axiosInstance
+      const response = await api
         .get(`expenses?userId=${user.id}`);
 
       expect(response.data)
         .toEqual([
           {
             id: expenseId,
-            ...expenseData,
+            ...data,
           },
         ]);
     });
 
     it('should return all expenses between dates', async() => {
-      const expenseData = {
+      const data = {
+        ...tv,
         userId: user.id,
-        spentAt: '2022-10-19T11:01:43.462Z',
-        title: 'Buy a new laptop',
-        amount: 999,
-        category: 'Electronics',
-        note: 'I need a new laptop',
       };
 
-      const { data: { id: expenseId } } = await axiosInstance
-        .post('expenses', expenseData);
+      const seconData = {
+        ...laptop,
+        userId: user.id,
+        spentAt: '2022-10-20T11:01:43.462Z',
+      };
 
-      const { data: { id: secondExpenseId } } = await axiosInstance
-        .post('expenses', {
-          ...expenseData, spentAt: '2022-10-20T11:01:43.462Z',
-        });
+      const { data: { id: expenseId } } = await api
+        .post('expenses', data);
 
-      const response = await axiosInstance
+      const { data: { id: secondExpenseId } } = await api
+        .post('expenses', { ...seconData });
+
+      const response = await api
         // eslint-disable-next-line max-len
         .get('expenses?&from=2022-10-19T11:01:43.462Z&to=2022-10-20T11:01:43.462Z');
 
@@ -201,43 +208,37 @@ describe('Expense', () => {
         .toEqual([
           {
             id: expenseId,
-            ...expenseData,
+            ...data,
           },
           {
             id: secondExpenseId,
-            ...expenseData,
-            spentAt: '2022-10-20T11:01:43.462Z',
+            ...seconData,
           },
         ]);
     });
 
     it('should return all expenses by category', async() => {
-      const expenseData = {
+      const data = {
+        ...laptop,
         userId: user.id,
-        spentAt: '2022-10-19T11:01:43.462Z',
-        title: 'Buy a new laptop',
-        amount: 999,
-        category: 'Electronics',
-        note: 'I need a new laptop',
       };
 
-      const { data: { id: expenseId } } = await axiosInstance
-        .post('expenses', expenseData);
+      const { data: { id: expenseId } } = await api.post('expenses', data);
 
-      await axiosInstance
+      await api
         .post('/expenses', {
-          ...expenseData,
+          ...data,
           category: 'Food',
         });
 
-      const response = await axiosInstance
+      const response = await api
         .get(`expenses?userId=${user.id}&categories=Electronics`);
 
       expect(response.data)
         .toEqual([
           {
             id: expenseId,
-            ...expenseData,
+            ...data,
           },
         ]);
     });
@@ -245,60 +246,47 @@ describe('Expense', () => {
 
   describe('getExpense', () => {
     it('should return expense', async() => {
-      const expenseData = {
+      const data = {
+        ...tv,
         userId: user.id,
-        spentAt: '2022-10-19T11:01:43.462Z',
-        title: 'Buy a new laptop',
-        amount: 999,
-        category: 'Electronics',
-        note: 'I need a new laptop',
       };
 
-      const { data: { id: expenseId } } = await axiosInstance
-        .post('expenses', expenseData);
+      const { data: { id: expenseId } } = await api.post('expenses', data);
 
-      const response = await axiosInstance
+      const response = await api
         .get(`expenses/${expenseId}`);
 
       expect(response.data)
         .toEqual({
           id: expenseId,
-          ...expenseData,
+          ...data,
         });
     });
 
     it('should return 404 if expense not found', async() => {
       expect.assertions(1);
 
-      try {
-        await axiosInstance.get('expenses/1');
-      } catch (err) {
-        expect(err.response.status).toBe(404);
-      }
+      await api.get('expenses/1')
+        .catch((err) => expect(err.response.status).toBe(404));
     });
   });
 
   describe('updateExpense', () => {
     it('should update expense', async() => {
-      const expenseData = {
+      const data = {
+        ...laptop,
         userId: user.id,
-        spentAt: '2022-10-19T11:01:43.462Z',
-        title: 'Buy a new laptop',
-        amount: 999,
-        category: 'Electronics',
-        note: 'I need a new laptop',
       };
 
-      const { data: { id: expenseId } } = await axiosInstance
-        .post('expenses', expenseData);
+      const { data: { id: expenseId } } = await api.post('expenses', data);
 
-      const response = await axiosInstance
+      const response = await api
         .patch(`expenses/${expenseId}`, { title: 'Buy a new TV' });
 
       expect(response.data)
         .toEqual({
           id: expenseId,
-          ...expenseData,
+          ...data,
           title: 'Buy a new TV',
         });
     });
@@ -306,7 +294,7 @@ describe('Expense', () => {
     it('should return 404 if expense not found', async() => {
       expect.assertions(1);
 
-      await axiosInstance.patch('expenses/1', {})
+      await api.patch('expenses/1', laptop)
         .catch((err) => {
           expect(err.response.status).toBe(404);
         });
@@ -317,24 +305,18 @@ describe('Expense', () => {
     it('should delete expense', async() => {
       expect.assertions(2);
 
-      const expenseData = {
+      const data = {
+        ...tv,
         userId: user.id,
-        spentAt: '2022-10-19T11:01:43.462Z',
-        title: 'Buy a new laptop',
-        amount: 999,
-        category: 'Electronics',
-        note: 'I need a new laptop',
       };
 
-      const { data: { id: expenseId } } = await axiosInstance
-        .post('expenses', expenseData);
+      const { data: { id: expenseId } } = await api.post('expenses', data);
 
-      const res = await axiosInstance
-        .delete(`expenses/${expenseId}`);
+      const res = await api.delete(`expenses/${expenseId}`);
 
       expect(res.status).toBe(204);
 
-      await axiosInstance
+      await api
         .get(`expenses/${expenseId}`)
         .catch((err) => {
           expect(err.response.status).toBe(404);
@@ -342,7 +324,7 @@ describe('Expense', () => {
     });
 
     it('should return 404 if expense not found', async() => {
-      await axiosInstance.delete('expenses/1')
+      await api.delete('expenses/1')
         .catch((err) => {
           expect(err.response.status).toBe(404);
         });
