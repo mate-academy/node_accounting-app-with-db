@@ -186,9 +186,7 @@ describe('User', () => {
     });
 
     it('should delete user', async() => {
-      const name = 'John Doe';
-
-      const createdUser = await api.post('users', { name });
+      const createdUser = await api.post('users', { name: 'John Doe' });
 
       const res = await api
         .delete(`users/${createdUser.data.id}`);
