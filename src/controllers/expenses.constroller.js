@@ -11,9 +11,9 @@ const {
 const { getUserById } = require('../services/users.services');
 
 const getAllExp = async(req, res) => {
-  const { userId, categories, from, to } = req.query;
+  const { userId, category, from, to } = req.query;
   const expenses = await getAllExpenses({
-    userId, categories, from, to,
+    userId, category, from, to,
   });
 
   res.send(expenses);

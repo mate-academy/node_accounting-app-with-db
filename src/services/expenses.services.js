@@ -8,7 +8,7 @@ const { Expenses } = require('../models/expenses');
 
 // getAllExpenses with optional, not required parameters
 // userId, categories, and from to to date
-const getAllExpenses = async({ userId, categories, from, to }) => {
+const getAllExpenses = async({ userId, category, from, to }) => {
   const filter = {};
 
   const today = new Date();
@@ -20,16 +20,13 @@ const getAllExpenses = async({ userId, categories, from, to }) => {
   const currentDate = year + '-' + month + '-' + day;
   let fromDate = '1900-01-01';
   let toDate = currentDate;
-  const spentAt = {
-    [Op.between]: [fromDate, toDate],
-  };
 
   if (userId) {
     filter.userId = userId;
   }
 
-  if (categories) {
-    filter.categories = categories;
+  if (category) {
+    filter.category = category;
   }
 
   if (from) {
@@ -40,10 +37,16 @@ const getAllExpenses = async({ userId, categories, from, to }) => {
     toDate = to;
   }
 
-  console.log(filter);
+  const spentAt = {
+    spentAt: { [Op.between]: [fromDate, toDate] },
+  };
+
+  console.log(spentAt);
 
   const result = await Expenses.findAll({
-    where: filter, spentAt,
+    where: {
+      ...filter, ...spentAt,
+    },
   });
 
   // console.log(result);
