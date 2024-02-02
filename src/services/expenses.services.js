@@ -1,36 +1,54 @@
+/* eslint-disable no-console */
 'use strict';
 
 // const expenses = [];
-
+const { Op } = require('sequelize');
 const { v4: uuidv4 } = require('uuid');
 const { Expenses } = require('../models/expenses');
 
+// getAllExpenses with optional, not required parameters
+// userId, categories, and from to to date
 const getAllExpenses = async({ userId, categories, from, to }) => {
-  let result = '';
+  const filter = {};
 
-  return Expenses.findAll({
-    where: {
-      result,
-    },
+  const today = new Date();
+
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+
+  const currentDate = year + '-' + month + '-' + day;
+  let fromDate = '1900-01-01';
+  let toDate = currentDate;
+  const spentAt = {
+    [Op.between]: [fromDate, toDate],
+  };
+
+  if (userId) {
+    filter.userId = userId;
+  }
+
+  if (categories) {
+    filter.categories = categories;
+  }
+
+  if (from) {
+    fromDate = from;
+  }
+
+  if (to) {
+    toDate = to;
+  }
+
+  console.log(filter);
+
+  const result = await Expenses.findAll({
+    where: filter, spentAt,
   });
 
-  // if (userId) {
-  //   result = result.filter(el => el.userId === +userId);
-  // }
+  // console.log(result);
 
-  // if (categories) {
-  //   result = result.filter(el => el.category === categories);
-  // }
-
-  // if (from) {
-  //   result = result.filter(el => new Date(el.spentAt) > new Date(from));
-  // }
-
-  // if (to) {
-  //   result = result.filter(el => new Date(el.spentAt) < new Date(to));
-  // }
-
-  // return result;
+  return result;
 };
 
 const getExpensesById = async(id) => {
