@@ -2,7 +2,7 @@
 
 const { Sequelize, DataTypes } = require('sequelize');
 
-const sequelize = new Sequelize('postgres', 'postgres', 'TotalyLegitPassword', {
+const sequelize = new Sequelize('postgres', 'postgres', 'LegitPassword', {
   host: 'localhost',
   dialect: 'postgres',
 });

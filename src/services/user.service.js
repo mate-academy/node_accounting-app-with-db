@@ -9,13 +9,9 @@ const getAllUsers = async() => {
 };
 
 const getUserById = async(id) => {
-  try {
-    const users = await User.findByPk(id);
+  const users = await User.findByPk(id);
 
-    return users;
-  } catch (error) {
-    return null;
-  }
+  return users;
 };
 
 const createUser = async(name) => {
@@ -27,22 +23,18 @@ const createUser = async(name) => {
 };
 
 const updateUser = async(id, name) => {
-  try {
-    const [rowsUpdated, [updatedUser]] = await User.update(
-      { name },
-      {
-        where: { id }, returning: true,
-      }
-    );
-
-    if (rowsUpdated === 0) {
-      throw new Error('User not found or no changes were made.');
+  const [rowsUpdated, [updatedUser]] = await User.update(
+    { name },
+    {
+      where: { id }, returning: true,
     }
+  );
 
-    return updatedUser;
-  } catch (error) {
-    throw error;
+  if (rowsUpdated === 0) {
+    throw new Error('User not found or no changes were made.');
   }
+
+  return updatedUser;
 };
 
 const deleteUser = async(id) => {
