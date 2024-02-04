@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 'use strict';
 
 const {
@@ -11,9 +12,9 @@ const {
 const { getUserById } = require('../services/users.services.js');
 
 const getAllExp = async(req, res) => {
-  const { userId, category, from, to } = req.query;
+  const { userId, categories, from, to } = req.query;
   const expenses = await getAllExpenses({
-    userId, category, from, to,
+    userId, categories, from, to,
   });
 
   res.send(expenses);
@@ -67,9 +68,12 @@ const addExp = async(req, res) => {
 
 const deleteExp = async(req, res) => {
   const { id } = req.params;
+  // eslint-disable-next-line max-len
+  const pattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
   const isExpensesExist = await getExpensesById(id);
 
-  if (isExpensesExist === null) {
+  if (isExpensesExist === null || !id.match(pattern)) {
     res.sendStatus(404);
 
     return;

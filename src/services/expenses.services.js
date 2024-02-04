@@ -6,48 +6,22 @@ const { Op } = require('sequelize');
 const { v4: uuidv4 } = require('uuid');
 const { Expense } = require('../models/Expense.model.js');
 
-const getAllExpenses = async({ userId, category, from, to }) => {
-  const filter = {};
-
-  const today = new Date();
-
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const day = String(today.getDate()).padStart(2, '0');
-
-  const currentDate = year + '-' + month + '-' + day;
-  let fromDate = '1900-01-01';
-  let toDate = currentDate;
+const getAllExpenses = async({ userId, categories, from, to }) => {
+  const where = {};
 
   if (userId) {
-    filter.userId = userId;
+    where.userId = userId;
   }
 
-  if (category) {
-    filter.category = category;
+  if (categories) {
+    where.category = categories;
   }
 
-  if (from) {
-    fromDate = from;
+  if (from && to) {
+    where.spentAt = { [Op.between]: [from, to] };
   }
 
-  if (to) {
-    toDate = to;
-  }
-
-  const spentAt = {
-    spentAt: { [Op.between]: [fromDate, toDate] },
-  };
-
-  console.log(spentAt);
-
-  const result = await Expense.findAll({
-    where: {
-      ...filter, ...spentAt,
-    },
-  });
-
-  // console.log(result);
+  const result = await Expense.findAll({ where });
 
   return result;
 };

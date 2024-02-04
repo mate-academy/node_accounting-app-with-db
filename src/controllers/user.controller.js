@@ -50,9 +50,11 @@ const addUser = async(req, res) => {
 
 const deleteUser = async(req, res) => {
   const { id } = req.params;
+  // eslint-disable-next-line max-len
+  const pattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   const isUserExist = await getUserById(id);
 
-  if (id === undefined) {
+  if (id === undefined || !id.match(pattern)) {
     res.sendStatus(400);
 
     return;
