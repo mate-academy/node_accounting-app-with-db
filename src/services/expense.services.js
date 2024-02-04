@@ -2,7 +2,7 @@
 'use strict';
 
 const { Op } = require('sequelize');
-const { Expense } = require('../models/expense.model');
+const { Expense } = require('../models/Expense.model.js');
 
 const getAllExpenses = async(req) => {
   const { userId, categories, from, to } = req.query;
