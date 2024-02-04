@@ -16,5 +16,4 @@ module.exports = {
 };
 
 createServer().listen(8080, () => {
-  console.log('server is running');
 });
