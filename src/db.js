@@ -30,15 +30,12 @@ global.TextEncoder = utils.TextEncoder;
 //   password: POSTGRES_PASSWORD || '123',
 // });
 
-// module.exports = {
-//   sequelize,
-// };
-
-// const { Sequelize } = require('sequelize');
-
-const sequelize = new Sequelize('postgres', 'postgres', '1280', {
-  host: 'localhost',
-  dialect: 'postgres',
+const sequelize = new Sequelize(
+  'postgres',
+  'postgres',
+  process.env.DB_PASSWORD, {
+    host: 'localhost',
+    dialect: 'postgres',
 });
 
 try {
