@@ -33,7 +33,7 @@ global.TextEncoder = utils.TextEncoder;
 const sequelize = new Sequelize(
   'postgres',
   'postgres',
-  process.env.DB_PASSWORD, {
+  process.env.POSTGRES_PASSWORD, {
     host: 'localhost',
     dialect: 'postgres',
 });
