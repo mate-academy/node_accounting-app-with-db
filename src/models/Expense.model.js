@@ -22,7 +22,7 @@ const Expense = sequelize.define('Expense', {
     allowNull: false,
   },
   amount: {
-    type: DataTypes.NUMBER,
+    type: DataTypes.INTEGER,
     allowNull: false,
   },
   note: {

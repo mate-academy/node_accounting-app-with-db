@@ -15,7 +15,8 @@ const User = sequelize.define('User', {
 
 const normalize = ({ id, name }) => {
   return {
-    id, name,
+    id,
+    name,
   };
 };
 

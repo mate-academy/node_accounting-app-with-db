@@ -2,12 +2,14 @@
 
 const { normalizeExpense } = require('../models/Expense.model');
 const {
+  getAll,
   getExpenses,
   createExpense,
   getExpense,
   deleteExpense,
   updateExpense,
 } = require('../services/expenses.serveces');
+const { getUser } = require('../services/users.serveces');
 
 const getAllExpenses = async(req, res) => {
   const {
@@ -17,17 +19,23 @@ const getAllExpenses = async(req, res) => {
     to,
   } = req.body;
 
-  if (!userId || !categories || !from || !to) {
-    res.sendStatus(400);
-    res.message = 'Some of your data are not valid';
+  let expenses = [];
 
-    return;
+  if (!userId && !categories && !from && !to) {
+    expenses = await getAll();
+  } else {
+    expenses = await getExpenses({
+      userId, categories, from, to,
+    });
   }
 
-  const expenses = await getExpenses(userId, categories, from, to);
-
-  res.statusCode(200);
-  res.send(normalizeExpense(expenses));
+  if (!expenses.length) {
+    res.status(200);
+    res.send([]);
+  } else {
+    res.status(200);
+    res.send(expenses.map(expense => normalizeExpense(expense)));
+  }
 };
 
 const createOneExpense = async(req, res) => {
@@ -40,62 +48,84 @@ const createOneExpense = async(req, res) => {
     note,
   } = req.body;
 
+  if (typeof userId !== 'number'
+    || typeof title !== 'string'
+    || typeof category !== 'string'
+    || typeof spentAt !== 'string'
+    || typeof amount !== 'number') {
+    res.status(400);
+    res.send('Some of your data are not valid');
+
+    return;
+  }
+
+  if (!getUser(userId)) {
+    res.status(400);
+    res.send('User not found');
+  }
+
   try {
-    const expense = await createExpense(
+    await createExpense({
       userId,
       title,
       spentAt,
       category,
       amount,
       note,
-    );
-
-    res.statusCode(201);
-
-    res.send(normalizeExpense(expense));
+    });
   } catch (error) {
-    res.sendStatus(400);
-    res.message = 'Some of your data are not valid';
+    res.status(400);
+    res.send('Something went wrong');
+
+    return;
   }
+
+  res.sendStatus(201);
 };
 
 const getOneExpense = async(req, res) => {
   const { id } = req.params;
 
   if (!id) {
-    res.sendStatus(400);
-    res.message = 'The id is invalid';
+    res.status(400);
+    res.send('The id is invalid');
 
     return;
   }
 
-  try {
-    const expense = await getExpense(id);
+  const expense = await getExpense(id);
 
-    res.sendStatus(200);
-    res.send(normalizeExpense(expense));
-  } catch (error) {
-    res.sendStatus(404);
+  if (!expense) {
+    res.status(404);
+    res.send('Not found');
+
+    return;
   }
+
+  res.status(200);
+  res.send(normalizeExpense(expense));
 };
 
 const deleteOneExpense = async(req, res) => {
   const { id } = req.params;
 
   if (!id) {
-    res.sendStatus(400);
-    res.message = 'The id is invalid';
+    res.status(400);
+    res.send('The id is invalid');
 
     return;
   }
 
-  try {
-    await deleteExpense(id);
+  if (!getExpense(id)) {
+    res.status(404);
+    res.send('Not found');
 
-    res.sendStatus(204);
-  } catch (error) {
-    res.sendStatus(404);
+    return;
   }
+
+  await deleteExpense(id);
+
+  res.sendStatus(204);
 };
 
 const updateOneExpense = async(req, res) => {
@@ -109,34 +139,29 @@ const updateOneExpense = async(req, res) => {
   } = req.body;
 
   if (!id) {
-    res.sendStatus(400);
-    res.message = 'The id is invalid';
+    res.status(400);
+    res.send('The id is invalid');
 
     return;
   }
 
   if (!getExpense(id)) {
-    res.sendStatus(404);
+    res.status(404);
+    res.send('Not found');
 
     return;
   }
 
-  try {
-    const updatedExpense = await updateExpense({
-      id,
-      title,
-      spentAt,
-      category,
-      amount,
-      note,
-    });
+  await updateExpense({
+    id,
+    title,
+    spentAt,
+    category,
+    amount,
+    note,
+  });
 
-    res.sendStatus(200);
-    res.send(normalizeExpense(updatedExpense));
-  } catch (error) {
-    res.sendStatus(400);
-    res.message = 'Some of your data are not valid';
-  }
+  res.sendStatus(200);
 };
 
 module.exports = {

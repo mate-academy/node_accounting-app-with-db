@@ -12,8 +12,8 @@ const {
 const expensesRouter = express.Router();
 
 expensesRouter.get('/', getAllExpenses);
-expensesRouter.get('/:id', createOneExpense);
-expensesRouter.post('/', getOneExpense);
+expensesRouter.get('/:id', getOneExpense);
+expensesRouter.post('/', createOneExpense);
 expensesRouter.delete('/:id', deleteOneExpense);
 expensesRouter.patch('/:id', updateOneExpense);
 

@@ -19,11 +19,11 @@ const getUser = (id) => {
 };
 
 const deleteUser = async(id) => {
-  await User.destroy({ where: id });
+  await User.destroy({ where: { id } });
 };
 
 const updateUser = async({ id, name }) => {
-  await User.update({ name }, { where: id });
+  await User.update({ name }, { where: { id } });
 };
 
 module.exports = {

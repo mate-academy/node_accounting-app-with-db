@@ -3,35 +3,45 @@
 const { Op } = require('sequelize');
 const { Expense } = require('../models/Expense.model');
 
-const getExpenses = async(
+const getAll = async() => Expense.findAll({ order: ['id'] });
+
+const getExpenses = async({
   userId,
   categories,
   from,
   to,
-) => {
+}) => {
+  const whereConditions = {};
+
+  if (userId) {
+    whereConditions.userId = userId;
+  }
+
+  if (categories) {
+    whereConditions.category = categories;
+  }
+
+  if (from && to) {
+    whereConditions.spentAt = {
+      [Op.between]: [new Date(from), new Date(to)],
+    };
+  }
+
   const expenses = await Expense.findAll({
-    where: {
-      userId,
-      spentAt: {
-        [Op.between]: [from, to],
-      },
-      category: {
-        [Op.in]: categories,
-      },
-    },
+    where: whereConditions,
   });
 
   return expenses;
 };
 
-const createExpense = async(
+const createExpense = async({
   userId,
   title,
   spentAt,
   category,
   amount,
   note = '',
-) => {
+}) => {
   await Expense.create({
     userId,
     title,
@@ -47,7 +57,7 @@ const getExpense = (id) => {
 };
 
 const deleteExpense = async(id) => {
-  await Expense.destroy({ where: id });
+  await Expense.destroy({ where: { id } });
 };
 
 const updateExpense = async({
@@ -56,7 +66,7 @@ const updateExpense = async({
   spentAt,
   category,
   amount,
-  note,
+  note = '',
 }) => {
   await Expense.update({
     title,
@@ -64,10 +74,11 @@ const updateExpense = async({
     category,
     amount,
     note,
-  }, { where: id });
+  }, { where: { id } });
 };
 
 module.exports = {
+  getAll,
   getExpenses,
   createExpense,
   getExpense,
