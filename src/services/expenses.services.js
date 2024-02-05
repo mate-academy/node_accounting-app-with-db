@@ -1,9 +1,6 @@
-/* eslint-disable no-console */
 'use strict';
 
-// const expenses = [];
 const { Op } = require('sequelize');
-// const { v4: uuidv4 } = require('uuid');
 const { Expense } = require('../models/Expense.model.js');
 
 const getAllExpenses = async({ userId, categories, from, to }) => {
@@ -31,14 +28,9 @@ const getExpensesById = async(id) => {
 };
 
 const createExpense = async(data) => {
-  const id = Math.floor(Math.random() * 100000);
-
   const result = await Expense.create({
-    id,
     ...data,
   }, { returning: ['id', 'userId', 'spentAt', 'title', 'amount'] });
-
-  console.log(result);
 
   return result;
 };

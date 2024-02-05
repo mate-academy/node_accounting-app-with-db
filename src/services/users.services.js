@@ -1,8 +1,6 @@
-/* eslint-disable no-console */
 'use strict';
 require('dotenv').config();
 
-// const { v4: uuidv4 } = require('uuid');
 const { User } = require('../models/User.model.js');
 
 const getAllUsers = async() => {
@@ -16,10 +14,8 @@ const getUserById = async(userId) => {
 };
 
 const createUser = async(name) => {
-  const id = Math.floor(Math.random() * 100000);
-
   return User.create({
-    name, id,
+    name,
   });
 };
 
