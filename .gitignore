@@ -2,6 +2,9 @@
 .idea
 .vscode
 
+#dataBase login
+.env
+
 # Node
 node_modules
 
