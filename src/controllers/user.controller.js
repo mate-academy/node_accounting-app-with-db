@@ -50,29 +50,39 @@ const addUser = async(req, res) => {
 
 const deleteUser = async(req, res) => {
   const { id } = req.params;
-  // eslint-disable-next-line max-len
-  const pattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  const isUserExist = await getUserById(id);
 
-  if (id === undefined || !id.match(pattern)) {
+  if (id === undefined) {
     res.sendStatus(400);
 
     return;
   }
 
-  if (isUserExist === null) {
+  try {
+    const isUserExist = await getUserById(id);
+
+    if (isUserExist === null) {
+      res.sendStatus(404);
+
+      return;
+    }
+
+    await deletUser(id);
+    res.sendStatus(204);
+  } catch (e) {
     res.sendStatus(404);
-
-    return;
   }
-
-  await deletUser(id);
-  res.sendStatus(204);
 };
 
 const editUser = async(req, res) => {
   const { id } = req.params;
   const { name } = req.body;
+
+  if (!id) {
+    res.sendStatus(400);
+
+    return;
+  }
+
   const userToUpdate = await getUserById(id);
 
   if (!userToUpdate) {

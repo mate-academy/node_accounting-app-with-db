@@ -36,7 +36,7 @@ const createExpense = async(userId, spentAt, title, amount, category, note) => {
   return Expense.create({
     id,
     userId,
-    spentAt: spentAt,
+    spentAt,
     title,
     amount,
     category,

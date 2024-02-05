@@ -12,7 +12,6 @@ const Expense = sequelize.define('Expenses', {
   },
   userId: {
     type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4,
     allowNull: false,
   },
   spentAt: {
@@ -29,7 +28,7 @@ const Expense = sequelize.define('Expenses', {
   },
   category: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   note: {
     type: DataTypes.STRING,
