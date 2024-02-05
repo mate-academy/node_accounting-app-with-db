@@ -61,7 +61,7 @@ const addExp = async(req, res) => {
     const isUserExist = await getUserById(userId);
 
     if (!isUserExist) {
-      res.sendStatus(404);
+      res.sendStatus(400);
 
       return;
     }
