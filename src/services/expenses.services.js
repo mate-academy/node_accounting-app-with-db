@@ -30,18 +30,17 @@ const getExpensesById = async(id) => {
   return Expense.findByPk(id);
 };
 
-const createExpense = async(userId, spentAt, title, amount, category, note) => {
+const createExpense = async(data) => {
   const id = uuidv4();
 
-  return Expense.create({
+  const result = await Expense.create({
     id,
-    userId,
-    spentAt,
-    title,
-    amount,
-    category,
-    note,
-  });
+    ...data,
+  }, { returning: ['id', 'userId', 'spentAt', 'title', 'amount'] });
+
+  console.log(result);
+
+  return result;
 };
 
 const deleteExpenses = async(id) => {

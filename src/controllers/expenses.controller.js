@@ -45,13 +45,13 @@ const getOneExp = async(req, res) => {
 };
 
 const addExp = async(req, res) => {
-  const { userId, spentAt, title, amount, category, note } = req.body;
+  const { userId, spentAt, title, amount } = req.body;
 
   if (userId === undefined
     || !spentAt
     || !title
     || amount === undefined
-    || !category) {
+  ) {
     res.sendStatus(400);
 
     return;
@@ -66,9 +66,7 @@ const addExp = async(req, res) => {
       return;
     }
 
-    const newExpense = await createExpense(
-      userId, spentAt, title, amount, category, note
-    );
+    const newExpense = await createExpense(req.body);
 
     res.status(201).send(newExpense);
   } catch (e) {
