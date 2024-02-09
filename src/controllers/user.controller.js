@@ -9,6 +9,8 @@ const get = async(req, res) => {
 
     if (!allUsers) {
       res.status(404).send('Not Found: The specified entity does not exist');
+
+      return;
     }
 
     res.send(allUsers);
@@ -23,6 +25,8 @@ const getOne = async(req, res) => {
 
   if (!id) {
     res.status(400).send('Bad Request: Missing required parameter');
+
+    return;
   }
 
   try {
@@ -73,6 +77,8 @@ const update = async(req, res) => {
 
   if (!name || !id) {
     res.status(400).send('Bad Request: Missing required parameter');
+
+    return;
   }
 
   try {
@@ -80,10 +86,14 @@ const update = async(req, res) => {
 
     if (!user) {
       res.status(404).send('Not Found: The specified entity does not exist');
+
+      return;
     }
 
     if (typeof name !== 'string') {
       res.sendStatus(422);
+
+      return;
     }
 
     const updatedUser = await userService.updateUser({
@@ -102,6 +112,8 @@ const remove = async(req, res) => {
 
   if (!id) {
     res.status(400).send('Bad Request: Missing required parameter');
+
+    return;
   }
 
   try {

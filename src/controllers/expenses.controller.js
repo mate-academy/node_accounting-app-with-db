@@ -13,6 +13,8 @@ const get = async(req, res) => {
 
     if (!allExpenses) {
       res.status(404).send('Not Found: The specified entity does not exist');
+
+      return;
     }
 
     res.send(allExpenses);
@@ -27,6 +29,8 @@ const getOne = async(req, res) => {
 
   if (!id) {
     res.status(400).send('Bad Request: Missing required parameter');
+
+    return;
   }
 
   try {
@@ -34,6 +38,8 @@ const getOne = async(req, res) => {
 
     if (!item) {
       res.status(404).send('Not Found: The specified entity does not exist');
+
+      return;
     }
 
     res.send(item);
@@ -126,6 +132,8 @@ const remove = async(req, res) => {
 
     if (!item) {
       res.status(404).send('Not Found: The specified entity does not exist');
+
+      return;
     }
 
     await expensesService.removeExpenses(Number(id));

@@ -12,7 +12,6 @@ const getUsersById = async(id) => {
 
 const createUser = async(name) => {
   const user = {
-    id: Math.floor(Math.random() * 10000),
     name,
   };
 
