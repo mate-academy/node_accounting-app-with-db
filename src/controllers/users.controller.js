@@ -11,26 +11,20 @@ module.exports = {
   update,
 };
 
-/* eslint no-console: "warn" */
-
 /**
  * @param { Express.Request } req
  * @param { Express.Response } res */
 async function get(req, res) {
-  console.info('\napp.get(\'/users\')\n');
-
   const users = await usersService.getAll();
 
   res.status(200)
-    .send(users.map(usersService.normalize));
+    .send(users.map(item => usersService.normalize(item.dataValues)));
 }
 
 /**
  * @param { Express.Request } req
  * @param { Express.Response } res */
 async function getById(req, res) {
-  console.info(`\napp.get('/users:id=${req.params.id}')\n`);
-
   const id = +req.params.id;
 
   if (!Number.isInteger(id)) {
@@ -57,8 +51,6 @@ async function getById(req, res) {
  * @param { Express.Request } req
  * @param { Express.Response } res */
 async function create(req, res) {
-  console.info(`\napp.post('/users\n`);
-
   const { name } = req.body;
 
   if (typeof name !== 'string') {
@@ -78,8 +70,6 @@ async function create(req, res) {
  * @param { Express.Request } req
  * @param { Express.Response } res */
 async function remove(req, res) {
-  console.info(`\napp.delete('/users:id=${req.params.id}'\n`);
-
   const id = +req.params.id;
 
   if (!Number.isInteger(id)) {
@@ -105,8 +95,6 @@ async function remove(req, res) {
  * @param { Express.Request } req
  * @param { Express.Response } res */
 async function update(req, res) {
-  console.info(`\napp.patch('/users:id=${req.params.id}'\n`);
-
   const id = +req.params.id;
   const { name } = req.body;
 
@@ -122,12 +110,6 @@ async function update(req, res) {
     id,
     name,
   });
-
-  // /** @type {usersService.User | undefined} */
-  // const updatedUser = updatedRows[0].dataValues;
-
-  // console.info(`updatedUser = `);
-  // console.dir(updatedUser);
 
   if (!updatedRows[0].dataValues || updatedCount !== 1) {
     res.status(404)

@@ -12,14 +12,10 @@ module.exports = {
   update,
 };
 
-/* eslint no-console: "warn" */
-
 /**
  * @param { Express.Request } req
  * @param { Express.Response } res */
 async function get(req, res) {
-  console.info(`\napp.get('/expenses')\n`);
-
   const { userId, ...restQueryParams } = req.query;
   const expenses = await expensesService.getAll({
     userId: +userId,
@@ -27,15 +23,13 @@ async function get(req, res) {
   });
 
   res.status(200)
-    .send(expenses);
+    .send(expenses.map(item => expensesService.normalize(item.dataValues)));
 }
 
 /**
  * @param { Express.Request } req
  * @param { Express.Response } res */
 async function getById(req, res) {
-  console.info(`\napp.get('/expenses:id=${req.params.id}')\n`);
-
   const id = +req.params.id;
 
   if (!Number.isInteger(id)) {
@@ -55,22 +49,31 @@ async function getById(req, res) {
   }
 
   res.status(200)
-    .send(expensesService.normalize(expense));
+    .send(expensesService.normalize(expense.dataValues));
 }
 
 /**
  * @param { Express.Request } req
  * @param { Express.Response } res */
 async function create(req, res) {
-  console.info(`\napp.post('/expenses\n`);
-
   /** @type {expensesService.Expense} */
-  const { userId, spentAt, title, amount, category, note } = req.body;
+  const newExpense
+    = expensesService.findMatchProps(
+      {
+        userId: 0,
+        spentAt: '',
+        title: '',
+        amount: 0,
+        category: '',
+        note: '',
+      },
+      req.body
+    );
 
-  if (!Number.isInteger(userId)
-    || !Number.isInteger(amount)
-    || typeof spentAt !== 'string'
-    || typeof title !== 'string'
+  if (!Number.isInteger(newExpense.userId)
+    || !Number.isInteger(newExpense.amount)
+    || typeof newExpense.spentAt !== 'string'
+    || typeof newExpense.title !== 'string'
   ) {
     res.status(400)
       .send('Required params');
@@ -78,40 +81,24 @@ async function create(req, res) {
     return;
   }
 
-  if (!await usersService.getById(userId)) {
+  if (!await usersService.getById(newExpense.userId)) {
     res.status(400)
       .send('User not exist');
 
     return;
   }
 
-  const newExpense = {
-    userId,
-    spentAt,
-    title,
-    amount,
-    category: category || '',
-    note: note || '',
-  };
-
-  // const updateExpense = expensesService.findMatchProps(
-  //   foundExpense,
-  //   req.body
-  // );
-
   const expense
     = await expensesService.create(newExpense);
 
   res.status(201)
-    .send(expensesService.normalize(expense));
+    .send(expensesService.normalize(expense.dataValues));
 }
 
 /**
  * @param { Express.Request } req
  * @param { Express.Response } res */
 async function remove(req, res) {
-  console.info(`\napp.delete('/expenses:id=${req.params.id}'\n`);
-
   const id = +req.params.id;
 
   if (!Number.isInteger(id)) {
@@ -137,8 +124,6 @@ async function remove(req, res) {
  * @param { Express.Request } req
  * @param { Express.Response } res */
 async function update(req, res) {
-  console.info(`\napp.patch('/expenses:id=${req.params.id}'\n`);
-
   const id = +req.params.id;
   const foundExpense = await expensesService.getById(id);
 

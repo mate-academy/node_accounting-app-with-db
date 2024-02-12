@@ -4,7 +4,6 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../db.js');
 
 const User = sequelize.define('User', {
-  // Model attributes are defined here
   id: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -13,15 +12,9 @@ const User = sequelize.define('User', {
   },
   name: {
     type: DataTypes.STRING,
-    allowNull: false, // allowNull defaults to true
+    allowNull: false,
     defaultValue: 'UserDefaultName',
   },
-  // createdAt: {
-  //   type: DataTypes.DATE,
-  //   field: 'created_at',
-  //   allowNull: false, // allowNull defaults to true
-  //   defaultValue: DataTypes.NOW,
-  // },
 }, {
   tableName: 'users',
   createdAt: false,

@@ -87,8 +87,4 @@ function removeManyById(ids) {
 
 async function removeAll() {
   await Users.sync({ force: true });
-
-  // await Users.destroy({
-  //   truncate: true,
-  // });
 }

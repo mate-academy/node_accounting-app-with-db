@@ -1,7 +1,7 @@
 'use strict';
 
 const { Op } = require('sequelize');
-// const { sequelize } = require('../db');
+const { sequelize } = require('../db');
 const { models: { Expense: Expenses } } = require('../models/models');
 
 /**
@@ -99,7 +99,7 @@ function updateById(expenseSource, transaction,
 
 /** @param {Expense[]} expensesSource */
 function updateManyById(expensesSource) {
-  return sequelize.transaction(async (t) => { // eslint-disable-line
+  return sequelize.transaction(async(t) => {
     const results = [];
 
     for (const expense of expensesSource) {
@@ -134,7 +134,6 @@ async function removeAll() {
  * @param {object} targetObj
  * @param {object} sourceObj */
 function findMatchProps(targetObj, sourceObj) {
-  /** @type {Expense} */
   const result = {};
 
   for (const [targetKey, targetValue] of Object.entries(targetObj)) {

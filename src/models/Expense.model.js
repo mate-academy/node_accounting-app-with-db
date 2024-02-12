@@ -12,29 +12,30 @@ const Expense = sequelize.define('Expense', {
   },
   userId: {
     type: DataTypes.INTEGER,
-    allowNull: false, // allowNull defaults to true
+    allowNull: false,
   },
   spentAt: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
-    allowNull: false, // allowNull defaults to true
+    allowNull: false,
   },
   title: {
     type: DataTypes.STRING,
-    allowNull: false, // allowNull defaults to true
+    allowNull: false,
   },
   amount: {
     type: DataTypes.INTEGER,
-    allowNull: false, // allowNull defaults to true
+    allowNull: false,
   },
   category: {
     type: DataTypes.STRING,
     defaultValue: '',
-    allowNull: false, // allowNull defaults to true
+    allowNull: false,
   },
   note: {
     type: DataTypes.STRING,
-    allowNull: false, // allowNull defaults to true
+    defaultValue: '',
+    allowNull: false,
   },
 }, {
   tableName: 'expenses',

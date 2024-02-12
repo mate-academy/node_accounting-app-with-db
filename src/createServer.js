@@ -11,9 +11,9 @@ module.exports = {
 function createServer() {
   const app = express();
 
-  app.use('/users', express.json(), usersRouter);
-
-  app.use('/expenses', express.json(), expenseRouter);
+  app.use(express.json());
+  app.use('/users', usersRouter);
+  app.use('/expenses', expenseRouter);
 
   return app;
 }

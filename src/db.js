@@ -15,15 +15,6 @@ const {
   POSTGRES_DB,
 } = process.env;
 
-// eslint-disable-next-line
-console.info(`
-POSTGRES_HOST = ${POSTGRES_HOST || 'localhost'},
-POSTGRES_PORT = ${POSTGRES_PORT || 5432},
-POSTGRES_USER = ${POSTGRES_USER || 'postgres'},
-POSTGRES_PASSWORD = ${POSTGRES_PASSWORD || '123'},
-POSTGRES_DB = ${POSTGRES_DB || 'postgres'},
-`);
-
 /*
   All credentials setted to default values (exsept password - it is exapmle)
   replace if needed with your own
