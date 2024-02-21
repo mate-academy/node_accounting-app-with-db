@@ -21,15 +21,21 @@ const create = async(name) => {
 };
 
 const update = async(id, name) => {
-  await User.update({ name }, {
-    where: {
-      id,
-    },
+  const [updatedCount] = await User.update({ name }, {
+    where: { id },
   });
+
+  if (updatedCount === 0) {
+    return null;
+  }
+
+  return {
+    id, name,
+  };
 };
 
 const remove = async(id) => {
-  await User.destroy({
+  return User.destroy({
     where: {
       id,
     },

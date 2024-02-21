@@ -44,7 +44,7 @@ const create = async(fields) => {
 };
 
 const update = async(id, fields) => {
-  await Expense.update({ ...fields }, {
+  return Expense.update({ ...fields }, {
     where: {
       id,
     },
@@ -52,7 +52,7 @@ const update = async(id, fields) => {
 };
 
 const remove = async(id) => {
-  await Expense.destroy({
+  return Expense.destroy({
     where: {
       id,
     },

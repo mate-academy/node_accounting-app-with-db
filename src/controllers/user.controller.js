@@ -52,9 +52,9 @@ const update = async(req, res) => {
     return;
   }
 
-  await usersService.update(+id, name);
+  const updatedUser = await usersService.update(+id, name);
 
-  res.send(await usersService.getById(+id));
+  res.send(updatedUser);
 };
 
 const remove = async(req, res) => {

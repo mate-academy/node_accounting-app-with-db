@@ -7,12 +7,12 @@ const router = express.Router();
 
 router.get('/', usersContoller.get);
 
-router.post('/', express.json(), usersContoller.create);
+router.post('/', usersContoller.create);
 
 router.get('/:id', usersContoller.getOne);
 
 router.delete('/:id', usersContoller.remove);
 
-router.patch('/:id', express.json(), usersContoller.update);
+router.patch('/:id', usersContoller.update);
 
 module.exports = router;

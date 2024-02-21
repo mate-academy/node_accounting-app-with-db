@@ -7,8 +7,8 @@ const expenseRouter = require('./routes/expense.route');
 const createServer = () => {
   const app = express();
 
-  app.use('/users', userRouter);
-  app.use('/expenses', expenseRouter);
+  app.use('/users', express.json(), userRouter);
+  app.use('/expenses', express.json(), expenseRouter);
 
   return app;
 };
