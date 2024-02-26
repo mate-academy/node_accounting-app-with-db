@@ -1,6 +1,6 @@
 'use strict';
 
-const { Expense } = require('../models/Expense.model');
+const { Expense } = require('../models/models').models;
 
 const getOne = async(id) => Expense.findByPk(id);
 const getAll = async() => Expense.findAll();

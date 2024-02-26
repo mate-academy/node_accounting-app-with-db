@@ -1,6 +1,6 @@
 'use strict';
 
-const { User } = require('../models/User.model');
+const { User } = require('../models/models').models;
 
 const getOne = async(id) => User.findByPk(id);
 const getAll = async() => User.findAll();
