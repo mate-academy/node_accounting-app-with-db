@@ -14,7 +14,7 @@ const create = async(
   category = 'uncategorized',
   note = null,
 ) => {
-  const expense = await Expense.create({
+  return Expense.create({
     userId,
     spentAt,
     title,
@@ -22,8 +22,6 @@ const create = async(
     category,
     note,
   });
-
-  return expense;
 };
 
 const update = async(id, args) => {

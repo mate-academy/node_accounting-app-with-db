@@ -20,6 +20,11 @@ const create = async(req, res) => {
 
 const getOne = async(req, res) => {
   const id = parseInt(req.params.id);
+
+  if (typeof id !== 'number' || !id) {
+    return res.sendStatus(400);
+  }
+
   const neededUser = await userService.getOne(id);
 
   if (!neededUser) {
@@ -31,6 +36,11 @@ const getOne = async(req, res) => {
 
 const remove = async(req, res) => {
   const id = parseInt(req.params.id);
+
+  if (typeof id !== 'number' || !id) {
+    return res.sendStatus(400);
+  }
+
   const user = await userService.getOne(id);
 
   if (!user) {
@@ -45,11 +55,17 @@ const remove = async(req, res) => {
 const update = async(req, res) => {
   const id = parseInt(req.params.id);
   const { name } = req.body;
-  const user = await userService.getOne(id);
 
-  if (typeof name !== 'string' || !name.length) {
+  if (
+    typeof name !== 'string'
+    || typeof id !== 'number'
+    || !name.length
+    || !id
+  ) {
     return res.sendStatus(400);
   }
+
+  const user = await userService.getOne(id);
 
   if (!user) {
     return res.sendStatus(404);

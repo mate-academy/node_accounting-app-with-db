@@ -26,6 +26,7 @@ const create = async(req, res) => {
     || typeof spentAt !== 'string'
     || !title
     || !amount
+    // || typeof category !== 'string'
     || !user
   ) {
     return res.sendStatus(400);
@@ -45,11 +46,12 @@ const create = async(req, res) => {
 
 const getOne = async(req, res) => {
   const id = parseInt(req.params.id);
-  const product = await expensesService.getOne(id);
 
   if (typeof id !== 'number' || !id) {
     return res.sendStatus(400);
   }
+
+  const product = await expensesService.getOne(id);
 
   if (!product) {
     return res.sendStatus(404);
@@ -60,6 +62,11 @@ const getOne = async(req, res) => {
 
 const remove = async(req, res) => {
   const id = parseInt(req.params.id);
+
+  if (typeof id !== 'number' || !id) {
+    return res.sendStatus(400);
+  }
+
   const product = await expensesService.getOne(id);
 
   if (!product) {
@@ -74,6 +81,11 @@ const remove = async(req, res) => {
 const update = async(req, res) => {
   const id = parseInt(req.params.id);
   const { ...args } = req.body;
+
+  if (typeof id !== 'number' || !id) {
+    return res.sendStatus(400);
+  }
+
   const product = await expensesService.getOne(id);
 
   if (!product) {

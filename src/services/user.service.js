@@ -7,11 +7,9 @@ const getAll = async() => User.findAll();
 const remove = async(id) => User.destroy({ where: { id } });
 
 const create = async(name) => {
-  const user = await User.create({
+  return User.create({
     name,
   });
-
-  return user;
 };
 
 const update = (id, name) => {
