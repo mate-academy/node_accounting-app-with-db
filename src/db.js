@@ -16,7 +16,7 @@ const {
 } = process.env;
 
 /*
-  All credentials setted to default values (exsept password - it is exapmle)
+  All credentials set to default values (except password - it is example)
   replace if needed with your own
 */
 
