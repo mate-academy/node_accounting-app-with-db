@@ -20,6 +20,15 @@ const {
   replace if needed with your own
 */
 
+// eslint-disable-next-line no-console
+console.log(
+  POSTGRES_HOST,
+  POSTGRES_PORT,
+  POSTGRES_USER,
+  POSTGRES_PASSWORD,
+  POSTGRES_DB
+);
+
 const sequelize = new Sequelize({
   database: POSTGRES_DB || 'postgres',
   username: POSTGRES_USER || 'postgres',
