@@ -4,9 +4,15 @@
 const axios = require('axios');
 const https = require('https');
 
-const { models: { User } } = require('../src/models/models');
+const {
+  models: { User },
+} = require('../src/models/models');
 const { createServer } = require('../src/createServer');
 const { sequelize } = require('../src/db');
+const { Agent } = require('http');
+
+// this prevents `socket hang up` for Node.js 20.10+
+axios.defaults.httpAgent = new Agent({ keepAlive: false });
 
 describe('User', () => {
   let server;
@@ -15,7 +21,7 @@ describe('User', () => {
 
   const HOST = 'http://localhost:7080/';
 
-  beforeAll(async() => {
+  beforeAll(async () => {
     try {
       await sequelize.sync({ force: true });
     } catch (err) {
@@ -30,7 +36,7 @@ describe('User', () => {
     });
   }, 7000);
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     server = createServer();
 
     serverInstance = server.listen(7080, () => {
@@ -40,58 +46,59 @@ describe('User', () => {
     await User.destroy({ truncate: true });
   });
 
-  afterEach(async() => {
+  afterEach(async () => {
     if (serverInstance) {
       await serverInstance.close();
     }
   });
 
-  afterAll(async() => {
+  afterAll(async () => {
     await sequelize.close();
   });
 
   describe('createUser', () => {
-    it('should create a new user', async() => {
+    it('should create a new user', async () => {
       const name = 'John Doe';
 
       const res = await api.post('users', { name });
 
       expect(res.status).toBe(201);
 
-      expect(res.headers['content-type'])
-        .toBe('application/json; charset=utf-8');
+      expect(res.headers['content-type']).toBe(
+        'application/json; charset=utf-8',
+      );
 
-      expect(res.data)
-        .toEqual(
-          expect.objectContaining({
-            id: expect.any(Number),
-            name,
-          }),
-        );
+      expect(res.data).toEqual(
+        expect.objectContaining({
+          id: expect.any(Number),
+          name,
+        }),
+      );
     });
 
-    it('should return 400 if name is not provided', async() => {
+    it('should return 400 if name is not provided', async () => {
       expect.assertions(1);
 
-      await api.post('users')
+      await api
+        .post('users')
         .catch((err) => expect(err.response.status).toBe(400));
     });
   });
 
   describe('getUsers', () => {
-    it('should return empty array if no users', async() => {
+    it('should return empty array if no users', async () => {
       const response = await api.get('users');
 
       expect(response.status).toBe(200);
 
-      expect(response.headers['content-type'])
-        .toBe('application/json; charset=utf-8');
+      expect(response.headers['content-type']).toBe(
+        'application/json; charset=utf-8',
+      );
 
-      expect(response.data)
-        .toEqual([]);
+      expect(response.data).toEqual([]);
     });
 
-    it('should return all users', async() => {
+    it('should return all users', async () => {
       const users = [
         {
           name: 'John Doe',
@@ -102,98 +109,100 @@ describe('User', () => {
       ];
 
       const createdUsers = await Promise.all(
-        users.map(
-          async(user) => {
-            const res = await api.post('users', user);
+        users.map(async (user) => {
+          const res = await api.post('users', user);
 
-            return res.data;
-          },
-        ),
+          return res.data;
+        }),
       );
 
       const response = await api.get('users');
 
       expect(response.status).toBe(200);
 
-      expect(response.headers['content-type'])
-        .toBe('application/json; charset=utf-8');
+      expect(response.headers['content-type']).toBe(
+        'application/json; charset=utf-8',
+      );
 
-      expect(response.data)
-        .toEqual(
-          expect.arrayContaining(
-            createdUsers,
-          ),
-        );
+      expect(response.data).toEqual(expect.arrayContaining(createdUsers));
     });
   });
 
   describe('getUser', () => {
-    it('should return 404 if user does not exist', async() => {
+    it('should return 404 if user does not exist', async () => {
       expect.assertions(1);
 
-      await api.get('users/1')
+      await api
+        .get('users/1')
         .catch((err) => expect(err.response.status).toBe(404));
     });
 
-    it('should return user', async() => {
-      const { data: createdUser } = await api
-        .post('users', { name: 'John Doe' });
+    it('should return user', async () => {
+      const { data: createdUser } = await api.post('users', {
+        name: 'John Doe',
+      });
 
-      const response = await api
-        .get(`users/${createdUser.id}`);
+      const response = await api.get(`users/${createdUser.id}`);
 
       expect(response.status).toBe(200);
 
-      expect(response.headers['content-type'])
-        .toBe('application/json; charset=utf-8');
+      expect(response.headers['content-type']).toBe(
+        'application/json; charset=utf-8',
+      );
 
       expect(response.data).toEqual(createdUser);
     });
   });
 
   describe('updateUser', () => {
-    it('should return 404 if user does not exist', async() => {
+    it('should return 404 if user does not exist', async () => {
       expect.assertions(1);
 
-      await api.put('users/1', { name: 'John Doe' })
+      await api
+        .put('users/1', { name: 'John Doe' })
         .catch((err) => expect(err.response.status).toBe(404));
     });
 
-    it('should update user', async() => {
-      const { data: createdUser } = await api
-        .post('/users', { name: 'John Doe' });
+    it('should update user', async () => {
+      const { data: createdUser } = await api.post('/users', {
+        name: 'John Doe',
+      });
 
-      const response = await api
-        .patch(`users/${createdUser.id}`, { name: 'Jane Doe' });
+      const response = await api.patch(`users/${createdUser.id}`, {
+        name: 'Jane Doe',
+      });
 
       expect(response.status).toBe(200);
 
-      expect(response.headers['content-type'])
-        .toBe('application/json; charset=utf-8');
+      expect(response.headers['content-type']).toBe(
+        'application/json; charset=utf-8',
+      );
 
       expect(response.data).toEqual({
-        ...createdUser, name: 'Jane Doe',
+        ...createdUser,
+        name: 'Jane Doe',
       });
     });
   });
 
   describe('deleteUser', () => {
-    it('should return 404 if user does not exist', async() => {
+    it('should return 404 if user does not exist', async () => {
       expect.assertions(1);
 
-      await api.delete('users/1')
+      await api
+        .delete('users/1')
         .catch((err) => expect(err.response.status).toBe(404));
     });
 
-    it('should delete user', async() => {
+    it('should delete user', async () => {
       const createdUser = await api.post('users', { name: 'John Doe' });
 
-      const res = await api
-        .delete(`users/${createdUser.data.id}`);
+      const res = await api.delete(`users/${createdUser.data.id}`);
 
       expect(res.status).toBe(204);
 
-      await api.get(`users/${createdUser.data.id}`)
+      await api
+        .get(`users/${createdUser.data.id}`)
         .catch((err) => expect(err.response.status).toBe(404));
     });
   });
