@@ -16,14 +16,10 @@ const findUserService = async (id) => {
   return User.findByPk(id);
 };
 
-const createUserService = (name) => {
-  const allUsers = getAllUsers();
-  const newUser = {
-    name,
-    id: allUsers.length + 1,
-  };
+const createUserService = async (name) => {
+  const newUserr = await User.create({ name });
 
-  return User.create(newUser);
+  return newUserr;
 };
 
 const deleteUserService = (userId) => {

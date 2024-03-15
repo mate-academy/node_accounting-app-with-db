@@ -17,9 +17,9 @@ async function createUser(req, res) {
   }
 
   try {
-    const newUser = await createUserService(name);
+    const user = await createUserService(name);
 
-    res.status(201).send(newUser);
+    res.status(201).send(user);
   } catch (error) {
     res.sendStatus(500);
   }
