@@ -1,7 +1,7 @@
 'use strict';
 
 const { createServer } = require('../src/createServer');
-const { sequelize } = require('../src/db');
+const { sequelize } = require('../src/core/db');
 const axios = require('axios');
 const https = require('https');
 const Expense = require('../src/modules/Expense/Expense.model');

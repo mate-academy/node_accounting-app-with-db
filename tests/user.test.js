@@ -6,7 +6,7 @@ const https = require('https');
 
 const User = require('../src/modules/User/User.model');
 const { createServer } = require('../src/createServer');
-const { sequelize } = require('../src/db');
+const { sequelize } = require('../src/core/db');
 
 describe('User', () => {
   let server;
@@ -37,7 +37,7 @@ describe('User', () => {
       console.log(HOST);
     });
 
-    await User.destroy({ truncate: true });
+    await User.destroy({ truncate: true, cascade: true });
   });
 
   afterEach(async() => {
