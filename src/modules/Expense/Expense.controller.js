@@ -110,7 +110,9 @@ class ExpenseController {
     }
 
     try {
-      const expense = await this.service.update({ ...request.body, id });
+      const expense = await this.service.update({
+        ...request.body, id,
+      });
 
       return response.send(this.service.normalize(expense));
     } catch (error) {

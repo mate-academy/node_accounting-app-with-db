@@ -10,7 +10,9 @@ class ExpenseService {
   normalize(expense) {
     const { id, userId, spentAt, title, amount, category, note } = expense;
 
-    return { id, userId, spentAt, title, amount, category, note };
+    return {
+      id, userId, spentAt, title, amount, category, note,
+    };
   }
 
   async getAll({ userId, categories, from, to }) {
@@ -50,7 +52,9 @@ class ExpenseService {
   async update(expense) {
     const { id } = expense;
     const [, updatedExpense] = await this.Expense.update(
-      expense, { where: { id }, returning: true },
+      expense, {
+        where: { id }, returning: true,
+      },
     );
 
     if (updatedExpense.length === 0) {

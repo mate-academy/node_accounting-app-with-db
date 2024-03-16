@@ -6,7 +6,9 @@ class UserService {
   }
 
   normalize({ id, name }) {
-    return { id, name };
+    return {
+      id, name,
+    };
   }
 
   async getAll() {
@@ -37,7 +39,9 @@ class UserService {
     const { id, name } = user;
     const [, updatedUsers] = await this.User.update(
       { name },
-      { where: { id }, returning: true },
+      {
+        where: { id }, returning: true,
+      },
     );
 
     if (updatedUsers.length === 0) {

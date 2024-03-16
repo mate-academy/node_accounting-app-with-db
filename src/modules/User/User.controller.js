@@ -69,7 +69,9 @@ class UserController {
     }
 
     try {
-      const user = { name, id };
+      const user = {
+        name, id,
+      };
       const updatedUser = await this.service.update(user);
 
       return response.send(this.service.normalize(updatedUser));
