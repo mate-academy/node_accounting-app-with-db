@@ -2,11 +2,7 @@
 
 const { User } = require('../models/User.model');
 
-const normalize = ({ id, name }) => {
-  return { id, name };
-};
-
-const getAllUsers = async () => {
+const getAllUsersService = async () => {
   const usersData = await User.findAll();
 
   return usersData;
@@ -22,14 +18,22 @@ const createUserService = async (name) => {
   return newUserr;
 };
 
-const deleteUserService = (userId) => {
-  // users = users.filter((user) => user.id !== +userId);
+const updateUserService = async (id, name) => {
+  await User.update({ name }, { where: { id } });
+};
+
+const deleteUserService = async (id) => {
+  await User.destroy({
+    where: {
+      id,
+    },
+  });
 };
 
 module.exports = {
   findUserService,
   createUserService,
   deleteUserService,
-  getAllUsers,
-  normalize,
+  getAllUsersService,
+  updateUserService,
 };

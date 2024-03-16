@@ -17,11 +17,11 @@ const {
   deleteUser,
 } = require('./controllers/users');
 
-router.post('users', createUser);
+router.post('/users', createUser);
 router.get('/users', getUsers);
-router.get('/users/:userId', getUser);
-router.patch('/users/:userId', updateUser);
-router.delete('/users/:userId', deleteUser);
+router.get('/users/:id', getUser);
+router.patch('/users/:id', updateUser);
+router.delete('/users/:id', deleteUser);
 
 router.post('/expenses', createExpense);
 router.get('/expenses', getExpenses);

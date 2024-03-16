@@ -6,34 +6,27 @@ const {
   findExpenseService,
   updateExpenseService,
   deleteExpenseService,
-  expenses,
+  getAllExpensesService,
+  normalizeExpense,
 } = require('../services/expenses.service');
 
-function createExpense(req, res) {
+async function createExpense(req, res) {
   const expense = req.body;
-  const { userId, spentAt, title, amount, category, note } = expense;
+  const { userId, spentAt, title, amount } = expense;
 
-  if (
-    !userId ||
-    !spentAt ||
-    !title ||
-    !amount ||
-    !category ||
-    !note ||
-    !findUserService(userId)
-  ) {
+  if (!userId || !spentAt || !title || !amount || !findUserService(userId)) {
     res.sendStatus(400);
   } else {
-    const newExpense = createExpenseService(expense);
+    const newExpense = await createExpenseService(expense);
 
-    res.status(201).send(newExpense);
+    res.status(201).send(normalizeExpense(newExpense));
   }
 }
 
-function getExpenses(req, res) {
+async function getExpenses(req, res) {
   const { userId, from, to, categories } = req.query;
 
-  const filteredExpenses = expenses.filter((expense) => {
+  const filteredExpenses = (await getAllExpensesService()).filter((expense) => {
     if (userId && expense.userId !== parseInt(userId)) {
       return false;
     }
@@ -55,26 +48,26 @@ function getExpenses(req, res) {
     return true;
   });
 
-  res.send(filteredExpenses);
+  res.send(filteredExpenses.map((expense) => normalizeExpense(expense)));
 }
 
-function getExpense(req, res) {
+async function getExpense(req, res) {
   const expenseId = parseInt(req.params.id);
-  const expense = findExpenseService(expenseId);
+  const expense = await findExpenseService(expenseId);
 
   if (!expense) {
     res.sendStatus(404);
 
     return;
   }
-  res.status(200).send(expense);
+  res.status(200).send(normalizeExpense(expense));
 }
 
-function updateExpense(req, res) {
-  const expenseId = parseInt(req.params.id);
+async function updateExpense(req, res) {
+  const { id } = req.params;
   const { title } = req.body;
-  const expenseIndex = expenses.findIndex(
-    (expense) => expense.id === expenseId,
+  const expenseIndex = (await getAllExpensesService()).findIndex(
+    (expense) => expense.id === +id,
   );
 
   if (expenseIndex === -1) {
@@ -89,15 +82,15 @@ function updateExpense(req, res) {
     return;
   }
 
-  const updatedExpense = updateExpenseService(expenseIndex, title);
+  const updatedExpense = await updateExpenseService(id, title);
 
-  res.send(updatedExpense);
+  res.send(normalizeExpense(updatedExpense));
 }
 
-function deleteExpense(req, res) {
-  const expenseId = parseInt(req.params.id);
-  const expenseIndex = expenses.findIndex(
-    (expense) => expense.id === expenseId,
+async function deleteExpense(req, res) {
+  const { id } = req.params;
+  const expenseIndex = (await getAllExpensesService()).findIndex(
+    (expense) => expense.id === +id,
   );
 
   if (expenseIndex === -1) {
@@ -106,7 +99,7 @@ function deleteExpense(req, res) {
     return;
   }
 
-  deleteExpenseService(expenseIndex);
+  await deleteExpenseService(id);
 
   res.sendStatus(204);
 }

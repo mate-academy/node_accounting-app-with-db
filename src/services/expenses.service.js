@@ -1,27 +1,65 @@
 'use strict';
 
-const expenses = [];
+const { Expense } = require('../models/Expense.model');
 
-const createExpenseService = (expense) => {
-  const newExpense = Object.assign(expense, { id: expenses.length + 1 });
+const normalizeExpense = ({
+  userId,
+  spentAt,
+  title,
+  amount,
+  category,
+  id,
+  note,
+}) => {
+  let res = {
+    userId,
+    spentAt,
+    title,
+    amount: +amount,
+    id: +id,
+  };
 
-  expenses.push(newExpense);
+  if (category !== undefined) {
+    res = { ...res, category };
+  }
+
+  if (note !== undefined) {
+    res = { ...res, note };
+  }
+
+  return res;
+};
+
+const getAllExpensesService = async () => {
+  const allExpenses = await Expense.findAll();
+
+  return allExpenses;
+};
+
+const findExpenseService = async (id) => {
+  return Expense.findByPk(id);
+};
+
+const createExpenseService = async (expense) => {
+  const newExpense = await Expense.create(expense);
 
   return newExpense;
 };
 
-const findExpenseService = (id) => {
-  return expenses.find((expense) => expense.id === +id) || null;
+const updateExpenseService = async (id, title) => {
+  await Expense.update({ title }, { where: { id } });
+
+  const updatedExpense = await Expense.findByPk(id);
+
+  return updatedExpense;
 };
 
-const updateExpenseService = (expenseIndex, title) => {
-  expenses[expenseIndex].title = title;
-
-  return expenses[expenseIndex];
-};
-
-const deleteExpenseService = (expenseIndex) => {
-  expenses.splice(expenseIndex, 1);
+const deleteExpenseService = async (id) => {
+  await Expense.destroy({
+    where: {
+      id,
+    },
+  });
 };
 
 module.exports = {
@@ -29,5 +67,6 @@ module.exports = {
   findExpenseService,
   updateExpenseService,
   deleteExpenseService,
-  expenses,
+  getAllExpensesService,
+  normalizeExpense,
 };

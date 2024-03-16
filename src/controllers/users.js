@@ -4,7 +4,8 @@ const {
   findUserService,
   createUserService,
   deleteUserService,
-  getAllUsers,
+  getAllUsersService,
+  updateUserService,
 } = require('../services/users.service');
 
 async function createUser(req, res) {
@@ -26,15 +27,15 @@ async function createUser(req, res) {
 }
 
 async function getUsers(req, res) {
-  const allUsers = await getAllUsers();
+  const allUsers = await getAllUsersService();
 
   res.status(200).send(allUsers);
 }
 
-function getUser(req, res) {
-  const { userId } = req.params;
+async function getUser(req, res) {
+  const { id } = req.params;
 
-  const user = findUserService(userId);
+  const user = await findUserService(id);
 
   if (!user) {
     return res.sendStatus(404);
@@ -43,31 +44,31 @@ function getUser(req, res) {
   return res.status(200).send(user);
 }
 
-function updateUser(req, res) {
-  const { userId } = req.params;
+async function updateUser(req, res) {
+  const { id } = req.params;
   const { name } = req.body;
 
-  const updatedUser = findUserService(userId);
+  const targetUser = await findUserService(id);
 
-  if (!updatedUser) {
+  if (!targetUser) {
     return res.sendStatus(404);
   }
 
-  updatedUser.name = name;
+  await updateUserService(id, name);
 
-  res.status(200).send(updatedUser);
+  res.status(200).send({ id: +id, name });
 }
 
-function deleteUser(req, res) {
-  const { userId } = req.params;
+async function deleteUser(req, res) {
+  const { id } = req.params;
 
-  if (!getAllUsers().some((user) => user.id === +userId)) {
+  if (!(await getAllUsersService()).some((user) => user.id === +id)) {
     res.sendStatus(404);
 
     return;
   }
 
-  deleteUserService(userId);
+  await deleteUserService(id);
 
   res.sendStatus(204);
 }
