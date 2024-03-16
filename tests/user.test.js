@@ -4,7 +4,7 @@
 const axios = require('axios');
 const https = require('https');
 
-const { models: { User } } = require('../src/models/models');
+const User = require('../src/modules/User/User.model');
 const { createServer } = require('../src/createServer');
 const { sequelize } = require('../src/db');
 

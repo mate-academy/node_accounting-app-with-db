@@ -4,7 +4,8 @@ const { createServer } = require('../src/createServer');
 const { sequelize } = require('../src/db');
 const axios = require('axios');
 const https = require('https');
-const { models: { User, Expense } } = require('../src/models/models');
+const Expense = require('../src/modules/Expense/Expense.model');
+const User = require('../src/modules/User/User.model');
 
 describe('Expense', () => {
   let server;

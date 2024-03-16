@@ -1,8 +1,8 @@
 'use strict';
 
 const { DataTypes } = require('sequelize');
-const { sequelize } = require('../db.js');
-const { User } = require('./User.model.js');
+const { sequelize } = require('../../db.js');
+const User = require('../User/User.model.js');
 
 const Expense = sequelize.define('Expense', {
   id: {
@@ -46,6 +46,4 @@ const Expense = sequelize.define('Expense', {
   },
 });
 
-module.exports = {
-  Expense,
-};
+module.exports = Expense;

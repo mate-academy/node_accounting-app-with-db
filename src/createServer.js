@@ -1,14 +1,12 @@
 'use strict';
 
 const express = require('express');
-const { User } = require('./db/models/User.model');
-const { Expense } = require('./db/models/Expense.model');
+const userRouter = require('./modules/User/User.router');
 
 const createServer = () => {
   const app = express();
 
-  User.sync({ force: true, logging: false });
-  Expense.sync({ force: true, logging: false });
+  app.use('/users', userRouter);
 
   return app;
 };
