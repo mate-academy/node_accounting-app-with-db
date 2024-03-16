@@ -3,11 +3,11 @@
 const { json } = require('express');
 const Router = require('../../utils/Router');
 
-class UserRouter extends Router {
-  constructor(userController) {
-    const { getAll, add, getOne, remove, update } = userController;
+class ExpenseRouter extends Router {
+  constructor(expenseController) {
+    const { getAll, add, getOne, remove, update } = expenseController;
 
-    super(userController, json(), [
+    super(expenseController, json(), [
       { method: 'get', path: '/', handler: getAll },
       { method: 'post', path: '/', handler: add },
       { method: 'get', path: '/:id', handler: getOne },
@@ -17,4 +17,4 @@ class UserRouter extends Router {
   }
 }
 
-module.exports = UserRouter;
+module.exports = ExpenseRouter;

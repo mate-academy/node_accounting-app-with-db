@@ -4,7 +4,11 @@ const User = require('./User.model');
 const UserService = require('./User.service');
 const UserController = require('./User.controller');
 
-const userService = new UserService(User);
-const userController = new UserController(userService);
+class UserProvider {
+  constructor() {
+    this.service = new UserService(User);
+    this.controller = new UserController(this.service);
+  }
+}
 
-module.exports = userController;
+module.exports = UserProvider;

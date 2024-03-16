@@ -22,9 +22,9 @@ class UserService {
   }
 
   async add({ name }) {
-    const user = await this.User.create({ name });
+    const { dataValues: newUser } = await this.User.create({ name });
 
-    return user;
+    return newUser;
   }
 
   async remove(id) {

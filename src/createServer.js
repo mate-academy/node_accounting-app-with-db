@@ -1,12 +1,15 @@
 'use strict';
 
 const express = require('express');
-const userRouter = require('./modules/User/User.router');
+const RootProvider = require('./core/Root.provider');
+const RootRouter = require('./core/Root.router');
 
 const createServer = () => {
   const app = express();
+  const provider = new RootProvider();
+  const router = new RootRouter(provider);
 
-  app.use('/users', userRouter);
+  app.use(router.getRouter());
 
   return app;
 };
