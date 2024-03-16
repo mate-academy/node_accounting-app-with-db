@@ -15,7 +15,6 @@ const init = async() => {
 const getExpenses = async(filterOptions) => {
   const expenses = await Expense.findAll();
 
-  // eslint-disable-next-line no-return-await
   return filterExpenses(expenses, filterOptions);
 };
 
