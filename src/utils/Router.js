@@ -3,10 +3,7 @@
 const express = require('express');
 
 class Router {
-  constructor(controller, ...middlewaresAndRoutes) {
-    const routes = middlewaresAndRoutes.at(-1);
-    const middlewares = middlewaresAndRoutes.slice(0, -1);
-
+  constructor({ controller, middlewares, routes }) {
     this.router = express.Router();
     middlewares.forEach(middleware => this.router.use(middleware));
 
