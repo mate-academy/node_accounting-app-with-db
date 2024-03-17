@@ -4,15 +4,9 @@
 const axios = require('axios');
 const https = require('https');
 
-const {
-  models: { User },
-} = require('../src/models/models');
+const User = require('../src/modules/User/User.model');
 const { createServer } = require('../src/createServer');
-const { sequelize } = require('../src/db');
-const { Agent } = require('http');
-
-// this prevents `socket hang up` for Node.js 20.10+
-axios.defaults.httpAgent = new Agent({ keepAlive: false });
+const { sequelize } = require('../src/core/db');
 
 describe('User', () => {
   let server;
@@ -43,7 +37,7 @@ describe('User', () => {
       console.log(HOST);
     });
 
-    await User.destroy({ truncate: true });
+    await User.destroy({ truncate: true, cascade: true });
   });
 
   afterEach(async () => {

@@ -4,7 +4,11 @@ module.exports = {
     jest: true
   },
   rules: {
-    'no-proto': 0
+    'no-proto': 0,
+    'object-curly-newline': 'off',
   },
-  plugins: ['jest']
+  plugins: ['jest'],
+  parserOptions: {
+    "ecmaVersion": 13
+  }
 };

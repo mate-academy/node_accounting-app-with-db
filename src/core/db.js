@@ -16,17 +16,18 @@ const {
 } = process.env;
 
 /*
-  All credentials setted to default values (exsept password - it is exapmle)
+  All credentials set to default values (except password - it is example)
   replace if needed with your own
 */
 
 const sequelize = new Sequelize({
-  database: POSTGRES_DB || 'postgres',
+  database: POSTGRES_DB || 'accounting_app',
   username: POSTGRES_USER || 'postgres',
   host: POSTGRES_HOST || 'localhost',
   dialect: 'postgres',
   port: POSTGRES_PORT || 5432,
-  password: POSTGRES_PASSWORD || '123',
+  password: POSTGRES_PASSWORD || '4485',
+  logging: false,
 });
 
 module.exports = {
