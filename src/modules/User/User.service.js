@@ -35,20 +35,17 @@ class UserService {
     return deletedCount;
   }
 
-  async update(user) {
-    const { id, name } = user;
-    const [, updatedUsers] = await this.User.update(
-      { name },
-      {
-        where: { id }, returning: true,
-      },
-    );
+  async update(userToUpdate) {
+    const { id } = userToUpdate;
+    const user = await this.User.findByPk(id);
 
-    if (updatedUsers.length === 0) {
+    if (!user) {
       throw new Error(404);
     }
 
-    return updatedUsers[0];
+    await user.update(userToUpdate);
+
+    return user;
   }
 }
 

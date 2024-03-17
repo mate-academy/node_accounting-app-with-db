@@ -49,19 +49,17 @@ class ExpenseService {
     return this.Expense.destroy({ where: { id } });
   }
 
-  async update(expense) {
-    const { id } = expense;
-    const [, updatedExpense] = await this.Expense.update(
-      expense, {
-        where: { id }, returning: true,
-      },
-    );
+  async update(expenseToUpdate) {
+    const { id } = expenseToUpdate;
+    const expense = await this.Expense.findByPk(id);
 
-    if (updatedExpense.length === 0) {
-      throw new Error(404);
+    if (!expense) {
+      throw new Error('Expense not found', 404);
     }
 
-    return updatedExpense[0];
+    await expense.update(expenseToUpdate);
+
+    return expense;
   }
 }
 
