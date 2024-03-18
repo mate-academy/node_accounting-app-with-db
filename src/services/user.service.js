@@ -18,19 +18,23 @@ const getById = async (id) => {
 };
 
 const create = async (name) => {
-  const users = await User.findAll();
+  // const users = await User.findAll();
 
-  const id = users.length + 1;
+  // const id = users.length + 1;
 
-  const result = await User.create({ id, name });
+  // const result = await User.create({ id, name });
+
+  // return result;
+
+  const result = await User.create({ name });
 
   return result;
 };
 
 const update = async (id, name) => {
-  const result = await User.update({ name }, { where: { id } });
+  await User.update({ name }, { where: { id } });
 
-  return result;
+  return getById(id);
 };
 
 const remove = async (id) => {

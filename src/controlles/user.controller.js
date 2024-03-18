@@ -15,7 +15,7 @@ const {
 const get = async (req, res) => {
   const users = await userService.getAll();
 
-  console.log('user controller 1');
+  console.log('user controller get all', users);
 
   res.status(OK).send(users);
 };
@@ -48,6 +48,8 @@ const create = async (req, res) => {
 
   const user = await userService.create(name);
 
+  console.log('created user', user);
+
   res.status(CREATED).send(user);
 };
 
@@ -69,6 +71,8 @@ const update = async (req, res) => {
   }
 
   const updatedUser = await userService.update(userId, name);
+
+  console.log('updatedUser', updatedUser);
 
   res.status(OK).send(updatedUser);
 };
