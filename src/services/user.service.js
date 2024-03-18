@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 'use strict';
 
 const {
@@ -18,14 +17,6 @@ const getById = async (id) => {
 };
 
 const create = async (name) => {
-  // const users = await User.findAll();
-
-  // const id = users.length + 1;
-
-  // const result = await User.create({ id, name });
-
-  // return result;
-
   const result = await User.create({ name });
 
   return result;

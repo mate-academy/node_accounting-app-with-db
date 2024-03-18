@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 'use strict';
 
 const userService = require('../services/user.service');
@@ -15,16 +14,12 @@ const {
 const get = async (req, res) => {
   const users = await userService.getAll();
 
-  console.log('user controller get all', users);
-
   res.status(OK).send(users);
 };
 
 const getOne = async (req, res) => {
   const userId = parseInt(req.params.id);
   const user = await userService.getById(userId);
-
-  console.log('user controller 2');
 
   if (!user) {
     res.status(NOT_FOUND).send({ message: USER_NOT_FOUND_MESSAGE });
@@ -38,8 +33,6 @@ const getOne = async (req, res) => {
 const create = async (req, res) => {
   const { name } = req.body;
 
-  console.log('user controller 3');
-
   if (!name) {
     res.status(BAD_REQUEST).send({ message: MISSING_PARAM_MESSAGE });
 
@@ -47,8 +40,6 @@ const create = async (req, res) => {
   }
 
   const user = await userService.create(name);
-
-  console.log('created user', user);
 
   res.status(CREATED).send(user);
 };
@@ -71,8 +62,6 @@ const update = async (req, res) => {
   }
 
   const updatedUser = await userService.update(userId, name);
-
-  console.log('updatedUser', updatedUser);
 
   res.status(OK).send(updatedUser);
 };

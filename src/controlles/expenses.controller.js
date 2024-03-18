@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 'use strict';
 
 const expenseService = require('../services/expense.service');
@@ -49,8 +48,6 @@ const getOne = async (req, res) => {
 
   const expense = await expenseService.getById(id);
 
-  console.log('expence controller 2');
-
   if (!expense) {
     res.status(NOT_FOUND).send({ message: EXPENSE_NOT_FOUND_MESSAGE });
 
@@ -63,13 +60,11 @@ const getOne = async (req, res) => {
 const create = async (req, res) => {
   const { userId, spentAt, title, amount, category, note } = req.body;
 
-  if (!userId || !spentAt || !title || !amount || !category || !note) {
+  if (!userId || !spentAt || !title || !amount) {
     res.status(BAD_REQUEST).send({ message: MISSING_PARAM_MESSAGE });
 
     return;
   }
-
-  console.log('expence controller 3');
 
   const user = await userService.getById(parseInt(userId));
 
@@ -79,23 +74,29 @@ const create = async (req, res) => {
     return;
   }
 
-  const expense = await expenseService.create(
+  const expense = await expenseService.create({
     userId,
     spentAt,
     title,
     amount,
     category,
     note,
-  );
+  });
 
   res.status(CREATED).send(expense);
 };
 
 const update = async (req, res) => {
   const id = parseInt(req.params.id);
-  const expense = await expenseService.getById(id);
+  const newExpense = req.body;
 
-  console.log('expence controller 4');
+  if (!newExpense) {
+    res.status(NOT_FOUND).send({ message: EXPENSE_NOT_FOUND_MESSAGE });
+
+    return;
+  }
+
+  const expense = await expenseService.getById(id);
 
   if (!expense) {
     res.status(NOT_FOUND).send({ message: EXPENSE_NOT_FOUND_MESSAGE });
@@ -103,23 +104,13 @@ const update = async (req, res) => {
     return;
   }
 
-  const { title, amount, category, note } = req.body;
-
-  const updatedExpense = await expenseService.update({
-    id,
-    title,
-    amount,
-    category,
-    note,
-  });
+  const updatedExpense = await expenseService.update(id, newExpense);
 
   res.status(OK).send(updatedExpense);
 };
 
 const remove = async (req, res) => {
   const expenseId = parseInt(req.params.id);
-
-  console.log('expence controller 5');
 
   const data = await expenseService.getById(expenseId);
 
