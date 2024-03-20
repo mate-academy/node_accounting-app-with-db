@@ -4,10 +4,6 @@ const { Op } = require('sequelize');
 const { Expense } = require('../models/Expense.model');
 
 async function getAll({ userId, categories, from, to }) {
-  // const fromDate = new Date(from);
-  // const toDate = new Date(to);
-  // const spentAt = new Date(exp.spentAt);
-
   const filterParams = {};
 
   if (userId) {
