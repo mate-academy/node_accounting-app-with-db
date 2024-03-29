@@ -91,7 +91,7 @@ describe('Expense', () => {
 
       expect(response.data).toEqual(
         expect.objectContaining({
-          id: expect.any(Number),
+          id: expect.any(String),
           ...data,
         }),
       );
@@ -118,7 +118,7 @@ describe('Expense', () => {
 
       expect(response.data).toEqual(
         expect.objectContaining({
-          id: expect.any(Number),
+          id: expect.any(String),
           ...data,
         }),
       );
