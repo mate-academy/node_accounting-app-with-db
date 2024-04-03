@@ -81,8 +81,8 @@ const create = async (data) => {
     });
 
     return result;
-  } catch (error) {
-    throw error;
+  } catch {
+    return 'error';
   }
 };
 
@@ -99,8 +99,8 @@ const update = async (id, body) => {
     });
 
     return result;
-  } catch (error) {
-    throw error;
+  } catch {
+    return 'error';
   }
 };
 

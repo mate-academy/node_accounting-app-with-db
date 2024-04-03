@@ -27,27 +27,19 @@ const getById = (req, res) => {
   res.status(200).send(expense);
 };
 
-const create = (req, res) => {
+const create = async (req, res) => {
   const body = req.body;
-  const { userId, spentAt, title, amount, category, note } = body;
 
-  if (
-    !userId ||
-    !spentAt ||
-    typeof title !== 'string' ||
-    typeof amount !== 'number' ||
-    typeof category !== 'string' ||
-    typeof note !== 'string'
-  ) {
+  const newExpense = await expensesService.create(body);
+
+  if (!newExpense) {
     res.sendStatus(400);
 
     return;
   }
 
-  const newExpense = expensesService.create(body);
-
-  if (!newExpense) {
-    res.sendStatus(400);
+  if (newExpense === 'error') {
+    res.sendStatus(500);
 
     return;
   }
@@ -76,7 +68,7 @@ const remove = (req, res) => {
   res.sendStatus(204);
 };
 
-const update = (req, res) => {
+const update = async (req, res) => {
   const { id } = req.params;
   const body = req.body;
 
@@ -86,13 +78,20 @@ const update = (req, res) => {
     return;
   }
 
-  const expense = expensesService.update(id, body);
+  const expense = await expensesService.update(id, body);
 
   if (!expense) {
     res.sendStatus(404);
 
     return;
   }
+
+  if (expense === 'error') {
+    res.sendStatus(500);
+
+    return;
+  }
+
   res.send(expense);
 };
 
