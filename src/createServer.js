@@ -7,7 +7,7 @@ const { expensesRouter } = require('./routes/expensesRoute');
 const { init: userInit } = require('./services/usersService');
 const { init: expensesInit } = require('./services/expensesService');
 
-function createServer() {
+async function createServer() {
   const app = express();
 
   app.use(express.json());
