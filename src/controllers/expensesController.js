@@ -1,4 +1,4 @@
-const expensesService = require('../models/Expense.model');
+const expensesService = require('../services/expensesService');
 
 const get = (req, res) => {
   const { userId, categories, from, to } = req.query;

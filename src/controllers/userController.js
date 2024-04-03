@@ -1,4 +1,4 @@
-const usersService = require('../models/User.model');
+const usersService = require('../services/usersService');
 
 const get = (req, res) => {
   res.statusCode = 200;

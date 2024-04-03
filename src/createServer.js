@@ -4,10 +4,10 @@ const express = require('express');
 const cors = require('cors');
 const { usersRouter } = require('./routes/userRoute');
 const { expensesRouter } = require('./routes/expensesRoute');
-const { init: userInit } = require('./models/User.model');
-const { init: expensesInit } = require('./models/Expense.model');
+const { init: userInit } = require('./services/usersService');
+const { init: expensesInit } = require('./services/expensesService');
 
-async function createServer() {
+function createServer() {
   const app = express();
 
   app.use(express.json());
@@ -16,8 +16,8 @@ async function createServer() {
   app.use('/users', usersRouter);
   app.use('/expenses', expensesRouter);
 
-  await userInit();
-  await expensesInit();
+  userInit();
+  expensesInit();
 
   return app;
 }
