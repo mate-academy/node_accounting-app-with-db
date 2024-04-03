@@ -1,13 +1,13 @@
 const expensesService = require('../services/expensesService');
 
-const get = (req, res) => {
+const get = async (req, res) => {
   const { userId, categories, from, to } = req.query;
 
   res.statusCode = 200;
-  res.send(expensesService.getAll(userId, categories, from, to));
+  res.send(await expensesService.getAll(userId, categories, from, to));
 };
 
-const getById = (req, res) => {
+const getById = async (req, res) => {
   const { id } = req.params;
 
   if (!id) {
@@ -16,7 +16,7 @@ const getById = (req, res) => {
     return;
   }
 
-  const expense = expensesService.getById(id);
+  const expense = await expensesService.getById(id);
 
   if (!expense) {
     res.sendStatus(404);
@@ -48,7 +48,7 @@ const create = async (req, res) => {
   res.send(newExpense);
 };
 
-const remove = (req, res) => {
+const remove = async (req, res) => {
   const { id } = req.params;
 
   if (!id) {
@@ -57,13 +57,13 @@ const remove = (req, res) => {
     return;
   }
 
-  if (!expensesService.getById(id)) {
+  if (!(await expensesService.getById(id))) {
     res.sendStatus(404);
 
     return;
   }
 
-  expensesService.remove(id);
+  await expensesService.remove(id);
 
   res.sendStatus(204);
 };

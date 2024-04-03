@@ -34,7 +34,7 @@ const getById = async (id) => {
 const create = async (data) => {
   try {
     const result = await sequelize.transaction(async (t) => {
-      const user = usersService.getById(data.userId);
+      const user = await usersService.getById(data.userId);
 
       if (!user) {
         return null;
@@ -52,7 +52,7 @@ const create = async (data) => {
 const update = async (id, body) => {
   try {
     const result = await sequelize.transaction(async (t) => {
-      const expense = usersService.getById(id);
+      const expense = await usersService.getById(id);
 
       if (!expense) {
         return null;
@@ -68,7 +68,7 @@ const update = async (id, body) => {
 };
 
 const remove = (id) => {
-  Expense.destroy({
+  return Expense.destroy({
     where: {
       id,
     },

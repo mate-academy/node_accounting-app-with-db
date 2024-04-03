@@ -40,8 +40,8 @@ const update = async (id, name) => {
   return User.update({ name }, { where: { id } });
 };
 
-const remove = async (id) => {
-  await User.destroy({ where: { id } });
+const remove = (id) => {
+  return User.destroy({ where: { id } });
 };
 
 module.exports = {

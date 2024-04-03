@@ -1,11 +1,11 @@
 const usersService = require('../services/usersService');
 
-const get = (req, res) => {
+const get = async (req, res) => {
   res.statusCode = 200;
-  res.send(usersService.getAll());
+  res.send(await usersService.getAll());
 };
 
-const getById = (req, res) => {
+const getById = async (req, res) => {
   const { id } = req.params;
 
   if (!id) {
@@ -14,7 +14,7 @@ const getById = (req, res) => {
     return;
   }
 
-  const user = usersService.getById(id);
+  const user = await usersService.getById(id);
 
   if (!user) {
     res.sendStatus(404);
@@ -25,7 +25,7 @@ const getById = (req, res) => {
   res.status(200).send(user);
 };
 
-const create = (req, res) => {
+const create = async (req, res) => {
   const { name } = req.body;
 
   if (!name) {
@@ -35,10 +35,10 @@ const create = (req, res) => {
   }
 
   res.statusCode = 201;
-  res.send(usersService.create(name));
+  res.send(await usersService.create(name));
 };
 
-const remove = (req, res) => {
+const remove = async (req, res) => {
   const { id } = req.params;
 
   if (!id) {
@@ -53,12 +53,12 @@ const remove = (req, res) => {
     return;
   }
 
-  usersService.remove(id);
+  await usersService.remove(id);
 
   res.sendStatus(204);
 };
 
-const update = (req, res) => {
+const update = async (req, res) => {
   const { id } = req.params;
   const { name } = req.body;
 
@@ -68,7 +68,7 @@ const update = (req, res) => {
     return;
   }
 
-  const user = usersService.update(id, name);
+  const user = await usersService.update(id, name);
 
   if (!user) {
     res.sendStatus(404);
