@@ -4,7 +4,6 @@
 'use strict';
 
 const { User } = require('../models/User.model');
-const { v4: uuidv4 } = require('uuid');
 
 const clearUsers = () => {
   User.sync({ truncate: true });
@@ -21,9 +20,7 @@ const getUserById = async (id) => {
 };
 
 const createUser = async (name) => {
-  const id = uuidv4();
-
-  return await User.create({ id, name });
+  return await User.create({ name });
 };
 
 const updateUser = async (id, name) => {

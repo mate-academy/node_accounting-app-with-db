@@ -38,7 +38,9 @@ const create = async (req, res) => {
     return;
   }
 
-  if (await !userService.getUserById(newExpense.userId)) {
+  const userExist = await userService.getUserById(newExpense.userId);
+
+  if (userExist === null) {
     res.status(statusCode.BAD_REQUEST);
     res.send();
 
@@ -52,7 +54,7 @@ const create = async (req, res) => {
 };
 
 const update = async (req, res) => {
-  const { id } = req.params || undefined;
+  const { id } = req.params;
   const updateExpense = req.body || undefined;
 
   if (!id || !updateExpense) {

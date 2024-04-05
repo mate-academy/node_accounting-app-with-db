@@ -20,7 +20,7 @@ const getOne = async (req, res) => {
 };
 
 const create = async (req, res) => {
-  const { name } = req.body || undefined;
+  const { name } = req.body;
 
   if (typeof name !== 'string') {
     res.status(statusCode.BAD_REQUEST);
@@ -53,13 +53,16 @@ const update = async (req, res) => {
 
 const remove = async (req, res) => {
   const { id } = req.params || undefined;
+  const user = await userService.getUserById(id);
 
-  if (userService.getUserById(id) !== null) {
-    await userService.deleteUser(id);
-    res.status(statusCode.NO_CONTENT).send();
-  } else {
+  if (!user) {
     res.status(statusCode.NOT_FOUND).send();
+
+    return;
   }
+
+  await userService.deleteUser(+id);
+  res.status(statusCode.NO_CONTENT).send();
 };
 
 module.exports = {

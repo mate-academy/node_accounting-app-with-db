@@ -3,7 +3,6 @@
 'use strict';
 
 const { Expense } = require('../models/Expense.model');
-const { v4: uuidv4 } = require('uuid');
 
 const clearExpenses = () => {
   Expense.sync({ force: true });
@@ -42,17 +41,15 @@ const getExpensesById = async (id) => {
 };
 
 const createExpense = async (newExpense) => {
-  const { userId, spentAt, title, amount, category, note } = newExpense;
-  const id = uuidv4();
+  const { userId, spentAt, title, amount } = newExpense;
 
   return await Expense.create({
-    id,
     userId,
     spentAt,
     title,
     amount,
-    category,
-    note,
+    category: newExpense.category || 'none',
+    note: newExpense.note || '',
   });
 };
 
