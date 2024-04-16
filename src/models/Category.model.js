@@ -3,8 +3,8 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../db.js');
 
-const User = sequelize.define(
-  'User',
+const Category = sequelize.define(
+  'Category',
   {
     id: {
       type: DataTypes.UUID,
@@ -17,10 +17,10 @@ const User = sequelize.define(
     },
   },
   {
-    tableName: 'users',
+    tableName: 'categories',
   },
 );
 
 module.exports = {
-  User,
+  Category,
 };
