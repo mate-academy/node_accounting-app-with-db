@@ -8,6 +8,11 @@ const {
 } = require('../services/expenses.service');
 const { getById: getUserById } = require('../services/users.service');
 const { getById: getCategoryById } = require('../services/categories.service');
+const {
+  EXPENSE_NOT_FOUND,
+  CATEGORY_NOT_FOUND,
+  USER_NOT_FOUND,
+} = require('../const/errors');
 
 const getExpenses = async (req, res) => {
   const { userId, categoryId, from, to } = req.query;
@@ -19,8 +24,10 @@ const getExpenses = async (req, res) => {
     to,
   });
 
+  const normalizedExpenses = expenses.map((expense) => normalize(expense));
+
   res.status(200);
-  res.send(expenses.map((expense) => normalize(expense)));
+  res.send(normalizedExpenses);
 };
 
 const getExpenseById = async (req, res) => {
@@ -31,7 +38,7 @@ const getExpenseById = async (req, res) => {
   if (!expense) {
     res.status(404);
 
-    res.send('Expense not found');
+    res.send(EXPENSE_NOT_FOUND);
   }
 
   res.status(200);
@@ -52,7 +59,7 @@ const createExpense = async (req, res) => {
   if (!user) {
     res.status(400);
 
-    res.send('UserId is incorrect');
+    res.send(USER_NOT_FOUND);
   }
 
   if (!spentAt) {
@@ -84,7 +91,7 @@ const createExpense = async (req, res) => {
   if (!category) {
     res.status(400);
 
-    res.send('CategoryId is incorrect');
+    res.send(CATEGORY_NOT_FOUND);
   }
 
   const newExpense = await create({
@@ -117,7 +124,7 @@ const updateExpense = async (req, res) => {
 
   if (!expense) {
     res.status(404);
-    res.send('Expense not found');
+    res.send(EXPENSE_NOT_FOUND);
   }
 
   await update(id, data);
@@ -135,7 +142,7 @@ const removeExpense = async (req, res) => {
 
   if (!expense) {
     res.status(404);
-    res.send('Expense not found');
+    res.send(EXPENSE_NOT_FOUND);
   }
 
   await remove(id);

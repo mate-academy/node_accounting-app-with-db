@@ -1,3 +1,4 @@
+const { CATEGORY_NOT_FOUND, NAME_REQUIRED } = require('../const/errors');
 const {
   getAll,
   normalize,
@@ -10,8 +11,12 @@ const {
 const getCategories = async (req, res) => {
   const categories = await getAll();
 
+  const normalizedCategories = categories.map((category) =>
+    // eslint-disable-next-line prettier/prettier
+    normalize(category));
+
   res.status(200);
-  res.send(categories.map((category) => normalize(category)));
+  res.send(normalizedCategories);
 };
 
 const getCategoryById = async (req, res) => {
@@ -22,7 +27,7 @@ const getCategoryById = async (req, res) => {
   if (!category) {
     res.status(404);
 
-    res.send('Category not found');
+    res.send(CATEGORY_NOT_FOUND);
   }
 
   res.status(200);
@@ -35,7 +40,7 @@ const createCategory = async (req, res) => {
   if (!name) {
     res.status(400);
 
-    res.send('Name is required');
+    res.send(NAME_REQUIRED);
   }
 
   const newCategory = await create(name);
@@ -50,14 +55,14 @@ const updateCategory = async (req, res) => {
 
   if (!name) {
     res.status(400);
-    res.send('Name is required');
+    res.send(NAME_REQUIRED);
   }
 
   const category = await getById(id);
 
   if (!category) {
     res.status(404);
-    res.send('Category not found');
+    res.send(CATEGORY_NOT_FOUND);
   }
 
   await update(id, name);
@@ -75,7 +80,7 @@ const removeCategory = async (req, res) => {
 
   if (!category) {
     res.status(404);
-    res.send('Category not found');
+    res.send(CATEGORY_NOT_FOUND);
   }
 
   await remove(id);
