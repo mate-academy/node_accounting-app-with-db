@@ -2,25 +2,26 @@ const expensesService = require('../services/expense.service.js');
 const userService = require('../services/user.service');
 
 const getExpenses = async (req, res) => {
+  const { from, to, userId, categories } = req.query;
   const options = {};
 
-  if (req.query.from) {
-    options.from = req.query.from;
+  if (from) {
+    options.from = from;
   }
 
-  if (req.query.to) {
-    options.to = req.query.to;
+  if (to) {
+    options.to = to;
   }
 
-  if (req.query.userId) {
-    options.userId = req.query.userId;
+  if (userId) {
+    options.userId = userId;
   }
 
-  if (req.query.categories && req.query.categories.length > 0) {
-    if (Array.isArray(req.query.categories)) {
-      options.categories = req.query.categories;
+  if (categories && categories.length > 0) {
+    if (Array.isArray(categories)) {
+      options.categories = categories;
     } else {
-      options.categories = req.query.categories.split(',');
+      options.categories = categories.split(',');
     }
   }
 
