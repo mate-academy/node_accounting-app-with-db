@@ -17,7 +17,7 @@ const getExpenses = async (req, res) => {
     options.userId = userId;
   }
 
-  if (categories && categories.length > 0) {
+  if (categories && !!categories.length) {
     if (Array.isArray(categories)) {
       options.categories = categories;
     } else {
