@@ -1,11 +1,18 @@
+const { sequelize } = require('../db');
 const { User } = require('../models/User.model');
 
 const init = async () => {
   User.sync({ force: true });
 };
 
-const normalize = ({ id, name }) => {
-  return { id, name };
+const normalize = (body) => {
+  if (body) {
+    const { id, name } = body;
+
+    return { id, name };
+  }
+
+  return null;
 };
 
 const getAll = async () => {
@@ -31,13 +38,23 @@ const create = async (name) => {
 };
 
 const update = async (id, name) => {
-  const user = await getById(id);
+  try {
+    const result = await sequelize.transaction(async (t) => {
+      const user = await getById(id);
 
-  if (!user) {
-    return null;
+      if (!user) {
+        return null;
+      }
+
+      await User.update({ name }, { where: { id } });
+
+      return getById(id);
+    });
+
+    return normalize(result);
+  } catch {
+    return 'error';
   }
-
-  return User.update({ name }, { where: { id } });
 };
 
 const remove = (id) => {

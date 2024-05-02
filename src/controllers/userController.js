@@ -47,7 +47,7 @@ const remove = async (req, res) => {
     return;
   }
 
-  if (!usersService.getById(id)) {
+  if (!(await usersService.getById(id))) {
     res.sendStatus(404);
 
     return;

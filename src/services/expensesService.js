@@ -7,6 +7,24 @@ const init = async () => {
   Expense.sync({ force: true });
 };
 
+const normalize = (body) => {
+  if (body) {
+    const { amount, category, id, note, spentAt, title, userId } = body;
+
+    return {
+      amount,
+      category,
+      id,
+      note,
+      spentAt,
+      title,
+      userId,
+    };
+  }
+
+  return null;
+};
+
 const getAll = async (userId, categories, from, to) => {
   const filter = {};
 
@@ -22,19 +40,21 @@ const getAll = async (userId, categories, from, to) => {
     filter.spentAt = { [Op.gte]: from };
   }
 
-  return Expense.findAll({
+  const expenses = await Expense.findAll({
     where: filter,
   });
+
+  return expenses.map((el) => normalize(el));
 };
 
 const getById = async (id) => {
-  return Expense.findByPk(id);
+  return normalize(await Expense.findByPk(id));
 };
 
 const create = async (data) => {
   try {
     const result = await sequelize.transaction(async (t) => {
-      const user = await usersService.getById(data.userId);
+      const user = (await usersService.getById(data.userId)) || null;
 
       if (!user) {
         return null;
@@ -43,8 +63,12 @@ const create = async (data) => {
       return Expense.create(data);
     });
 
-    return result;
-  } catch {
+    if (!result) {
+      return;
+    }
+
+    return normalize(result);
+  } catch (err) {
     return 'error';
   }
 };
@@ -52,16 +76,18 @@ const create = async (data) => {
 const update = async (id, body) => {
   try {
     const result = await sequelize.transaction(async (t) => {
-      const expense = await usersService.getById(id);
+      const expense = await getById(id);
 
       if (!expense) {
         return null;
       }
 
-      return Expense.update(body, { where: { id } });
+      await Expense.update(body, { where: { id } });
+
+      return getById(id);
     });
 
-    return result;
+    return normalize(result);
   } catch {
     return 'error';
   }

@@ -1,16 +1,16 @@
 function expensesMiddleware(req, res, next) {
   const body = req.body;
-  const { userId, spentAt, title, amount, category, note } = body;
+  const { userId, spentAt, title, amount } = body;
 
   if (
     !userId ||
     !spentAt ||
     typeof title !== 'string' ||
-    typeof amount !== 'number' ||
-    typeof category !== 'string' ||
-    typeof note !== 'string'
+    typeof amount !== 'number'
   ) {
     res.sendStatus(400);
+
+    return;
   }
 
   next();
