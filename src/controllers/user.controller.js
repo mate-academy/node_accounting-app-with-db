@@ -2,13 +2,9 @@ const userService = require('../services/user.service');
 const userHelpers = require('../helpers/user.helpers');
 
 const get = async (req, res) => {
-  try {
-    const users = await userService.getAll();
+  const users = await userService.getAll();
 
-    res.send(users.map((user) => userHelpers.normalize(user)));
-  } catch (error) {
-    res.status(500).send({ error: 'Failed to get users try again' });
-  }
+  res.send(users.map((user) => userHelpers.normalize(user)));
 };
 
 const getOne = async (req, res) => {
@@ -18,13 +14,9 @@ const getOne = async (req, res) => {
     return;
   }
 
-  try {
-    const user = await userService.getById(id);
+  const user = await userService.getById(id);
 
-    res.send(userHelpers.normalize(user));
-  } catch (error) {
-    res.status(500).send({ error: 'Failed to get user try again' });
-  }
+  res.send(userHelpers.normalize(user));
 };
 
 const create = async (req, res) => {
@@ -34,13 +26,9 @@ const create = async (req, res) => {
     return;
   }
 
-  try {
-    const user = await userService.create(name);
+  const user = await userService.create(name);
 
-    res.status(201).send(userHelpers.normalize(user));
-  } catch (error) {
-    res.status(500).send({ error: 'Failed to create user try again' });
-  }
+  res.status(201).send(userHelpers.normalize(user));
 };
 
 const remove = async (req, res) => {
@@ -50,13 +38,9 @@ const remove = async (req, res) => {
     return;
   }
 
-  try {
-    await userService.remove(id);
+  await userService.remove(id);
 
-    res.sendStatus(204);
-  } catch (error) {
-    res.status(500).send({ error: 'Failed to remove user try again' });
-  }
+  res.sendStatus(204);
 };
 
 const update = async (req, res) => {
@@ -70,13 +54,9 @@ const update = async (req, res) => {
     return;
   }
 
-  try {
-    const updatedUser = await userService.update({ id, name });
+  const updatedUser = await userService.update({ id, name });
 
-    res.send(userHelpers.normalize(updatedUser));
-  } catch (error) {
-    res.status(500).send({ error: 'Failed to update user try again' });
-  }
+  res.send(userHelpers.normalize(updatedUser));
 };
 
 module.exports = {

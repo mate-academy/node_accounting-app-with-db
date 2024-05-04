@@ -1,17 +1,18 @@
 const express = require('express');
 const userController = require('../controllers/user.controller');
+const { catchError } = require('../utils/catchError');
 
 const router = express.Router();
 
-router.get('/', userController.get);
+router.get('/', catchError(userController.get));
 
-router.get('/:id', userController.getOne);
+router.get('/:id', catchError(userController.getOne));
 
-router.post('/', userController.create);
+router.post('/', catchError(userController.create));
 
-router.delete('/:id', userController.remove);
+router.delete('/:id', catchError(userController.remove));
 
-router.patch('/:id', userController.update);
+router.patch('/:id', catchError(userController.update));
 
 module.exports = {
   router,

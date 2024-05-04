@@ -4,18 +4,14 @@ const expensesHelpers = require('../helpers/expense.helpers');
 const get = async (req, res) => {
   const { userId, categories, from, to } = req.query;
 
-  try {
-    const expenses = await expensesService.getExpenses(
-      userId,
-      categories,
-      from,
-      to,
-    );
+  const expenses = await expensesService.getExpenses(
+    userId,
+    categories,
+    from,
+    to,
+  );
 
-    res.send(expenses.map((expense) => expensesHelpers.normalize(expense)));
-  } catch (error) {
-    res.status(500).send({ error: 'Failed to get expenses try again' });
-  }
+  res.send(expenses.map((expense) => expensesHelpers.normalize(expense)));
 };
 
 const getOne = async (req, res) => {
@@ -25,13 +21,9 @@ const getOne = async (req, res) => {
     return;
   }
 
-  try {
-    const expense = await expensesService.getExpenseById(id);
+  const expense = await expensesService.getExpenseById(id);
 
-    res.send(expensesHelpers.normalize(expense));
-  } catch (error) {
-    res.status(500).send({ error: 'Failed to get expense try again' });
-  }
+  res.send(expensesHelpers.normalize(expense));
 };
 
 const create = async (req, res) => {
@@ -50,22 +42,18 @@ const create = async (req, res) => {
     return;
   }
 
-  try {
-    const expense = await expensesService.create(
-      userId,
-      spentAt,
-      title,
-      amount,
-      category,
-      note,
-    );
+  const expense = await expensesService.create(
+    userId,
+    spentAt,
+    title,
+    amount,
+    category,
+    note,
+  );
 
-    res.statusCode = 201;
+  res.statusCode = 201;
 
-    res.send(expense);
-  } catch (error) {
-    res.status(500).send({ error: 'Failed to create expense try again' });
-  }
+  res.send(expense);
 };
 
 const remove = async (req, res) => {
@@ -75,13 +63,9 @@ const remove = async (req, res) => {
     return;
   }
 
-  try {
-    await expensesService.remove(id);
+  await expensesService.remove(id);
 
-    res.sendStatus(204);
-  } catch (error) {
-    res.status(500).send({ error: 'Failed to remove expense try again' });
-  }
+  res.sendStatus(204);
 };
 
 const update = async (req, res) => {
@@ -98,16 +82,12 @@ const update = async (req, res) => {
     return;
   }
 
-  try {
-    const updatedExpense = await expensesService.update({
-      id,
-      title,
-    });
+  const updatedExpense = await expensesService.update({
+    id,
+    title,
+  });
 
-    res.send(expensesHelpers.normalize(updatedExpense));
-  } catch (error) {
-    res.status(500).send({ error: 'Failed to update expense try again' });
-  }
+  res.send(expensesHelpers.normalize(updatedExpense));
 };
 
 module.exports = {
