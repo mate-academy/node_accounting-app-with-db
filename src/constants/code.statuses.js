@@ -1,0 +1,13 @@
+const NOT_FOUND = 404;
+const BAD_REQUEST = 400;
+const INTERNAL_SERVER_ERROR = 500;
+const CREATED = 201;
+const NO_CONTENT = 204;
+
+module.exports = {
+  NOT_FOUND,
+  BAD_REQUEST,
+  CREATED,
+  INTERNAL_SERVER_ERROR,
+  NO_CONTENT,
+};

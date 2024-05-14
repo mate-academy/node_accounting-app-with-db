@@ -1,5 +1,11 @@
 const userService = require('../services/user.service');
 const userHelpers = require('../helpers/user.helpers');
+const {
+  NOT_FOUND,
+  BAD_REQUEST,
+  CREATED,
+  NO_CONTENT,
+} = require('../constants/code.statuses');
 
 const get = async (req, res) => {
   const users = await userService.getAll();
@@ -11,7 +17,7 @@ const getOne = async (req, res) => {
   const { id } = req.params;
 
   if (await userHelpers.isUserExist(id, res)) {
-    res.status(404).send('User with this id not found');
+    res.status(NOT_FOUND).send('User with this id not found');
 
     return;
   }
@@ -24,9 +30,9 @@ const getOne = async (req, res) => {
 const create = async (req, res) => {
   const { name } = req.body;
 
-  if (userHelpers.nameCheck(name)) {
+  if (userHelpers.isNameValid(name)) {
     res
-      .status(400)
+      .status(BAD_REQUEST)
       .send('Invalid request: "name" is required and must be a string.');
 
     return;
@@ -34,21 +40,21 @@ const create = async (req, res) => {
 
   const user = await userService.create(name);
 
-  res.status(201).send(userHelpers.normalize(user));
+  res.status(CREATED).send(userHelpers.normalize(user));
 };
 
 const remove = async (req, res) => {
   const { id } = req.params;
 
   if (await userHelpers.isUserExist(id, res)) {
-    res.status(404).send('User with this id not found');
+    res.status(NOT_FOUND).send('User with this id not found');
 
     return;
   }
 
   await userService.remove(id);
 
-  res.sendStatus(204);
+  res.sendStatus(NO_CONTENT);
 };
 
 const update = async (req, res) => {
@@ -56,14 +62,14 @@ const update = async (req, res) => {
   const { name } = req.body;
 
   if (await userHelpers.isUserExist(id, res)) {
-    res.status(404).send('User with this id not found');
+    res.status(NOT_FOUND).send('User with this id not found');
 
     return;
   }
 
-  if (userHelpers.nameCheck(name)) {
+  if (userHelpers.isNameValid(name)) {
     res
-      .status(400)
+      .status(BAD_REQUEST)
       .send('Invalid request: "name" is required and must be a string.');
 
     return;

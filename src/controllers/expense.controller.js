@@ -1,6 +1,12 @@
 const expensesService = require('../services/expense.service');
 const expensesHelpers = require('../helpers/expense.helpers');
 const userHelpers = require('../helpers/user.helpers');
+const {
+  NOT_FOUND,
+  BAD_REQUEST,
+  CREATED,
+  NO_CONTENT,
+} = require('../constants/code.statuses');
 const get = async (req, res) => {
   const expenses = await expensesService.getExpenses(req.query);
 
@@ -11,7 +17,7 @@ const getOne = async (req, res) => {
   const { id } = req.params;
 
   if (await expensesHelpers.isExpenseExist(id)) {
-    res.status(404).send('Expense with this id not found');
+    res.status(NOT_FOUND).send('Expense with this id not found');
 
     return;
   }
@@ -22,29 +28,22 @@ const getOne = async (req, res) => {
 };
 
 const create = async (req, res) => {
-  const { userId, title, amount, category } = req.body;
-
-  if (await userHelpers.isUserExist(userId)) {
-    res.status(400).send('User not found');
+  if (await userHelpers.isUserExist(req.body.userId)) {
+    res.status(BAD_REQUEST).send('User not found');
 
     return;
   }
 
   try {
-    expensesHelpers.validateRequestBodyFields({
-      userId,
-      title,
-      amount,
-      category,
-    });
+    expensesHelpers.validateRequestBodyFields(req.body);
 
     const expense = await expensesService.create(req.body);
 
-    res.statusCode = 201;
+    res.statusCode = CREATED;
 
     res.send(expense);
   } catch (error) {
-    res.status(400).send(error.message);
+    res.status(BAD_REQUEST).send(error.message);
   }
 };
 
@@ -52,14 +51,14 @@ const remove = async (req, res) => {
   const { id } = req.params;
 
   if (await expensesHelpers.isExpenseExist(id)) {
-    res.status(404).send('Expense with this id not found');
+    res.status(NOT_FOUND).send('Expense with this id not found');
 
     return;
   }
 
   await expensesService.remove(id);
 
-  res.sendStatus(204);
+  res.sendStatus(NO_CONTENT);
 };
 
 const update = async (req, res) => {
@@ -67,13 +66,13 @@ const update = async (req, res) => {
   const { title } = req.body;
 
   if (await expensesHelpers.isExpenseExist(id)) {
-    res.status(404).send('Expense with this id not found');
+    res.status(NOT_FOUND).send('Expense with this id not found');
 
     return;
   }
 
   if (typeof title !== 'string') {
-    res.sendStatus(400);
+    res.sendStatus(BAD_REQUEST);
 
     return;
   }

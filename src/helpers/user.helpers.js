@@ -1,14 +1,10 @@
 const userService = require('../services/user.service');
-const nameCheck = (name) => {
-  if (!name || typeof name !== 'string') {
-    return true;
-  }
+const isNameValid = (name) => {
+  return !name || typeof name !== 'string';
 };
 
 const isUserExist = async (id) => {
-  if (!(await userService.getById(id))) {
-    return true;
-  }
+  return !(await userService.getById(id));
 };
 
 const normalize = ({ id, name }) => {
@@ -19,7 +15,7 @@ const normalize = ({ id, name }) => {
 };
 
 module.exports = {
-  nameCheck,
+  isNameValid,
   isUserExist,
   normalize,
 };
