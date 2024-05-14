@@ -1,66 +1,39 @@
 const expensesHelpers = require('../helpers/expense.helpers');
 const expensesService = require('../services/expense.service');
-const {
-  INTERNAL_SERVER_ERROR,
-  EXPENSE_NOT_FOUND_ERROR,
-} = require('../utils/config');
+const { ERRORS } = require('../utils/errors');
 
 const create = async (req, res) => {
   try {
-    const {
-      userId,
-      spentAt,
-      title,
-      amount,
-      note,
-      category = 'Other',
-    } = req.body;
-
     const requestData = {
-      userId,
-      title,
-      amount,
-      category,
-      note,
-      res,
+      ...req.body,
+      category: req.body.category || 'Other',
     };
 
-    if (
-      expensesHelpers.isUserExist(userId, res) ||
-      expensesHelpers.validateRequestData(requestData)
-    ) {
-      return;
+    if (!expensesHelpers.checkUserExist(requestData.userId, res)) {
+      return res.status(400).send(ERRORS.userNotFound);
     }
 
-    const expense = await expensesService.create({
-      userId,
-      title,
-      spentAt,
-      category,
-      amount,
-      note,
-    });
+    const validateError = expensesHelpers.validateRequestData(requestData);
+
+    if (validateError) {
+      return res.status(400).send(validateError);
+    }
+
+    const expense = await expensesService.create(requestData);
 
     res.status(201).send(expense);
   } catch (error) {
-    res.status(500).send(INTERNAL_SERVER_ERROR);
+    res.status(error.status).send(error.message);
   }
 };
 
 const get = async (req, res) => {
   try {
-    const { userId, categories, from, to } = req.query;
-
-    const expenses = await expensesService.getExpenses({
-      userId,
-      categories,
-      from,
-      to,
-    });
+    const expenses = await expensesService.getExpenses(req.query);
 
     res.send(expenses);
   } catch (error) {
-    res.status(500).send(INTERNAL_SERVER_ERROR);
+    res.status(error.status).send(error.message);
   }
 };
 
@@ -71,12 +44,12 @@ const getOne = async (req, res) => {
     const expense = await expensesService.getExpenseById(id);
 
     if (!expense) {
-      return res.status(404).send({ EXPENSE_NOT_FOUND_ERROR });
+      return res.status(404).send(ERRORS.expenseNotFound);
     }
 
     res.send(expense);
   } catch (error) {
-    res.status(500).send(INTERNAL_SERVER_ERROR);
+    res.status(error.status).send(error.message);
   }
 };
 
@@ -87,14 +60,14 @@ const remove = async (req, res) => {
     const expense = await expensesService.getExpenseById(id);
 
     if (!expense) {
-      return res.status(404).send({ EXPENSE_NOT_FOUND_ERROR });
+      return res.status(404).send(ERRORS.expenseNotFound);
     }
 
     await expensesService.remove(id);
 
     res.sendStatus(204);
   } catch (error) {
-    res.status(500).send(INTERNAL_SERVER_ERROR);
+    res.status(error.status).send(error.message);
   }
 };
 
@@ -106,20 +79,18 @@ const update = async (req, res) => {
     const expense = await expensesService.getExpenseById(id);
 
     if (!expense) {
-      return res.status(404).send({ EXPENSE_NOT_FOUND_ERROR });
+      return res.status(404).send(ERRORS.expenseNotFound);
     }
 
     if (typeof title !== 'string') {
-      res.sendStatus(400);
-
-      return;
+      return res.sendStatus(400);
     }
 
     const updatedExpense = await expensesService.update({ id, title });
 
     res.send(updatedExpense);
   } catch (error) {
-    res.status(500).send(INTERNAL_SERVER_ERROR);
+    res.status(error.status).send(error.message);
   }
 };
 

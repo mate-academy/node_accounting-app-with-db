@@ -14,28 +14,21 @@ const getExpenses = async ({ userId, categories, from, to }) => {
 
   if (from || to) {
     conditions.spentAt = {};
+  }
 
-    if (from) {
-      conditions.spentAt[Sequelize.Op.gte] = from;
-    }
+  if (from) {
+    conditions.spentAt[Sequelize.Op.gte] = from;
+  }
 
-    if (to) {
-      conditions.spentAt[Sequelize.Op.lte] = to;
-    }
+  if (to) {
+    conditions.spentAt[Sequelize.Op.lte] = to;
   }
 
   return Expense.findAll({ where: conditions });
 };
 
-const create = ({ userId, title, spentAt, category, amount, note }) => {
-  return Expense.create({
-    userId,
-    title,
-    spentAt,
-    category,
-    amount,
-    note,
-  });
+const create = (expense) => {
+  return Expense.create(expense);
 };
 
 const getExpenseById = async (id) => {
