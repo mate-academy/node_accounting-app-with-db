@@ -1,9 +1,5 @@
 const { User } = require('../models/User.model');
 
-const {
-  getRandomNumberFromUUID,
-} = require('../helpers/getRandomNumberFromUUID');
-
 const getAll = async () => {
   return User.findAll({
     order: [['createdAt', 'DESC']],
@@ -16,7 +12,6 @@ const getById = async (id) => {
 
 const create = async (name) => {
   return User.create({
-    id: getRandomNumberFromUUID(),
     name,
   });
 };

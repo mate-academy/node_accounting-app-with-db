@@ -1,15 +1,8 @@
 const expensesService = require('../services/expense.service');
 const expensesHelpers = require('../helpers/expense.helpers');
-
+const userHelpers = require('../helpers/user.helpers');
 const get = async (req, res) => {
-  const { userId, categories, from, to } = req.query;
-
-  const expenses = await expensesService.getExpenses(
-    userId,
-    categories,
-    from,
-    to,
-  );
+  const expenses = await expensesService.getExpenses(req.query);
 
   res.send(expenses.map((expense) => expensesHelpers.normalize(expense)));
 };
@@ -17,7 +10,9 @@ const get = async (req, res) => {
 const getOne = async (req, res) => {
   const { id } = req.params;
 
-  if (await expensesHelpers.isExpenseExist(id, res)) {
+  if (await expensesHelpers.isExpenseExist(id)) {
+    res.status(404).send('Expense with this id not found');
+
     return;
   }
 
@@ -27,39 +22,38 @@ const getOne = async (req, res) => {
 };
 
 const create = async (req, res) => {
-  const { userId, spentAt, title, amount, category, note } = req.body;
+  const { userId, title, amount, category } = req.body;
 
-  if (
-    (await expensesHelpers.isUserExist(userId, res)) ||
+  if (await userHelpers.isUserExist(userId)) {
+    res.status(400).send('User not found');
+
+    return;
+  }
+
+  try {
     expensesHelpers.validateRequestBodyFields({
       userId,
       title,
       amount,
       category,
-      res,
-    })
-  ) {
-    return;
+    });
+
+    const expense = await expensesService.create(req.body);
+
+    res.statusCode = 201;
+
+    res.send(expense);
+  } catch (error) {
+    res.status(400).send(error.message);
   }
-
-  const expense = await expensesService.create(
-    userId,
-    spentAt,
-    title,
-    amount,
-    category,
-    note,
-  );
-
-  res.statusCode = 201;
-
-  res.send(expense);
 };
 
 const remove = async (req, res) => {
   const { id } = req.params;
 
-  if (await expensesHelpers.isExpenseExist(id, res)) {
+  if (await expensesHelpers.isExpenseExist(id)) {
+    res.status(404).send('Expense with this id not found');
+
     return;
   }
 
@@ -72,7 +66,9 @@ const update = async (req, res) => {
   const { id } = req.params;
   const { title } = req.body;
 
-  if (await expensesHelpers.isExpenseExist(id, res)) {
+  if (await expensesHelpers.isExpenseExist(id)) {
+    res.status(404).send('Expense with this id not found');
+
     return;
   }
 

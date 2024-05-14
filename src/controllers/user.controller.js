@@ -11,6 +11,8 @@ const getOne = async (req, res) => {
   const { id } = req.params;
 
   if (await userHelpers.isUserExist(id, res)) {
+    res.status(404).send('User with this id not found');
+
     return;
   }
 
@@ -22,7 +24,11 @@ const getOne = async (req, res) => {
 const create = async (req, res) => {
   const { name } = req.body;
 
-  if (userHelpers.nameCheck(name, res)) {
+  if (userHelpers.nameCheck(name)) {
+    res
+      .status(400)
+      .send('Invalid request: "name" is required and must be a string.');
+
     return;
   }
 
@@ -35,6 +41,8 @@ const remove = async (req, res) => {
   const { id } = req.params;
 
   if (await userHelpers.isUserExist(id, res)) {
+    res.status(404).send('User with this id not found');
+
     return;
   }
 
@@ -47,10 +55,17 @@ const update = async (req, res) => {
   const { id } = req.params;
   const { name } = req.body;
 
-  if (
-    (await userHelpers.isUserExist(id, res)) ||
-    userHelpers.nameCheck(name, res)
-  ) {
+  if (await userHelpers.isUserExist(id, res)) {
+    res.status(404).send('User with this id not found');
+
+    return;
+  }
+
+  if (userHelpers.nameCheck(name)) {
+    res
+      .status(400)
+      .send('Invalid request: "name" is required and must be a string.');
+
     return;
   }
 

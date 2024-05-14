@@ -1,24 +1,9 @@
-const userService = require('../services/user.service');
 const expenseService = require('../services/expense.service');
 
-const isUserExist = async (userId, res) => {
-  if (!(await userService.getById(userId))) {
-    res.status(400).send('User not found');
-
-    return true;
-  }
-
-  return false;
-};
-
-const isExpenseExist = async (id, res) => {
+const isExpenseExist = async (id) => {
   if (!(await expenseService.getExpenseById(id))) {
-    res.status(404).send('Expense with this id not found');
-
     return true;
   }
-
-  return false;
 };
 
 const validateRequestBodyFields = ({
@@ -26,52 +11,36 @@ const validateRequestBodyFields = ({
   title,
   amount,
   category,
-  res,
   isCreatingExpense = true,
 }) => {
   if (isCreatingExpense && !userId) {
-    res.status(400).send('provide userId');
-
-    return true;
+    throw new Error('provide userId');
   }
 
   if (!title || typeof title !== 'string') {
-    res
-      .status(400)
-      .send('Invalid request: "title" is required and must be a string.');
-
-    return true;
+    throw new Error(
+      'Invalid request: "title" is required and must be a string.',
+    );
   }
 
   if (typeof amount !== 'number') {
-    res.status(400).send('Invalid request: "amount" must be a number.');
-
-    return true;
+    throw new Error('Invalid request: "amount" must be a number.');
   }
 
   if (!category || typeof category !== 'string') {
-    res
-      .status(400)
-      .send('Invalid request: "category" is required and must be a string.');
-
-    return true;
+    throw new Error(
+      'Invalid request: "category" is required and must be a string.',
+    );
   }
 };
 
-const normalize = ({ id, userId, spentAt, title, amount, category, note }) => {
-  return {
-    id,
-    userId,
-    spentAt,
-    title,
-    amount,
-    category,
-    note,
-  };
+const normalize = ({ dataValues: expense }) => {
+  const { password, ...rest } = expense;
+
+  return rest;
 };
 
 module.exports = {
-  isUserExist,
   isExpenseExist,
   validateRequestBodyFields,
   normalize,

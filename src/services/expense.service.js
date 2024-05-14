@@ -1,11 +1,8 @@
 const { Expense } = require('../models/Expense.model');
 
-const {
-  getRandomNumberFromUUID,
-} = require('../helpers/getRandomNumberFromUUID');
 const { Sequelize } = require('sequelize');
 
-const getExpenses = async (userId, categories, from, to) => {
+const getExpenses = async ({ userId, categories, from, to }) => {
   const where = {};
 
   if (userId) {
@@ -37,10 +34,9 @@ const getExpenseById = async (id) => {
   return Expense.findByPk(id);
 };
 
-const create = (userId, spentAt, title, amount = 1, category, note) => {
+const create = ({ userId, spentAt, title, amount, category, note }) => {
   return Expense.create({
     userId,
-    id: getRandomNumberFromUUID(),
     spentAt,
     title,
     amount,
