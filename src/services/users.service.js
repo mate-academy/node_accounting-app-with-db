@@ -1,28 +1,25 @@
 const { User } = require('../models/User.model');
-const getId = require('../utils/createMaxId');
 
-const normalize = ({ id, name }) => {
-  return {
-    id,
-    name,
-  };
+const initUsers = () => {
+  return [];
 };
 
 const getAllUsers = async () => {
-  const getUsers = await User.findAll();
+  const users = await User.findAll();
 
-  return getUsers;
+  if (!users) {
+    return [];
+  }
+
+  return users;
 };
 
-const getUserById = (id) => {
+const getUserById = async (id) => {
   return User.findByPk(id);
 };
 
 const createUser = async (name) => {
-  const users = await User.findAll();
-  const id = getId.createMaxId(users);
-
-  return User.create({ id, name });
+  return User.create({ name });
 };
 
 const removeUser = async (id) => {
@@ -38,10 +35,10 @@ const updateUser = async ({ id, name }) => {
 };
 
 module.exports = {
+  initUsers,
   getAllUsers,
   getUserById,
   createUser,
   removeUser,
   updateUser,
-  normalize,
 };

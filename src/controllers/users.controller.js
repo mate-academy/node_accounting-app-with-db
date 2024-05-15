@@ -4,7 +4,7 @@ const usersService = require('../services/users.service');
 const getAllUsers = async (req, res) => {
   const users = await usersService.getAllUsers();
 
-  res.send(users.map((user) => usersService.normalize(user)));
+  res.send(users);
 };
 
 const getOneUser = async (req, res) => {
@@ -18,7 +18,8 @@ const getOneUser = async (req, res) => {
   }
 
   res.statusCode = status.successful;
-  res.send(usersService.normalize(user));
+
+  res.send(user);
 };
 
 const createNewUser = async (req, res) => {
@@ -26,6 +27,8 @@ const createNewUser = async (req, res) => {
 
   if (!name) {
     res.sendStatus(status.badRequest);
+
+    return;
   }
 
   const user = await usersService.createUser(name);
