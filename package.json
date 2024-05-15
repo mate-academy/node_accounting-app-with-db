@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "@mate-academy/eslint-config": "latest",
-    "@mate-academy/scripts": "^1.7.3",
+    "@mate-academy/scripts": "^1.8.1",
     "axios": "^1.6.7",
     "eslint": "^7.32.0",
     "eslint-plugin-jest": "^22.4.1",
