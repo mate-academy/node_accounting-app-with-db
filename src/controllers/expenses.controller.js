@@ -2,18 +2,18 @@ const status = require('../constants/httpStatusCodes');
 const expensesService = require('../services/expenses.service');
 const { getUserById } = require('../services/users.service');
 
-const getAllExpenses = (req, res) => {
+const getAllExpenses = async (req, res) => {
   const query = req.query;
 
-  const expenses = expensesService.getAllExpenses(query);
+  const expenses = await expensesService.getAllExpenses(query);
 
   res.send(expenses);
 };
 
-const getExpenceById = (req, res) => {
+const getExpenceById = async (req, res) => {
   const { id } = req.params;
 
-  const expense = expensesService.getExpenseById(id);
+  const expense = await expensesService.getExpenseById(Number(id));
 
   if (!expense) {
     res.sendStatus(status.notFound);
@@ -24,48 +24,54 @@ const getExpenceById = (req, res) => {
   res.send(expense);
 };
 
-const createNewExpense = (req, res) => {
+const createNewExpense = async (req, res) => {
   const body = req.body;
   const user = getUserById(body.userId);
 
   if (!user) {
     res.sendStatus(status.badRequest);
+
+    return;
   }
 
-  const expense = expensesService.createExpence(body);
+  const expense = await expensesService.createExpence(body);
 
   res.statusCode = status.created;
 
   res.send(expense);
 };
 
-const removeExpence = (req, res) => {
+const removeExpence = async (req, res) => {
   const { id } = req.params;
-  const expense = expensesService.getExpenseById(Number(id));
+  const expense = await expensesService.getExpenseById(Number(id));
 
   if (!expense) {
     res.sendStatus(status.notFound);
 
     return;
   }
-  expensesService.deleteExpense(id);
+  await expensesService.deleteExpense(id);
   res.sendStatus(status.noContent);
 };
 
-const updateExpenceById = (req, res) => {
+const updateExpenceById = async (req, res) => {
   const { id } = req.params;
   const body = req.body;
-  const expense = expensesService.getExpenseById(Number(id));
+  const expense = await expensesService.getExpenseById(Number(id));
 
   if (!expense) {
     res.sendStatus(status.notFound);
+
+    return;
   }
 
-  const updatedExpense = expensesService.updateExpence(id, body);
+  await expensesService.updateExpence(id, body);
+
+  const updateExpense = await expensesService.getExpenseById(id);
 
   res.statusCode = status.successful;
 
-  res.send(updatedExpense);
+  res.send(updateExpense);
 };
 
 module.exports = {

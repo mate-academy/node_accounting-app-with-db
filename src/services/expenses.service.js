@@ -1,44 +1,56 @@
-let expenses = [];
-const getId = require('../utils/createMaxId');
+const { Expense } = require('../models/Expense.model');
 const { getFilteredExpenses } = require('../utils/getFilteredExpenses');
 
 const initExpenses = () => {
-  expenses = [];
+  return [];
 };
 
-const getAllExpenses = (query) => {
-  expenses = getFilteredExpenses(expenses, query);
+const getAllExpenses = async (query) => {
+  const filteredExpenses = getFilteredExpenses(query);
 
-  return expenses;
-};
+  if (!filteredExpenses) {
+    return [];
+  }
 
-const getExpenseById = (id) => {
-  return expenses.find((expense) => expense.id === Number(id) || null);
-};
-
-const createExpence = (body) => {
-  const expense = {
-    id: getId.createMaxId(expenses),
-    ...body,
-  };
-
-  expenses.push(expense);
-
-  return expense;
-};
-
-const deleteExpense = (id) => {
-  expenses = expenses.filter((expense) => expense.id !== Number(id));
-};
-
-const updateExpence = (id, body) => {
-  const expense = getExpenseById(id);
-
-  Object.assign(expense, {
-    ...body,
+  return Expense.findAll({
+    where: filteredExpenses,
   });
+};
 
-  return expense;
+const getExpenseById = async (id) => {
+  return Expense.findByPk(id);
+};
+
+const createExpence = async ({
+  userId,
+  spentAt,
+  title,
+  amount,
+  category,
+  note,
+}) => {
+  return Expense.create({
+    userId,
+    spentAt,
+    title,
+    amount,
+    category,
+    note,
+  });
+};
+
+const deleteExpense = async (id) => {
+  await Expense.destroy({
+    where: {
+      id,
+    },
+  });
+};
+
+const updateExpence = async (id, body) => {
+  await Expense.update({ ...body }, { where: { id } });
+
+  return Expense.findByPk(id);
 };
 
 module.exports = {
