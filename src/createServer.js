@@ -1,7 +1,9 @@
 'use strict';
 
+const express = require('express');
+
 const createServer = () => {
-  // your code goes here
+  return express();
 };
 
 module.exports = {
