@@ -4,7 +4,6 @@ const { getUserById } = require('../services/users.service');
 
 const getAllExpenses = async (req, res) => {
   const query = req.query;
-
   const expenses = await expensesService.getAllExpenses(query);
 
   res.send(expenses);
@@ -12,7 +11,6 @@ const getAllExpenses = async (req, res) => {
 
 const getExpenceById = async (req, res) => {
   const { id } = req.params;
-
   const expense = await expensesService.getExpenseById(Number(id));
 
   if (!expense) {
@@ -26,7 +24,7 @@ const getExpenceById = async (req, res) => {
 
 const createNewExpense = async (req, res) => {
   const body = req.body;
-  const user = getUserById(body.userId);
+  const user = await getUserById(body.userId);
 
   if (!user) {
     res.sendStatus(status.badRequest);
@@ -37,7 +35,6 @@ const createNewExpense = async (req, res) => {
   const expense = await expensesService.createExpence(body);
 
   res.statusCode = status.created;
-
   res.send(expense);
 };
 

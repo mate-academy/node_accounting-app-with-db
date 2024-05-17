@@ -18,7 +18,6 @@ const getOneUser = async (req, res) => {
   }
 
   res.statusCode = status.successful;
-
   res.send(user);
 };
 
@@ -34,7 +33,6 @@ const createNewUser = async (req, res) => {
   const user = await usersService.createUser(name);
 
   res.statusCode = status.created;
-
   res.send(user);
 };
 

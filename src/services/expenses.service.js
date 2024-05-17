@@ -1,16 +1,8 @@
 const { Expense } = require('../models/Expense.model');
 const { getFilteredExpenses } = require('../utils/getFilteredExpenses');
 
-const initExpenses = () => {
-  return [];
-};
-
 const getAllExpenses = async (query) => {
   const filteredExpenses = getFilteredExpenses(query);
-
-  if (!filteredExpenses) {
-    return [];
-  }
 
   return Expense.findAll({
     where: filteredExpenses,
@@ -26,8 +18,8 @@ const createExpence = async ({
   spentAt,
   title,
   amount,
-  category,
-  note,
+  category = '',
+  note = '',
 }) => {
   return Expense.create({
     userId,
@@ -54,7 +46,6 @@ const updateExpence = async (id, body) => {
 };
 
 module.exports = {
-  initExpenses,
   getAllExpenses,
   getExpenseById,
   createExpence,
