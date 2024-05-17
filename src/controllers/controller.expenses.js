@@ -1,35 +1,29 @@
 'use strict';
 
 const { Expense } = require('../models/Expense.model');
+const { Op } = require("sequelize");
 
 async function getAll(req, res) {
+  const where = req.where;
+
   try {
     const expenses = await Expense.findAll({
-      order: [['id', 'DESC']],
+      where,
     });
 
-    res.send(JSON.stringify(expenses));
+    res.json(expenses.map(data => data.dataValues));
   } catch (err) {
     res.sendStatus(500);
   }
 }
 
 async function postById(req, res) {
-  const { userId, spentAt, title, amount, category, note } = req.body;
-
   try {
-    const dataValues = await Expense.create({
-      userId,
-      spentAt,
-      title,
-      amount,
-      category,
-      note: note || '',
-    });
+    const dataValues = await Expense.create({ ...req.preparedData });
 
-    res.send(JSON.stringify(dataValues));
+    res.status(201).json(dataValues);
   } catch (err) {
-    res.status(500).send(JSON.stringify(err));
+    res.sendStatus(500);
   }
 }
 
@@ -45,7 +39,7 @@ async function getById(req, res) {
       return;
     }
 
-    res.send(JSON.stringify(expense.dataValues));
+    res.json(expense);
   } catch (err) {
     res.sendStatus(500);
   }
@@ -67,7 +61,15 @@ async function patchById(req, res) {
       return;
     }
 
-    res.sendStatus(200);
+    const expense = await Expense.findByPk(id);
+
+    if (!expense) {
+      res.sendStatus(404);
+
+      return;
+    }
+
+    res.json(expense);
   } catch (err) {
     res.sendStatus(500);
   }
@@ -87,16 +89,16 @@ async function deleteById(req, res) {
       return;
     }
 
-    res.sendStatus(200);
+    res.sendStatus(204);
   } catch (err) {
     res.sendStatus(500);
   }
 }
 
 function middlewareCheckCorrectPostData(req, res, next) {
-  const { userId, spentAt, title, amount, category } = req.body;
+  const { userId, spentAt, title, amount, category, note } = req.body;
 
-  if (!userId || !spentAt || !title || !amount || !category) {
+  if (!userId || !spentAt || !title || !amount) {
     res.status(400).send('Invalid data');
 
     return;
@@ -113,6 +115,23 @@ function middlewareCheckCorrectPostData(req, res, next) {
 
     return;
   }
+
+  const preparedData = {
+    userId,
+    spentAt,
+    title,
+    amount,
+  };
+
+  if (typeof category === 'string') {
+    preparedData.category = category;
+  }
+
+  if (typeof note === 'string') {
+    preparedData.note = note;
+  }
+
+  req.preparedData = preparedData;
 
   next();
 }
@@ -143,6 +162,34 @@ function middlewareCheckCorrectPatchData(req, res, next) {
   next();
 }
 
+function middlewarePrepareQuery(req, res, next) {
+  const where = {
+    [Op.and]: []
+  };
+
+  if (req.query.userId) {
+    where[Op.and].push({ userId: req.query.userId });
+  }
+
+  if (req.query.categories) {
+    where[Op.and].push({ category: req.query.categories });
+  }
+
+  if (req.query.from && req.query.to) {
+    where.spentAt = {
+      [Op.between]: [req.query.from, req.query.to]
+    };
+  }
+
+  if (where[Op.and].length === 0) {
+    delete where[Op.and];
+  }
+
+  req.where = where;
+
+  next();
+}
+
 module.exports = {
   expensesController: {
     getAll,
@@ -152,5 +199,6 @@ module.exports = {
     deleteById,
     middlewareCheckCorrectPostData,
     middlewareCheckCorrectPatchData,
+    middlewarePrepareQuery,
   },
 };

@@ -6,34 +6,34 @@ const { normalizeData } = require('../service/normalize');
 async function getAll(req, res) {
   try {
     const users = await User.findAll({
-      order: [['firstName', 'DESC']],
+      order: [['name', 'DESC']],
     });
 
     const preparedUsers = users.map(({ dataValues }) => {
       return normalizeData(dataValues);
     });
 
-    res.send(JSON.stringify(preparedUsers));
+    res.json(preparedUsers);
   } catch (err) {
     res.sendStatus(500);
   }
 }
 
 async function postById(req, res) {
-  const { firstName } = req.body;
+  const { name } = req.body;
 
-  if (!firstName || firstName.trim() === '') {
-    res.send(400);
+  if (!name || name.trim() === '') {
+    res.sendStatus(400);
 
     return;
   }
 
   try {
     const { dataValues } = await User.create({
-      firstName,
+      name,
     });
 
-    res.send(JSON.stringify(normalizeData(dataValues)));
+    res.status(201).json(normalizeData(dataValues));
   } catch (err) {
     res.sendStatus(500);
   }
@@ -51,7 +51,7 @@ async function getById(req, res) {
       return;
     }
 
-    res.send(JSON.stringify(normalizeData(user.dataValues)));
+    res.json(normalizeData(user.dataValues));
   } catch (err) {
     res.sendStatus(500);
   }
@@ -59,16 +59,16 @@ async function getById(req, res) {
 
 async function patchById(req, res) {
   const id = req.params.id;
-  const { firstName } = req.body;
+  const { name } = req.body;
 
-  if (!firstName || firstName.trim() === '') {
+  if (!name || name.trim() === '') {
     res.sendStatus(400);
 
     return;
   }
 
   try {
-    const result = await User.update({ firstName }, { where: { id } });
+    const result = await User.update({ name }, { where: { id } });
 
     if (!result[0]) {
       res.sendStatus(404);
@@ -76,7 +76,15 @@ async function patchById(req, res) {
       return;
     }
 
-    res.sendStatus(200);
+    const user = await User.findByPk(id);
+
+    if (!user) {
+      res.sendStatus(404);
+
+      return;
+    }
+
+    res.status(200).json(normalizeData(user.dataValues));
   } catch (err) {
     res.sendStatus(500);
   }
@@ -96,7 +104,7 @@ async function deleteById(req, res) {
       return;
     }
 
-    res.sendStatus(200);
+    res.sendStatus(204);
   } catch (err) {
     res.sendStatus(500);
   }

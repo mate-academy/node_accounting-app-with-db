@@ -8,7 +8,11 @@ const {
 
 const routerExpenses = express.Router();
 
-routerExpenses.get('/', expensesController.getAll);
+routerExpenses.get(
+  '/',
+  expensesController.middlewarePrepareQuery,
+  expensesController.getAll,
+);
 
 routerExpenses.post(
   '/',
