@@ -2,7 +2,9 @@
 
 const express = require('express');
 const { expensesController } = require('../controllers/controller.expenses');
-const { middlewareCheckIdAsInteger } = require('../service/middlewareCheckIdAsInteger');
+const {
+  middlewareCheckIdAsInteger,
+} = require('../service/middlewareCheckIdAsInteger');
 
 const routerExpenses = express.Router();
 
@@ -24,7 +26,7 @@ routerExpenses.patch(
 
 routerExpenses.delete('/:id', expensesController.deleteById);
 
-routerExpenses.param('id', middlewareCheckIdAsInteger)
+routerExpenses.param('id', middlewareCheckIdAsInteger);
 
 module.exports = {
   routerExpenses,

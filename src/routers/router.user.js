@@ -2,7 +2,9 @@
 
 const express = require('express');
 const { userController } = require('../controllers/controller.user');
-const { middlewareCheckIdAsInteger } = require('../servise/middlewareCheckIdAsInteger');
+const {
+  middlewareCheckIdAsInteger,
+} = require('../service/middlewareCheckIdAsInteger');
 
 const routerUsers = express.Router();
 

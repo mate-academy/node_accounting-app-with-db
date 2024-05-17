@@ -1,12 +1,12 @@
 'use strict';
 
-const { User } = require("../models/User.model");
-const { normalizeData } = require("../service/normalize");
+const { User } = require('../models/User.model');
+const { normalizeData } = require('../service/normalize');
 
 async function getAll(req, res) {
   try {
     const users = await User.findAll({
-      order: [['firstName', 'DESC']]
+      order: [['firstName', 'DESC']],
     });
 
     const preparedUsers = users.map(({ dataValues }) => {
@@ -30,7 +30,7 @@ async function postById(req, res) {
 
   try {
     const { dataValues } = await User.create({
-      firstName
+      firstName,
     });
 
     res.send(JSON.stringify(normalizeData(dataValues)));
@@ -68,16 +68,13 @@ async function patchById(req, res) {
   }
 
   try {
-    const result = await User.update(
-      { firstName },
-      { where: { id } },
-    );
+    const result = await User.update({ firstName }, { where: { id } });
 
-    if (!result[0])  {
+    if (!result[0]) {
       res.sendStatus(404);
 
       return;
-    };
+    }
 
     res.sendStatus(200);
   } catch (err) {
@@ -106,12 +103,11 @@ async function deleteById(req, res) {
 }
 
 module.exports = {
-
   userController: {
     getAll,
     postById,
     getById,
     patchById,
-    deleteById
-  }
-}
+    deleteById,
+  },
+};

@@ -1,4 +1,4 @@
-function middlewareCheckIdAsInteger (req, res, next, id) {
+function middlewareCheckIdAsInteger(req, res, next, id) {
   if (!Number.isInteger(+id)) {
     res.sendStatus(400);
 
@@ -6,7 +6,7 @@ function middlewareCheckIdAsInteger (req, res, next, id) {
   }
 
   next();
-};
+}
 
 module.exports = {
   middlewareCheckIdAsInteger,

@@ -3,6 +3,7 @@
 'use strict';
 
 require('dotenv/config');
+
 const cors = require('cors');
 const { createServer } = require('./createServer');
 const { routerExpenses } = require('./routers/router.expenses');

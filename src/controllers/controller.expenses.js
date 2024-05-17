@@ -1,12 +1,11 @@
 'use strict';
 
-const { Expense } = require("../models/Expense.model");
-
+const { Expense } = require('../models/Expense.model');
 
 async function getAll(req, res) {
   try {
     const expenses = await Expense.findAll({
-      order: [['id', 'DESC']]
+      order: [['id', 'DESC']],
     });
 
     res.send(JSON.stringify(expenses));
@@ -16,14 +15,7 @@ async function getAll(req, res) {
 }
 
 async function postById(req, res) {
-  const {
-    userId,
-    spentAt,
-    title,
-    amount,
-    category,
-    note
-  } = req.body;
+  const { userId, spentAt, title, amount, category, note } = req.body;
 
   try {
     const dataValues = await Expense.create({
@@ -69,11 +61,11 @@ async function patchById(req, res) {
       { where: { id } },
     );
 
-    if (!result[0])  {
+    if (!result[0]) {
       res.sendStatus(404);
 
       return;
-    };
+    }
 
     res.sendStatus(200);
   } catch (err) {
@@ -102,13 +94,7 @@ async function deleteById(req, res) {
 }
 
 function middlewareCheckCorrectPostData(req, res, next) {
-  const {
-    userId,
-    spentAt,
-    title,
-    amount,
-    category,
-  } = req.body;
+  const { userId, spentAt, title, amount, category } = req.body;
 
   if (!userId || !spentAt || !title || !amount || !category) {
     res.status(400).send('Invalid data');
@@ -118,7 +104,6 @@ function middlewareCheckCorrectPostData(req, res, next) {
 
   if (typeof amount !== 'number') {
     res.status(400).send('Invalid data type amount');
-
 
     return;
   }
@@ -133,12 +118,7 @@ function middlewareCheckCorrectPostData(req, res, next) {
 }
 
 function middlewareCheckCorrectPatchData(req, res, next) {
-  const {
-    spentAt,
-    title,
-    amount,
-    category,
-  } = req.body;
+  const { spentAt, title, amount, category } = req.body;
 
   const updatedValues = {};
 
@@ -151,7 +131,7 @@ function middlewareCheckCorrectPatchData(req, res, next) {
   }
 
   if (category) {
-    updatedValues.title = title;
+    updatedValues.category = category;
   }
 
   if (amount || typeof amount === 'number') {
@@ -171,6 +151,6 @@ module.exports = {
     patchById,
     deleteById,
     middlewareCheckCorrectPostData,
-    middlewareCheckCorrectPatchData
-  }
-}
+    middlewareCheckCorrectPatchData,
+  },
+};
