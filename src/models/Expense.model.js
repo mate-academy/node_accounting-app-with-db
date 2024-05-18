@@ -8,7 +8,7 @@ const { sequelize } = require('../db.js');
 // );
 
 const Expense = sequelize.define(
-  'User',
+  'Expense',
   {
     id: {
       type: DataTypes.INTEGER,

@@ -15,7 +15,7 @@ const { User } = require('../models/User.model');
 
 const getAll = async () => {
   const users = await User.findAll({
-    order: ['title'],
+    order: ['name'],
   });
 
   return users;
@@ -26,7 +26,9 @@ const getById = async (id) => {
 };
 
 const create = async (title) => {
-  return User.create({ name: title });
+  const user = await User.create({ name: title });
+
+  return user;
 };
 
 const remove = async (id) => {
@@ -38,7 +40,7 @@ const remove = async (id) => {
 };
 
 const change = async (id, title) => {
-  return User.update({ title }, { where: { id } });
+  return User.update({ name: title }, { where: { id } });
 
   // const user = await User.findByPk(id);
 

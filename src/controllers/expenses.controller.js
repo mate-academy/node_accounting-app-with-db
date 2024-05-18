@@ -1,14 +1,14 @@
 const expensesService = require('./../services/expenses.service.js');
 const userService = require('./../services/user.service.js');
 
-const get = (req, res) => {
+const get = async (req, res) => {
   const { userId, categories, from, to } = req.query;
 
   res.statusCode = 200;
-  res.send(expensesService.getAll(userId, categories, from, to));
+  res.send(await expensesService.getAll(userId, categories, from, to));
 };
 
-const getOne = (req, res) => {
+const getOne = async (req, res) => {
   const { id } = req.params;
 
   if (!id) {
@@ -17,7 +17,7 @@ const getOne = (req, res) => {
     res.end();
   }
 
-  const expenses = expensesService.getById(id);
+  const expenses = await expensesService.getById(id);
 
   if (!expenses) {
     res.statusCode = 404;
@@ -29,7 +29,7 @@ const getOne = (req, res) => {
   res.send(expenses);
 };
 
-const post = (req, res) => {
+const post = async (req, res) => {
   const { userId, spentAt, title, amount, category, note } = req.body;
 
   if (!(userId && spentAt && title && amount && category && note)) {
@@ -38,7 +38,7 @@ const post = (req, res) => {
     res.end();
   }
 
-  const user = userService.getById(userId);
+  const user = await userService.getById(userId);
 
   if (!user) {
     res.sendStatus(400);
@@ -46,7 +46,7 @@ const post = (req, res) => {
     return;
   }
 
-  const item = expensesService.create(
+  const item = await expensesService.create(
     userId,
     spentAt,
     title,
@@ -59,26 +59,26 @@ const post = (req, res) => {
   res.send(item);
 };
 
-const remove = (req, res) => {
+const remove = async (req, res) => {
   const { id } = req.params;
 
-  if (!expensesService.getById(id)) {
+  if (!(await expensesService.getById(id))) {
     res.statusCode = 404;
 
     res.end();
   }
 
-  expensesService.remove(id);
+  await expensesService.remove(id);
 
   res.statusCode = 204;
   res.end();
 };
 
-const patch = (req, res) => {
+const patch = async (req, res) => {
   const { id } = req.params;
   const { title } = req.body;
 
-  if (!expensesService.getById(id)) {
+  if (!(await expensesService.getById(id))) {
     res.statusCode = 404;
 
     res.end();
@@ -90,7 +90,7 @@ const patch = (req, res) => {
     return;
   }
 
-  const user = expensesService.change(id, title);
+  const user = await expensesService.change(id, title);
 
   res.statusCode = 200;
   res.send(user);
