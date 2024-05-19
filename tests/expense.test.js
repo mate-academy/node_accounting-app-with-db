@@ -81,6 +81,8 @@ describe('Expense', () => {
         userId: user.id,
       };
 
+      console.log('New expenses data =============', data)
+
       const response = await api.post('expenses', data);
 
       expect(response.status).toBe(201);
