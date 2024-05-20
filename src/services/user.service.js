@@ -25,8 +25,8 @@ const getById = async (id) => {
   return User.findByPk(id);
 };
 
-const create = async (title) => {
-  const user = await User.create({ name: title });
+const create = async (name) => {
+  const user = await User.create({ name });
 
   return user;
 };
@@ -39,8 +39,8 @@ const remove = async (id) => {
   });
 };
 
-const change = async (id, title) => {
-  return User.update({ name: title }, { where: { id } });
+const change = async (id, name) => {
+  return User.update({ name }, { where: { id } });
 
   // const user = await User.findByPk(id);
 
