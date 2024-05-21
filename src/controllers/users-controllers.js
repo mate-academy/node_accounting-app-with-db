@@ -21,10 +21,12 @@ const getUserById = async (req, res) => {
   if (!user) {
     res.statusCode = STATUS_CODES.NOT_FOUND;
     res.send(res.statusCode);
-  } else {
-    res.statusCode = STATUS_CODES.OK;
-    res.send(user);
+
+    return;
   }
+
+  res.statusCode = STATUS_CODES.OK;
+  res.send(user);
 };
 
 const postUser = async (req, res) => {
@@ -52,10 +54,12 @@ const deleteUser = async (req, res) => {
   if (previousUsers.length === newUsers.length) {
     res.statusCode = STATUS_CODES.NOT_FOUND;
     res.send(res.statusCode);
-  } else {
-    res.statusCode = STATUS_CODES.NO_CONTENT;
-    res.send(res.statusCode);
+
+    return;
   }
+
+  res.statusCode = STATUS_CODES.NO_CONTENT;
+  res.send(res.statusCode);
 };
 
 const updateUser = async (req, res) => {
@@ -66,11 +70,13 @@ const updateUser = async (req, res) => {
   if (!user) {
     res.statusCode = STATUS_CODES.NOT_FOUND;
     res.send('User not found');
-  } else {
-    const updatedUser = await updateUserData(Number(user.id), name);
 
-    res.send(updatedUser);
+    return;
   }
+
+  const updatedUser = await updateUserData(Number(user.id), name);
+
+  res.send(updatedUser);
 };
 
 module.exports = {

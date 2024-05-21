@@ -9,10 +9,6 @@ const {
 const { getOneUserData } = require('../services/users-service');
 const { STATUS_CODES } = require('../utils/constants');
 
-function isSomeDataInvalid({ userId, spentAt, title, amount, category, note }) {
-  return userId || spentAt || title || amount || category || note;
-}
-
 const getExpenses = async (req, res) => {
   const filteredExpenses = await getExpensesData(req.query);
 
@@ -37,7 +33,10 @@ const getExpenseById = async (req, res) => {
 const postExpense = async (req, res) => {
   const { userId, spentAt, title, amount, category, note } = req.body;
 
-  if (!isSomeDataInvalid) {
+  const isAllDataValid =
+    userId || spentAt || title || amount || category || note;
+
+  if (!isAllDataValid) {
     res.statusCode = STATUS_CODES.BAD_REQUEST;
     res.send(res.statusCode);
 
@@ -70,39 +69,35 @@ const postExpense = async (req, res) => {
 
 const deleteExpense = async (req, res) => {
   const { id } = req.params;
-  const previousExpenses = await getExpensesData();
+  const deletedExpense = await getOneExpenseData(id);
 
-  const newExpenses = await removeExpense(id);
-
-  if (previousExpenses.length === newExpenses.length) {
+  if (!deletedExpense) {
     res.statusCode = STATUS_CODES.NOT_FOUND;
     res.send(res.statusCode);
-  } else {
-    res.statusCode = STATUS_CODES.NO_CONTENT;
-    res.send(res.statusCode);
+
+    return;
   }
+
+  res.statusCode = STATUS_CODES.NO_CONTENT;
+  await removeExpense(id);
+  res.send(res.statusCode);
 };
 
 const updateExpense = async (req, res) => {
   const { id } = req.params;
-  const { spentAt, title, amount, category, note } = req.body;
   const expense = await getOneExpenseData(id);
 
   if (!expense) {
     res.statusCode = STATUS_CODES.NOT_FOUND;
     res.send('Expense not found');
-  } else {
-    const newExpense = await updatedExpenseData(id, {
-      spentAt,
-      title,
-      amount,
-      category,
-      note,
-    });
 
-    res.statusCode = STATUS_CODES.OK;
-    res.send(newExpense);
+    return;
   }
+
+  const newExpense = await updatedExpenseData(id, req.body);
+
+  res.statusCode = STATUS_CODES.OK;
+  res.send(newExpense);
 };
 
 module.exports = {
