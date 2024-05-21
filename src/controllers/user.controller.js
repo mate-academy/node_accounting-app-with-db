@@ -2,6 +2,7 @@ const userService = require('./../services/user.service.js');
 
 const get = async (req, res) => {
   res.statusCode = 200;
+
   res.send(await userService.getAll());
 };
 
@@ -11,9 +12,9 @@ const getOne = async (req, res) => {
   const user = await userService.getById(id);
 
   if (!user) {
-    res.statusCode = 404;
+    res.sendStatus(404);
 
-    res.end();
+    return;
   }
 
   res.statusCode = 200;
@@ -24,17 +25,17 @@ const post = async (req, res) => {
   const { name } = req.body;
 
   if (!name) {
-    res.statusCode = 400;
+    res.sendStatus(400);
 
-    res.end();
+    return;
   }
 
   const item = await userService.create(name);
 
   if (!item) {
-    res.statusCode = 400;
+    res.sendStatus(400);
 
-    res.end();
+    return;
   }
 
   res.statusCode = 201;
@@ -45,15 +46,14 @@ const remove = async (req, res) => {
   const { id } = req.params;
 
   if (!(await userService.getById(id))) {
-    res.statusCode = 404;
+    res.sendStatus(404);
 
-    res.end();
+    return;
   }
 
   await userService.remove(id);
 
-  res.statusCode = 204;
-  res.end();
+  res.sendStatus(204);
 };
 
 const patch = async (req, res) => {
@@ -61,9 +61,9 @@ const patch = async (req, res) => {
   const { name } = req.body;
 
   if (!(await userService.getById(id))) {
-    res.statusCode = 404;
+    res.sendStatus(404);
 
-    res.end();
+    return;
   }
 
   const user = await userService.change(id, name);

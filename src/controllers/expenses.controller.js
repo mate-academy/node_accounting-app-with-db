@@ -12,17 +12,17 @@ const getOne = async (req, res) => {
   const { id } = req.params;
 
   if (!id) {
-    res.statusCode = 400;
+    res.sendStatus(400);
 
-    res.end();
+    return;
   }
 
   const expenses = await expensesService.getById(id);
 
   if (!expenses) {
-    res.statusCode = 404;
+    res.sendStatus(404);
 
-    res.end();
+    return;
   }
 
   res.statusCode = 200;
@@ -32,10 +32,10 @@ const getOne = async (req, res) => {
 const post = async (req, res) => {
   const { userId, spentAt, title, amount, category, note } = req.body;
 
-  if (!(userId && spentAt && title && amount && category && note)) {
-    res.statusCode = 400;
+  if (!(userId && spentAt && title && amount)) {
+    res.sendStatus(400);
 
-    res.end();
+    return;
   }
 
   const user = await userService.getById(userId);
@@ -63,15 +63,14 @@ const remove = async (req, res) => {
   const { id } = req.params;
 
   if (!(await expensesService.getById(id))) {
-    res.statusCode = 404;
+    res.sendStatus(404);
 
-    res.end();
+    return;
   }
 
   await expensesService.remove(id);
 
-  res.statusCode = 204;
-  res.end();
+  res.sendStatus(204);
 };
 
 const patch = async (req, res) => {
@@ -79,9 +78,9 @@ const patch = async (req, res) => {
   const { title } = req.body;
 
   if (!(await expensesService.getById(id))) {
-    res.statusCode = 404;
+    res.sendStatus(404);
 
-    res.end();
+    return;
   }
 
   if (typeof title !== 'string') {

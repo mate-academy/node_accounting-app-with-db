@@ -3,18 +3,13 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../db.js');
 
-// const Expense = sequelize.define(
-//   // your code goes here
-// );
-
 const Expense = sequelize.define(
   'Expense',
   {
     id: {
       type: DataTypes.INTEGER,
-      defaultValue: DataTypes.INTEGER,
       primaryKey: true,
-      allowNull: false,
+      autoIncrement: true,
     },
     userId: {
       type: DataTypes.INTEGER,
@@ -34,11 +29,11 @@ const Expense = sequelize.define(
     },
     category: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     note: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
   },
   {
