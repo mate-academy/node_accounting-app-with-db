@@ -1,0 +1,9 @@
+const HTTP_STATUS_CODES = {
+  OK: 200,
+  CREATED: 201,
+  BAD_REQUEST: 400,
+  NOT_FOUND: 404,
+  NO_CONTENT: 204,
+};
+
+module.exports = HTTP_STATUS_CODES;
