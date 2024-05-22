@@ -1,11 +1,4 @@
 const { User } = require('../models/User.model');
-// const getId = require('../utils/getMaxId');
-
-// let users = [];
-
-// const initUsers = () => {
-//   users = [];
-// };
 
 const getAll = async () => {
   const users = await User.findAll();
