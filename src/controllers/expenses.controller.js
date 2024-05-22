@@ -27,23 +27,16 @@ const getOne = async (req, res) => {
 };
 
 const create = async (req, res) => {
-  const { userId, spentAt, title, amount, category, note } = req.body;
-  const user = await getById(userId);
+  const body = req.body;
+  const user = await getById(body.userId);
 
-  if (!user || !spentAt || !title || !amount) {
+  if (!user) {
     res.sendStatus(HTTP_STATUS_CODES.BAD_REQUEST);
 
     return;
   }
 
-  const expense = await expensesService.create({
-    userId,
-    spentAt,
-    title,
-    amount,
-    category,
-    note,
-  });
+  const expense = await expensesService.create(body);
 
   res.statusCode = HTTP_STATUS_CODES.CREATED;
   res.send(expense);

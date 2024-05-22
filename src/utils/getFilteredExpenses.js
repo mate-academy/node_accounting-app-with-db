@@ -11,12 +11,6 @@ const getFilteredExpenses = ({ userId, categories, from, to }) => {
     queryFilters.category = categories;
   }
 
-  // if (from && to) {
-  //   queryFilters.spentAt = {
-  //     [Op.between]: [from, to],
-  //   };
-  // }
-
   if (from || to) {
     queryFilters.spentAt = {};
 
