@@ -7,7 +7,7 @@ const createExpense = async (req, res) => {
   const { userId, spentAt, title, amount, category, note } = req.body;
 
   try {
-    if (!userId || !spentAt || !title || !amount || !category) {
+    if (!userId || !spentAt || !title || !amount) {
       return res.status(400).json({ message: 'Missing required parameters' });
     }
 
