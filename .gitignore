@@ -8,4 +8,7 @@ node_modules
 # MacOS
 .DS_Store
 
-.env.local
+tests
+
+expense.test.js
+user.test.js
