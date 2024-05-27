@@ -8,6 +8,7 @@ const Expense = sequelize.define(
   {
     id: {
       type: DataTypes.INTEGER,
+      autoIncrement: true,
       primaryKey: true,
     },
     userId: {
@@ -38,8 +39,8 @@ const Expense = sequelize.define(
   },
   {
     tableName: 'expenses',
-    // createdAt: false,
-    // updatedAt: false,
+    createdAt: false,
+    updatedAt: false,
   },
 );
 

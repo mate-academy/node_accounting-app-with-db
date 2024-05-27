@@ -1,18 +1,36 @@
 /* eslint-disable function-paren-newline */
 const { Expense } = require('../models/Expense.model');
-const Match = require('../filterExp');
 
-const allExpenses = async (id, categories, from, to) => {
-  const fromDate = from
-    ? new Date(from).toISOString()
-    : new Date(0).toISOString();
+const allExpenses = async (userId, categories, from, to) => {
+  try {
+    const filter = {};
 
-  const toDate = to ? new Date(to).toISOString() : new Date().toISOString();
-  const result = await Expense.findAll();
+    if (userId) {
+      filter.userId = userId;
+    }
 
-  return result.filter((expense) =>
-    Match.isExpenseMatch(expense, id, categories, fromDate, toDate),
-  );
+    if (categories) {
+      filter.category = categories;
+    }
+
+    if (from || to) {
+      filter.spentAt = {};
+
+      if (from) {
+        filter.spentAt['$gte'] = from;
+      }
+
+      if (to) {
+        filter.spentAt['$lte'] = to;
+      }
+    }
+
+    const expenses = await Expense.findAll({ where: filter });
+
+    return expenses;
+  } catch (error) {
+    return error;
+  }
 };
 
 const expenseById = async (id) => {

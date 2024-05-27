@@ -18,9 +18,7 @@ const userById = async (id) => {
 };
 
 const createUser = (name) => {
-  const id = Math.floor(Math.random() * 10000);
-
-  return User.create({ id, name });
+  return User.create({ name });
 };
 
 const deleteUser = async (id) => {
@@ -44,24 +42,3 @@ module.exports = {
   normalize,
   clearUsers,
 };
-
-// const clearUsers = (usrs) => {
-//   usrs = [];
-// };
-// let users = [];
-
-// const result = await client.query(`SELECT * FROM users`);
-
-// const read = async () => {
-//   const filePath = path.resolve('data', 'users.json');
-
-//   const data = await fs.readFile(filePath, 'utf-8');
-
-//   return JSON.parse(data);
-// };
-
-// const write = async (usrs) => {
-//   const filePath = path.resolve('data', 'users.json');
-
-//   await fs.writeFile(filePath, JSON.stringify(usrs), 'utf-8');
-// };
