@@ -1,7 +1,7 @@
 const expenseService = require('../services/expense.service');
 const userService = require('../services/user.service');
-const { Expense } = require('../models/Expense.model');
 const STATUS_CODES = require('../constant/statusCode');
+const { validateExpense } = require('../function/validation');
 
 const getAll = async (req, res) => {
   const expense = await expenseService.getAll(req.query);
@@ -23,21 +23,11 @@ const getById = async (req, res) => {
 };
 
 const postExpense = async (req, res) => {
-  const { userId, spentAt, title, amount } = req.body;
+  const { userId } = req.body;
 
-  if (!(await userService.getById(userId))) {
-    res.sendStatus(STATUS_CODES.badRequest);
+  const validation = await validateExpense(req.body);
 
-    return;
-  }
-
-  if (
-    !spentAt ||
-    !title ||
-    typeof title !== 'string' ||
-    !amount ||
-    typeof amount !== 'number'
-  ) {
+  if (!validation.isValid || !(await userService.getById(userId))) {
     return res.sendStatus(STATUS_CODES.badRequest);
   }
 
@@ -72,7 +62,7 @@ const updateExpense = async (req, res) => {
 
   await expenseService.update(id, req.body);
 
-  const findExpense = await Expense.findByPk(expenseId);
+  const findExpense = await expenseService.getById(expenseId);
 
   res.statusCode = STATUS_CODES.successful;
   res.send(findExpense);

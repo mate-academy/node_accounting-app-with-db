@@ -39,7 +39,7 @@ const deleteUser = async (req, res) => {
     return res.sendStatus(STATUS_CODES.notFound);
   }
 
-  userService.remove(id);
+  await userService.remove(id);
 
   return res.sendStatus(STATUS_CODES.noContent);
 };
@@ -61,7 +61,7 @@ const updateUser = async (req, res) => {
 
   await User.update({ name }, { where: { id } });
 
-  const findUser = await User.findByPk(userId);
+  const findUser = await userService.getById(userId);
 
   res.statusCode = STATUS_CODES.successful;
   res.send(findUser);

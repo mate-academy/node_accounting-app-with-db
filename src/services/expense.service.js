@@ -7,9 +7,8 @@ const getAll = async (query) => {
   return Expense.findAll({ where: filters });
 };
 
-const getById = async (userID) => {
-  // return expenses.find((expense) => expense.id === Number(userID)) || null;
-  return Expense.findByPk(userID);
+const getById = async (id) => {
+  return Expense.findByPk(id);
 };
 
 const create = async ({
@@ -39,9 +38,6 @@ const remove = async (id) => {
 };
 
 const update = async (id, data) => {
-  // const expenseIndex = expenses.findIndex(
-  //   (expense) => expense.id === Number(id),
-  // );
   const { userId, spentAt, title, amount, category } = data;
 
   await Expense.update(
@@ -54,9 +50,6 @@ const update = async (id, data) => {
     },
     { where: { id } },
   );
-  // expenses[expenseIndex] = { ...expenses[expenseIndex], ...data };
-
-  // return expenses[expenseIndex];
 };
 
 module.exports = {
