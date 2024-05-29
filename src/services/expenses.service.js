@@ -1,10 +1,45 @@
-const { getPreparedExpenses } = require('../utils/getPreparedExpenses');
+const { Op } = require('sequelize');
 const { Expense } = require('../models/Expense.model');
 
 const getAll = async (query = null) => {
-  const expenses = await Expense.findAll();
+  const whereConditions = {};
 
-  return getPreparedExpenses(query, expenses);
+  Object.entries(query).forEach(([key, value]) => {
+    if (
+      key !== 'from' &&
+      key !== 'to' &&
+      key !== 'categories' &&
+      value !== null &&
+      value !== undefined
+    ) {
+      whereConditions[key] = value;
+    }
+
+    if (key === 'categories') {
+      whereConditions.category = value;
+    }
+  });
+
+  if (query.from && query.to) {
+    whereConditions.spentAt = {
+      [Op.gte]: new Date(query.from),
+      [Op.lte]: new Date(query.to),
+    };
+  } else if (query.from) {
+    whereConditions.spentAt = {
+      [Op.gte]: new Date(query.from),
+    };
+  } else if (query.to) {
+    whereConditions.spentAt = {
+      [Op.lte]: new Date(query.to),
+    };
+  }
+
+  const expenses = await Expense.findAll({
+    where: whereConditions,
+  });
+
+  return expenses;
 };
 
 const getOneById = async (id) => {
