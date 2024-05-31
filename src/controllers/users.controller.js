@@ -13,7 +13,7 @@ const getOne = async (req, res) => {
   const user = await userService.getOne(id);
 
   if (!user) {
-    return res.sendStatus(404);
+    return res.sendStatus(status.NOT_FOUND);
   }
   res.send(userService.normalize(user));
 };
@@ -22,7 +22,7 @@ const create = async (req, res) => {
   const { name } = req.body;
 
   if (!name) {
-    return res.sendStatus(400);
+    return res.sendStatus(status.BAD_REQUEST);
   }
 
   const user = await userService.createOne({ name });
@@ -45,7 +45,7 @@ const remove = async (req, res) => {
   const user = await userService.getOne(id);
 
   if (!user) {
-    return res.sendStatus(404);
+    return res.sendStatus(status.NOT_FOUND);
   }
 
   const deleted = await userService.deleteOne(id);

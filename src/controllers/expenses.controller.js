@@ -3,46 +3,30 @@ const expensesService = require('../services/expenses.service');
 const userService = require('../services/users.service');
 
 const getAll = async (req, res) => {
-  const { userId, categories, from, to } = req.query;
+  const expenses = await expensesService.getAll(req);
 
-  const expenses = await expensesService.getAll();
-  let returnData = [...expenses];
-
-  if (userId) {
-    returnData = returnData.filter(
-      (e) => e.userId.toString() === userId.toString(),
-    );
-  }
-
-  if (categories) {
-    returnData = returnData.filter((e) => e.category === categories);
-  }
-
-  if (from && to) {
-    const fromDate = new Date(from);
-    const toDate = new Date(to);
-
-    returnData = returnData.filter(
-      (e) => new Date(e.spentAt) >= fromDate && new Date(e.spentAt) <= toDate,
-    );
-  }
-
-  res.send(returnData.map((e) => expensesService.normalize(e)));
+  res.statusCode = status.OK;
+  res.send(expenses);
 };
 
 const getOne = async (req, res) => {
   const { id } = req.params;
+
+  if (!id) {
+    res.status(status.BAD_REQUEST);
+  }
+
   const expense = await expensesService.getOne(id);
 
   if (!expense) {
     return res.sendStatus(status.NOT_FOUND);
   }
-  res.send(expensesService.normalize(expense));
+  res.send(expense);
 };
 
 const create = async (req, res) => {
-  const { title, spentAt, userId, amount, category, note } = req.body;
-  const isParamsValid = !title || !amount || !spentAt || !userId;
+  const { title, spentAt, userId, amount } = req.body;
+  const isParamsValid = !title || !amount || !spentAt;
 
   if (isParamsValid) {
     return res.sendStatus(status.BAD_REQUEST);
@@ -54,36 +38,40 @@ const create = async (req, res) => {
     return res.sendStatus(status.BAD_REQUEST);
   }
 
-  const expense = await expensesService.createOne({
-    title,
-    spentAt,
-    userId,
-    amount,
-    category,
-    note,
-  });
+  try {
+    const newExpense = await expensesService.createOne(req.body);
 
-  res.status(status.CREATED).send(expensesService.normalize(expense));
+    res.statusCode = status.CREATED;
+    res.send(newExpense);
+  } catch (error) {
+    res.sendStatus(status.NOT_FOUND);
+  }
 };
 
 const update = async (req, res) => {
   const { id } = req.params;
-  const expense = await expensesService.updateOne(id, req.body);
+  let expense = await expensesService.getOne(id);
+
+  if (!expense) {
+    return res.sendStatus(status.NOT_FOUND);
+  }
+  expense = await expensesService.updateOne(id, req.body);
 
   if (!expense) {
     return res.sendStatus(status.NOT_FOUND);
   }
 
-  res.status(status.OK).send(expensesService.normalize(expense));
+  res.status(status.OK).send(expense);
 };
 
 const remove = async (req, res) => {
   const { id } = req.params;
-  const deleted = await expensesService.deleteOne(id);
+  const expense = await expensesService.getOne(+id);
 
-  if (!deleted) {
+  if (!expense) {
     return res.sendStatus(status.NOT_FOUND);
   }
+  await expensesService.deleteOne(id);
 
   res.sendStatus(status.NO_CONTENT);
 };

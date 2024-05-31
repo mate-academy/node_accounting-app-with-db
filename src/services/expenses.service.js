@@ -1,36 +1,33 @@
 const { Expense } = require('../models/Expense.model.js');
+const { Op } = require('sequelize');
 
-const normalize = ({ id, userId, spentAt, title, amount, category, note }) => {
-  return {
-    id,
-    userId,
-    spentAt,
-    title,
-    amount,
-    category,
-    note,
-  };
-};
+async function getAll(req) {
+  const { userId, categories, from, to } = req.query;
+  const where = {};
 
-async function getAll() {
-  const result = await Expense.findAll();
+  if (userId) {
+    where.userId = userId;
+  }
 
-  return result;
+  if (categories) {
+    where.category = categories;
+  }
+
+  if (from && to) {
+    where.spentAt = { [Op.between]: [from, to] };
+  }
+
+  const expense = await Expense.findAll({ where });
+
+  return expense;
 }
 
 async function getOne(id) {
   return Expense.findByPk(id);
 }
 
-async function createOne({ userId, spentAt, title, amount, category, note }) {
-  return Expense.create({
-    userId,
-    spentAt,
-    title,
-    amount,
-    category,
-    note,
-  });
+async function createOne(expense) {
+  return Expense.create(expense);
 }
 
 async function updateOne(
@@ -53,14 +50,11 @@ async function updateOne(
 }
 
 async function deleteOne(id) {
-  await Expense.destroy({ where: { id } });
-
-  return true;
+  return Expense.destroy({ where: { id } });
 }
 
 module.exports = {
   Expense,
-  normalize,
   getAll,
   getOne,
   createOne,
