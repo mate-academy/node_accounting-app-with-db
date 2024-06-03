@@ -31,8 +31,6 @@ const create = async (req, res) => {
 
   const user = await userService.create(name);
 
-  res.statusCode = 201;
-
   res.status(201).send(user);
 };
 

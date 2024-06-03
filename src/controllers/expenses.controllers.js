@@ -1,5 +1,14 @@
 const expensesService = require('../services/expenses.services');
 
+const statusCode = {
+  OK: 200,
+  CREATED: 201,
+  NO_CONTENT: 204,
+  BAD_REQUEST: 400,
+  NOT_FOUND: 404,
+  INTERNAL_SERVER_ERROR: 500,
+};
+
 const getAll = async (req, res) => {
   const query = req.query;
   const expenses = await expensesService.get(query);
@@ -12,12 +21,12 @@ const getOne = async (req, res) => {
   const expense = await expensesService.getById(id);
 
   if (!expense) {
-    res.sendStatus(404);
+    res.sendStatus(statusCode.NOT_FOUND);
 
     return;
   }
 
-  res.statusCode = 200;
+  res.statusCode = statusCode;
   res.send(expense);
 };
 
@@ -26,15 +35,19 @@ const add = async (req, res) => {
   const userId = parseInt(body.userId);
 
   if (!userId) {
-    res.sendStatus(400);
+    res.sendStatus(statusCode.BAD_REQUEST);
 
     return;
   }
 
-  const expense = await expensesService.add(body);
+  try {
+    const expense = await expensesService.add(body);
 
-  res.statusCode = 201;
-  res.send(expense);
+    res.statusCode = statusCode.CREATED;
+    res.send(expense);
+  } catch (error) {
+    res.status(statusCode.INTERNAL_SERVER_ERROR).send(error.message);
+  }
 };
 
 const remove = async (req, res) => {
@@ -43,9 +56,9 @@ const remove = async (req, res) => {
   try {
     await expensesService.remove(id);
 
-    res.sendStatus(204);
+    res.sendStatus(statusCode.NO_CONTENT);
   } catch (error) {
-    res.sendStatus(404);
+    res.sendStatus(statusCode.NOT_FOUND);
   }
 };
 
@@ -55,15 +68,19 @@ const update = async (req, res) => {
   const expense = await expensesService.getById(id);
 
   if (!expense) {
-    res.sendStatus(404);
+    res.sendStatus(statusCode.NOT_FOUND);
 
     return;
   }
 
-  const updatedExpense = await expensesService.update(expense.id, body);
+  try {
+    const updatedExpense = await expensesService.update(expense.id, body);
 
-  res.statusCode = 200;
-  res.send(updatedExpense);
+    res.statusCode = statusCode.OK;
+    res.send(updatedExpense);
+  } catch (error) {
+    res.status(statusCode.INTERNAL_SERVER_ERROR).send(error.message);
+  }
 };
 
 module.exports = {
