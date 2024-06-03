@@ -1,13 +1,5 @@
 const expensesService = require('../services/expenses.services');
-
-const statusCode = {
-  OK: 200,
-  CREATED: 201,
-  NO_CONTENT: 204,
-  BAD_REQUEST: 400,
-  NOT_FOUND: 404,
-  INTERNAL_SERVER_ERROR: 500,
-};
+const { statusCode } = require('../helpers/statusCode');
 
 const getAll = async (req, res) => {
   const query = req.query;
@@ -26,7 +18,7 @@ const getOne = async (req, res) => {
     return;
   }
 
-  res.statusCode = statusCode;
+  res.statusCode = 200;
   res.send(expense);
 };
 
@@ -40,14 +32,10 @@ const add = async (req, res) => {
     return;
   }
 
-  try {
-    const expense = await expensesService.add(body);
+  const expense = await expensesService.add(body);
 
-    res.statusCode = statusCode.CREATED;
-    res.send(expense);
-  } catch (error) {
-    res.status(statusCode.INTERNAL_SERVER_ERROR).send(error.message);
-  }
+  res.statusCode = statusCode.CREATED;
+  res.send(expense);
 };
 
 const remove = async (req, res) => {
@@ -73,14 +61,10 @@ const update = async (req, res) => {
     return;
   }
 
-  try {
-    const updatedExpense = await expensesService.update(expense.id, body);
+  const updatedExpense = await expensesService.update(expense.id, body);
 
-    res.statusCode = statusCode.OK;
-    res.send(updatedExpense);
-  } catch (error) {
-    res.status(statusCode.INTERNAL_SERVER_ERROR).send(error.message);
-  }
+  res.statusCode = statusCode.OK;
+  res.send(updatedExpense);
 };
 
 module.exports = {

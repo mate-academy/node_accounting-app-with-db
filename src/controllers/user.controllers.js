@@ -1,4 +1,5 @@
 const userService = require('../services/user.services');
+const { statusCode } = require('../helpers/statusCode');
 
 const getAll = async (req, res) => {
   const users = await userService.getAll();
@@ -12,26 +13,26 @@ const getOne = async (req, res) => {
   const user = await userService.getUserById(id);
 
   if (!user) {
-    res.sendStatus(404);
+    res.sendStatus(statusCode.NOT_FOUND);
 
     return;
   }
 
-  res.status(200).send(user);
+  res.status(statusCode.OK).send(user);
 };
 
 const create = async (req, res) => {
   const { name } = req.body;
 
   if (!name) {
-    res.sendStatus(400);
+    res.sendStatus(statusCode.BAD_REQUEST);
 
     return;
   }
 
   const user = await userService.create(name);
 
-  res.status(201).send(user);
+  res.status(statusCode.CREATED).send(user);
 };
 
 const remove = async (req, res) => {
@@ -40,14 +41,14 @@ const remove = async (req, res) => {
   const user = await userService.getUserById(id);
 
   if (!user) {
-    res.sendStatus(404);
+    res.sendStatus(statusCode.NOT_FOUND);
 
     return;
   }
 
   userService.remove(id);
 
-  res.sendStatus(204);
+  res.sendStatus(statusCode.NO_CONTENT);
 };
 
 const update = async (req, res) => {
@@ -57,13 +58,13 @@ const update = async (req, res) => {
   const user = userService.getUserById(id);
 
   if (!user) {
-    res.sendStatus(404);
+    res.sendStatus(statusCode.NOT_FOUND);
 
     return;
   }
 
   if (typeof name !== 'string') {
-    res.sendStatus(422);
+    res.sendStatus(statusCode.UNPROCESSABLE_ENTITY);
 
     return;
   }
