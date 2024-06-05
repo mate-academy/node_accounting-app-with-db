@@ -23,6 +23,12 @@ const create = async (req, res) => {
 const getOne = async (req, res) => {
   const { id } = req.params;
 
+  if (!id) {
+    res.sendStatus(400);
+
+    return;
+  }
+
   const expense = await expensesService.getById(id);
 
   if (!expense) {
@@ -37,6 +43,12 @@ const getOne = async (req, res) => {
 const remove = async (req, res) => {
   const { id } = req.params;
 
+  if (!id) {
+    res.sendStatus(400);
+
+    return;
+  }
+
   if (!(await expensesService.getById(id))) {
     res.sendStatus(404);
 
@@ -49,7 +61,12 @@ const remove = async (req, res) => {
 
 const update = async (req, res) => {
   const { id } = req.params;
-  const data = req.body;
+
+  if (!id) {
+    res.sendStatus(400);
+
+    return;
+  }
 
   const expense = await expensesService.getById(id);
 
@@ -58,6 +75,8 @@ const update = async (req, res) => {
 
     return;
   }
+
+  const data = req.body;
 
   if (!data) {
     res.sendStatus(400);

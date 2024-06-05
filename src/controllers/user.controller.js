@@ -19,6 +19,13 @@ const create = async (req, res) => {
 
 const getOne = async (req, res) => {
   const { id } = req.params;
+
+  if (!id) {
+    res.sendStatus(400);
+
+    return;
+  }
+
   const user = await userServices.getById(id);
 
   if (!user) {
@@ -33,6 +40,12 @@ const getOne = async (req, res) => {
 const remove = async (req, res) => {
   const { id } = req.params;
 
+  if (!id) {
+    res.sendStatus(400);
+
+    return;
+  }
+
   if (!(await userServices.getById(id))) {
     res.sendStatus(404);
 
@@ -45,18 +58,25 @@ const remove = async (req, res) => {
 
 const update = async (req, res) => {
   const { id } = req.params;
+
+  if (!id) {
+    res.sendStatus(400);
+
+    return;
+  }
+
   const { name } = req.body;
+
+  if (!name || typeof name !== 'string') {
+    res.sendStatus(400);
+
+    return;
+  }
 
   const user = await userServices.getById(id);
 
   if (!user) {
     res.sendStatus(404);
-
-    return;
-  }
-
-  if (typeof name !== 'string') {
-    res.sendStatus(400);
 
     return;
   }
