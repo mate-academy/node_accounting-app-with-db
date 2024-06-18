@@ -43,7 +43,8 @@ describe('User', () => {
       console.log(HOST);
     });
 
-    await User.destroy({ truncate: true });
+    // i added cascade so destroy work corectly with associations
+    await User.destroy({ truncate: true, cascade: true });
   });
 
   afterEach(async () => {

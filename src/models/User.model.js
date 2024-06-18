@@ -1,9 +1,20 @@
 'use strict';
 
+const { DataTypes } = require('sequelize');
 const { sequelize } = require('../db.js');
 
 const User = sequelize.define(
-  // your code goes here
+  'User',
+  {
+    name: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
+  },
+  {
+    createdAt: false,
+    updatedAt: false,
+  },
 );
 
 module.exports = {
