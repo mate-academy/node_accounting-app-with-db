@@ -1,0 +1,22 @@
+{
+    "sourceFile": ".gitignore",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1718791972967,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1718791997517,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -5,7 +5,5 @@\n # Node\n node_modules\n \n # MacOS\n-.DS_Store\n-\n-db.js\n\\ No newline at end of file\n+.DS_Store\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1718791972967,
+            "name": "Commit-0",
+            "content": "# IDE\n.idea\n.vscode\n\n# Node\nnode_modules\n\n# MacOS\n.DS_Store\n\ndb.js"
+        }
+    ]
+}

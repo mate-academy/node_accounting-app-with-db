@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/models/User.model.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1718789329967,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1718790745061,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,11 +1,21 @@\n 'use strict';\n \n-const { DataTypes } = require('sequelize')\n+const { DataTypes } = require('sequelize');\n const { sequelize } = require('../db.js');\n \n const User = sequelize.define(\n-  // your code goes here\n+  'User',\n+  {\n+    name: {\n+      type: DataTypes.STRING,\n+      allowNull: false,\n+    },\n+  },\n+  {\n+    createdAt: false,\n+    updatedAt: false,\n+  },\n );\n \n module.exports = {\n   User,\n"
+                }
+            ],
+            "date": 1718789329967,
+            "name": "Commit-0",
+            "content": "'use strict';\n\nconst { DataTypes } = require('sequelize')\nconst { sequelize } = require('../db.js');\n\nconst User = sequelize.define(\n  // your code goes here\n);\n\nmodule.exports = {\n  User,\n};\n"
+        }
+    ]
+}

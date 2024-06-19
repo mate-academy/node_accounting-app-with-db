@@ -1,0 +1,50 @@
+{
+    "sourceFile": "src/controllers/users.controller.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 8,
+            "patches": [
+                {
+                    "date": 1718790011917,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1718790056801,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,10 +1,14 @@\n const userService = require('../services/users.service');\n \n const getAllUsers = async (_req, res) => {\n-  const users = await userService.getUsers();\n+  try {\n+    const users = await userService.getUsers();\n \n-  res.send(users);\n+    res.send(users);\n+  } catch (error) {\n+    res.status(400).send(error.message);\n+  }\n };\n \n const getOneUser = async (req, res) => {\n   const { id } = req.params;\n"
+                },
+                {
+                    "date": 1718790093821,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -11,14 +11,16 @@\n };\n \n const getOneUser = async (req, res) => {\n   const { id } = req.params;\n-  const user = await userService.getUser(+id);\n-\n-  if (user) {\n-    res.send(user);\n-  } else {\n-    res.sendStatus(404);\n+  try {\n+    const user = await userService.getUser(+id);\n+    \n+    if (user) {\n+      res.send(user);\n+    } else {\n+      res.sendStatus(404);\n+    }\n   }\n };\n \n const addUser = async (req, res) => {\n"
+                },
+                {
+                    "date": 1718790201289,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -13,14 +13,16 @@\n const getOneUser = async (req, res) => {\n   const { id } = req.params;\n   try {\n     const user = await userService.getUser(+id);\n-    \n+\n     if (user) {\n       res.send(user);\n     } else {\n       res.sendStatus(404);\n     }\n+  } catch (error) {\n+    res.status(400).send(error.message);\n   }\n };\n \n const addUser = async (req, res) => {\n@@ -41,12 +43,12 @@\n \n   try {\n     const user = userService.updateUser(+id, userData);\n \n-    if (!user) {\n+    if (user) {\n+      return;\n+    } else {\n       res.sendStatus(404);\n-\n-      return;\n     }\n \n     res.send(user);\n   } catch (error) {\n"
+                },
+                {
+                    "date": 1718790218312,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,77 @@\n+const userService = require('../services/users.service');\n+\n+const getAllUsers = async (_req, res) => {\n+  try {\n+    const users = await userService.getUsers();\n+\n+    res.send(users);\n+  } catch (error) {\n+    res.status(400).send(error.message);\n+  }\n+};\n+\n+const getOneUser = async (req, res) => {\n+  const { id } = req.params;\n+  try {\n+    const user = await userService.getUser(+id);\n+\n+    if (user) {\n+      res.send(user);\n+    } else {\n+      res.sendStatus(404);\n+    }\n+  } catch (error) {\n+    res.status(400).send(error.message);\n+  }\n+};\n+\n+const addUser = async (req, res) => {\n+  const userData = req.body;\n+\n+  try {\n+    const user = await userService.addUser(userData);\n+\n+    res.status(201).send(user);\n+  } catch (error) {\n+    res.status(400).send(error.message);\n+  }\n+};\n+\n+const updateUser = (req, res) => {\n+  const { id } = req.params;\n+  const userData = req.body;\n+\n+  try {\n+    const user = userService.updateUser(+id, userData);\n+\n+    if (user) {\n+      res.send(user);\n+    } else {\n+      res.sendStatus(404);\n+    }\n+\n+    res.send(user);\n+  } catch (error) {\n+    res.statusMessage(error.message).sendStatus(400);\n+  }\n+};\n+\n+const deleteUser = (req, res) => {\n+  const { id } = req.params;\n+\n+  const didDelete = userService.deleteUser(+id);\n+\n+  if (didDelete) {\n+    res.sendStatus(204);\n+  } else {\n+    res.sendStatus(404);\n+  }\n+};\n+\n+module.exports = {\n+  getAllUsers,\n+  getOneUser,\n+  addUser,\n+  deleteUser,\n+  updateUser,\n+};\n"
+                },
+                {
+                    "date": 1718790249489,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -48,92 +48,13 @@\n       res.send(user);\n     } else {\n       res.sendStatus(404);\n     }\n-\n-    res.send(user);\n   } catch (error) {\n-    res.statusMessage(error.message).sendStatus(400);\n-  }\n-};\n-\n-const deleteUser = (req, res) => {\n-  const { id } = req.params;\n-\n-  const didDelete = userService.deleteUser(+id);\n-\n-  if (didDelete) {\n-    res.sendStatus(204);\n-  } else {\n-    res.sendStatus(404);\n-  }\n-};\n-\n-module.exports = {\n-  getAllUsers,\n-  getOneUser,\n-  addUser,\n-  deleteUser,\n-  updateUser,\n-};\n-const userService = require('../services/users.service');\n-\n-const getAllUsers = async (_req, res) => {\n-  try {\n-    const users = await userService.getUsers();\n-\n-    res.send(users);\n-  } catch (error) {\n     res.status(400).send(error.message);\n   }\n };\n \n-const getOneUser = async (req, res) => {\n-  const { id } = req.params;\n-  try {\n-    const user = await userService.getUser(+id);\n-\n-    if (user) {\n-      res.send(user);\n-    } else {\n-      res.sendStatus(404);\n-    }\n-  } catch (error) {\n-    res.status(400).send(error.message);\n-  }\n-};\n-\n-const addUser = async (req, res) => {\n-  const userData = req.body;\n-\n-  try {\n-    const user = await userService.addUser(userData);\n-\n-    res.status(201).send(user);\n-  } catch (error) {\n-    res.status(400).send(error.message);\n-  }\n-};\n-\n-const updateUser = (req, res) => {\n-  const { id } = req.params;\n-  const userData = req.body;\n-\n-  try {\n-    const user = userService.updateUser(+id, userData);\n-\n-    if (user) {\n-      return;\n-    } else {\n-      res.sendStatus(404);\n-    }\n-\n-    res.send(user);\n-  } catch (error) {\n-    res.statusMessage(error.message).sendStatus(400);\n-  }\n-};\n-\n const deleteUser = (req, res) => {\n   const { id } = req.params;\n \n   const didDelete = userService.deleteUser(+id);\n"
+                },
+                {
+                    "date": 1718790319584,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -53,17 +53,21 @@\n     res.status(400).send(error.message);\n   }\n };\n \n-const deleteUser = (req, res) => {\n+const deleteUser = async (req, res) => {\n   const { id } = req.params;\n \n-  const didDelete = userService.deleteUser(+id);\n+  try {\n+    const didDelete = await userService.deleteUser(+id);\n \n-  if (didDelete) {\n-    res.sendStatus(204);\n-  } else {\n-    res.sendStatus(404);\n+    if (didDelete) {\n+      res.sendStatus(204);\n+    } else {\n+      res.sendStatus(404);\n+    }\n+  } catch (error) {\n+    res.status(404).send(error.message);\n   }\n };\n \n module.exports = {\n"
+                },
+                {
+                    "date": 1718790343278,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -11,8 +11,9 @@\n };\n \n const getOneUser = async (req, res) => {\n   const { id } = req.params;\n+\n   try {\n     const user = await userService.getUser(+id);\n \n     if (user) {\n"
+                },
+                {
+                    "date": 1718793135148,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -37,14 +37,14 @@\n     res.status(400).send(error.message);\n   }\n };\n \n-const updateUser = (req, res) => {\n+const updateUser = async (req, res) => {\n   const { id } = req.params;\n   const userData = req.body;\n \n   try {\n-    const user = userService.updateUser(+id, userData);\n+    const user = await userService.updateUser(+id, userData);\n \n     if (user) {\n       res.send(user);\n     } else {\n"
+                }
+            ],
+            "date": 1718790011917,
+            "name": "Commit-0",
+            "content": "const userService = require('../services/users.service');\n\nconst getAllUsers = async (_req, res) => {\n  const users = await userService.getUsers();\n\n  res.send(users);\n};\n\nconst getOneUser = async (req, res) => {\n  const { id } = req.params;\n  const user = await userService.getUser(+id);\n\n  if (user) {\n    res.send(user);\n  } else {\n    res.sendStatus(404);\n  }\n};\n\nconst addUser = async (req, res) => {\n  const userData = req.body;\n\n  try {\n    const user = await userService.addUser(userData);\n\n    res.status(201).send(user);\n  } catch (error) {\n    res.status(400).send(error.message);\n  }\n};\n\nconst updateUser = (req, res) => {\n  const { id } = req.params;\n  const userData = req.body;\n\n  try {\n    const user = userService.updateUser(+id, userData);\n\n    if (!user) {\n      res.sendStatus(404);\n\n      return;\n    }\n\n    res.send(user);\n  } catch (error) {\n    res.statusMessage(error.message).sendStatus(400);\n  }\n};\n\nconst deleteUser = (req, res) => {\n  const { id } = req.params;\n\n  const didDelete = userService.deleteUser(+id);\n\n  if (didDelete) {\n    res.sendStatus(204);\n  } else {\n    res.sendStatus(404);\n  }\n};\n\nmodule.exports = {\n  getAllUsers,\n  getOneUser,\n  addUser,\n  deleteUser,\n  updateUser,\n};\n"
+        }
+    ]
+}

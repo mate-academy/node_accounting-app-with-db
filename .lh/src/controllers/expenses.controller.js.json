@@ -1,0 +1,46 @@
+{
+    "sourceFile": "src/controllers/expenses.controller.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 7,
+            "patches": [
+                {
+                    "date": 1718789828880,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1718789843279,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -30,26 +30,26 @@\n     res.sendStatus(404);\n   }\n };\n \n-const addExpense = (req, res) => {\n+const addExpense = async (req, res) => {\n   const expenseData = req.body;\n \n   try {\n-    const expense = expensesService.addExpense(expenseData);\n+    const expense = await expensesService.addExpense(expenseData);\n \n     res.status(201).send(expense);\n   } catch (error) {\n     res.status(400).send(error.message);\n   }\n };\n \n-const updateExpense = (req, res) => {\n+const updateExpense = async (req, res) => {\n   const expenseData = req.body;\n   const { id } = req.params;\n \n   try {\n-    const expense = expensesService.updateExpense(+id, expenseData);\n+    const expense = await expensesService.updateExpense(+id, expenseData);\n \n     if (expense) {\n       res.send(expense);\n     } else {\n"
+                },
+                {
+                    "date": 1718789851007,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -59,11 +59,11 @@\n     res.status(400).send(error.message);\n   }\n };\n \n-const deleteExpense = (req, res) => {\n+const deleteExpense = async (req, res) => {\n   const { id } = req.params;\n-  const didSucceed = expensesService.deleteExpense(+id);\n+  const didSucceed = await expensesService.deleteExpense(+id);\n \n   if (didSucceed) {\n     res.sendStatus(204);\n   } else {\n"
+                },
+                {
+                    "date": 1718789931773,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -61,14 +61,16 @@\n };\n \n const deleteExpense = async (req, res) => {\n   const { id } = req.params;\n-  const didSucceed = await expensesService.deleteExpense(+id);\n-\n-  if (didSucceed) {\n-    res.sendStatus(204);\n-  } else {\n-    res.sendStatus(404);\n+  try {\n+    const didSucceed = await expensesService.deleteExpense(+id);\n+    \n+    if (didSucceed) {\n+      res.sendStatus(204);\n+    } else {\n+      res.sendStatus(404);\n+    }\n   }\n };\n \n module.exports = {\n"
+                },
+                {
+                    "date": 1718789953730,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -63,14 +63,16 @@\n const deleteExpense = async (req, res) => {\n   const { id } = req.params;\n   try {\n     const didSucceed = await expensesService.deleteExpense(+id);\n-    \n+\n     if (didSucceed) {\n       res.sendStatus(204);\n     } else {\n       res.sendStatus(404);\n     }\n+  } catch (error) {\n+    res.status(400).send(error.message);\n   }\n };\n \n module.exports = {\n"
+                },
+                {
+                    "date": 1718789968335,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -61,8 +61,9 @@\n };\n \n const deleteExpense = async (req, res) => {\n   const { id } = req.params;\n+\n   try {\n     const didSucceed = await expensesService.deleteExpense(+id);\n \n     if (didSucceed) {\n"
+                },
+                {
+                    "date": 1718792782432,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,15 +1,13 @@\n const expensesService = require('../services/expenses.service');\n \n const getExpenses = async (req, res) => {\n   const { userId, categories, from, to } = req.query;\n-  const arrCategories =\n-    categories && !Array.isArray(categories) ? [categories] : categories;\n \n   try {\n     const expenses = await expensesService.getExpenses(\n       +userId,\n-      arrCategories,\n+      categories,\n       from,\n       to,\n     );\n \n"
+                },
+                {
+                    "date": 1718792836054,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,86 @@\n+const expensesService = require('../services/expenses.service');\n+\n+const getExpenses = async (req, res) => {\n+  const { userId, categories, from, to } = req.query;\n+\n+  try {\n+    const expenses = await expensesService.getExpenses(\n+      +userId,\n+      categories,\n+      from,\n+      to,\n+    );\n+\n+    res.send(expenses);\n+  } catch (error) {\n+    res.status(400).send(error.message);\n+  }\n+};\n+\n+const getOneExpense = async (req, res) => {\n+  const { id } = req.params;\n+  try {\n+    const expense = await expensesService.getExpense(+id);\n+\n+    if (expense) {\n+      res.send(expense);\n+    } else {\n+      res.sendStatus(404);\n+    }\n+  } catch (error) {\n+    res.status(400).send(error.message);\n+  }\n+};\n+\n+const addExpense = async (req, res) => {\n+  const expenseData = req.body;\n+\n+  try {\n+    const expense = await expensesService.addExpense(expenseData);\n+\n+    res.status(201).send(expense);\n+  } catch (error) {\n+    res.status(400).send(error.message);\n+  }\n+};\n+\n+const updateExpense = async (req, res) => {\n+  const expenseData = req.body;\n+  const { id } = req.params;\n+\n+  try {\n+    const expense = await expensesService.updateExpense(+id, expenseData);\n+\n+    if (expense) {\n+      res.send(expense);\n+    } else {\n+      res.sendStatus(404);\n+    }\n+  } catch (error) {\n+    res.status(400).send(error.message);\n+  }\n+};\n+\n+const deleteExpense = async (req, res) => {\n+  const { id } = req.params;\n+\n+  try {\n+    const didSucceed = await expensesService.deleteExpense(+id);\n+\n+    if (didSucceed) {\n+      res.sendStatus(204);\n+    } else {\n+      res.sendStatus(404);\n+    }\n+  } catch (error) {\n+    res.status(400).send(error.message);\n+  }\n+};\n+\n+module.exports = {\n+  getExpenses,\n+  getOneExpense,\n+  addExpense,\n+  deleteExpense,\n+  updateExpense,\n+};\n"
+                }
+            ],
+            "date": 1718789828880,
+            "name": "Commit-0",
+            "content": "const expensesService = require('../services/expenses.service');\n\nconst getExpenses = async (req, res) => {\n  const { userId, categories, from, to } = req.query;\n  const arrCategories =\n    categories && !Array.isArray(categories) ? [categories] : categories;\n\n  try {\n    const expenses = await expensesService.getExpenses(\n      +userId,\n      arrCategories,\n      from,\n      to,\n    );\n\n    res.send(expenses);\n  } catch (error) {\n    res.status(400).send(error.message);\n  }\n};\n\nconst getOneExpense = async (req, res) => {\n  const { id } = req.params;\n\n  const expense = await expensesService.getExpense(+id);\n\n  if (expense) {\n    res.send(expense);\n  } else {\n    res.sendStatus(404);\n  }\n};\n\nconst addExpense = (req, res) => {\n  const expenseData = req.body;\n\n  try {\n    const expense = expensesService.addExpense(expenseData);\n\n    res.status(201).send(expense);\n  } catch (error) {\n    res.status(400).send(error.message);\n  }\n};\n\nconst updateExpense = (req, res) => {\n  const expenseData = req.body;\n  const { id } = req.params;\n\n  try {\n    const expense = expensesService.updateExpense(+id, expenseData);\n\n    if (expense) {\n      res.send(expense);\n    } else {\n      res.sendStatus(404);\n    }\n  } catch (error) {\n    res.status(400).send(error.message);\n  }\n};\n\nconst deleteExpense = (req, res) => {\n  const { id } = req.params;\n  const didSucceed = expensesService.deleteExpense(+id);\n\n  if (didSucceed) {\n    res.sendStatus(204);\n  } else {\n    res.sendStatus(404);\n  }\n};\n\nmodule.exports = {\n  getExpenses,\n  getOneExpense,\n  addExpense,\n  deleteExpense,\n  updateExpense,\n};\n"
+        }
+    ]
+}
