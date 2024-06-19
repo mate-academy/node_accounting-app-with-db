@@ -6,6 +6,11 @@ const { sequelize } = require('../db.js');
 const Expense = sequelize.define(
   'Expense',
   {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      allowNull: false,
+    },
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
