@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/models/models.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1718790816930,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1718790816930,
+            "name": "Commit-0",
+            "content": "'use strict';\n\nconst { User } = require('./User.model');\nconst { Expense } = require('./Expense.model');\n\nUser.hasMany(Expense, {\n  foreignKey: {\n    name: 'userId',\n    allowNull: false,\n  },\n});\n\nExpense.belongsTo(User, {\n  foreignKey: {\n    name: 'userId',\n    allowNull: false,\n  },\n});\n\nmodule.exports = {\n  models: {\n    User,\n    Expense,\n  },\n};\n"
+        }
+    ]
+}

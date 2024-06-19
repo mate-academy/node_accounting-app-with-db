@@ -1,0 +1,62 @@
+{
+    "sourceFile": "src/services/users.service.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 11,
+            "patches": [
+                {
+                    "date": 1718793495164,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1718793500232,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,6 @@\n-,const { User } = require('../models/models')\n+const { User } = require('../models/models');\n+\n const getId = () => {\n   return users.length ? Math.floor(Math.random() * 2137) : 1;\n };\n \n"
+                },
+                {
+                    "date": 1718793519871,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,16 +1,12 @@\n const { User } = require('../models/models');\n \n-const getId = () => {\n-  return users.length ? Math.floor(Math.random() * 2137) : 1;\n-};\n-\n const getUsers = () => {\n   return User.findAll();\n };\n \n const getUser = (id) => {\n-  return users.find((u) => u.id === id);\n+  return User.findByPk(id);\n };\n \n const deleteUser = (id) => {\n   let exists = false;\n"
+                },
+                {
+                    "date": 1718793561886,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -7,22 +7,16 @@\n const getUser = (id) => {\n   return User.findByPk(id);\n };\n \n-const deleteUser = (id) => {\n-  let exists = false;\n-\n-  users = users.filter((u) => {\n-    if (u.id === id) {\n-      exists = true;\n-\n-      return false;\n-    }\n-\n-    return true;\n+const deleteUser = async (id) => {\n+  const rows = await User.destroy({\n+    where: {\n+      id: id,\n+    },\n   });\n \n-  return exists;\n+  return rows === 1;\n };\n \n const addUser = ({ name }) => {\n   if (typeof name !== 'string') {\n"
+                },
+                {
+                    "date": 1718793588217,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -18,20 +18,9 @@\n   return rows === 1;\n };\n \n const addUser = ({ name }) => {\n-  if (typeof name !== 'string') {\n-    throw new Error('invalid name');\n-  }\n-\n-  const user = {\n-    id: getId(),\n-    name,\n-  };\n-\n-  users = [...users, user];\n-\n-  return user;\n+  return User.create({ name });\n };\n \n const updateUser = (id, userInfo) => {\n   if (typeof userInfo !== 'object' || userInfo === null) {\n"
+                },
+                {
+                    "date": 1718793597819,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,9 +17,9 @@\n \n   return rows === 1;\n };\n \n-const addUser = ({ name }) => {\n+const addUser = async ({ name }) => {\n   return User.create({ name });\n };\n \n const updateUser = (id, userInfo) => {\n"
+                },
+                {
+                    "date": 1718793639754,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -21,47 +21,22 @@\n const addUser = async ({ name }) => {\n   return User.create({ name });\n };\n \n-const updateUser = (id, userInfo) => {\n-  if (typeof userInfo !== 'object' || userInfo === null) {\n-    throw new Error('invalid data');\n-  }\n-\n-  const { name } = userInfo;\n-\n-  if (name && typeof name !== 'string') {\n-    throw new Error('invalid name');\n-  }\n-\n-  let user;\n-\n-  users = users.map((u) => {\n-    if (u.id === id) {\n-      const newUser = {\n-        ...u,\n-        name: name || u.name,\n-      };\n-\n-      user = newUser;\n-\n-      return newUser;\n-    }\n-\n-    return u;\n+const updateUser = async (id, userInfo) => {\n+  const [, [user]] = await User.update(userInfo, {\n+    where: {\n+      id,\n+    },\n+    returning: true,\n   });\n \n   return user;\n };\n \n-const deleteAllUsers = () => {\n-  users = [];\n-};\n-\n module.exports = {\n   getUsers,\n   getUser,\n   deleteUser,\n   addUser,\n   updateUser,\n-  deleteAllUsers,\n };\n"
+                },
+                {
+                    "date": 1718793702395,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n const { User } = require('../models/models');\n-\n+require('sequelize');\n const getUsers = () => {\n   return User.findAll();\n };\n \n"
+                },
+                {
+                    "date": 1718793731396,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,10 @@\n-const { User } = require('../models/models');\n+const {\n+  models: { User },\n+} = require('../models/models');\n+\n require('sequelize');\n+\n const getUsers = () => {\n   return User.findAll();\n };\n \n"
+                },
+                {
+                    "date": 1718794885219,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,31 @@\n+const { User } = require('../models/User.model');\n+\n+const getUsers = async () => {\n+  return User.findAll();\n+};\n+\n+const getUser = async (id) => {\n+  return User.findByPk(id);\n+};\n+\n+const createUser = async (name) => {\n+  return User.create({ name });\n+};\n+\n+const updateUser = async ({ id, name }) => {\n+  await User.update({ name }, { where: { id } });\n+\n+  return User.findByPk(id);\n+};\n+\n+const deleteUser = async (id) => {\n+  return User.destroy({ where: { id } });\n+};\n+\n+module.exports = {\n+  getUsers,\n+  getUser,\n+  createUser,\n+  updateUser,\n+  deleteUser,\n+};\n"
+                },
+                {
+                    "date": 1718796114048,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -11,12 +11,17 @@\n const createUser = async (name) => {\n   return User.create({ name });\n };\n \n-const updateUser = async ({ id, name }) => {\n-  await User.update({ name }, { where: { id } });\n+const updateUser = async ({ id, userData }) => {\n+  const [, [user]] = await User.update(userData, {\n+    where: {\n+      id,\n+    },\n+    returning: true,\n+  });\n \n-  return User.findByPk(id);\n+  return user;\n };\n \n const deleteUser = async (id) => {\n   return User.destroy({ where: { id } });\n@@ -28,50 +33,4 @@\n   createUser,\n   updateUser,\n   deleteUser,\n };\n-const {\n-  models: { User },\n-} = require('../models/models');\n-\n-require('sequelize');\n-\n-const getUsers = () => {\n-  return User.findAll();\n-};\n-\n-const getUser = (id) => {\n-  return User.findByPk(id);\n-};\n-\n-const deleteUser = async (id) => {\n-  const rows = await User.destroy({\n-    where: {\n-      id: id,\n-    },\n-  });\n-\n-  return rows === 1;\n-};\n-\n-const addUser = async ({ name }) => {\n-  return User.create({ name });\n-};\n-\n-const updateUser = async (id, userInfo) => {\n-  const [, [user]] = await User.update(userInfo, {\n-    where: {\n-      id,\n-    },\n-    returning: true,\n-  });\n-\n-  return user;\n-};\n-\n-module.exports = {\n-  getUsers,\n-  getUser,\n-  deleteUser,\n-  addUser,\n-  updateUser,\n-};\n"
+                },
+                {
+                    "date": 1718796127790,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -11,17 +11,12 @@\n const createUser = async (name) => {\n   return User.create({ name });\n };\n \n-const updateUser = async ({ id, userData }) => {\n-  const [, [user]] = await User.update(userData, {\n-    where: {\n-      id,\n-    },\n-    returning: true,\n-  });\n+const updateUser = async ({ id, name }) => {\n+  await User.update({ name }, { where: { id } });\n \n-  return user;\n+  return User.findByPk(id);\n };\n \n const deleteUser = async (id) => {\n   return User.destroy({ where: { id } });\n"
+                }
+            ],
+            "date": 1718793495164,
+            "name": "Commit-0",
+            "content": ",const { User } = require('../models/models')\nconst getId = () => {\n  return users.length ? Math.floor(Math.random() * 2137) : 1;\n};\n\nconst getUsers = () => {\n  return User.findAll();\n};\n\nconst getUser = (id) => {\n  return users.find((u) => u.id === id);\n};\n\nconst deleteUser = (id) => {\n  let exists = false;\n\n  users = users.filter((u) => {\n    if (u.id === id) {\n      exists = true;\n\n      return false;\n    }\n\n    return true;\n  });\n\n  return exists;\n};\n\nconst addUser = ({ name }) => {\n  if (typeof name !== 'string') {\n    throw new Error('invalid name');\n  }\n\n  const user = {\n    id: getId(),\n    name,\n  };\n\n  users = [...users, user];\n\n  return user;\n};\n\nconst updateUser = (id, userInfo) => {\n  if (typeof userInfo !== 'object' || userInfo === null) {\n    throw new Error('invalid data');\n  }\n\n  const { name } = userInfo;\n\n  if (name && typeof name !== 'string') {\n    throw new Error('invalid name');\n  }\n\n  let user;\n\n  users = users.map((u) => {\n    if (u.id === id) {\n      const newUser = {\n        ...u,\n        name: name || u.name,\n      };\n\n      user = newUser;\n\n      return newUser;\n    }\n\n    return u;\n  });\n\n  return user;\n};\n\nconst deleteAllUsers = () => {\n  users = [];\n};\n\nmodule.exports = {\n  getUsers,\n  getUser,\n  deleteUser,\n  addUser,\n  updateUser,\n  deleteAllUsers,\n};\n"
+        }
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/db.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1718792000516,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1718792000516,
+            "name": "Commit-0",
+            "content": "'use strict';\n\nconst { Sequelize } = require('sequelize');\nconst utils = require('util');\n\n// Needed for testing purposes, do not remove\nrequire('dotenv').config();\nglobal.TextEncoder = utils.TextEncoder;\n\nconst {\n  POSTGRES_HOST,\n  POSTGRES_PORT,\n  POSTGRES_USER,\n  POSTGRES_PASSWORD,\n  POSTGRES_DB,\n} = process.env;\n\n/*\n  All credentials setted to default values (exsept password - it is exapmle)\n  replace if needed with your own\n*/\n\nconst sequelize = new Sequelize({\n  database: POSTGRES_DB || 'postgres',\n  username: POSTGRES_USER || 'postgres',\n  host: POSTGRES_HOST || 'localhost',\n  dialect: 'postgres',\n  port: POSTGRES_PORT || 5432,\n  password: POSTGRES_PASSWORD || '7913791q',\n});\n\nmodule.exports = {\n  sequelize,\n};\n"
+        }
+    ]
+}
