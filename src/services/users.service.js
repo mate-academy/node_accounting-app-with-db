@@ -1,46 +1,31 @@
-const {
-  models: { User },
-} = require('../models/models');
+const { User } = require('../models/User.model');
 
-require('sequelize');
-
-const getUsers = () => {
+const getUsers = async () => {
   return User.findAll();
 };
 
-const getUser = (id) => {
+const getUser = async (id) => {
+  return User.findByPk(id);
+};
+
+const createUser = async (name) => {
+  return User.create({ name });
+};
+
+const updateUser = async ({ id, name }) => {
+  await User.update({ name }, { where: { id } });
+
   return User.findByPk(id);
 };
 
 const deleteUser = async (id) => {
-  const rows = await User.destroy({
-    where: {
-      id: id,
-    },
-  });
-
-  return rows === 1;
-};
-
-const addUser = async ({ name }) => {
-  return User.create({ name });
-};
-
-const updateUser = async (id, userInfo) => {
-  const [, [user]] = await User.update(userInfo, {
-    where: {
-      id,
-    },
-    returning: true,
-  });
-
-  return user;
+  return User.destroy({ where: { id } });
 };
 
 module.exports = {
   getUsers,
   getUser,
-  deleteUser,
-  addUser,
+  createUser,
   updateUser,
+  deleteUser,
 };

@@ -1,77 +1,50 @@
-const { op } = require('sequelize');
-const {
-  models: { Expense },
-} = require('../models/models');
+const { Expense } = require('../models/Expense.model');
+const { getFilteredExpenses } = require('../utils/getFilteredExpenses');
 
-const getExpenses = async (userId, categories, from, to) => {
-  const where = {};
+const getExpenses = async (query) => {
+  const filteredExpenses = getFilteredExpenses(query);
 
-  if (userId) {
-    where.userId = userId;
-  }
-
-  if (Array.isArray(categories)) {
-    where.category = {
-      [op.in]: categories,
-    };
-  } else if (categories) {
-    where.category = categories;
-  }
-
-  if (from && to) {
-    where.spentAt = {
-      [op.between]: [from, to],
-    };
-  } else if (from) {
-    where.spentAt = {
-      [op.gt]: from,
-    };
-  } else if (to) {
-    where.spentAt = {
-      [op.lt]: to,
-    };
-  }
-
-  return Expense.findAll({ where });
+  return Expense.findAll({
+    where: filteredExpenses,
+  });
 };
 
-const addExpense = async ({ expenseData }) => {
-  return Expense.create(expenseData);
+const getExpense = async (id) => {
+  return Expense.findByPk(id);
 };
 
-const getExpense = (id) => {
-  return Expense.findByPk(+id);
+const createExpense = async ({
+  userId,
+  spentAt,
+  title,
+  amount,
+  category = '',
+  note = '',
+}) => {
+  return Expense.create({
+    userId,
+    spentAt,
+    title,
+    amount,
+    category,
+    note,
+  });
+};
+
+const updateExpense = async (id, body) => {
+  await Expense.update({ ...body }, { where: { id } });
+
+  return Expense.findByPk(id);
 };
 
 const deleteExpense = async (id) => {
-  const rows = await Expense.destroy({
-    where: {
-      id,
-    },
-  });
-
-  return rows === 1;
-};
-
-const updateExpense = async (id, expenseData) => {
-  try {
-    const [, [expense]] = await Expense.update(expenseData, {
-      where: {
-        id,
-      },
-      returning: true,
-    });
-
-    return expense;
-  } catch (error) {
-    throw new Error('invalid data');
-  }
+  return Expense.destroy({ where: { id } });
 };
 
 module.exports = {
   getExpenses,
   getExpense,
-  deleteExpense,
-  addExpense,
+  createExpense,
   updateExpense,
+  deleteExpense,
 };

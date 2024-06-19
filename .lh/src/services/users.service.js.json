@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 8,
+            "activePatchIndex": 11,
             "patches": [
                 {
                     "date": 1718793495164,
@@ -40,6 +40,18 @@
                 {
                     "date": 1718793731396,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,10 @@\n-const { User } = require('../models/models');\n+const {\n+  models: { User },\n+} = require('../models/models');\n+\n require('sequelize');\n+\n const getUsers = () => {\n   return User.findAll();\n };\n \n"
+                },
+                {
+                    "date": 1718794885219,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,31 @@\n+const { User } = require('../models/User.model');\n+\n+const getUsers = async () => {\n+  return User.findAll();\n+};\n+\n+const getUser = async (id) => {\n+  return User.findByPk(id);\n+};\n+\n+const createUser = async (name) => {\n+  return User.create({ name });\n+};\n+\n+const updateUser = async ({ id, name }) => {\n+  await User.update({ name }, { where: { id } });\n+\n+  return User.findByPk(id);\n+};\n+\n+const deleteUser = async (id) => {\n+  return User.destroy({ where: { id } });\n+};\n+\n+module.exports = {\n+  getUsers,\n+  getUser,\n+  createUser,\n+  updateUser,\n+  deleteUser,\n+};\n"
+                },
+                {
+                    "date": 1718796114048,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -11,12 +11,17 @@\n const createUser = async (name) => {\n   return User.create({ name });\n };\n \n-const updateUser = async ({ id, name }) => {\n-  await User.update({ name }, { where: { id } });\n+const updateUser = async ({ id, userData }) => {\n+  const [, [user]] = await User.update(userData, {\n+    where: {\n+      id,\n+    },\n+    returning: true,\n+  });\n \n-  return User.findByPk(id);\n+  return user;\n };\n \n const deleteUser = async (id) => {\n   return User.destroy({ where: { id } });\n@@ -28,50 +33,4 @@\n   createUser,\n   updateUser,\n   deleteUser,\n };\n-const {\n-  models: { User },\n-} = require('../models/models');\n-\n-require('sequelize');\n-\n-const getUsers = () => {\n-  return User.findAll();\n-};\n-\n-const getUser = (id) => {\n-  return User.findByPk(id);\n-};\n-\n-const deleteUser = async (id) => {\n-  const rows = await User.destroy({\n-    where: {\n-      id: id,\n-    },\n-  });\n-\n-  return rows === 1;\n-};\n-\n-const addUser = async ({ name }) => {\n-  return User.create({ name });\n-};\n-\n-const updateUser = async (id, userInfo) => {\n-  const [, [user]] = await User.update(userInfo, {\n-    where: {\n-      id,\n-    },\n-    returning: true,\n-  });\n-\n-  return user;\n-};\n-\n-module.exports = {\n-  getUsers,\n-  getUser,\n-  deleteUser,\n-  addUser,\n-  updateUser,\n-};\n"
+                },
+                {
+                    "date": 1718796127790,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -11,17 +11,12 @@\n const createUser = async (name) => {\n   return User.create({ name });\n };\n \n-const updateUser = async ({ id, userData }) => {\n-  const [, [user]] = await User.update(userData, {\n-    where: {\n-      id,\n-    },\n-    returning: true,\n-  });\n+const updateUser = async ({ id, name }) => {\n+  await User.update({ name }, { where: { id } });\n \n-  return user;\n+  return User.findByPk(id);\n };\n \n const deleteUser = async (id) => {\n   return User.destroy({ where: { id } });\n"
                 }
             ],
             "date": 1718793495164,
