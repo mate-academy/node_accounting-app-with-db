@@ -4,20 +4,18 @@
 const express = require('express');
 const { userRouter } = require('./routes/user.router');
 const { expensesRouter } = require('./routes/expenses.router');
-const expenseServices = require('./services/expense.service');
-const usersServices = require('./services/user.service');
+// const expenseServices = require('./services/expense.service');
+// const usersServices = require('./services/user.service');
 
 function createServer() {
   const app = express();
-
-  app.use(express.json());
 
   app.get('/', (request, response) => {
     response.send('Hello');
   });
 
-  expenseServices.reset();
-  usersServices.reset();
+  // expenseServices.reset();
+  // usersServices.reset();
 
   app.use('/users', express.json(), userRouter);
   app.use('/expenses', express.json(), expensesRouter);
