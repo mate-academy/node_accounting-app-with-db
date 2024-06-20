@@ -1,49 +1,48 @@
-let users = [{ id: 1 }];
-let nextId = 2;
+const { User } = require('../models/User.model');
 
-const getAllUsers = () => {
-  return users;
+const getAllUsers = async () => {
+  return User.findAll();
 };
 
-const getUserById = (userId) => {
-  return users.find((u) => u.id === Number(userId));
+const getUserById = async (userId) => {
+  return User.findByPk(userId);
 };
 
-const existUser = (userId) => users.some((user) => user.id === userId);
+// const existUser = (userId) => users.some((user) => user.id === userId);
 
-const addUser = (name) => {
+const addUser = async (name) => {
   const newUser = {
-    id: nextId++,
     name,
   };
 
-  users.push(newUser);
-
-  return newUser;
+  return User.create(newUser);
 };
 
-const deleteUser = (id) => {
-  users = users.filter((user) => user.id !== id);
+const deleteUser = async (id) => {
+  return User.destroy({
+    where: { id },
+  });
 };
 
-const updateUser = ({ id, name }) => {
-  const userToUpdate = getUserById(id);
+const updateUser = async (id, name) => {
+  const nameToUpdate = {
+    name,
+  };
+  const idToUpdate = {
+    where: {
+      id,
+    },
+  };
 
-  Object.assign(userToUpdate, { name });
+  await User.update(nameToUpdate, idToUpdate);
 
-  return userToUpdate;
-};
-
-const reset = () => {
-  users = [];
+  return User.findByPk(id);
 };
 
 module.exports = {
   getAllUsers,
-  reset,
   getUserById,
   deleteUser,
   addUser,
-  existUser,
   updateUser,
 };

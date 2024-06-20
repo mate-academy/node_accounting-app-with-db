@@ -1,26 +1,33 @@
 const userService = require('../services/user.service');
 
-const getAllUsers = (request, response) => {
-  const users = userService.getAllUsers();
+const getAllUsers = async (request, response) => {
+  try {
+    const users = await userService.getAllUsers();
 
-  response.status(200).send(users);
+    response.status(200).send(users);
+  } catch (error) {
+    response.status(404);
+  }
 };
 
-const getOneUser = (request, response) => {
+const getOneUser = async (request, response) => {
   const userId = Number(request.params.id);
 
-  const user = userService.getUserById(userId);
+  try {
+    const user = await userService.getUserById(userId);
 
-  if (!user) {
-    response.status(404).send();
+    if (!user) {
+      response.status(404).send();
 
-    return;
+      return;
+    }
+    response.status(200).send(user);
+  } catch (error) {
+    response.status(404);
   }
-
-  response.status(200).send(user);
 };
 
-const createUser = (request, response) => {
+const createUser = async (request, response) => {
   const { name } = request.body;
 
   if (!name) {
@@ -29,12 +36,16 @@ const createUser = (request, response) => {
     return;
   }
 
-  const newUser = userService.addUser(name);
+  try {
+    const newUser = await userService.addUser(name);
 
-  response.status(201).send(newUser);
+    response.status(201).send(newUser);
+  } catch (error) {
+    response.status(404);
+  }
 };
 
-const updateUser = (request, response) => {
+const updateUser = async (request, response) => {
   const userId = Number(request.params.id);
   const { name } = request.body;
 
@@ -44,29 +55,40 @@ const updateUser = (request, response) => {
     return;
   }
 
-  const userToUpdate = userService.updateUser({ id: userId, name });
+  try {
+    const user = await userService.getUserById(userId);
 
-  if (!userToUpdate) {
-    response.status(404).send();
+    if (!user) {
+      response.status(404).send();
 
-    return;
+      return;
+    }
+
+    const userToUpdate = await userService.updateUser(userId, name);
+
+    response.status(200).send(userToUpdate);
+  } catch (error) {
+    response.status(404);
   }
-  response.status(200).send(userToUpdate);
 };
 
-const deleteUser = (request, response) => {
+const deleteUser = async (request, response) => {
   const userId = Number(request.params.id);
 
-  const userToDelete = userService.getUserById(userId);
+  try {
+    const userToDelete = await userService.getUserById(userId);
 
-  if (!userToDelete) {
-    response.status(404).send();
+    if (!userToDelete) {
+      response.status(404).send();
 
-    return;
+      return;
+    }
+
+    await userService.deleteUser(userId);
+    response.status(204).send();
+  } catch (error) {
+    response.status(404);
   }
-
-  userService.deleteUser(userId);
-  response.status(204).send();
 };
 
 module.exports = {
