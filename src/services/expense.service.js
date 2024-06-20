@@ -1,83 +1,97 @@
-const { existUser } = require('./user.service');
-let expenses = [];
-let nextId = 0;
+const { Expense } = require('../models/Expense.model');
+const { Op } = require('sequelize');
 
-const getAllExpense = () => {
-  return expenses;
+const getAllExpense = async () => {
+  return Expense.findAll();
 };
 
-const getExpenseById = (expenseId) => {
-  return expenses.find((e) => e.id === Number(expenseId));
+const getExpenseById = async (expenseId) => {
+  return Expense.findByPk(expenseId);
 };
 
-const filterQuery = ({ from, to, userId, categories }) => {
-  return expenses.filter((e) => {
-    const userIdMatch = !userId || e.userId === Number(userId);
-    const fromMatch = !from || new Date(e.spentAt) >= new Date(from);
-    const toMatch = !to || new Date(e.spentAt) <= new Date(to);
-    const categoryMatch = !categories || categories.includes(e.category);
+const filterQuery = async ({ from, to, userId, categories }) => {
+  const where = {};
 
-    return userIdMatch && fromMatch && toMatch && categoryMatch;
-  });
-};
-
-const addExpense = ({ userId, spentAt, title, amount, category, note }) => {
-  if (!existUser(userId)) {
-    return null;
+  if (userId) {
+    where.userId = userId;
   }
 
-  const newExpense = {
-    id: nextId++,
-    spentAt: new Date(spentAt),
-    userId: Number(userId),
-    title,
-    amount: Number(amount),
-    category,
-    note,
-  };
-
-  expenses.push(newExpense);
-
-  return newExpense;
-};
-
-const deleteExpense = (expenseId) => {
-  const expenseToDelete = getExpenseById(expenseId);
-
-  if (!expenseToDelete) {
-    return;
+  if (from) {
+    where.spentAt = { ...where.spentAt, [Op.gte]: new Date(from) };
   }
 
-  expenses = expenses.filter((e) => e.id !== expenseToDelete.id);
+  if (to) {
+    where.spentAt = { ...where.spentAt, [Op.lte]: new Date(to) };
+  }
+
+  if (categories) {
+    where.category = { [Op.in]: categories };
+  }
+
+  return Expense.findAll({ where });
 };
 
-const updateExpense = ({
-  expenseId,
+const addExpense = async ({
+  userId,
   spentAt,
   title,
   amount,
   category,
   note,
 }) => {
-  const expenseToUpdate = getExpenseById(expenseId);
-
-  if (!expenseToUpdate) {
-    return null;
-  }
-
-  Object.assign(expenseToUpdate, {
+  const newExpence = {
+    userId,
     spentAt,
     title,
     amount,
     category,
     note,
-  });
+  };
 
-  return expenseToUpdate;
+  return Expense.create(newExpence);
 };
 
-const reset = () => {
-  expenses = [];
+const deleteExpense = async (expenseId) => {
+  const rowsDeleted = await Expense.destroy({
+    where: { id: expenseId },
+  });
+
+  return rowsDeleted;
+};
+
+const updateExpense = async (
+  expenseId,
+  title,
+  spentAt,
+  amount,
+  category,
+  note,
+) => {
+  const expenseToUpdate = await Expense.findByPk(expenseId);
+
+  if (title) {
+    expenseToUpdate.title = title;
+  }
+
+  if (spentAt) {
+    expenseToUpdate.spentAt = spentAt;
+  }
+
+  if (amount) {
+    expenseToUpdate.amount = amount;
+  }
+
+  if (category) {
+    expenseToUpdate.category = category;
+  }
+
+  if (note) {
+    expenseToUpdate.note = note;
+  }
+
+  await expenseToUpdate.save();
+
+  return expenseToUpdate;
 };
 
 module.exports = {
@@ -86,6 +100,5 @@ module.exports = {
   addExpense,
   deleteExpense,
   updateExpense,
-  reset,
   filterQuery,
 };
