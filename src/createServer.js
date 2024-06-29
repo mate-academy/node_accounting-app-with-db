@@ -1,14 +1,10 @@
 'use strict';
 
 const express = require('express');
-const morgan = require('morgan');
 const { Client } = require('pg');
-const { Expense, User } = require('./models/models');
-
-const logger = {
-  // ESLint-disable-next-line no-console
-  error: console.error,
-};
+const { User } = require('./models/User.model');
+const { Expense } = require('./models/Expense.model');
+const { Op } = require('sequelize');
 
 const createServer = () => {
   const app = express();
@@ -21,7 +17,6 @@ const createServer = () => {
 
   client.connect();
 
-  app.use(morgan('combined'));
   app.use(express.json());
 
   app.get('/', (req, res) => {
@@ -30,12 +25,11 @@ const createServer = () => {
 
   app.get('/users', async (req, res) => {
     try {
-      const result = await client.query('SELECT * FROM accounting_user');
+      const result = await User.findAll();
 
-      res.status(200).send(result.rows);
+      res.status(200).send(result);
     } catch (err) {
-      logger.error('Error inserting expense:', err);
-      res.status(500).send({ error: 'Internal Server Error 36' });
+      res.status(500).send({ error: 'Internal Server Error' });
     }
   });
 
@@ -47,15 +41,11 @@ const createServer = () => {
     }
 
     try {
-      const result = await client.query(
-        'INSERT INTO accounting_user (name) VALUES ($1) RETURNING *',
-        [name],
-      );
+      const result = await User.create({ name });
 
-      res.status(201).send(result.rows[0]);
+      res.status(201).send(result);
     } catch (err) {
-      logger.error('Error inserting expense:', err);
-      res.status(500).send({ error: 'Internal Server Error 58' });
+      res.status(500).send({ error: 'Internal Server Error' });
     }
   });
 
@@ -63,19 +53,15 @@ const createServer = () => {
     const id = parseInt(req.params.id, 10);
 
     try {
-      const result = await client.query(
-        'SELECT * FROM accounting_user WHERE id = $1',
-        [id],
-      );
+      const result = await User.findByPk(id);
 
-      if (result.rows.length === 0) {
+      if (!result) {
         return res.status(404).send({ error: 'User not found' });
       }
 
-      res.status(200).send(result.rows[0]);
+      res.status(200).send(result);
     } catch (err) {
-      logger.error('Error inserting expense:', err);
-      res.status(500).send({ error: 'Internal Server Error 77' });
+      res.status(500).send({ error: 'Internal Server Error' });
     }
   });
 
@@ -83,19 +69,17 @@ const createServer = () => {
     const id = parseInt(req.params.id, 10);
 
     try {
-      const result = await client.query(
-        'DELETE FROM accounting_user WHERE id = $1 RETURNING *',
-        [id],
-      );
+      const user = await User.findByPk(id);
 
-      if (result.rows.length === 0) {
-        return res.status(404).send('Not found');
+      if (!user) {
+        return res.status(404).send({ error: 'User not found' });
       }
+
+      await User.destroy({ where: { id } });
 
       res.sendStatus(204);
     } catch (err) {
-      logger.error('Error inserting expense:', err);
-      res.status(500).send({ error: 'Internal Server Error 96' });
+      res.status(500).send({ error: 'Internal Server Error' });
     }
   });
 
@@ -108,100 +92,85 @@ const createServer = () => {
     }
 
     try {
-      const result = await client.query(
-        'UPDATE accounting_user SET name = $1 WHERE id = $2 RETURNING *',
-        [name, id],
-      );
+      const user = await User.findByPk(id);
 
-      if (result === 0) {
+      if (!user) {
         return res.status(404).send({ error: 'User not found' });
       }
 
-      res.status(200).send(result.rows[0]);
+      await User.update({ name }, { where: { id } });
+
+      const updatedUser = await User.findByPk(id);
+
+      res.status(200).send(updatedUser);
     } catch (err) {
-      logger.error('Error inserting expense:', err);
-      res.status(500).send({ error: 'Internal Server Error 120' });
+      res.status(500).send({ error: 'Internal Server Error' });
     }
   });
 
   app.get('/expenses', async (req, res) => {
     const { userId, from, to, categories } = req.query;
-    const conditions = [];
-    const params = [];
+    const where = {};
 
     if (userId) {
-      conditions.push('userId = $1');
-      params.push(parseInt(userId, 10));
+      where.userId = parseInt(userId, 10);
     }
 
     if (from) {
-      conditions.push('spentAt >= $' + (params.length + 1));
-      params.push(new Date(from));
+      where.spentAt = { [Op.gte]: new Date(from) };
     }
 
     if (to) {
-      conditions.push('spentAt <= $' + (params.length + 1));
-      params.push(new Date(to));
+      if (!where.spentAt) {
+        where.spentAt = {};
+      }
+      where.spentAt[Op.lte] = new Date(to);
     }
 
     if (categories) {
       const categoriesArray = categories.split(',');
-      const placeholders = categoriesArray.map(
-        (_, index) => '$' + (params.length + index + 1),
-      );
 
-      conditions.push(`category IN (${placeholders.join(', ')})`);
-      params.push(...categoriesArray);
-    }
-
-    let query = 'SELECT * FROM accounting_expenses';
-
-    if (conditions.length > 0) {
-      query += ' WHERE ' + conditions.join(' AND ');
+      where.category = { [Op.in]: categoriesArray };
     }
 
     try {
-      const result = await client.query(query, params);
+      const result = await Expense.findAll({
+        where,
+      });
 
-      res.status(200).json(result.rows);
+      res.status(200).json(result);
     } catch (err) {
-      logger.error('Error inserting expense:', err);
-      res.status(500).send({ error: 'Internal Server Error 165' });
+      res.status(500).send({ error: 'Internal Server Error' });
     }
   });
 
   app.post('/expenses', async (req, res) => {
     const { userId, spentAt, title, amount, category, note } = req.body;
 
-
-    if (!userId || !spentAt || !title || !amount || !category) {
-      return res.status(400).json({ error: 'All fields are required' });
-    }
-
     try {
-      const user = await client.query(
-        'SELECT * FROM accounting_user WHERE id = $1',
-        [userId]);
+      const user = await User.findByPk(userId);
 
-      if (!user.rows[0]) {
+      if (!user) {
         return res.status(400).json({ error: 'User not found' });
       }
 
-      const expense = await Expense.create({
+      const expenseData = {
         spentAt,
         title,
         amount,
         category,
         userId,
-        note,
-      });
+      };
+
+      if (note) {
+        expenseData.note = note;
+      }
+
+      const expense = await Expense.create(expenseData);
 
       res.status(201).json(expense);
     } catch (err) {
-      logger.error('Error inserting expense:', err);
-      // console.log('Error inserting expense: ', err);
-      logger.error('Error inserting expense:', err);
-      res.status(500).json({ error: 'Internal Server Error 200' });
+      res.status(500).json({ error: 'Internal Server Error' });
     }
   });
 
@@ -209,18 +178,15 @@ const createServer = () => {
     const id = parseInt(req.params.id, 10);
 
     try {
-      const expense = await client.query(
-        'SELECT * FROM accounting_expenses WHERE id=$1',
-        [id],
-      );
+      const expense = await Expense.findByPk(id);
 
-      if (!expense.rows.length) {
-        return res.status(400).json({ error: 'User not found' });
+      if (!expense) {
+        return res.status(404).send({ error: 'User not found' });
       }
+
       res.status(200).send(expense);
     } catch (err) {
-      logger.error('Error inserting expense:', err);
-      res.status(500).json({ error: 'Internal Server Error 218' });
+      res.status(500).json({ error: 'Internal Server Error' });
     }
   });
 
@@ -228,52 +194,44 @@ const createServer = () => {
     const id = parseInt(req.params.id, 10);
     const { title, amount, category, note } = req.body;
 
-    const fieldsToUpdate = [];
-    const params = [];
+    const fieldsToUpdate = {};
 
     if (title) {
-      fieldsToUpdate.push(`title = $${fieldsToUpdate.length + 1}`);
-      params.push(title);
+      fieldsToUpdate.title = title;
     }
 
     if (amount) {
-      fieldsToUpdate.push(`amount = $${fieldsToUpdate.length + 1}`);
-      params.push(amount);
+      fieldsToUpdate.amount = amount;
     }
 
     if (category) {
-      fieldsToUpdate.push(`category = $${fieldsToUpdate.length + 1}`);
-      params.push(category);
+      fieldsToUpdate.category = category;
     }
 
     if (note) {
-      fieldsToUpdate.push(`note = $${fieldsToUpdate.length + 1}`);
-      params.push(note);
+      fieldsToUpdate.note = note;
     }
-    params.push(id);
 
-    if (fieldsToUpdate.length === 0) {
+    if (Object.keys(fieldsToUpdate).length === 0) {
       return res.status(400).send({ error: 'No fields to update' });
     }
 
-    const query = `
-      UPDATE accounting_expenses
-      SET ${fieldsToUpdate.join(', ')}
-      WHERE id = $${params.length}
-      RETURNING *
-    `;
-
     try {
-      const result = await client.query(query, params);
+      const [updatedRowsCount, updatedRows] = await Expense.update(
+        fieldsToUpdate,
+        {
+          where: { id },
+          returning: true,
+        },
+      );
 
-      if (result.rows.length === 0) {
+      if (updatedRowsCount === 0) {
         return res.status(404).send({ error: 'Expense not found' });
       }
 
-      res.status(200).send(result.rows[0]);
+      res.status(200).json(updatedRows[0]);
     } catch (err) {
-      logger.error('Error inserting expense:', err);
-      res.status(500).send({ error: 'Internal Server Error 270' });
+      res.status(500).json({ error: 'Internal Server Error' });
     }
   });
 
@@ -281,18 +239,15 @@ const createServer = () => {
     const id = parseInt(req.params.id, 10);
 
     try {
-      const result = await client.query(
-        'DELETE  FROM accounting_expenses WHERE id=$1 RETURNING *',
-        [id],
-      );
+      const result = await Expense.destroy({ where: { id } });
 
-      if (!result.rows.length) {
-        return res.status(400).json({ error: 'User not found' });
+      if (result[0] === 0) {
+        return res.status(404).json({ error: 'User not found' });
       }
+
       res.sendStatus(204);
     } catch (err) {
-      logger.error('Error inserting expense:', err);
-      res.status(500).json({ error: 'Internal Server Error 288' });
+      res.status(500).json({ error: 'Internal Server Error' });
     }
   });
 
