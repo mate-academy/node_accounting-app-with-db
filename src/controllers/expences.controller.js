@@ -1,17 +1,23 @@
 const expencesService = require('../services/expences.service');
+const { validate: uuidValidate } = require('uuid');
 
-const getAllExpences = (_, res) => {
-  const expences = expencesService.getAllExpences();
+const getAllExpences = async (_, res) => {
+  const expences = await expencesService.getAllExpences();
 
   res.json(expences);
 };
 
-const getExpences = (req, res) => {
+const getExpences = async (req, res) => {
   const { userId, categories, from, to } = req.query;
-  const userIdNumber = Number(userId);
 
-  const expences = expencesService.getExpences({
-    userId: userIdNumber,
+  if (userId && !uuidValidate(userId)) {
+    res.status(404).json({ message: 'Invalid id' });
+
+    return;
+  }
+
+  const expences = await expencesService.getExpences({
+    userId,
     categories,
     from,
     to,
@@ -20,11 +26,16 @@ const getExpences = (req, res) => {
   res.json(expences);
 };
 
-const getExpenceById = (req, res) => {
+const getExpenceById = async (req, res) => {
   const { id } = req.params;
-  const userIdNumber = Number(id);
 
-  const expence = expencesService.getExpenceById(userIdNumber);
+  if (!uuidValidate(id)) {
+    res.status(404).json({ message: 'Invalid id' });
+
+    return;
+  }
+
+  const expence = await expencesService.getExpenceById(id);
 
   if (!expence) {
     res.status(404).json({ message: 'Expence not found' });
@@ -35,26 +46,24 @@ const getExpenceById = (req, res) => {
   res.json(expence);
 };
 
-const createExpence = (req, res) => {
+const createExpence = async (req, res) => {
   const { userId, spentAt, title, amount, category, note } = req.body;
-  const userIdNumber = Number(userId);
-  const amountNumber = Number(amount);
 
-  if (!Number.isFinite(userIdNumber) || !Number.isFinite(amountNumber)) {
-    return res
-      .status(400)
-      .json({ message: 'userId and amount should be valid number' });
+  if (!uuidValidate(userId)) {
+    res.status(400).json({ message: 'Invalid id' });
+
+    return;
   }
 
-  if (!userId || !spentAt || !title || !amount || !category || !note) {
-    return res.status(400).json({ message: 'Missing required fields' });
+  if (!userId || !spentAt || !title || !amount) {
+    return res.status(404).json({ message: 'Missing required fields' });
   }
 
-  const newExpence = expencesService.createExpence({
-    userId: userIdNumber,
+  const newExpence = await expencesService.createExpence({
+    userId,
     spentAt,
     title,
-    amount: amountNumber,
+    amount,
     category,
     note,
   });
@@ -68,6 +77,12 @@ const createExpence = (req, res) => {
 const deleteExpence = (req, res) => {
   const { id } = req.params;
 
+  if (!uuidValidate(id)) {
+    res.status(404).json({ message: 'Invalid id' });
+
+    return;
+  }
+
   const isDeleted = expencesService.deleteExpence(id);
 
   if (!isDeleted) {
@@ -77,11 +92,16 @@ const deleteExpence = (req, res) => {
   res.status(204).end();
 };
 
-const patchExpence = (req, res) => {
+const patchExpence = async (req, res) => {
   const { id } = req.params;
+
   const { spentAt, title, amount, category, note } = req.body;
 
-  const numberedId = Number(id);
+  if (!uuidValidate(id)) {
+    res.status(404).json({ message: 'Invalid id' });
+
+    return;
+  }
 
   if (!spentAt && !title && !amount && !category && !note) {
     return res.status(404).json({ message: 'No update information provided' });
@@ -101,7 +121,7 @@ const patchExpence = (req, res) => {
     return acc;
   }, {});
 
-  const expence = expencesService.patchExpence(numberedId, updateData);
+  const expence = await expencesService.patchExpence(id, updateData);
 
   if (!expence) {
     res.status(404).json({ message: 'Expence not found' });

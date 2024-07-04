@@ -2,16 +2,11 @@
 
 const express = require('express');
 const morgan = require('morgan');
-const userServices = require('./services/user.service');
-const expencesServices = require('./services/expences.service');
 const { usersRouter } = require('./routes/users.routes');
 const { expencesRouter } = require('./routes/expences.routes');
 
 function createServer() {
   const app = express();
-
-  userServices.deleteUsers();
-  expencesServices.deleteExpences();
 
   app.use(express.json());
   app.use(morgan('tiny'));

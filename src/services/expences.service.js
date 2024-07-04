@@ -1,106 +1,79 @@
-const { getUsersArray } = require('./user.service');
+const { Op } = require('sequelize');
+const { Expense } = require('../models/Expense.model');
+const { User } = require('../models/User.model');
 
-let expences = [];
+const getAllExpences = () => Expense.findAll();
 
-const getAllExpences = () => expences;
+const getExpences = async ({ userId, categories, from, to }) => {
+  const whereClause = {};
 
-const getId = () => Math.floor(Math.random() * 37);
+  if (userId) {
+    whereClause.userId = userId;
+  }
 
-const getExpences = ({ userId, categories, from, to }) => {
-  return expences.filter((expence) => {
-    if (userId && expence.userId !== userId) {
-      return false;
-    }
+  if (categories) {
+    whereClause.category = {
+      [Op.in]: Array.isArray(categories) ? categories : [categories],
+    };
+  }
 
-    if (categories && expence.category !== categories) {
-      return false;
-    }
+  if (from && to) {
+    whereClause.spentAt = {
+      [Op.between]: [new Date(from), new Date(to)],
+    };
+  } else if (from) {
+    whereClause.spentAt = {
+      [Op.gte]: new Date(from),
+    };
+  } else if (to) {
+    whereClause.spentAt = {
+      [Op.lte]: new Date(to),
+    };
+  }
 
-    const expenceDate = new Date(expence.spentAt);
-
-    if (from) {
-      const fromDate = new Date(from);
-
-      if (expenceDate < fromDate) {
-        return false;
-      }
-    }
-
-    if (to) {
-      const toDate = new Date(to);
-
-      if (expenceDate > toDate) {
-        return false;
-      }
-    }
-
-    return true;
+  return Expense.findAll({
+    where: whereClause,
   });
 };
 
-const getExpenceById = (id) => expences.find((expence) => expence.id === id);
+const getExpenceById = (id) => Expense.findByPk(id);
 
 const createExpence = (data) => {
-  const newExpence = {
-    id: getId(),
-    ...data,
-  };
-
-  const userExists = getUsersArray().some(
-    (user) => user.id === newExpence.userId,
-  );
+  const userExists = User.findByPk(data.userId);
 
   if (!userExists) {
     return null;
   }
 
-  expences = [...expences, newExpence];
-
-  return newExpence;
+  return Expense.create(data);
 };
 
-const deleteExpence = (id) => {
-  const numberedId = Number(id);
-  const expence = getExpenceById(numberedId);
+const deleteExpence = async (id) => {
+  const expence = await Expense.findByPk(id);
 
   if (!expence) {
     return null;
   }
 
-  expences = expences.filter((item) => item.id !== numberedId);
-
-  return expence;
+  return Expense.destroy({ where: { id } });
 };
 
-const patchExpence = (id, data) => {
-  const expence = getExpenceById(id);
+const patchExpence = async (id, data) => {
+  const expence = Expense.findByPk(id);
 
   if (!expence) {
     return null;
   }
 
-  const newExpence = {
-    ...expence,
-    ...data,
-  };
+  await Expense.update(data, { where: { id } });
 
-  expences = expences.map(
-    (item) => (item.id === id ? { ...item, ...newExpence } : item),
-    // eslint-disable-next-line function-paren-newline
-  );
-
-  return newExpence;
-};
-
-const deleteExpences = () => {
-  expences = [];
+  return Expense.findByPk(id);
 };
 
 module.exports = {
   getExpences,
   getExpenceById,
   createExpence,
-  deleteExpences,
   getAllExpences,
   deleteExpence,
   patchExpence,
