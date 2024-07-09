@@ -111,6 +111,7 @@ describe('Expense', () => {
         spentAt: '2022-10-19T11:01:43.462Z',
         title: 'Buy a new laptop',
         amount: 999,
+        category: 'Tech',
         userId: user.id,
       };
 
