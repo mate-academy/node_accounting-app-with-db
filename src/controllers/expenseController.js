@@ -1,101 +1,91 @@
 const expenseService = require('../services/expenseService');
-const userService = require('../services/userService');
 
 module.exports = {
   async getAll(req, res) {
-    const { userId, categories, from, to } = req.query;
-    const numberUserId = parseInt(userId);
+    try {
+      const { userId, categories, from, to } = req.query;
+      const numberUserId = +userId;
+      const validCategories = categories ? [categories].flat() : null;
 
-    const expenses = await expenseService.getAllFiltered({
-      userId: numberUserId,
-      categories,
-      from,
-      to,
-    });
+      const expenses = await expenseService.getAllFiltered({
+        userId: numberUserId,
+        categories: validCategories,
+        from,
+        to,
+      });
 
-    res.status(200).send(expenses.map(expenseService.format));
+      res.status(200).send(expenses.map(expenseService.format));
+    } catch (error) {
+      res.status(500).send('Server error');
+    }
   },
   async getOne(req, res) {
-    const id = parseInt(req.params.id);
+    try {
+      const id = +req.params.id;
 
-    const expense = await expenseService.getById(id);
+      const expense = await expenseService.getById(id);
 
-    if (!expense) {
-      res.sendStatus(404);
+      if (!expense) {
+        res.status(404).send('No expenses found');
 
-      return;
+        return;
+      }
+
+      res.status(200).send(expenseService.format(expense));
+    } catch (error) {
+      res.status(500).send('Server error');
     }
-
-    res.status(200).send(expenseService.format(expense));
   },
   async create(req, res) {
-    const { userId, spentAt, title, amount, category, note } = req.body;
+    try {
+      const { userId, spentAt, title, amount, category, note } = req.body;
 
-    const foundUser = await userService.getById(userId);
+      const expense = await expenseService.create({
+        userId,
+        spentAt,
+        title,
+        amount,
+        category,
+        note,
+      });
 
-    if (!userId || !spentAt || !title || !amount || !category || !foundUser) {
-      res.sendStatus(400);
-
-      return;
+      res.status(201).send(expenseService.format(expense));
+    } catch (error) {
+      res.status(500).send('Server error');
     }
-
-    const expense = await expenseService.create({
-      userId,
-      spentAt,
-      title,
-      amount,
-      category,
-      note,
-    });
-
-    res.status(201).send(expenseService.format(expense));
   },
   async update(req, res) {
-    const currentId = parseInt(req.params.id);
-    const { id, userId, spentAt, title, amount, category, note } = req.body;
+    try {
+      const currentId = +req.params.id;
+      const { id, userId, spentAt, title, amount, category, note } = req.body;
 
-    const foundExpense = await expenseService.getById(currentId);
+      await expenseService.update({
+        currentId,
+        id,
+        userId,
+        spentAt,
+        title,
+        amount,
+        category,
+        note,
+      });
 
-    if (!foundExpense) {
-      res.sendStatus(404);
+      const updatedExpense = await expenseService.getById(id ?? currentId);
 
-      return;
+      res.status(200).send(expenseService.format(updatedExpense));
+    } catch (error) {
+      res.status(500).send('Server error');
     }
-
-    if (!id && !userId && !spentAt && !title && !amount && !category && !note) {
-      res.sendStatus(400);
-
-      return;
-    }
-
-    await expenseService.update({
-      currentId,
-      id,
-      userId,
-      spentAt,
-      title,
-      amount,
-      category,
-      note,
-    });
-
-    const updatedExpense = await expenseService.getById(id ?? currentId);
-
-    res.status(200).send(expenseService.format(updatedExpense));
   },
   async remove(req, res) {
-    const id = parseInt(req.params.id);
+    try {
+      const id = +req.params.id;
 
-    const foundExpense = await expenseService.getById(id);
+      await expenseService.remove(id);
 
-    if (!foundExpense) {
-      res.sendStatus(404);
-
-      return;
+      res.sendStatus(204);
+    } catch (error) {
+      res.status(500).send('Server error');
     }
-
-    await expenseService.remove(id);
-
-    res.sendStatus(204);
   },
 };
