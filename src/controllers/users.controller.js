@@ -1,16 +1,22 @@
 const usersServise = require('../services/users.service');
 
+const HTTP_OK = 200;
+const HTTP_BAD_REQUEST = 400;
+const HTTP_NOT_FOUND = 404;
+const HTTP_NO_CONTENT = 204;
+const HTTP_CREATED = 201;
+
 const get = async (req, res) => {
   try {
     const users = await usersServise.getAll();
 
     if (!users) {
-      return res.status(404).send();
+      return res.status(HTTP_NOT_FOUND).send();
     } else {
-      return res.status(200).send(users);
+      return res.status(HTTP_OK).send(users);
     }
   } catch (err) {
-    return res.status(400).send(err.message);
+    return res.status(HTTP_BAD_REQUEST).send(err.message);
   }
 };
 
@@ -19,18 +25,18 @@ const getOne = async (req, res) => {
     const { id } = req.params;
 
     if (!id) {
-      return res.status(400).send();
+      return res.status(HTTP_BAD_REQUEST).send();
     }
 
     const user = await usersServise.getUser(id);
 
     if (!user) {
-      return res.status(404).send();
+      return res.status(HTTP_NOT_FOUND).send();
     } else {
-      return res.status(200).send(user);
+      return res.status(HTTP_OK).send(user);
     }
   } catch (err) {
-    return res.status(400).send(err.message);
+    return res.status(HTTP_BAD_REQUEST).send(err.message);
   }
 };
 
@@ -41,12 +47,12 @@ const post = async (req, res) => {
     if (name) {
       const added = await usersServise.addNew(name);
 
-      return res.status(201).send(added);
+      return res.status(HTTP_CREATED).send(added);
     } else {
-      return res.status(400).send();
+      return res.status(HTTP_BAD_REQUEST).send();
     }
   } catch (err) {
-    return res.status(400).send(err.message);
+    return res.status(HTTP_BAD_REQUEST).send(err.message);
   }
 };
 
@@ -56,18 +62,18 @@ const patch = async (req, res) => {
     const { name } = req.body;
 
     if (!id || !name) {
-      return res.status(400).send();
+      return res.status(HTTP_BAD_REQUEST).send();
     }
 
     const updatedUser = await usersServise.updateUser(id, name);
 
     if (updatedUser) {
-      return res.status(200).json(updatedUser);
+      return res.status(HTTP_OK).json(updatedUser);
     } else {
-      return res.status(404).send();
+      return res.status(HTTP_NOT_FOUND).send();
     }
   } catch (err) {
-    return res.status(400).send(err.message);
+    return res.status(HTTP_BAD_REQUEST).send(err.message);
   }
 };
 
@@ -79,12 +85,12 @@ const deleting = async (req, res) => {
     if (user) {
       await usersServise.deleteUser(id);
 
-      return res.status(204).send();
+      return res.status(HTTP_NO_CONTENT).send();
     }
 
-    return res.status(404).send();
+    return res.status(HTTP_NOT_FOUND).send();
   } catch (err) {
-    return res.status(400).send(err.message);
+    return res.status(HTTP_BAD_REQUEST).send(err.message);
   }
 };
 
