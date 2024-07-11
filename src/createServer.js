@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const userRouter = require('./routes/user.route');
-// const expenseRouter = require('./routes/expense.route');
+const expenseRouter = require('./routes/expense.route');
 
 function createServer() {
   const app = express();
@@ -10,7 +10,7 @@ function createServer() {
   app.use(express.json());
 
   app.use('/users', userRouter);
-  // app.use('/expenses', expenseRouter);
+  app.use('/expenses', expenseRouter);
 
   return app;
 }
