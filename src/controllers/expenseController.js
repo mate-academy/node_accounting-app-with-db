@@ -37,7 +37,19 @@ async function createExpense(req, res) {
 
 async function getAllExpenses(req, res) {
   try {
-    const expenses = await expenseService.getAllExpenses(req.query);
+    const userId = req.query.userId;
+    const category = req.query.categories;
+    const filters = {};
+
+    if (userId) {
+      filters.userId = userId;
+    }
+
+    if (category) {
+      filters.category = category;
+    }
+
+    const expenses = await expenseService.getAllExpenses(filters);
 
     res.json(expenses);
   } catch (error) {
@@ -65,10 +77,10 @@ async function getExpense(req, res) {
 
 async function updateExpense(req, res) {
   try {
-    const expense = await expenseService.updateExpense({
-      ...req.body,
-      id: parseInt(req.params.id),
-    });
+    const expense = await expenseService.updateExpense(
+      parseInt(req.params.id),
+      req.body,
+    );
 
     if (!expense) {
       return res.status(404).send('Expense not found');
