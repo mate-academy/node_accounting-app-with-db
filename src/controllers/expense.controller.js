@@ -25,42 +25,11 @@ const parseQueryParameters = (req) => {
   };
 };
 
-const filterExpenses = (expenses, userId, from, to, categories) => {
-  let filteredExpenses = expenses;
-
-  if (userId !== null) {
-    filteredExpenses = filteredExpenses.filter(
-      (expense) => expense.userId === userId,
-    );
-  }
-
-  if (from && to) {
-    filteredExpenses = filteredExpenses.filter((expense) => {
-      const spentAt = new Date(expense.spentAt);
-
-      return spentAt >= from && spentAt <= to;
-    });
-  }
-
-  if (categories.length > 0) {
-    filteredExpenses = filteredExpenses.reduce((acc, expense) => {
-      if (categories.includes(expense.category)) {
-        acc.push(expense);
-      }
-
-      return acc;
-    }, []);
-  }
-
-  return filteredExpenses;
-};
-
 const get = async (req, res) => {
   try {
-    const { userId, from, to, categories } = parseQueryParameters(req);
-    let expenses = await getAll();
+    const filters = parseQueryParameters(req);
+    const expenses = await getAll(filters);
 
-    expenses = filterExpenses(expenses, userId, from, to, categories);
     res.send(expenses);
   } catch (error) {
     res.status(500).send('Error fetching expenses');

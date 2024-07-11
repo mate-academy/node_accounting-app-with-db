@@ -1,5 +1,6 @@
 'use strict';
 
+const { Op } = require('sequelize');
 const { Expense } = require('../models/Expense.model');
 
 const normalize = ({ id, userId, spentAt, title, amount, category, note }) => {
@@ -14,8 +15,30 @@ const normalize = ({ id, userId, spentAt, title, amount, category, note }) => {
   };
 };
 
-const getAll = async () => {
-  const result = await Expense.findAll();
+const getAll = async (filters = {}) => {
+  const { userId, from, to, categories } = filters;
+  const query = {
+    where: {},
+    order: [['spentAt', 'ASC']],
+  };
+
+  if (userId) {
+    query.where.userId = userId;
+  }
+
+  if (from && to) {
+    query.where.spentAt = {
+      [Op.between]: [from, to],
+    };
+  }
+
+  if (categories && categories.length > 0) {
+    query.where.category = {
+      [Op.in]: categories,
+    };
+  }
+
+  const result = await Expense.findAll(query);
 
   return result.map(normalize);
 };
