@@ -15,7 +15,7 @@ const get = async (req, res) => {
 
     res.send(users.map(normalize));
   } catch (error) {
-    throw new Error('Error fetching users');
+    res.status(500).send('Error fetching users');
   }
 };
 
@@ -31,7 +31,7 @@ const getByIdController = async (req, res) => {
     }
     res.send(normalize(user));
   } catch (error) {
-    throw new Error('Error fetching user by id');
+    res.status(500).send('Error fetching user by id');
   }
 };
 
@@ -49,7 +49,7 @@ const createController = async (req, res) => {
 
     res.status(201).send(normalize(user));
   } catch (error) {
-    throw new Error('Error creating user');
+    res.status(500).send('Error creating user');
   }
 };
 
@@ -65,7 +65,7 @@ const removeController = async (req, res) => {
     }
     res.sendStatus(204);
   } catch (error) {
-    throw new Error('Error removing user');
+    res.status(500).send('Error removing user');
   }
 };
 
@@ -89,7 +89,7 @@ const updateController = async (req, res) => {
     }
     res.send(normalize(user));
   } catch (error) {
-    throw new Error('Error updating user');
+    res.status(500).send('Error updating user');
   }
 };
 

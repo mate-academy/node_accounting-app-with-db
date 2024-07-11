@@ -7,9 +7,9 @@ const User = sequelize.define(
   'User',
   {
     id: {
-      type: DataTypes.UUID,
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
       primaryKey: true,
-      defaultValue: DataTypes.UUIDV4,
     },
     name: {
       type: DataTypes.STRING,
@@ -18,14 +18,13 @@ const User = sequelize.define(
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
-      field: 'created_at',
       defaultValue: DataTypes.NOW,
+      field: 'created_at',
     },
   },
   {
     tableName: 'users',
     updatedAt: false,
-    createdAt: false,
   },
 );
 
