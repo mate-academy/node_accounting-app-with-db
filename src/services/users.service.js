@@ -1,68 +1,37 @@
-const { User } = require('../models/User.model');
+const { User } = require('../models/User.model.js');
 
-const initUsers = async () => {
-  try {
-    await User.sync({ force: true });
-  } catch (error) {
-    throw new Error();
-  }
-};
-const getAllUsers = async () => {
-  try {
-    return await User.findAll();
-  } catch (error) {
-    throw new Error();
-  }
+const getAllUsersService = async () => {
+  return User.findAll();
 };
 
-const getUserById = async (id) => {
-  try {
-    return await User.findByPk(id);
-  } catch (error) {
-    throw new Error();
-  }
+const getUserByIdService = async (id) => {
+  return User.findByPk(id);
 };
 
-const createUser = async (name) => {
-  try {
-    return await User.create({ name });
-  } catch (error) {
-    throw new Error();
-  }
+const createUserService = async ({ name }) => {
+  return User.create({ name });
 };
 
-const updateUser = async (id, name) => {
-  try {
-    return await User.update(
-      { name },
-      {
-        where: {
-          id,
-        },
-      },
-    );
-  } catch (error) {
-    throw new Error();
-  }
+const updateUserService = async (id, name) => {
+  await User.update({ name }, { where: { id } });
+
+  return User.findByPk(id);
 };
 
-const deleteUser = async (id) => {
-  try {
-    return await User.destroy({
-      where: {
-        id,
-      },
-    });
-  } catch (error) {
-    throw new Error();
+const deleteUserService = async (id) => {
+  const user = await User.findByPk(id);
+
+  if (user) {
+    await User.destroy({ where: { id } });
   }
+
+  return user;
 };
 
 module.exports = {
-  initUsers,
-  getAllUsers,
-  getUserById,
-  createUser,
-  updateUser,
-  deleteUser,
+  getAllUsersService,
+  getUserByIdService,
+  createUserService,
+  updateUserService,
+  deleteUserService,
 };

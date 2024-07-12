@@ -1,82 +1,93 @@
-const userService = require('../services/users.service');
+const services = require('../services/users.service.js');
 
 const getAllUsers = async (req, res) => {
-  const users = await userService.getAllUsers();
+  try {
+    const users = await services.getAllUsersService();
 
-  res.send(users);
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
 };
 
-const createUser = async (req, res) => {
+const getOneUser = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const user = await services.getUserByIdService(+id);
+
+    if (!user) {
+      res.sendStatus(404);
+
+      return;
+    }
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const createNewUser = async (req, res) => {
   const { name } = req.body;
 
   if (!name) {
-    res.sendStatus(400);
+    res.status(400).json({ error: 'Name is required' });
 
     return;
   }
 
-  const newUser = await userService.createUser(name);
+  try {
+    const newUser = await services.createUserService({ name });
 
-  return res.status(201).json(newUser);
-};
-
-const getUser = async (req, res) => {
-  const { id } = req.params;
-
-  const user = await userService.getUserById(id);
-
-  if (!user) {
-    res.sendStatus(404);
-
-    return;
+    res.status(201).json(newUser);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
   }
-
-  res.send(user);
-};
-
-const deleteUser = async (req, res) => {
-  const { id } = req.params;
-
-  const user = await userService.getUserById(id);
-
-  if (!user) {
-    res.sendStatus(404);
-
-    return;
-  }
-
-  await userService.deleteUser(id);
-
-  res.sendStatus(204);
 };
 
 const updateUser = async (req, res) => {
   const { id } = req.params;
   const { name } = req.body;
 
-  const user = await userService.getUserById(id);
+  try {
+    const user = await services.getUserByIdService(+id);
 
-  if (!user) {
-    res.sendStatus(404);
+    if (!user) {
+      res.sendStatus(404);
 
-    return;
+      return;
+    }
+
+    const updatedUser = await services.updateUserService(+id, name);
+
+    res.json(updatedUser);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
   }
+};
 
-  if (!name) {
-    res.sendStatus(400);
+const deleteUser = async (req, res) => {
+  const { id } = req.params;
 
-    return;
+  try {
+    const user = await services.getUserByIdService(+id);
+
+    if (!user) {
+      res.status(404).json({ error: 'User not found' });
+
+      return;
+    }
+    await services.deleteUserService(+id);
+    res.sendStatus(204);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
   }
-
-  await userService.updateUser(id, name);
-
-  res.send(await userService.getUserById(id));
 };
 
 module.exports = {
   getAllUsers,
-  createUser,
-  getUser,
-  deleteUser,
+  getOneUser,
+  createNewUser,
   updateUser,
+  deleteUser,
 };

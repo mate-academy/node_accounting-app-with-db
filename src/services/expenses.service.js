@@ -1,93 +1,69 @@
 const { Op } = require('sequelize');
-const { Expense } = require('../models/Expense.model');
+const { Expense } = require('../models/Expense.model.js');
 
-const initExpenses = async () => {
-  try {
-    Expense.sync({ force: true });
-  } catch (error) {
-    throw new Error();
+const getAllExpenseService = async ({ userId, from, to, categories }) => {
+  const whereClause = {};
+
+  if (userId) {
+    whereClause.userId = userId;
   }
+
+  if (from && to) {
+    whereClause.spentAt = {
+      [Op.between]: [new Date(from), new Date(to)],
+    };
+  }
+
+  if (categories) {
+    whereClause.category = {
+      [Op.in]: categories.split(','),
+    };
+  }
+
+  return Expense.findAll({ where: whereClause });
 };
 
-const getAllExpenses = async ({ userId, categories, from, to }) => {
-  try {
-    const whereClause = {};
-
-    if (userId) {
-      whereClause.userId = userId;
-    }
-
-    if (categories) {
-      whereClause.category = categories;
-    }
-
-    if (from && to) {
-      whereClause.spentAt = {
-        [Op.between]: [from, to],
-      };
-    } else if (from) {
-      whereClause.spentAt = {
-        [Op.gte]: from,
-      };
-    } else if (to) {
-      whereClause.spentAt = {
-        [Op.lte]: to,
-      };
-    }
-
-    const filteredExpenses = await Expense.findAll({
-      where: whereClause,
-    });
-
-    return filteredExpenses;
-  } catch (error) {
-    throw error;
-  }
+const getExpenseByIdService = async (id) => {
+  return Expense.findByPk(id);
 };
 
-const createExpense = async (newExpense) => {
-  try {
-    return await Expense.create({
-      userId: newExpense.userId,
-      title: newExpense.title,
-      amount: newExpense.amount,
-      category: newExpense.category,
-      note: newExpense.note,
-    });
-  } catch (error) {
-    throw new Error();
+const createExpenseService = async (data) => {
+  if (!data) {
+    throw new Error('Invalid input data');
   }
+
+  const newExpense = await Expense.create(data);
+
+  return newExpense;
 };
 
-const getExpenseById = async (id) => {
-  try {
-    return await Expense.findByPk(id);
-  } catch (error) {
-    throw new Error();
+const updateExpenseService = async (id, title) => {
+  const expense = await getExpenseByIdService(id);
+
+  if (!expense) {
+    throw new Error('Expense not found');
   }
+
+  expense.title = title;
+  await expense.save();
+
+  return expense;
 };
 
-const updateExpense = async (id, data) => {
-  try {
-    return await Expense.update(data, { where: { id } });
-  } catch (error) {
-    throw new Error();
-  }
-};
+const deleteExpenseService = async (id) => {
+  const deletedRows = await Expense.destroy({
+    where: { id },
+  });
 
-const deleteExpense = async (id) => {
-  try {
-    await Expense.destroy({ where: { id } });
-  } catch (error) {
-    throw new Error();
+  if (deletedRows === 0) {
+    throw new Error('Expense not found');
   }
 };
 
 module.exports = {
-  initExpenses,
-  getAllExpenses,
-  createExpense,
-  getExpenseById,
-  updateExpense,
-  deleteExpense,
+  getAllExpenseService,
+  getExpenseByIdService,
+  createExpenseService,
+  updateExpenseService,
+  deleteExpenseService,
 };
