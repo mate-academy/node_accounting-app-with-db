@@ -61,7 +61,7 @@ describe('Expense', () => {
       console.log(HOST);
     });
 
-    await Expense.destroy({ truncate: true });
+    await Expense.sync({ force: true });
   });
 
   afterEach(async () => {
