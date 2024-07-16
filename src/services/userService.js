@@ -1,44 +1,50 @@
-let users = [];
+const { User } = require('../models/User.model');
 
-const getAllUsers = () => users;
+const getAllUsers = async () => {
+  const result = await User.findAll();
 
-const createUser = (name) => {
-  const newId = getHighestId(users) + 1;
-
-  const newUser = { id: newId, name };
-
-  users.push(newUser);
-
-  return newUser;
+  return result;
 };
 
-const getUserById = (userId) => {
-  return users.find((user) => user.id === userId);
+const createUser = async (name) => {
+  return User.create({ name });
 };
 
-const deleteUserById = (userId) => {
-  const searchedUserIndex = users.findIndex((user) => user.id === userId);
-
-  users.splice(searchedUserIndex, 1);
+const getUserById = async (userId) => {
+  return User.findByPk(userId);
 };
 
-const UpdateUserData = (searchedUser, name) => {
-  Object.assign(searchedUser, { name });
+const deleteUserById = async (userId) => {
+  const operationResult = await User.destroy({
+    where: {
+      id: userId,
+    },
+  });
+
+  if (operationResult !== 1) {
+    throw new Error('Todo not found');
+  }
 };
 
-function resetUsers() {
-  users = [];
-}
+const UpdateUserData = async (userId, name) => {
+  if (typeof userId !== 'number' || typeof name !== 'string') {
+    throw new Error('Invalid user data');
+  }
 
-function getHighestId(array) {
-  return array.reduce(
-    (acc, currentObject) => (currentObject.id > acc ? currentObject.id : acc),
-    array[0]?.id || -1,
+  const [affectedCount, updatedUsers] = await User.update(
+    { name },
+    {
+      where: {
+        id: userId,
+      },
+      returning: true,
+    },
   );
-}
+
+  return [affectedCount, updatedUsers];
+};
 
 module.exports = {
-  resetUsers,
   getAllUsers,
   createUser,
   getUserById,

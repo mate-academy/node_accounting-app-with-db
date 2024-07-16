@@ -15,12 +15,9 @@ const {
   deleteExpense,
   patchExpense,
 } = require('./controllers/expenses-controller.js');
-const { resetStoredData } = require('./helpers/resetStoredData.js');
 
 const createServer = () => {
   const app = express();
-
-  resetStoredData();
 
   // Users
   app.get('/users', express.json(), getUsers);

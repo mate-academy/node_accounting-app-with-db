@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const {
   getAllExpenses,
   getExpensesByFilter,
@@ -8,56 +9,49 @@ const {
 } = require('../services/ExpenseService.js');
 const { getUserById } = require('../services/userService.js');
 
-const getExpenses = (req, res) => {
+const getExpenses = async (req, res) => {
   const { userId, categories, from, to } = req.query;
 
   if (!userId && !categories && !from && !to) {
-    res.send(getAllExpenses());
+    try {
+      const allExpenses = await getAllExpenses();
+
+      res.status(200).send(allExpenses);
+    } catch {
+      res.sendStatus(404);
+    }
 
     return;
   }
 
-  let expensesToSend = [];
+  const filters = [];
 
   if (userId) {
-    expensesToSend = expensesToSend.concat(
-      getExpensesByFilter((expense) => expense.userId === +userId),
-    );
+    filters.push({ userId: userId });
   }
 
   if (categories) {
-    if (userId) {
-      expensesToSend = expensesToSend.filter(
-        (expense) => expense.category === categories,
-      );
-    } else {
-      expensesToSend = getExpensesByFilter(
-        (expense) => expense.category === categories,
-      );
-    }
+    filters.push({ category: categories });
   }
 
   if (from && to) {
-    if (userId || categories) {
-      expensesToSend = expensesToSend.filter(
-        (expense) =>
-          new Date(expense.spentAt) > new Date(from) &&
-          new Date(expense.spentAt) < new Date(to),
-      );
-    } else {
-      expensesToSend = getExpensesByFilter(
-        (expense) =>
-          new Date(expense.spentAt) > new Date(from) &&
-          new Date(expense.spentAt) < new Date(to),
-      );
-    }
+    filters.push({
+      spentAt: {
+        [Op.between]: [new Date(from), new Date(to)],
+      },
+    });
   }
 
-  res.statusCode = 200;
-  res.send(expensesToSend);
+  try {
+    const expensesFromDb = await getExpensesByFilter(filters);
+
+    res.status(200).send(expensesFromDb);
+  } catch {
+    res.sendStatus(404);
+  }
 };
 
-const getExpense = (req, res) => {
+const getExpense = async (req, res) => {
   const { expenseId } = req.params;
 
   if (expenseId === undefined) {
@@ -66,7 +60,7 @@ const getExpense = (req, res) => {
     return;
   }
 
-  const searchedExpense = getExpenseById(+expenseId);
+  const searchedExpense = await getExpenseById(+expenseId);
 
   if (!searchedExpense) {
     res.sendStatus(404);
@@ -74,54 +68,28 @@ const getExpense = (req, res) => {
     return;
   }
 
-  res.statusCode = 200;
-  res.send(searchedExpense);
+  res.status(200).send(searchedExpense);
 };
 
-const postExpense = (req, res) => {
+const postExpense = async (req, res) => {
   const { userId } = req.body;
 
-  if (typeof userId !== 'number') {
+  if (userId === undefined || !(await getUserById(+userId))) {
     res.sendStatus(400);
 
     return;
   }
 
-  if (!getUserById(userId)) {
+  try {
+    const newExpense = await createExpense(req.body);
+
+    res.status(201).send(newExpense);
+  } catch {
     res.sendStatus(400);
-
-    return;
   }
-
-  const newExpense = createExpense(req.body);
-
-  res.statusCode = 201;
-  res.send(newExpense);
 };
 
-const deleteExpense = (req, res) => {
-  const { expenseId } = req.params;
-
-  if (expenseId === undefined) {
-    res.sendStatus(404);
-
-    return;
-  }
-
-  const searchedExpense = getExpenseById(+expenseId);
-
-  if (!searchedExpense) {
-    res.sendStatus(404);
-
-    return;
-  }
-
-  deleteExpenseById(expenseId);
-
-  res.sendStatus(204);
-};
-
-const patchExpense = (req, res) => {
+const deleteExpense = async (req, res) => {
   const { expenseId } = req.params;
 
   if (expenseId === undefined) {
@@ -130,22 +98,33 @@ const patchExpense = (req, res) => {
     return;
   }
 
-  const searchedExpense = getExpenseById(expenseId);
+  try {
+    await deleteExpenseById(expenseId);
 
-  if (!searchedExpense) {
+    res.sendStatus(204);
+
+    return;
+  } catch {
     res.sendStatus(404);
+  }
+};
+
+const patchExpense = async (req, res) => {
+  const { expenseId } = req.params;
+
+  if (expenseId === undefined) {
+    res.sendStatus(400);
 
     return;
   }
 
-  const newExpenseData = req.body;
+  try {
+    const [, affectedRows] = await updateExpense(+expenseId, req.body);
 
-  updateExpense(searchedExpense, newExpenseData);
-
-  Object.assign(searchedExpense, newExpenseData);
-
-  res.statusCode = 200;
-  res.send(searchedExpense);
+    res.status(200).send(affectedRows[0]);
+  } catch {
+    res.sendStatus(404);
+  }
 };
 
 module.exports = {
