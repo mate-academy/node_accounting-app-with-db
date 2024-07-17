@@ -16,12 +16,12 @@ const {
 } = process.env;
 
 const sequelize = new Sequelize({
-  database: POSTGRES_DB || 'postgres',
-  username: POSTGRES_USER || 'postgres',
-  host: POSTGRES_HOST || 'localhost',
+  database: POSTGRES_DB,
+  username: POSTGRES_USER,
+  host: POSTGRES_HOST,
   dialect: 'postgres',
-  port: POSTGRES_PORT || 5432,
-  password: POSTGRES_PASSWORD || '1',
+  port: POSTGRES_PORT,
+  password: POSTGRES_PASSWORD,
 });
 
 module.exports = {
