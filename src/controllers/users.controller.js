@@ -13,31 +13,15 @@ const addUser = async (req, res) => {
     return res.sendStatus(400);
   }
 
-  try {
-    const users = await usersService.getAllUsers();
+  const newUser = await usersService.addUser({ name });
 
-    const ids = users
-      .map((item) => parseInt(item.id, 10))
-      .filter((itemId) => !isNaN(itemId));
-    const id = ids.length > 0 ? Math.max(...ids) + 1 : 1;
-
-    const newUser = {
-      id: id,
-      name: name,
-    };
-
-    await usersService.addUser(newUser);
-
-    res.status(201).send(newUser);
-  } catch (error) {
-    res.sendStatus(500);
-  }
+  res.status(201).send(newUser);
 };
 
 const getUser = async (req, res) => {
   const { id } = req.params;
 
-  const user = await usersService.findUser(+id);
+  const user = await usersService.findUser(id);
 
   if (!user) {
     return res.sendStatus(404);
@@ -64,10 +48,7 @@ const changeUser = async (req, res) => {
   const { id } = req.params;
   const { name } = req.body;
 
-  let newUser = await usersService.findUser(id);
-
-  newUser = Object.assign(newUser, { name });
-  usersService.changeUser(newUser);
+  const newUser = await usersService.changeUser({ id, name });
 
   res.send(newUser);
 };

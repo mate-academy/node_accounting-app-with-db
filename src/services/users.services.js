@@ -1,14 +1,14 @@
 const { Op } = require('sequelize');
 const { User } = require('../models/User.model');
 
-const getAllUsers = () => {
-  const users = User.findAll();
+const getAllUsers = async () => {
+  const users = await User.findAll();
 
   return users;
 };
 
-const addUser = async ({ id, name }) => {
-  await User.create({ id, name });
+const addUser = async ({ name }) => {
+  return User.create({ name });
 };
 
 const findUser = async (id) => {
@@ -22,7 +22,16 @@ const filteredUsers = (id) => {
 };
 
 const changeUser = async ({ id, name }) => {
-  await User.update({ name }, { where: { id } });
+  const [affectedCount, affectedRows] = await User.update(
+    { name },
+    { where: { id }, returning: true },
+  );
+
+  if (affectedCount > 0) {
+    const updatedUser = affectedRows[0];
+
+    return updatedUser;
+  }
 };
 
 const deleteUser = async (id) => {

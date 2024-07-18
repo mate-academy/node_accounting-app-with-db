@@ -9,30 +9,30 @@ const Expense = sequelize.define(
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
+      autoIncrement: true,
     },
     title: {
       type: DataTypes.STRING,
       allowNull: false,
     },
     amount: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     category: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     note: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    createdAt: {
+    spentAt: {
       type: DataTypes.DATE,
-      field: 'created-at',
       allowNull: false,
       defaultValue: DataTypes.NOW,
     },
@@ -40,6 +40,7 @@ const Expense = sequelize.define(
   {
     tableName: 'expenses',
     updatedAt: false,
+    createdAt: false,
   },
 );
 

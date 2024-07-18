@@ -1,5 +1,5 @@
 const expensesService = require('../services/expenses.services');
-const usersService = require('../services/users.services');
+/* const usersService = require('../services/users.services'); */
 
 const getAll = async (req, res) => {
   const expenses = await expensesService.getAllExpenses(req.query);
@@ -8,28 +8,21 @@ const getAll = async (req, res) => {
 };
 
 const addExpense = async (req, res) => {
-  const { userId, title, amount, category, note } = req.body;
+  const { userId, title, amount, category, note, spentAt } = req.body;
 
-  let expense = {};
-  const user = await usersService.findUser(userId);
+  /*  const user = await usersService.findUser(+userId); */
 
-  if (!title || !userId || !amount || !category || !note) {
-    res.sendStatus(400);
-  } else if (!user) {
+  if (!title || !userId || !amount) {
     res.sendStatus(400);
   } else {
-    const id = userId;
-
-    expense = {
-      title: title,
-      amount: amount,
-      category: category,
-      note: note,
-      id: id,
-      userId: userId,
-    };
-
-    expensesService.addExpense(expense);
+    const expense = await expensesService.addExpense({
+      title,
+      amount,
+      category,
+      note,
+      userId,
+      spentAt,
+    });
 
     res.status(201).send(expense);
   }
@@ -38,7 +31,7 @@ const addExpense = async (req, res) => {
 const getExpense = async (req, res) => {
   const { id } = req.params;
 
-  const expense = await expensesService.findExpense(id);
+  const expense = await expensesService.findExpense(+id);
 
   if (!expense) {
     return res.sendStatus(404);
@@ -72,7 +65,7 @@ const removeExpense = async (req, res) => {
     return res.sendStatus(404);
   }
 
-  expensesService.deleteExpense(id);
+  expensesService.deleteExpense(expense.id);
 
   res.sendStatus(204);
 };

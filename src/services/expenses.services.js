@@ -39,7 +39,7 @@ const getAllExpenses = async (query) => {
 };
 
 const addExpense = async (expense) => {
-  await Expense.create(expense);
+  return Expense.create(expense);
 };
 
 const findExpense = async (id) => {
