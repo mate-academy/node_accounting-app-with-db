@@ -1,5 +1,4 @@
 const expensesService = require('../services/expenses.services');
-/* const usersService = require('../services/users.services'); */
 
 const getAll = async (req, res) => {
   const expenses = await expensesService.getAllExpenses(req.query);
@@ -9,8 +8,6 @@ const getAll = async (req, res) => {
 
 const addExpense = async (req, res) => {
   const { userId, title, amount, category, note, spentAt } = req.body;
-
-  /*  const user = await usersService.findUser(+userId); */
 
   if (!title || !userId || !amount) {
     res.sendStatus(400);
