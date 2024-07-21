@@ -18,7 +18,9 @@ const addUser = async (req, res) => {
 
     res.status(STATUS_CODES.CREATED).send(user);
   } catch {
-    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send({ error: 'Failed to add user' });
+    res
+      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .send({ error: 'Failed to add user' });
   }
 };
 
@@ -34,7 +36,9 @@ const getUser = async (req, res) => {
       res.status(STATUS_CODES.OK).send(response);
     }
   } catch {
-    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send({ error: 'Failed to get user' });
+    res
+      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .send({ error: 'Failed to get user' });
   }
 };
 
@@ -51,7 +55,9 @@ const deleteUser = async (req, res) => {
       res.sendStatus(STATUS_CODES.NO_CONTENT);
     }
   } catch {
-    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send({ error: 'Failed to delete user' });
+    res
+      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .send({ error: 'Failed to delete user' });
   }
 };
 
@@ -69,7 +75,9 @@ const updateUser = async (req, res) => {
       res.status(STATUS_CODES.OK).send(updatedUser);
     }
   } catch {
-    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send({ error: 'Failed to update user' });
+    res
+      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .send({ error: 'Failed to update user' });
   }
 };
 

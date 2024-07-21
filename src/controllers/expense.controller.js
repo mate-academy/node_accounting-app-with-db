@@ -16,7 +16,9 @@ const getExpenses = async (req, res) => {
 
     res.status(STATUS_CODES.OK).send(response);
   } catch (error) {
-    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send({ error: 'Failed to fetch expenses' });
+    res
+      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .send({ error: 'Failed to fetch expenses' });
   }
 };
 
@@ -57,7 +59,9 @@ const addExpense = async (req, res) => {
 
     res.status(STATUS_CODES.CREATED).send(createdExpense);
   } catch (error) {
-    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send({ error: 'Failed to add expense' });
+    res
+      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .send({ error: 'Failed to add expense' });
   }
 };
 
@@ -77,7 +81,9 @@ const getExpense = async (req, res) => {
       res.status(STATUS_CODES.OK).send(response);
     }
   } catch (error) {
-    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send({ error: 'Failed to fetch expense' });
+    res
+      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .send({ error: 'Failed to fetch expense' });
   }
 };
 
@@ -95,7 +101,9 @@ const deleteExpense = async (req, res) => {
       res.sendStatus(STATUS_CODES.NOT_FOUND);
     }
   } catch (error) {
-    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send({ error: 'Failed to delete expense' });
+    res
+      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .send({ error: 'Failed to delete expense' });
   }
 };
 
@@ -117,7 +125,9 @@ const updateExpense = async (req, res) => {
       res.sendStatus(STATUS_CODES.NOT_FOUND);
     }
   } catch {
-    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send({ error: 'Failed to update expense' });
+    res
+      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .send({ error: 'Failed to update expense' });
   }
 };
 
