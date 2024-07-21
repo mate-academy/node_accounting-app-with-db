@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const ExpensesControl = require('../controllers/expense.controller');
-const { ROUTES } = require('./routes');
+const { ROUTES } = require('../constants/routes');
 
 router.get(ROUTES.EXPENSES, ExpensesControl.getExpenses);
 router.post(ROUTES.EXPENSES, ExpensesControl.addExpense);

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const UserController = require('../controllers/user.controller');
-const { ROUTES } = require('./routes');
+const { ROUTES } = require('../constants/routes');
 
 router.get(ROUTES.USERS, UserController.getUsers);
 router.post(ROUTES.USERS, UserController.addUser);

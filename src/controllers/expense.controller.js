@@ -1,7 +1,7 @@
 /* eslint-disable function-paren-newline */
 const Expense = require('../models/Expense.model');
 const User = require('../models/User.model');
-const { STATUS_CODES } = require('../constants');
+const { STATUS_CODES } = require('../constants/statusCodes');
 
 const getExpenses = async (req, res) => {
   const { categories, ...otherQueryParams } = req.query;

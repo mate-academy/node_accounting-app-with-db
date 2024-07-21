@@ -1,6 +1,6 @@
 /* eslint-disable function-paren-newline */
 const User = require('../models/User.model');
-const { STATUS_CODES } = require('../constants');
+const { STATUS_CODES } = require('../constants/statusCodes');
 
 const getUsers = (req, res) => {
   User.getUsers().then((users) => res.status(STATUS_CODES.OK).send(users));
