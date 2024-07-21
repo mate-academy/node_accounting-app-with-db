@@ -1,4 +1,5 @@
 const express = require('express');
+const { ROUTES } = require('./routes');
 
 function createServer() {
   const app = express();
@@ -13,12 +14,10 @@ function createServer() {
 
   // Routes
   const userRoutes = require('./routes/user.route');
-
-  app.use('/users', userRoutes);
-
   const expensesRoutes = require('./routes/expense.route');
 
-  app.use('/expenses', expensesRoutes);
+  app.use(ROUTES.USERS, userRoutes);
+  app.use(ROUTES.EXPENSES, expensesRoutes);
 
   return app;
 }

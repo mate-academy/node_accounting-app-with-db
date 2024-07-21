@@ -1,6 +1,7 @@
 /* eslint-disable function-paren-newline */
 const Expense = require('../models/Expense.model');
 const User = require('../models/User.model');
+const { STATUS_CODES } = require('../constants');
 
 const getExpenses = async (req, res) => {
   const { categories, ...otherQueryParams } = req.query;
@@ -13,9 +14,9 @@ const getExpenses = async (req, res) => {
   try {
     const response = await Expense.getExpenses(query);
 
-    res.send(response);
+    res.status(STATUS_CODES.OK).send(response);
   } catch (error) {
-    res.status(500).send({ error: 'Failed to fetch expenses' });
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send({ error: 'Failed to fetch expenses' });
   }
 };
 
@@ -32,7 +33,7 @@ const addExpense = async (req, res) => {
 
   for (const key in requiredProperties) {
     if (!requiredProperties[key]) {
-      return res.sendStatus(400);
+      return res.sendStatus(STATUS_CODES.BAD_REQUEST);
     }
   }
 
@@ -40,7 +41,7 @@ const addExpense = async (req, res) => {
     const user = await User.getUser(userId);
 
     if (!user) {
-      return res.sendStatus(400);
+      return res.sendStatus(STATUS_CODES.BAD_REQUEST);
     }
 
     const newExpense = {
@@ -54,9 +55,9 @@ const addExpense = async (req, res) => {
 
     const createdExpense = await Expense.addExpense(newExpense);
 
-    res.status(201).send(createdExpense);
+    res.status(STATUS_CODES.CREATED).send(createdExpense);
   } catch (error) {
-    res.status(500).send({ error: 'Failed to add expense' });
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send({ error: 'Failed to add expense' });
   }
 };
 
@@ -64,19 +65,19 @@ const getExpense = async (req, res) => {
   const { id } = req.params;
 
   if (isNaN(Number(id))) {
-    return res.sendStatus(400);
+    return res.sendStatus(STATUS_CODES.BAD_REQUEST);
   }
 
   try {
     const response = await Expense.getExpense(id);
 
     if (!response) {
-      res.sendStatus(404);
+      res.sendStatus(STATUS_CODES.NOT_FOUND);
     } else {
-      res.send(response);
+      res.status(STATUS_CODES.OK).send(response);
     }
   } catch (error) {
-    res.status(500).send({ error: 'Failed to fetch expense' });
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send({ error: 'Failed to fetch expense' });
   }
 };
 
@@ -89,12 +90,12 @@ const deleteExpense = async (req, res) => {
     if (response) {
       await Expense.deleteExpense(id);
 
-      res.sendStatus(204);
+      res.sendStatus(STATUS_CODES.NO_CONTENT);
     } else {
-      res.sendStatus(404);
+      res.sendStatus(STATUS_CODES.NOT_FOUND);
     }
   } catch (error) {
-    res.status(500).send({ error: 'Failed to delete expense' });
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send({ error: 'Failed to delete expense' });
   }
 };
 
@@ -102,7 +103,7 @@ const updateExpense = async (req, res) => {
   const { id } = req.params;
 
   if (isNaN(Number(id))) {
-    return res.sendStatus(400);
+    return res.sendStatus(STATUS_CODES.BAD_REQUEST);
   }
 
   try {
@@ -111,12 +112,12 @@ const updateExpense = async (req, res) => {
     if (response) {
       const updatedExpense = await Expense.updateExpense(id, req.body);
 
-      res.send(updatedExpense);
+      res.status(STATUS_CODES.OK).send(updatedExpense);
     } else {
-      res.sendStatus(404);
+      res.sendStatus(STATUS_CODES.NOT_FOUND);
     }
   } catch {
-    res.status(500).send({ error: 'Failed to update expense' });
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send({ error: 'Failed to update expense' });
   }
 };
 
