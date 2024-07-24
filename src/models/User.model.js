@@ -20,7 +20,7 @@ const User = sequelize.define(
     tableName: 'users',
     updatedAt: false,
     createdAt: false,
-  }
+  },
 );
 
 module.exports = {
