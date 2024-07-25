@@ -29,7 +29,7 @@ async function updateUser(id, data) {
     where: { id },
   });
 
-  return { id, ...data };
+  return { id: +id, ...data };
 }
 
 module.exports = {

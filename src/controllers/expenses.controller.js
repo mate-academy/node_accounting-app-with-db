@@ -74,7 +74,10 @@ async function updateExpense(req, res) {
       return;
     }
 
-    const newExpense = { ...expenseToUpdate.dataValues, ...data };
+    const newExpense = {
+      ...expenseToUpdate.dataValues,
+      ...data,
+    };
 
     res.send(await expensesService.update(id, newExpense));
   } catch (error) {

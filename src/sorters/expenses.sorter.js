@@ -17,7 +17,7 @@ function sortByCategory(category, currentExpenses) {
 function sortByFrom(from, currentExpenses) {
   if (from) {
     return currentExpenses.filter(
-      (exp) => new Date(exp.spentAt) > new Date(from),
+      (exp) => new Date(exp.spentAt) >= new Date(from),
     );
   }
 
@@ -27,7 +27,7 @@ function sortByFrom(from, currentExpenses) {
 function sortByTo(to, currentExpenses) {
   if (to) {
     return currentExpenses.filter(
-      (exp) => new Date(exp.spentAt) < new Date(to),
+      (exp) => new Date(exp.spentAt) <= new Date(to),
     );
   }
 

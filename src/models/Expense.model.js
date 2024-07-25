@@ -22,13 +22,15 @@ const Expense = sequelize.define(
       type: DataTypes.STRING,
     },
     amount: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
     },
     category: {
       type: DataTypes.STRING,
+      allowNull: true,
     },
     note: {
       type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {

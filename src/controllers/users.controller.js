@@ -44,14 +44,20 @@ async function deleteUser(req, res) {
   try {
     const id = req.params.id;
 
-    const deletedUser = await usersService.getOne(id);
+    try {
+      const deletedUser = await usersService.getOne(id);
 
-    if (deletedUser.dataValues.id) {
-      await usersService.deleteUser(id);
-      res.sendStatus(204);
-    } else {
+      if (!deletedUser.dataValues.id) {
+        throw Error;
+      }
+    } catch (error) {
       res.sendStatus(404);
+
+      return;
     }
+
+    await usersService.deleteUser(id);
+    res.sendStatus(204);
   } catch (error) {
     res.sendStatus(500);
   }
