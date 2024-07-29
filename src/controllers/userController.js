@@ -2,11 +2,21 @@
 
 const userService = require('../services/userService');
 
+function validateName(name, res) {
+  if (!name) {
+    res.status(400).send('Name is required');
+
+    return false;
+  }
+
+  return true;
+}
+
 async function createUser(req, res) {
   const { name } = req.body;
 
-  if (!name) {
-    return res.status(400).send('Name and  are required');
+  if (!validateName(name, res)) {
+    return;
   }
 
   try {
@@ -30,10 +40,9 @@ async function getAllUsers(req, res) {
 
 async function getUser(req, res) {
   try {
-    const users = await userService.getAllUsers({
+    const [user] = await userService.getAllUsers({
       id: parseInt(req.params.id),
     });
-    const user = users[0];
 
     if (!user) {
       return res.status(404).send('User not found');
@@ -48,8 +57,8 @@ async function getUser(req, res) {
 async function updateUser(req, res) {
   const { name } = req.body;
 
-  if (!name) {
-    return res.status(400).send('Name and  are required');
+  if (!validateName(name, res)) {
+    return;
   }
 
   try {

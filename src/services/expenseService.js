@@ -4,60 +4,52 @@ const { models } = require('../models/models');
 
 class ExpenseService {
   async createExpense(userId, spentAt, title, amount, category, note) {
-    try {
-      const newExpense = await models.Expense.create({
-        userId,
-        spentAt,
-        title,
-        amount,
-        category,
-        note,
-      });
+    const newExpense = await models.Expense.create({
+      userId,
+      spentAt,
+      title,
+      amount,
+      category,
+      note,
+    });
 
-      return newExpense;
-    } catch (error) {
-      throw error;
-    }
+    return newExpense;
   }
 
-  async getAllExpenses(filters = {}) {
-    try {
-      const expenses = await models.Expense.findAll({
-        where: filters,
-      });
+  async getAllExpenses({ userId, category }) {
+    const where = {};
 
-      return expenses;
-    } catch (error) {
-      throw error;
+    if (userId) {
+      where.userId = userId;
     }
+
+    if (category) {
+      where.category = category;
+    }
+
+    const expenses = await models.Expense.findAll({ where });
+
+    return expenses;
   }
 
   async updateExpense(id, newExpense) {
-    try {
-      const [updatedRowsCount, [updatedExpense]] = await models.Expense.update(
-        newExpense,
-        {
-          where: { id },
-          returning: true,
-        },
-      );
+    const [updatedRowsCount, [updatedExpense]] = await models.Expense.update(
+      newExpense,
+      {
+        where: { id },
+        returning: true,
+      },
+    );
 
-      return updatedRowsCount ? updatedExpense : null;
-    } catch (error) {
-      throw error;
-    }
+    return updatedRowsCount ? updatedExpense : null;
   }
 
   async deleteExpense(id) {
-    try {
-      const deletedRowsCount = await models.Expense.destroy({
-        where: { id },
-      });
+    const deletedRowsCount = await models.Expense.destroy({
+      where: { id },
+    });
 
-      return deletedRowsCount > 0;
-    } catch (error) {
-      throw error;
-    }
+    return deletedRowsCount > 0;
   }
 }
 

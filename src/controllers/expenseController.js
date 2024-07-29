@@ -37,19 +37,9 @@ async function createExpense(req, res) {
 
 async function getAllExpenses(req, res) {
   try {
-    const userId = req.query.userId;
-    const category = req.query.categories;
-    const filters = {};
+    const { userId, categories: category } = req.query;
 
-    if (userId) {
-      filters.userId = userId;
-    }
-
-    if (category) {
-      filters.category = category;
-    }
-
-    const expenses = await expenseService.getAllExpenses(filters);
+    const expenses = await expenseService.getAllExpenses({ userId, category });
 
     res.json(expenses);
   } catch (error) {

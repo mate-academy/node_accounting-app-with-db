@@ -10,16 +10,7 @@ const userService = {
   },
 
   async getAllUsers(filters = {}) {
-    const where = {};
-
-    if (filters.id) {
-      where.id = filters.id;
-    }
-
-    if (filters.name) {
-      where.name = filters.name;
-    }
-
+    const where = { ...filters };
     const users = await User.findAll({ where });
 
     return users;
