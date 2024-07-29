@@ -44,6 +44,10 @@ const createUser = async (req, res) => {
 const deleteUser = async (req, res) => {
   const { id } = req.params;
 
+  if (!id || isNaN(Number(id))) {
+    return res.status(400).send('Bad request: Invalid Id!');
+  }
+
   try {
     const userToRemove = await userServices.deleteUserById(Number(id));
 
@@ -58,7 +62,7 @@ const deleteUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   const { id } = req.params;
-  const { name, spentAt, title, amount, category, note } = req.body;
+  const { name, ...userProps } = req.body;
 
   if (!id || !name) {
     return res.sendStatus(400);
@@ -68,11 +72,7 @@ const updateUser = async (req, res) => {
     const userToUpdate = await userServices.updateUserById({
       id: Number(id),
       name,
-      spentAt,
-      title,
-      amount,
-      category,
-      note,
+      ...userProps,
     });
 
     if (!userToUpdate) {
