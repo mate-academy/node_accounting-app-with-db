@@ -9,8 +9,7 @@ const userService = {
     return newUser;
   },
 
-  async getAllUsers(filters = {}) {
-    const where = { ...filters };
+  async getAllUsers(where = {}) {
     const users = await User.findAll({ where });
 
     return users;

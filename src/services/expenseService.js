@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 'use strict';
 
 const { models } = require('../models/models');
@@ -16,20 +17,15 @@ class ExpenseService {
     return newExpense;
   }
 
-  async getAllExpenses({ userId, category }) {
-    const where = {};
+  async getAllExpenses(where = {}) {
+    try {
+      const expenses = await models.Expense.findAll({ where });
 
-    if (userId) {
-      where.userId = userId;
+      return expenses;
+    } catch (error) {
+      console.error('Error in getAllExpenses:', error);
+      throw error;
     }
-
-    if (category) {
-      where.category = category;
-    }
-
-    const expenses = await models.Expense.findAll({ where });
-
-    return expenses;
   }
 
   async updateExpense(id, newExpense) {

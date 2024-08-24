@@ -3,6 +3,7 @@
 
 const { ExpenseService } = require('../services/expenseService');
 const expenseService = new ExpenseService();
+const { Op } = require('sequelize');
 const userService = require('../services/userService');
 
 async function createExpense(req, res) {
@@ -37,9 +38,24 @@ async function createExpense(req, res) {
 
 async function getAllExpenses(req, res) {
   try {
-    const { userId, categories: category } = req.query;
+    const { userId, categories: category, from, to } = req.query;
+    const where = {};
 
-    const expenses = await expenseService.getAllExpenses({ userId, category });
+    if (userId) {
+      where.userId = userId;
+    }
+
+    if (category) {
+      where.category = category;
+    }
+
+    if (from && to) {
+      where.spentAt = {
+        [Op.between]: [new Date(from), new Date(to)],
+      };
+    }
+
+    const expenses = await expenseService.getAllExpenses(where);
 
     res.json(expenses);
   } catch (error) {

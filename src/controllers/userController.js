@@ -2,24 +2,9 @@
 
 const userService = require('../services/userService');
 
-function validateName(name, res) {
-  if (!name) {
-    res.status(400).send('Name is required');
-
-    return false;
-  }
-
-  return true;
-}
-
 async function createUser(req, res) {
-  const { name } = req.body;
-
-  if (!validateName(name, res)) {
-    return;
-  }
-
   try {
+    const { name } = req.body;
     const newUser = await userService.createUser({ name });
 
     res.status(201).json(newUser);
@@ -56,10 +41,6 @@ async function getUser(req, res) {
 
 async function updateUser(req, res) {
   const { name } = req.body;
-
-  if (!validateName(name, res)) {
-    return;
-  }
 
   try {
     const user = await userService.updateUser(parseInt(req.params.id), {
