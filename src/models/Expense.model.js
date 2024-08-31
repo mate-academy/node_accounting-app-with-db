@@ -4,7 +4,7 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../db.js');
 
 const Expense = sequelize.define(
-  'Expense',
+  'expense',
   {
     id: {
       type: DataTypes.INTEGER,
@@ -14,13 +14,13 @@ const Expense = sequelize.define(
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: 'User',
-        key: 'id',
-      },
+      // references: {
+      //   model: 'users',
+      //   key: 'id',
+      // },
     },
     spentAt: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.DATE,
       allowNull: false,
     },
     title: {
@@ -37,11 +37,11 @@ const Expense = sequelize.define(
     },
     note: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
   },
   {
-    tableName: 'Expenses',
+    tableName: 'expenses',
   },
 );
 

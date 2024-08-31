@@ -4,20 +4,20 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../db.js');
 
 const User = sequelize.define(
-  'User',
+  'user',
   {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
     },
-    userId: {
-      type: DataTypes.INTEGER,
+    name: {
+      type: DataTypes.STRING,
       allowNull: false,
     },
   },
   {
-    tableName: 'Users',
+    tableName: 'users',
   },
 );
 

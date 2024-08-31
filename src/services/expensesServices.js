@@ -38,20 +38,16 @@ const createExpense = async (
   category,
   note,
 ) => {
-  try {
-    const newExpense = await Expense.create({
-      userId,
-      spentAt,
-      title,
-      amount,
-      category,
-      note,
-    });
+  const newExpense = await Expense.create({
+    userId,
+    spentAt,
+    title,
+    amount,
+    category,
+    note,
+  });
 
-    return newExpense;
-  } catch (error) {
-    throw error;
-  }
+  return newExpense;
 };
 
 const removeExpense = async (id) => {

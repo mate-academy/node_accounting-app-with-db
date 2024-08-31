@@ -11,9 +11,8 @@ const get = async (req, res) => {
 };
 
 const getOne = async (req, res) => {
-  const { id } = req.params;
-
   try {
+    const { id } = req.params;
     const choosedUser = await usersServices.getOneUser(id);
 
     if (!choosedUser) {
@@ -56,10 +55,10 @@ const patch = async (req, res) => {
     }
 
     if (!choosedUser) {
-      return res.status(404).send('err ch');
+      return res.status(404).send('err choosed user');
     }
 
-    const update = usersServices.updateUser({ id, name });
+    const update = await usersServices.updateUser({ id, name });
 
     return res.status(200).send(update);
   } catch (error) {
@@ -70,17 +69,13 @@ const patch = async (req, res) => {
 const post = async (req, res) => {
   const { name } = req.body;
 
-  try {
-    if (!name) {
-      return res.status(400).send();
-    }
-
-    const user = await usersServices.createUser(name);
-
-    return res.status(201).send(user);
-  } catch (error) {
-    return res.status(500).send(error);
+  if (!name) {
+    return res.status(400).send();
   }
+
+  const user = await usersServices.createUser(name);
+
+  return res.status(201).send(user);
 };
 
 module.exports = {

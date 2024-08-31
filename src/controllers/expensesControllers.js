@@ -55,26 +55,22 @@ const remove = async (req, res) => {
 const post = async (req, res) => {
   const { userId, spentAt, title, amount, category, note } = req.body;
 
-  try {
-    const selectedUser = await usersServices.getOneUser(userId);
+  const selectedUser = await usersServices.getOneUser(userId);
 
-    if (!spentAt || !title || !amount || !category || !selectedUser) {
-      return res.status(400).send();
-    }
-
-    const newExpense = await expensesServices.createExpense(
-      userId,
-      spentAt,
-      title,
-      amount,
-      category,
-      note,
-    );
-
-    return res.status(201).send(newExpense);
-  } catch (error) {
-    return res.status(500).send(error);
+  if (!spentAt || !title || !amount || !category || !selectedUser) {
+    return res.status(400).send();
   }
+
+  const newExpense = await expensesServices.createExpense(
+    userId,
+    spentAt,
+    title,
+    amount,
+    category,
+    note,
+  );
+
+  return res.status(201).send(newExpense);
 };
 
 const patch = async (req, res) => {

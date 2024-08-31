@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
 const { User } = require('../models/User.model');
 
-const getUsers = async () => {
+const getUsers = () => {
   try {
-    const user = await User.findAll();
+    const user = User.findAll();
 
     return user;
   } catch (error) {
@@ -12,28 +12,9 @@ const getUsers = async () => {
 };
 
 const getOneUser = async (id) => {
-  try {
-    const selectedUser = await User.findByPk(id);
+  const selectedUser = await User.findByPk(id);
 
-    return selectedUser;
-  } catch (error) {
-    throw error;
-  }
-};
-
-const createUser = async (name) => {
-  try {
-    const newUser = await User.create(
-      {
-        name,
-      },
-      { returning: true },
-    );
-
-    return newUser;
-  } catch (error) {
-    throw error;
-  }
+  return selectedUser;
 };
 
 const removeUser = async (id) => {
@@ -48,8 +29,8 @@ const removeUser = async (id) => {
   }
 };
 
-const updateUser = ({ id, name }) => {
-  const [updatedcount, updatedRows] = User.update(
+const updateUser = async ({ id, name }) => {
+  const [updatedcount, updatedRows] = await User.update(
     { name },
     {
       where: { id },
@@ -62,6 +43,17 @@ const updateUser = ({ id, name }) => {
   }
 
   return updatedRows[0];
+};
+
+const createUser = async (name) => {
+  const newUser = await User.create(
+    {
+      name,
+    },
+    { returning: true },
+  );
+
+  return newUser;
 };
 
 module.exports = {
