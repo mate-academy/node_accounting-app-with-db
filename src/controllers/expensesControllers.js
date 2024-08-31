@@ -2,7 +2,7 @@ const expensesServices = require('../services/expensesServices');
 const usersServices = require('../services/usersServices');
 
 const get = async (req, res) => {
-  const { userId, categories, from, to } = req.query;
+  const { userId, categories, from, to } = req.body;
 
   try {
     const expenses = await expensesServices.getExpenses(

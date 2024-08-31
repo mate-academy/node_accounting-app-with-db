@@ -2,15 +2,11 @@
 
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../db.js');
+const { User } = require('./User.model.js');
 
 const Expense = sequelize.define(
   'expense',
   {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
-    },
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -42,8 +38,13 @@ const Expense = sequelize.define(
   },
   {
     tableName: 'expenses',
+    updatedAt: false,
+    createdAt: false,
   },
 );
+
+User.hasMany(Expense, { foreignKey: { name: 'userId', allowNull: false } });
+Expense.belongsTo(User, { foreignKey: { name: 'userId', allowNull: false } });
 
 module.exports = {
   Expense,

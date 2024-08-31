@@ -3,9 +3,7 @@ const { sequelize } = require('./db.js');
 // const { User, Expense } = require('./models/models.js');
 
 const sync = async () => {
-  await sequelize.sync();
-  // await User.sync();
-  // await Expense.sync();
+  await sequelize.sync({ force: true });
 
   console.log('pieknie');
 };
