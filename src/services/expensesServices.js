@@ -4,18 +4,31 @@ const { Expense } = require('../models/Expense.model');
 
 const getExpenses = async (userId, categories, from, to) => {
   try {
+    const whereClause = {};
+
+    if (categories && Array.isArray(categories) && categories.length > 0) {
+      whereClause.category = { [Op.in]: categories };
+    }
+
+    if (userId) {
+      whereClause.userId = userId;
+    }
+
+    if (from && to) {
+      whereClause.spentAt = { [Op.between]: [new Date(from), new Date(to)] };
+    } else if (from) {
+      whereClause.spentAt = { [Op.gte]: from };
+    } else if (to) {
+      whereClause.spentAt = { [Op.lte]: new Date(to) };
+    }
+
     const exp = await Expense.findAll({
-      where: {
-        ...(categories && { category: { [Op.in]: categories } }),
-        ...(userId && { userId }),
-        ...(from && to && { spentAt: { [Op.between]: [from, to] } }),
-        ...(from && { spentAt: { [Op.gt]: from } }),
-        ...(to && { spentAt: { [Op.lt]: to } }),
-      },
+      where: whereClause,
     });
 
     return exp;
   } catch (error) {
+    console.error('Error fetching expenses:', error); // Lepsze logowanie błędów
     throw error;
   }
 };

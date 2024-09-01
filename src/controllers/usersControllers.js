@@ -28,19 +28,15 @@ const getOne = async (req, res) => {
 const remove = async (req, res) => {
   const { id } = req.params;
 
-  try {
-    const choosedUser = await usersServices.getOneUser(id);
+  const choosedUser = await usersServices.getOneUser(id);
 
-    if (!choosedUser) {
-      return res.status(404).send();
-    }
-
-    usersServices.removeUser(id);
-
-    return res.status(204).send();
-  } catch (error) {
-    return res.status(500).send();
+  if (!choosedUser) {
+    return res.status(404).send();
   }
+
+  await usersServices.removeUser(id);
+
+  res.status(204).send();
 };
 
 const patch = async (req, res) => {

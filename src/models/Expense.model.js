@@ -10,10 +10,10 @@ const Expense = sequelize.define(
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      // references: {
-      //   model: 'users',
-      //   key: 'id',
-      // },
+      references: {
+        model: 'users',
+        key: 'id',
+      },
     },
     spentAt: {
       type: DataTypes.DATE,
