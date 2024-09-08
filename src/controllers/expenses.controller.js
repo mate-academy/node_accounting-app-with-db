@@ -38,7 +38,7 @@ const createExpense = async (req, res) => {
   try {
     const { userId, spentAt, title, amount, category, note } = req.body;
 
-    if (isValidDate(req.body)) {
+    if (!spentAt || !title || !amount || !userId || !isValidDate(req.body)) {
       res.statusCode = 400;
       res.statusMessage = 'Error';
       res.end();
