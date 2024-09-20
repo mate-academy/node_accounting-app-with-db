@@ -2,10 +2,11 @@ const userService = require('../services/users.service');
 
 const getAll = async (req, res) => {
   try {
-    res.send(await userService.getAll());
+    const users = await userService.getAll();
+
+    res.status(200).send(users);
   } catch (error) {
-    res.statusCode = 500;
-    res.send('Something went wrong');
+    res.status(500).send('Something went wrong');
   }
 };
 
@@ -15,48 +16,44 @@ const getOne = async (req, res) => {
     const user = await userService.getOne(id);
 
     if (!user) {
-      res.sendStatus(404);
-
-      return;
+      return res.sendStatus(404);
     }
 
-    res.send(user);
-  } catch {
-    res.statusCode = 500;
-    res.send('Something went wrong');
+    res.status(200).send(user);
+  } catch (error) {
+    res.status(500).send('Something went wrong');
   }
 };
 
 const createUser = async (req, res) => {
   if (!req.body.name) {
-    res.sendStatus(400);
-
-    return;
+    return res.status(400).send('Name is required');
   }
 
   try {
-    res.statusCode = 201;
-    res.send(await userService.createUser(req.body));
-  } catch {
-    res.statusCode = 500;
-    res.send('Something went wrong');
+    const newUser = await userService.createUser(req.body);
+
+    res.status(201).send(newUser);
+  } catch (error) {
+    res.status(500).send('Something went wrong');
   }
 };
 
 const updateUser = async (req, res) => {
   const { id } = req.params;
 
-  if (!(await userService.getOne(id))) {
-    res.sendStatus(404);
-
-    return;
-  }
-
   try {
-    res.send(await userService.updateUser(id, req.body));
-  } catch {
-    res.statusCode = 500;
-    res.send('Something went wrong');
+    const user = await userService.getOne(id);
+
+    if (!user) {
+      return res.sendStatus(404);
+    }
+
+    const updatedUser = await userService.updateUser(id, req.body);
+
+    res.status(200).send(updatedUser);
+  } catch (error) {
+    res.status(500).send('Something went wrong');
   }
 };
 
@@ -64,17 +61,16 @@ const removeUser = async (req, res) => {
   const { id } = req.params;
 
   try {
-    if (!(await userService.getOne(id))) {
-      res.sendStatus(404);
+    const user = await userService.getOne(id);
 
-      return;
+    if (!user) {
+      return res.sendStatus(404);
     }
 
     await userService.removeUser(id);
     res.sendStatus(204);
-  } catch {
-    res.statusCode = 500;
-    res.send('Something went wrong');
+  } catch (error) {
+    res.status(500).send('Something went wrong');
   }
 };
 

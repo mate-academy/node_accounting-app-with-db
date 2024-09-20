@@ -23,6 +23,11 @@ const sequelize = new Sequelize({
   password: POSTGRES_PASSWORD || '69301410',
 });
 
+// const sequelize = new Sequelize({
+//   dialect: 'sqlite',
+//   storage: 'db.sqlite',
+// });
+
 module.exports = {
   sequelize,
 };
