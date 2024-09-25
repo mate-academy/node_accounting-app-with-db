@@ -1,67 +1,87 @@
 const userService = require('../services/userService.js');
 
 const getUsers = async (req, res) => {
-  res.send(await userService.getAllUsers());
+  try {
+    res.send(await userService.getAllUsers());
+  } catch (error) {
+    res.sendStatus(500);
+  }
 };
 
 const getUser = async (req, res) => {
-  const { id } = req.params;
-  const user = await userService.getUserById(id);
+  try {
+    const { id } = req.params;
+    const user = await userService.getUserById(id);
 
-  if (!user) {
-    res.sendStatus(404);
+    if (!user) {
+      res.sendStatus(404);
 
-    return;
+      return;
+    }
+    res.status(200);
+    res.json(user);
+  } catch (error) {
+    res.sendStatus(500);
   }
-  res.status(200);
-  res.json(user);
 };
 
 const createUser = async (req, res) => {
-  const { name } = req.body;
+  try {
+    const { name } = req.body;
 
-  if (!name) {
-    res.sendStatus(400);
+    if (!name) {
+      res.sendStatus(400);
 
-    return;
+      return;
+    }
+
+    const user = await userService.createUser(name);
+
+    res.status(201).json(user);
+  } catch (error) {
+    res.sendStatus(500);
   }
-
-  const user = await userService.createUser(name);
-
-  res.status(201).json(user);
 };
 
 const updateUser = async (req, res) => {
-  const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-  if (!(await userService.getUserById(id))) {
-    res.sendStatus(404);
+    if (!(await userService.getUserById(id))) {
+      res.sendStatus(404);
 
-    return;
+      return;
+    }
+
+    const { name } = req.body;
+    const updatedUser = await userService.patchUser({ id, name });
+
+    if (!updatedUser) {
+      res.sendStatus(404);
+
+      return;
+    }
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    res.sendStatus(500);
   }
-
-  const { name } = req.body;
-  const updatedUser = await userService.patchUser({ id, name });
-
-  if (!updatedUser) {
-    res.sendStatus(404);
-
-    return;
-  }
-  res.status(200).json(updatedUser);
 };
 
 const removeUser = async (req, res) => {
-  const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-  if (!(await userService.getUserById(id))) {
-    res.sendStatus(404);
+    if (!(await userService.getUserById(id))) {
+      res.sendStatus(404);
 
-    return;
+      return;
+    }
+
+    await userService.deleteUser(id);
+    res.sendStatus(204);
+  } catch (error) {
+    res.sendStatus(500);
   }
-
-  await userService.deleteUser(id);
-  res.sendStatus(204);
 };
 
 module.exports = {
