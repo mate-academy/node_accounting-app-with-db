@@ -18,7 +18,13 @@ const create = async (name) => {
 };
 
 const update = async (id, name) => {
-  await User.update({ name }, { where: { id } });
+  // eslint-disable-next-line no-unused-vars
+  const [_, updatedRecords] = await User.update(
+    { name },
+    { where: { id }, returning: true },
+  );
+
+  return updatedRecords[0];
 };
 
 const remove = async (id) => {

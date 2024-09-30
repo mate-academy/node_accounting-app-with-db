@@ -48,15 +48,15 @@ const update = async (req, res) => {
     return;
   }
 
-  if (!userService.getById(id)) {
+  if (!(await userService.getById(id))) {
     res.sendStatus(404);
 
     return;
   }
 
-  const updatedUser = await userService.update(id, name);
+  const updatedUsers = await userService.update(id, name);
 
-  res.send(updatedUser);
+  res.send(updatedUsers);
 };
 
 const remove = async (req, res) => {
@@ -68,7 +68,7 @@ const remove = async (req, res) => {
     return;
   }
 
-  if (!userService.getById(id)) {
+  if (!(await userService.getById(id))) {
     res.sendStatus(404);
 
     return;

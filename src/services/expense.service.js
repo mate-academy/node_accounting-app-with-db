@@ -50,7 +50,13 @@ const create = async (newExpenseBody) => {
 };
 
 const update = async (id, updatedExpenseBody) => {
-  await Expense.update(updatedExpenseBody, { where: { id } });
+  // eslint-disable-next-line no-unused-vars
+  const [_, updatedRecords] = await Expense.update(updatedExpenseBody, {
+    where: { id },
+    returning: true,
+  });
+
+  return updatedRecords[0];
 };
 
 const remove = async (id) => {

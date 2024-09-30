@@ -59,7 +59,7 @@ const update = async (req, res) => {
     return;
   }
 
-  if (!expenseService.getById(id)) {
+  if (!(await expenseService.getById(id))) {
     res.sendStatus(404);
 
     return;
@@ -79,7 +79,7 @@ const remove = async (req, res) => {
     return;
   }
 
-  if (!expenseService.getById(id)) {
+  if (!(await expenseService.getById(id))) {
     res.sendStatus(404);
 
     return;
