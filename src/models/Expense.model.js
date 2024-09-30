@@ -9,6 +9,7 @@ const Expense = sequelize.define(
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
+      autoIncrement: true,
     },
     userId: {
       type: DataTypes.INTEGER,
@@ -28,7 +29,6 @@ const Expense = sequelize.define(
     },
     category: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
     note: {
       type: DataTypes.STRING,

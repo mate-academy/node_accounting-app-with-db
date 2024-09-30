@@ -27,17 +27,11 @@ const getById = async (req, res) => {
 
 const create = async (req, res) => {
   const newExpenseBody = req.body;
-  const requiredProperties = [
-    'userId',
-    'spentAt',
-    'title',
-    'amount',
-    'category',
-  ];
+  const requiredProperties = ['userId', 'spentAt', 'title', 'amount'];
 
   if (
     !requiredProperties.every((prop) => prop in newExpenseBody) ||
-    !userService.getById(newExpenseBody.userId)
+    !(await userService.getById(newExpenseBody.userId))
   ) {
     res.sendStatus(400);
 

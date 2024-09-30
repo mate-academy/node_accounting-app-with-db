@@ -1,7 +1,6 @@
 const {
   models: { User },
 } = require('../models/models');
-const { getNewId } = require('../utils/getNewId');
 
 const get = async () => {
   return User.findAll();
@@ -12,9 +11,7 @@ const getById = async (id) => {
 };
 
 const create = async (name) => {
-  const id = getNewId(await get());
-
-  return User.create({ id, name });
+  return User.create({ name });
 };
 
 const update = async (id, name) => {
