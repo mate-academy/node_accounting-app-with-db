@@ -1,23 +1,6 @@
 /* eslint-disable no-console */
 const { Expense } = require('../models/Expense.model');
 
-// let expenses = [];
-/* логіка вибору унікального ключа */
-const expensesId = async () => {
-  const id = await Expense.max('id');
-
-  return id ? id + 1 : 1;
-};
-
-let idExp;
-
-const initializeIdExp = async () => {
-  idExp = await expensesId();
-};
-
-initializeIdExp();
-/**/
-
 const resetExpenses = async () => {
   try {
     await Expense.destroy({
@@ -32,8 +15,26 @@ const resetExpenses = async () => {
   }
 };
 
-const getAllExpenses = async () => {
-  const expensesAll = await Expense.findAll();
+const getAllExpenses = async (userId, categories, from, to) => {
+  let expensesAll = await Expense.findAll();
+
+  if (userId) {
+    expensesAll = expensesAll.filter((expense) => expense.userId === +userId);
+  }
+
+  if (categories) {
+    expensesAll = expensesAll.filter(
+      (expense) => expense.category === categories,
+    );
+  }
+
+  if (from && to) {
+    expensesAll = expensesAll.filter(
+      (expense) =>
+        new Date(from) <= new Date(expense.spentAt) &&
+        new Date(to) >= new Date(expense.spentAt),
+    );
+  }
 
   return expensesAll;
 };
@@ -54,7 +55,6 @@ const createExpense = async (
 ) => {
   try {
     const expense = await Expense.create({
-      id: idExp,
       userId,
       spentAt,
       title,
@@ -62,8 +62,6 @@ const createExpense = async (
       category,
       note,
     });
-
-    idExp++;
 
     console.log('New expense create');
 

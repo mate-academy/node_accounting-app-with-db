@@ -6,27 +6,12 @@ const getExpenses = async (req, res) => {
   try {
     const { userId, categories, from, to } = req.query;
 
-    let expensesResult = await expenseService.getAllExpenses();
-
-    if (userId) {
-      expensesResult = expensesResult.filter(
-        (expense) => expense.userId === +userId,
-      );
-    }
-
-    if (categories) {
-      expensesResult = expensesResult.filter(
-        (expense) => expense.category === categories,
-      );
-    }
-
-    if (from && to) {
-      expensesResult = expensesResult.filter(
-        (expense) =>
-          new Date(from) <= new Date(expense.spentAt) &&
-          new Date(to) >= new Date(expense.spentAt),
-      );
-    }
+    const expensesResult = await expenseService.getAllExpenses(
+      userId,
+      categories,
+      from,
+      to,
+    );
 
     res.status(200).json(expensesResult);
   } catch (err) {
