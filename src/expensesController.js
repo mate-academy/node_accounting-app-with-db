@@ -11,6 +11,26 @@ const getAllExpenses = async (req, res) => {
   }
 };
 
+const getExpenseById = async (req, res) => {
+  const expenseId = req.params.id;
+
+  if (!expenseId) {
+    return res.sendStatus(400);
+  }
+
+  try {
+    const gottenExpense = await service.getExpenseById(expenseId);
+
+    if (!gottenExpense) {
+      return res.sendStatus(404);
+    }
+
+    res.status(200).json(gottenExpense);
+  } catch (err) {
+    throw err;
+  }
+};
+
 const addExpense = async (req, res) => {
   const { userId, spentAt, amount, title, category, note } = req.body;
 
@@ -44,26 +64,6 @@ const addExpense = async (req, res) => {
   }
 };
 
-const getExpenseById = async (req, res) => {
-  const expenseId = req.params.id;
-
-  if (!expenseId) {
-    return res.sendStatus(400);
-  }
-
-  try {
-    const gottenExpense = await service.getExpenseById(expenseId);
-
-    if (!gottenExpense) {
-      return res.sendStatus(404);
-    }
-
-    res.status(200).json(gottenExpense);
-  } catch (err) {
-    throw err;
-  }
-};
-
 const deleteExpense = async (req, res) => {
   const expenseId = req.params.id;
 
@@ -72,13 +72,23 @@ const deleteExpense = async (req, res) => {
   }
 
   try {
-    const deletedExpense = await service.deleteExpense(expenseId);
+    const isExpense = await service.getExpenseById();
 
-    if (!deletedExpense) {
+    if (!isExpense) {
       return res.sendStatus(404);
     }
 
-    res.sendStatus(204);
+    try {
+      const deletedExpense = await service.deleteExpense(expenseId);
+
+      if (!deletedExpense) {
+        return res.sendStatus(404);
+      }
+
+      res.sendStatus(204);
+    } catch (err) {
+      throw err;
+    }
   } catch (err) {
     throw err;
   }

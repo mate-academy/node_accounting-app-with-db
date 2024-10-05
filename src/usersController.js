@@ -50,7 +50,7 @@ const deleteUser = async (req, res) => {
   const userId = req.params.id;
 
   if (!userId) {
-    return res.sendStatus(400);
+    return res.sendStatus(404);
   }
 
   try {
