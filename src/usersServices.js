@@ -1,8 +1,8 @@
 const { User } = require('./models/User.model');
 
-async function getAllUsers() {
+function getAllUsers() {
   try {
-    return await User.findAll();
+    return User.findAll();
   } catch (err) {
     throw err;
   }
@@ -19,17 +19,17 @@ function addUser(userName) {
   }
 }
 
-async function getUser(userId) {
+function getUser(userId) {
   try {
-    return await User.findByPk(userId);
+    return User.findByPk(userId);
   } catch (err) {
     throw err;
   }
 }
 
-async function deleteUser(userId) {
+function deleteUser(userId) {
   try {
-    return await User.destroy({ where: { id: userId } });
+    return User.destroy({ where: { id: userId } });
   } catch (err) {
     throw err;
   }

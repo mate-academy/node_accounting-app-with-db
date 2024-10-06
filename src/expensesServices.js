@@ -1,50 +1,54 @@
+const { Op } = require('sequelize');
 const { Expense } = require('./models/Expense.model');
 
-async function getAllExpenses(queries) {
+function getAllExpenses(queries) {
+  const whereConditions = {};
+
   if (!queries || Object.keys(queries).length === 0) {
     try {
-      return await Expense.findAll();
+      return Expense.findAll();
     } catch (err) {
       throw err;
     }
   }
 
   if (queries.userId) {
-    return Expense.findAll({
-      where: { userId: queries.userId },
-    });
+    whereConditions.userId = queries.userId;
   }
 
   if (queries.categories) {
-    return Expense.findAll({
-      where: { userId: queries.categories },
-    });
+    whereConditions.category = queries.categories;
   }
 
   if (queries.from) {
-    return Expense.findAll({
-      where: { userId: queries.from },
-    });
+    whereConditions.spentAt = { [Op.gt]: queries.from };
   }
 
   if (queries.to) {
-    return Expense.findAll({
-      where: { userId: queries.to },
-    });
+    whereConditions.spentAt = {
+      ...whereConditions.spentAt,
+      [Op.lt]: queries.to,
+    };
   }
-}
 
-async function getExpenseById(expenseId) {
   try {
-    return await Expense.findByPk(expenseId);
+    return Expense.findAll({ where: whereConditions });
   } catch (err) {
     throw err;
   }
 }
 
-async function addExpense(userId, spentAt, amount, title, category, note) {
+function getExpenseById(expenseId) {
   try {
-    return await Expense.create({
+    return Expense.findByPk(expenseId);
+  } catch (err) {
+    throw err;
+  }
+}
+
+function addExpense(userId, spentAt, amount, title, category, note) {
+  try {
+    return Expense.create({
       id: Math.floor(Math.random() * 1000),
       userId: userId,
       spentAt: spentAt,
@@ -58,9 +62,9 @@ async function addExpense(userId, spentAt, amount, title, category, note) {
   }
 }
 
-async function deleteExpense(expenseId) {
+function deleteExpense(expenseId) {
   try {
-    return await Expense.destroy({ where: { id: expenseId } });
+    return Expense.destroy({ where: { id: expenseId } });
   } catch (err) {
     throw err;
   }

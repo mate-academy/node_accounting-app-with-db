@@ -54,7 +54,7 @@ const deleteUser = async (req, res) => {
   }
 
   try {
-    const isUser = service.getUser(userId);
+    const isUser = await service.getUser(userId);
 
     if (!isUser) {
       return res.sendStatus(404);
