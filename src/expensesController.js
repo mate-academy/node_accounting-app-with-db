@@ -72,7 +72,7 @@ const deleteExpense = async (req, res) => {
   }
 
   try {
-    const isExpense = await service.getExpenseById();
+    const isExpense = await service.getExpenseById(expenseId);
 
     if (!isExpense) {
       return res.sendStatus(404);
