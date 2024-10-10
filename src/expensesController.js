@@ -32,7 +32,14 @@ const getExpenseById = async (req, res) => {
 };
 
 const addExpense = async (req, res) => {
-  const { userId, spentAt, amount, title, category, note } = req.body;
+  const {
+    userId,
+    spentAt,
+    amount,
+    title,
+    category = null,
+    note = null,
+  } = req.body;
 
   try {
     const isUser = await usersService.getUser(userId);
@@ -109,11 +116,13 @@ const updateExpense = async (req, res) => {
       return res.sendStatus(404);
     }
 
-    const updatedExpense = await service.updateExpense(expenseId, updating);
+    const updatingSuccess = await service.updateExpense(expenseId, updating);
 
-    if (!updatedExpense) {
+    if (!updatingSuccess) {
       return res.sendStatus(404);
     }
+
+    const updatedExpense = await service.getExpenseById(expenseId);
 
     res.status(200).json(updatedExpense);
   } catch (err) {

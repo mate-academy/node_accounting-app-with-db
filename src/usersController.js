@@ -1,4 +1,4 @@
-const service = require('./usersServices.js');
+const service = require('./usersServices');
 
 const getAllUsers = async (req, res) => {
   try {
@@ -87,7 +87,9 @@ const updateUser = async (req, res) => {
       return res.sendStatus(404);
     }
 
-    const updatedUser = await service.updateUser(userToUpdateId, userName);
+    await service.updateUser(userToUpdateId, userName);
+
+    const updatedUser = await service.getUser(userToUpdateId);
 
     res.status(200).json(updatedUser);
   } catch (err) {

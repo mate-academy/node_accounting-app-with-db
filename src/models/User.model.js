@@ -4,11 +4,12 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../db.js');
 
 const User = sequelize.define(
-  'User',
+  'user',
   {
     id: {
-      type: DataTypes.NUMBER,
+      type: DataTypes.INTEGER,
       primaryKey: true,
+      autoIncrement: true,
     },
     name: {
       type: DataTypes.STRING,
@@ -16,7 +17,6 @@ const User = sequelize.define(
     },
   },
   {
-    tableName: 'users',
     createdAt: false,
     updatedAt: false,
   },

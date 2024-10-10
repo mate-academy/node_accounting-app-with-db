@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const { Op } = require('sequelize');
 const { Expense } = require('./models/Expense.model');
 
@@ -21,13 +22,13 @@ function getAllExpenses(queries) {
   }
 
   if (queries.from) {
-    whereConditions.spentAt = { [Op.gt]: queries.from };
+    whereConditions.spentAt = { [Op.gte]: queries.from };
   }
 
   if (queries.to) {
     whereConditions.spentAt = {
       ...whereConditions.spentAt,
-      [Op.lt]: queries.to,
+      [Op.lte]: queries.to,
     };
   }
 
@@ -49,7 +50,6 @@ function getExpenseById(expenseId) {
 function addExpense(userId, spentAt, amount, title, category, note) {
   try {
     return Expense.create({
-      id: Math.floor(Math.random() * 1000),
       userId: userId,
       spentAt: spentAt,
       amount: amount,
@@ -79,9 +79,9 @@ function updateExpense(expenseId, updating) {
 }
 
 function validateNewExpense(req, res, next) {
-  const { userId, spentAt, title, amount, category, note } = req.body;
+  const { userId, spentAt, title, amount } = req.body;
 
-  if (!userId || !spentAt || !title || !amount || !category || !note) {
+  if (!userId || !spentAt || !title || !amount) {
     return res.sendStatus(400);
   }
 

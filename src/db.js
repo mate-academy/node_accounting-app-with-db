@@ -1,7 +1,8 @@
+/* eslint-disable no-console */
 'use strict';
 
 const { Sequelize } = require('sequelize');
-const { Client } = require('pg');
+// const { Client } = require('pg');
 
 const utils = require('util');
 
@@ -26,24 +27,12 @@ const sequelize = new Sequelize({
   password: POSTGRES_PASSWORD || '11112222',
 });
 
-const client = new Client({
-  host: 'localhost',
-  user: 'postgres',
-  password: '11112222',
-  database: 'postgres',
-});
-
-async function initConnection() {
+(async () => {
   try {
-    await client.connect();
-  } catch (err) {
-    throw err;
+    await sequelize.authenticate();
+    console.log('Connection has been established successfully.');
+  } catch (error) {
+    console.error('Unable to connect to the database:', error);
   }
-}
-
-initConnection();
-
-module.exports = {
-  sequelize,
-  client,
-};
+})();
+module.exports = { sequelize };

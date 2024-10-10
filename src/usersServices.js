@@ -11,7 +11,6 @@ function getAllUsers() {
 function addUser(userName) {
   try {
     return User.create({
-      id: Math.floor(Math.random() * 1000),
       name: userName,
     });
   } catch (err) {
