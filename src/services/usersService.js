@@ -1,52 +1,28 @@
 'use strict';
 
-const createId = require('../utils/createId');
+const { User } = require('../models/User.model');
 
-const users = [];
-
-function init() {
-  users.length = 0;
+async function get() {
+  return User.findAll();
 }
 
-function get() {
-  return users;
+async function create(name) {
+  return User.create({ name });
 }
 
-function create(name) {
-  const user = {
-    id: createId(users),
-    name,
-  };
-
-  users.push(user);
-
-  return user;
+async function getById(id) {
+  return User.findByPk(id);
 }
 
-function getById(id) {
-  return users.find((user) => user.id === id);
-}
-
-function remove(id) {
-  const index = users.findIndex((user) => user.id === id);
-
-  if (index > -1) {
-    users.splice(index, 1);
-  }
+async function remove(id) {
+  await User.destroy({ where: { id } });
 }
 
 function update(id, name) {
-  const user = getById(id);
-
-  if (user) {
-    user.name = name;
-  }
-
-  return user;
+  return User.update({ name }, { where: { id } });
 }
 
 module.exports = {
-  init,
   get,
   create,
   getById,

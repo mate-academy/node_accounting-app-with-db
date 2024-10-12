@@ -3,11 +3,11 @@
 const { StatusCodes, ReasonPhrases } = require('http-status-codes');
 const usersService = require('../services/usersService');
 
-function get(_, res) {
-  res.status(StatusCodes.OK).send(usersService.get());
+async function get(_, res) {
+  res.status(StatusCodes.OK).send(await usersService.get());
 }
 
-function post(req, res) {
+async function post(req, res) {
   const { name } = req.body;
 
   if (!name) {
@@ -18,10 +18,10 @@ function post(req, res) {
     return;
   }
 
-  res.status(StatusCodes.CREATED).send(usersService.create(name));
+  res.status(StatusCodes.CREATED).send(await usersService.create(name));
 }
 
-function getById(req, res) {
+async function getById(req, res) {
   const { id } = req.params;
 
   if (!id) {
@@ -32,7 +32,7 @@ function getById(req, res) {
     return;
   }
 
-  const user = usersService.getById(+id);
+  const user = await usersService.getById(id);
 
   if (!user) {
     res
@@ -45,59 +45,61 @@ function getById(req, res) {
   res.status(StatusCodes.OK).send(user);
 }
 
-function remove(req, res) {
+async function remove(req, res) {
   const { id } = req.params;
 
   if (!id) {
-    res
+    return res
       .status(StatusCodes.BAD_REQUEST)
       .send(`${ReasonPhrases.BAD_REQUEST}: id is required`);
-
-    return;
   }
 
-  if (!usersService.getById(+id)) {
-    res
+  if (!usersService.getById(id)) {
+    return res
       .status(StatusCodes.NOT_FOUND)
       .send(`${ReasonPhrases.NOT_FOUND}: user with id ${id} does not exist`);
-
-    return;
   }
 
-  usersService.remove(+id);
+  usersService.remove(id);
 
   res.sendStatus(StatusCodes.NO_CONTENT);
 }
 
-function patch(req, res) {
+async function patch(req, res) {
   const { id } = req.params;
   const { name } = req.body;
 
   if (!id) {
-    res
+    return res
       .status(StatusCodes.BAD_REQUEST)
       .send(`${ReasonPhrases.BAD_REQUEST}: id is required`);
-
-    return;
   }
 
   if (!name) {
-    res
+    return res
       .status(StatusCodes.BAD_REQUEST)
       .send(`${ReasonPhrases.BAD_REQUEST}: name is required`);
-
-    return;
   }
 
-  if (!usersService.getById(+id)) {
-    res
-      .status(StatusCodes.NOT_FOUND)
-      .send(`${ReasonPhrases.NOT_FOUND}: user with id ${id} does not exist`);
+  try {
+    const user = await usersService.getById(id);
 
-    return;
+    if (!user) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .send(`${ReasonPhrases.NOT_FOUND}: user with id ${id} does not exist`);
+    }
+
+    await usersService.update(id, name);
+
+    const updatedUser = await usersService.getById(id);
+
+    return res.status(StatusCodes.OK).send(updatedUser);
+  } catch (error) {
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .send(`${ReasonPhrases.INTERNAL_SERVER_ERROR}: ${error.message}`);
   }
-
-  res.status(StatusCodes.OK).send(usersService.update(+id, name));
 }
 
 module.exports = {

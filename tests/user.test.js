@@ -43,7 +43,10 @@ describe('User', () => {
       console.log(HOST);
     });
 
-    await User.destroy({ truncate: true });
+    // This doesn't work with tables with foreign keys
+    // await User.destroy({ truncate: true });
+
+    await User.destroy({ truncate: true, cascade: true });
   });
 
   afterEach(async () => {
