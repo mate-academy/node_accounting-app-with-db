@@ -1,73 +1,52 @@
 'use strict';
 
-const createId = require('../utils/createId');
+const { Op } = require('sequelize');
+const { Expense } = require('../models/Expense.model');
 
-const expenses = [];
-
-function init() {
-  expenses.length = 0;
-}
-
-const get = (params) => {
-  let filteredExpenses = expenses;
+async function get(params) {
+  if (!params || Object.keys(params).length === 0) {
+    return Expense.findAll();
+  }
 
   const { userId, categories, from, to } = params;
+  const query = { where: {} };
 
   if (userId) {
-    filteredExpenses = filteredExpenses.filter(
-      (expense) => expense.userId === +userId,
-    );
+    query.where.userId = userId;
   }
 
   if (categories) {
-    filteredExpenses = filteredExpenses.filter(
-      (expense) => expense.category === categories,
-    );
+    query.where.category = categories;
   }
 
-  if (from && to) {
-    const fromDate = new Date(from);
-    const toDate = new Date(to);
-
-    filteredExpenses = filteredExpenses.filter(
-      (expense) =>
-        fromDate <= new Date(expense.spentAt) &&
-        new Date(expense.spentAt) <= toDate,
-    );
+  if (from) {
+    query.where.spentAt = { ...query.where.spentAt, [Op.gte]: from };
   }
 
-  return filteredExpenses;
-};
+  if (to) {
+    query.where.spentAt = { ...query.where.spentAt, [Op.lte]: to };
+  }
 
-function create(data) {
-  const expense = {
-    id: createId(expenses),
-    ...data,
-  };
-
-  expenses.push(expense);
-
-  return expense;
+  return Expense.findAll(query);
 }
 
-function getById(id) {
-  return expenses.find((expense) => expense.id === id);
+async function create(data) {
+  return Expense.create(data);
+}
+
+async function getById(id) {
+  return Expense.findByPk(id);
 }
 
 function remove(id) {
-  const index = expenses.findIndex((expense) => expense.id === id);
-
-  if (index > -1) {
-    expenses.splice(index, 1);
-  }
+  return Expense.destroy({ where: { id } });
 }
 
-function update(expense, data) {
-  return Object.assign(expense, data);
+async function update(id, data) {
+  return Expense.update(data, { where: { id } });
 }
 
 module.exports = {
-  init,
   get,
   create,
   getById,

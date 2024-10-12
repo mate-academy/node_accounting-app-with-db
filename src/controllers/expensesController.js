@@ -4,114 +4,152 @@ const { StatusCodes, ReasonPhrases } = require('http-status-codes');
 const expensesService = require('../services/expensesService');
 const usersService = require('../services/usersService');
 
-function get(req, res) {
-  const { userId, categories, from, to } = req.query;
-
-  res.status(StatusCodes.OK).send(
-    expensesService.get({
-      userId,
-      categories,
-      from,
-      to,
-    }),
-  );
+async function get(req, res) {
+  try {
+    return res
+      .status(StatusCodes.OK)
+      .send(await expensesService.get(req.query));
+  } catch (error) {
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .send(`${ReasonPhrases.INTERNAL_SERVER_ERROR}: ${error.message}`);
+  }
 }
 
-function post(req, res) {
-  const data = req.body;
+async function post(req, res) {
+  const { userId, spentAt, title, amount, category, note } = req.body;
 
-  if (!usersService.getById(data.userId)) {
-    res
+  if ((!userId, !spentAt, !title, !amount)) {
+    return res
       .status(StatusCodes.BAD_REQUEST)
       .send(
-        `${ReasonPhrases.BAD_REQUEST}: user with id ${data.userId} does not exist`,
+        `${ReasonPhrases.BAD_REQUEST}: userId, spentAt, title, amount, category are required`,
       );
-
-    return;
   }
 
-  res.status(StatusCodes.CREATED).send(expensesService.create(data));
+  const user = await usersService.getById(userId);
+
+  if (!user) {
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .send(
+        `${ReasonPhrases.BAD_REQUEST}: user with id ${userId} does not exist`,
+      );
+  }
+
+  try {
+    return res.status(StatusCodes.CREATED).send(
+      await expensesService.create({
+        userId,
+        spentAt,
+        title,
+        amount,
+        category,
+        note,
+      }),
+    );
+  } catch (error) {
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .send(`${ReasonPhrases.INTERNAL_SERVER_ERROR}: ${error.message}`);
+  }
 }
 
-function getById(req, res) {
+async function getById(req, res) {
   const { id } = req.params;
 
   if (!id) {
-    res
+    return res
       .status(StatusCodes.BAD_REQUEST)
       .send(`${ReasonPhrases.BAD_REQUEST}: id is required`);
-
-    return;
   }
 
-  const expense = expensesService.getById(+id);
+  try {
+    const expense = await expensesService.getById(id);
+
+    if (!expense) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .send(
+          `${ReasonPhrases.NOT_FOUND}: expense with id ${id} does not exist`,
+        );
+    }
+
+    res.status(StatusCodes.OK).send(expense);
+  } catch (error) {
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .send(`${ReasonPhrases.INTERNAL_SERVER_ERROR}: ${error.message}`);
+  }
+}
+
+async function remove(req, res) {
+  const { id } = req.params;
+
+  if (!id) {
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .send(`${ReasonPhrases.BAD_REQUEST}: id is required`);
+  }
+
+  const expense = await expensesService.getById(id);
 
   if (!expense) {
-    res
+    return res
       .status(StatusCodes.NOT_FOUND)
       .send(`${ReasonPhrases.NOT_FOUND}: expense with id ${id} does not exist`);
-
-    return;
   }
 
-  res.status(StatusCodes.OK).send(expense);
+  try {
+    await expensesService.remove(id);
+
+    return res.sendStatus(StatusCodes.NO_CONTENT);
+  } catch (error) {
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .send(`${ReasonPhrases.INTERNAL_SERVER_ERROR}: ${error.message}`);
+  }
 }
 
-function remove(req, res) {
-  const { id } = req.params;
-
-  if (!id) {
-    res
-      .status(StatusCodes.BAD_REQUEST)
-      .send(`${ReasonPhrases.BAD_REQUEST}: id is required`);
-
-    return;
-  }
-
-  if (!expensesService.getById(+id)) {
-    res
-      .status(StatusCodes.NOT_FOUND)
-      .send(`${ReasonPhrases.NOT_FOUND}: expense with id ${id} does not exist`);
-
-    return;
-  }
-
-  expensesService.remove(+id);
-
-  res.sendStatus(StatusCodes.NO_CONTENT);
-}
-
-function patch(req, res) {
+async function patch(req, res) {
   const { id } = req.params;
   const data = req.body;
 
   if (!id) {
-    res
+    return res
       .status(StatusCodes.BAD_REQUEST)
       .send(`${ReasonPhrases.BAD_REQUEST}: id is required`);
-
-    return;
   }
 
   if (!data) {
-    res
+    return res
       .status(StatusCodes.BAD_REQUEST)
       .send(`${ReasonPhrases.BAD_REQUEST}: data is required`);
-
-    return;
   }
 
-  const expense = expensesService.getById(+id);
+  const expense = await expensesService.getById(id);
 
   if (!expense) {
-    res
+    return res
       .status(StatusCodes.NOT_FOUND)
       .send(`${ReasonPhrases.NOT_FOUND}: expense with id ${id} does not exist`);
-
-    return;
   }
 
-  res.status(StatusCodes.OK).send(expensesService.update(expense, data));
+  try {
+    const [result] = await expensesService.update(id, data);
+
+    if (result !== 1) {
+      return res.status(StatusCodes.NOT_FOUND).send('Expense not found');
+    }
+
+    const updatedExpense = await expensesService.getById(id);
+
+    return res.status(StatusCodes.OK).send(updatedExpense);
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .send(`${ReasonPhrases.INTERNAL_SERVER_ERROR}: ${error.message}`);
+  }
 }
 
 module.exports = {
