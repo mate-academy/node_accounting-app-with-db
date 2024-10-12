@@ -4,45 +4,39 @@ const { StatusCodes, ReasonPhrases } = require('http-status-codes');
 const usersService = require('../services/usersService');
 
 async function get(_, res) {
-  res.status(StatusCodes.OK).send(await usersService.get());
+  return res.status(StatusCodes.OK).send(await usersService.get());
 }
 
 async function post(req, res) {
   const { name } = req.body;
 
   if (!name) {
-    res
+    return res
       .status(StatusCodes.BAD_REQUEST)
       .send(`${ReasonPhrases.BAD_REQUEST}: name is required`);
-
-    return;
   }
 
-  res.status(StatusCodes.CREATED).send(await usersService.create(name));
+  return res.status(StatusCodes.CREATED).send(await usersService.create(name));
 }
 
 async function getById(req, res) {
   const { id } = req.params;
 
   if (!id) {
-    res
+    return res
       .status(StatusCodes.BAD_REQUEST)
       .send(`${ReasonPhrases.BAD_REQUEST}: id is required`);
-
-    return;
   }
 
   const user = await usersService.getById(id);
 
   if (!user) {
-    res
+    return res
       .status(StatusCodes.NOT_FOUND)
       .send(`${ReasonPhrases.NOT_FOUND}: user with id ${id} does not exist`);
-
-    return;
   }
 
-  res.status(StatusCodes.OK).send(user);
+  return res.status(StatusCodes.OK).send(user);
 }
 
 async function remove(req, res) {
@@ -60,9 +54,9 @@ async function remove(req, res) {
       .send(`${ReasonPhrases.NOT_FOUND}: user with id ${id} does not exist`);
   }
 
-  usersService.remove(id);
+  await usersService.remove(id);
 
-  res.sendStatus(StatusCodes.NO_CONTENT);
+  return res.sendStatus(StatusCodes.NO_CONTENT);
 }
 
 async function patch(req, res) {
