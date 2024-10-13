@@ -4,7 +4,7 @@ const { StatusCodes, ReasonPhrases } = require('http-status-codes');
 const expensesService = require('../services/expensesService');
 const usersService = require('../services/usersService');
 
-async function get(req, res) {
+async function getExpenses(req, res) {
   try {
     return res
       .status(StatusCodes.OK)
@@ -16,7 +16,7 @@ async function get(req, res) {
   }
 }
 
-async function post(req, res) {
+async function postExpense(req, res) {
   const { userId, spentAt, title, amount, category, note } = req.body;
 
   if ((!userId, !spentAt, !title, !amount)) {
@@ -55,7 +55,7 @@ async function post(req, res) {
   }
 }
 
-async function getById(req, res) {
+async function getExpenseById(req, res) {
   const { id } = req.params;
 
   if (!id) {
@@ -83,7 +83,7 @@ async function getById(req, res) {
   }
 }
 
-async function remove(req, res) {
+async function removeExpense(req, res) {
   const { id } = req.params;
 
   if (!id) {
@@ -111,7 +111,7 @@ async function remove(req, res) {
   }
 }
 
-async function patch(req, res) {
+async function udpateExpense(req, res) {
   const { id } = req.params;
   const data = req.body;
 
@@ -153,9 +153,9 @@ async function patch(req, res) {
 }
 
 module.exports = {
-  get,
-  post,
-  getById,
-  remove,
-  patch,
+  getExpenses,
+  postExpense,
+  getExpenseById,
+  removeExpense,
+  udpateExpense,
 };

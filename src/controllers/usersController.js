@@ -3,7 +3,7 @@
 const { StatusCodes, ReasonPhrases } = require('http-status-codes');
 const usersService = require('../services/usersService');
 
-async function get(_, res) {
+async function getAllUsers(_, res) {
   try {
     return res.status(StatusCodes.OK).send(await usersService.get());
   } catch (error) {
@@ -13,7 +13,7 @@ async function get(_, res) {
   }
 }
 
-async function post(req, res) {
+async function postUser(req, res) {
   const { name } = req.body;
 
   if (!name) {
@@ -33,7 +33,7 @@ async function post(req, res) {
   }
 }
 
-async function getById(req, res) {
+async function getUserById(req, res) {
   const { id } = req.params;
 
   if (!id) {
@@ -59,7 +59,7 @@ async function getById(req, res) {
   }
 }
 
-async function remove(req, res) {
+async function removeUser(req, res) {
   const { id } = req.params;
 
   if (!id) {
@@ -87,7 +87,7 @@ async function remove(req, res) {
   }
 }
 
-async function patch(req, res) {
+async function updateUser(req, res) {
   const { id } = req.params;
   const { name } = req.body;
 
@@ -129,9 +129,9 @@ async function patch(req, res) {
 }
 
 module.exports = {
-  get,
-  post,
-  getById,
-  remove,
-  patch,
+  getAllUsers,
+  postUser,
+  getUserById,
+  removeUser,
+  updateUser,
 };
