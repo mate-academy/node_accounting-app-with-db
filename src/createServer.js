@@ -1,38 +1,29 @@
 'use strict';
 
 const express = require('express');
-const User = require('./models/User.model');
+const {
+  getAllUsers,
+  getUserById,
+  createUser,
+  updateUser,
+  destroyUser,
+} = require('./services/users.service');
+const {
+  getAllExpenses,
+  getExpenseById,
+  createExpense,
+  destroyExpense,
+  updateExpense,
+} = require('./services/expenses.services');
 
 const createServer = () => {
   // your code goes here
   const app = express(); // ініціалізація серверу
-  let users = []; // масив users
-  let expenses = []; // масив expenses
-
-  // Функція для отримання наступного порядкового номера для users
-  const getNextUserId = () => {
-    if (users.length === 0) {
-      return 1;
-    } // якщо немає користувачів, починати з 1
-
-    // eslint-disable-next-line max-len
-    return Math.max(...users.map((user) => user.id)) + 1; // знаходимо максимальний id і додаємо 1
-  };
-
-  // Функція для отримання наступного порядкового номера для expenses
-  const getNextExpenseId = () => {
-    if (expenses.length === 0) {
-      return 1;
-    } // якщо немає витрат, починати з 1
-
-    // eslint-disable-next-line max-len
-    return Math.max(...expenses.map((expense) => expense.id)) + 1; // знаходимо максимальний id і додаємо 1
-  };
 
   // отримати всі users з масиву
   app.get('/users', async (req, res) => {
     try {
-      const usersFromDB = await User.findAll();
+      const usersFromDB = await getAllUsers();
 
       res.status(200).send(usersFromDB);
     } catch (error) {
@@ -41,10 +32,9 @@ const createServer = () => {
   });
 
   // отримати конкретного user з масиву
-  app.get('/users/:id', (req, res) => {
+  app.get('/users/:id', async (req, res) => {
     const { id } = req.params;
-    // eslint-disable-next-line max-len
-    const chosenUser = users.find((user) => user.id === parseInt(id)); // конвертуємо id у число
+    const chosenUser = await getUserById(id);
 
     if (!chosenUser) {
       return res.sendStatus(404);
@@ -54,70 +44,71 @@ const createServer = () => {
   });
 
   // додати новий user до масиву
-  app.post('/users', express.json(), (req, res) => {
+  app.post('/users', express.json(), async (req, res) => {
     const { name } = req.body;
 
     if (!name) {
       return res.sendStatus(400);
     }
 
-    const user = {
-      id: getNextUserId(), // Використання функції для отримання нового id
-      name,
-    };
-
-    users.push(user);
+    const user = await createUser({ name });
 
     res.status(201).send(user);
   });
 
   // видалити user з масиву за id
-  app.delete('/users/:id', (req, res) => {
+  app.delete('/users/:id', async (req, res) => {
     const { id } = req.params;
 
-    const newUsers = users.filter((user) => user.id !== parseInt(id));
+    try {
+      const deletedRows = await destroyUser({ id });
 
-    if (users.length === newUsers.length) {
-      return res.sendStatus(404);
+      if (deletedRows === 0) {
+        return res.status(404).send({ message: 'User not found' });
+      }
+
+      res.sendStatus(204); // No content, deletion successful
+    } catch (error) {
+      res.status(500).send({ message: error.message }); // Server error
     }
-
-    users = newUsers;
-
-    res.sendStatus(204);
   });
 
   // відредагувати user з масиву
-  app.patch('/users/:id', express.json(), (req, res) => {
+  app.patch('/users/:id', express.json(), async (req, res) => {
     const { id } = req.params;
     const { name } = req.body;
 
-    const chosenUser = users.find((user) => user.id === parseInt(id));
-
-    if (typeof name !== 'string') {
-      return res.sendStatus(400);
+    // Validate the input before trying to update
+    if (typeof name !== 'string' || name.trim() === '') {
+      return res.status(400).send({ message: 'Invalid name provided' });
     }
 
-    if (!chosenUser || !name) {
-      return res.sendStatus(404);
+    try {
+      const updatedUser = await updateUser({ id, name });
+
+      if (!updatedUser) {
+        return res.status(404).send({ message: 'User not found' });
+      }
+
+      res.status(200).send(updatedUser);
+    } catch (error) {
+      res.status(500).send({ message: error.message });
     }
-
-    Object.assign(chosenUser, { name });
-
-    res.send(chosenUser);
   });
 
   // отримати всі expenses з масиву
-  app.get('/expenses', (req, res) => {
+  app.get('/expenses', async (req, res) => {
     const { userId, from, to, categories } = req.query;
+    const allExpenses = await getAllExpenses();
 
     if (!userId && !categories && (!from || !to)) {
-      res.send(expenses);
+      return res.send(allExpenses);
     }
 
     const normalizedCategories =
       Array.isArray(categories) || !categories ? categories : [categories];
 
-    let filteredExpenses = expenses;
+    let filteredExpenses = allExpenses;
 
     if (userId) {
       filteredExpenses = filteredExpenses.filter((expense) => {
@@ -126,7 +117,7 @@ const createServer = () => {
     }
 
     if (normalizedCategories) {
-      filteredExpenses = expenses.filter((expense) => {
+      filteredExpenses = allExpenses.filter((expense) => {
         return normalizedCategories.includes(expense.category);
       });
     }
@@ -135,7 +126,7 @@ const createServer = () => {
       const fromDate = new Date(from);
       const toDate = new Date(to);
 
-      filteredExpenses = expenses.filter((expense) => {
+      filteredExpenses = allExpenses.filter((expense) => {
         const spentAt = new Date(expense.spentAt);
 
         return spentAt >= fromDate && spentAt <= toDate;
@@ -146,83 +137,77 @@ const createServer = () => {
   });
 
   // отримати конкретний expense з масиву
-  app.get('/expenses/:id', (req, res) => {
+  app.get('/expenses/:id', async (req, res) => {
     const { id } = req.params;
-
-    const chosenExpense = expenses.find(
-      (expense) => expense.id === parseInt(id),
-    );
+    const chosenExpense = await getExpenseById(id);
 
     if (!chosenExpense) {
-      res.sendStatus(404);
-
-      return;
+      return res.sendStatus(404);
     }
 
     res.send(chosenExpense);
   });
 
   // додати новий expense до масиву
-  app.post('/expenses', express.json(), (req, res) => {
+  app.post('/expenses', express.json(), async (req, res) => {
     const { userId, spentAt, title, amount, category, note } = req.body;
 
-    if (!userId || !spentAt || !title || !amount || !category || !note) {
+    if (!userId || !spentAt || !title || !amount) {
       return res.sendStatus(400);
     }
 
-    const findUser = users.find((user) => user.id === userId);
-
-    if (!findUser) {
-      return res.sendStatus(400);
-    }
-
-    const newExpense = {
-      id: getNextExpenseId(), // Використання функції для отримання нового id
+    const newExpense = await createExpense({
       userId,
       spentAt,
       title,
       amount,
-      category,
-      note,
-    };
-
-    expenses.push(newExpense);
+      category: category || '',
+      note: note || '',
+    });
 
     res.status(201).send(newExpense);
   });
 
   // видалити expense з масиву
-  app.delete('/expenses/:id', (req, res) => {
+  app.delete('/expenses/:id', async (req, res) => {
     const { id } = req.params;
 
-    const newExpenses = expenses.filter(
-      (expense) => expense.id !== parseInt(id),
-    );
+    try {
+      const deletedRows = await destroyExpense({ id });
 
-    if (expenses.length === newExpenses.length) {
-      return res.sendStatus(404);
+      if (deletedRows === 0) {
+        return res.status(404).send({ message: 'Expsense not found' });
+      }
+
+      res.sendStatus(204); // No content, deletion successful
+    } catch (error) {
+      res.status(500).send({ message: error.message }); // Server error
     }
-
-    expenses = newExpenses;
-
-    res.sendStatus(204);
   });
 
   // відредагувати expense з масиву
-  app.patch('/expenses/:id', express.json(), (req, res) => {
+  app.patch('/expenses/:id', express.json(), async (req, res) => {
     const { id } = req.params;
+    const { spentAt, title, amount, category, note } = req.body;
 
-    const chosenExpense = expenses.find(
-      (expense) => expense.id === parseInt(id),
-    );
+    try {
+      const updatedExpense = await updateExpense({
+        id,
+        spentAt,
+        title,
+        amount,
+        category,
+        note,
+      });
 
-    if (!chosenExpense) {
-      return res.sendStatus(404);
+      if (!updatedExpense) {
+        return res.status(404).send({ message: 'Expense not found' });
+      }
+
+      res.status(200).send(updatedExpense);
+    } catch (error) {
+      res.status(500).send({ message: error.message });
     }
-
-    Object.assign(chosenExpense, req.body);
-
-    res.status(200).send(chosenExpense);
   });
 
   return app;

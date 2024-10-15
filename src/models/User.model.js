@@ -3,7 +3,7 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../db.js');
 
-sequelize.sync({ force: true });
+sequelize.sync({ force: false });
 
 const User = sequelize.define(
   'User',
@@ -11,6 +11,7 @@ const User = sequelize.define(
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
+      autoIncrement: true,
     },
     name: {
       type: DataTypes.TEXT,
