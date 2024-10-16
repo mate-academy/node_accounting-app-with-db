@@ -1,51 +1,64 @@
-let expenses = [];
+const { Op } = require('sequelize');
+const { models } = require('../models/models.js');
+const { Expense } = models;
 
-const resetExpenses = () => {
-  expenses = [];
+const getAllExpenses = async (userId, categories, from, to) => {
+  const whereClause = {};
+
+  if (userId) {
+    whereClause.userId = userId;
+  }
+
+  if (categories && categories.length > 0) {
+    whereClause.category = categories;
+  }
+
+  if (from && to) {
+    whereClause.spentAt = { [Op.between]: [from, to] };
+  } else if (from) {
+    whereClause.spentAt = { [Op.gte]: from };
+  } else if (to) {
+    whereClause.spentAt = { [Op.lte]: to };
+  }
+
+  return Expense.findAll({
+    where: whereClause,
+  });
 };
 
-const getAllExpenses = (userId, categories, from, to) => {
-  return expenses
-    .filter((expense) => !userId || expense.userId === +userId)
-    .filter((expense) => !categories || expense.category === categories)
-    .filter((expense) => !from || new Date(expense.spentAt) >= new Date(from))
-    .filter((expense) => !to || new Date(expense.spentAt) <= new Date(to));
+const getExpenseById = async (id) => {
+  return Expense.findByPk(id);
 };
 
-const getExpenseById = (id) => {
-  return expenses.find((expense) => expense.id === +id);
-};
-
-const createExpense = (userId, spentAt, title, amount, category, note) => {
-  const expense = {
-    id: Math.floor(Math.random() * 1000),
+const createExpense = async (
+  userId,
+  spentAt,
+  title,
+  amount,
+  category,
+  note,
+) => {
+  return Expense.create({
     userId,
     spentAt,
     title,
     amount,
     category,
     note,
-  };
-
-  expenses.push(expense);
-
-  return expense;
+  });
 };
 
-const updateExpense = (id, data) => {
-  const expense = getExpenseById(id);
+const updateExpense = async (id, data) => {
+  await Expense.update({ ...data }, { where: { id } });
 
-  Object.assign(expense, data);
-
-  return expense;
+  return Expense.findByPk(id);
 };
 
-const deleteExpense = (id) => {
-  expenses = expenses.filter((expense) => expense.id !== +id);
+const deleteExpense = async (id) => {
+  return Expense.destroy({ where: { id } });
 };
 
 module.exports = {
-  resetExpenses,
   getAllExpenses,
   getExpenseById,
   createExpense,

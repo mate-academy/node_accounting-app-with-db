@@ -36,9 +36,9 @@ const Expense = sequelize.define(
     },
   },
   {
-    tableName: 'expense',
-    createdAt: false,
+    tableName: 'expenses',
     updatedAt: false,
+    createdAt: false,
   },
 );
 

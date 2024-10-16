@@ -1,9 +1,9 @@
 const expensesService = require('../services/expensesService');
 const userService = require('../services/userService');
 
-const get = (req, res) => {
+const get = async (req, res) => {
   const { userId, categories, from, to } = req.query;
-  const filteredExpenses = expensesService.getAllExpenses(
+  const filteredExpenses = await expensesService.getAllExpenses(
     userId,
     categories,
     from,
@@ -13,9 +13,9 @@ const get = (req, res) => {
   res.status(200).send(filteredExpenses);
 };
 
-const getOne = (req, res) => {
+const getOne = async (req, res) => {
   const { id } = req.params;
-  const expense = expensesService.getExpenseById(id);
+  const expense = await expensesService.getExpenseById(id);
 
   if (!expense) {
     res.sendStatus(404);
@@ -26,17 +26,17 @@ const getOne = (req, res) => {
   res.send(expense);
 };
 
-const create = (req, res) => {
+const create = async (req, res) => {
   const { userId, spentAt, title, amount, category, note } = req.body;
-  const user = userService.getUserById(userId);
+  const user = await userService.getUserById(userId);
 
-  if (!user || !spentAt || !title || !amount || !category || !note) {
+  if (!user) {
     res.sendStatus(400);
 
     return;
   }
 
-  const expense = expensesService.createExpense(
+  const expense = await expensesService.createExpense(
     userId,
     spentAt,
     title,
@@ -49,9 +49,9 @@ const create = (req, res) => {
   res.send(expense);
 };
 
-const remove = (req, res) => {
+const remove = async (req, res) => {
   const { id } = req.params;
-  const expense = expensesService.getExpenseById(id);
+  const expense = await expensesService.getExpenseById(id);
 
   if (!expense) {
     res.sendStatus(404);
@@ -59,14 +59,14 @@ const remove = (req, res) => {
     return;
   }
 
-  expensesService.deleteExpense(id);
+  await expensesService.deleteExpense(id);
 
   res.sendStatus(204);
 };
 
-const update = (req, res) => {
+const update = async (req, res) => {
   const { id } = req.params;
-  const expense = expensesService.getExpenseById(id);
+  const expense = await expensesService.getExpenseById(id);
 
   if (!expense) {
     res.sendStatus(404);
@@ -74,7 +74,7 @@ const update = (req, res) => {
     return;
   }
 
-  const updatedExpense = expensesService.updateExpense(id, req.body);
+  const updatedExpense = await expensesService.updateExpense(id, req.body);
 
   if (!updatedExpense) {
     res.sendStatus(404);

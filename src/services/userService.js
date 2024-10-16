@@ -10,7 +10,7 @@ const getUserById = async (id) => {
 };
 
 const createUser = async (name) => {
-  await User.create({ name });
+  return User.create({ name });
 };
 
 const updateUser = async ({ id, name }) => {
@@ -20,7 +20,7 @@ const updateUser = async ({ id, name }) => {
 };
 
 const deleteUser = async (id) => {
-  await User.destroy({ where: { id } });
+  return User.destroy({ where: { id } });
 };
 
 module.exports = {

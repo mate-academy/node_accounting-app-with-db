@@ -1,13 +1,13 @@
 const userService = require('../services/userService');
 
-const get = (req, res) => {
-  res.send(userService.getAllUsers());
+const get = async (req, res) => {
+  res.send(await userService.getAllUsers());
 };
 
-const getOne = (req, res) => {
+const getOne = async (req, res) => {
   const { id } = req.params;
 
-  const user = userService.getUserById(id);
+  const user = await userService.getUserById(id);
 
   if (!user) {
     res.sendStatus(404);
@@ -18,10 +18,10 @@ const getOne = (req, res) => {
   res.send(user);
 };
 
-const update = (req, res) => {
+const update = async (req, res) => {
   const { id } = req.params;
   const { name } = req.body;
-  const user = userService.updateUser({ id, name });
+  const user = await userService.updateUser({ id, name });
 
   if (!user) {
     res.sendStatus(404);
@@ -38,7 +38,7 @@ const update = (req, res) => {
   res.send(user);
 };
 
-const create = (req, res) => {
+const create = async (req, res) => {
   const { name } = req.body;
 
   if (!name) {
@@ -47,22 +47,22 @@ const create = (req, res) => {
     return;
   }
 
-  const user = userService.createUser(name);
+  const user = await userService.createUser(name);
 
   res.statusCode = 201;
   res.send(user);
 };
 
-const remove = (req, res) => {
+const remove = async (req, res) => {
   const { id } = req.params;
 
-  if (!userService.getUserById(id)) {
+  if (!(await userService.getUserById(id))) {
     res.sendStatus(404);
 
     return;
   }
 
-  userService.deleteUser(id);
+  await userService.deleteUser(id);
 
   res.sendStatus(204);
 };
