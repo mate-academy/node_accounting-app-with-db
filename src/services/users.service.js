@@ -10,19 +10,6 @@ const getUserById = async (id) => {
   return User.findByPk(id);
 };
 
-// Функція для отримання наступного порядкового номера для users
-// const getNextUserId = async () => {
-//   const users = await getAllUsers(); // Wait for the users to be fetched
-
-//   if (users.length === 0) {
-//     return 1; // Start with 1 if there are no users
-//   }
-
-//   // eslint-disable-next-line max-len
-//   return Math.max(...users.map((user) => user.id)) + 1;
-// Get the max ID and add 1
-// };
-
 const createUser = async ({ name }) => {
   return User.create({ name });
 };
