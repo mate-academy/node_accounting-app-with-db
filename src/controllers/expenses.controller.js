@@ -111,6 +111,10 @@ const updateExpenseById = async (req, res) => {
   const { id } = req.params;
   const { spentAt, title, amount, category, note } = req.body;
 
+  if (!id) {
+    res.status(400).send('Invalid id provided');
+  }
+
   try {
     const updatedExpense = await updateExpense({
       id,

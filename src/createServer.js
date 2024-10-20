@@ -57,12 +57,3 @@ const createServer = () => {
 module.exports = {
   createServer,
 };
-
-// {
-//   "userId": 0,
-//   "spentAt": "2024-10-20T11:49:45.942Z",
-//   "title": "string",
-//   "amount": 0,
-//   "category": "string",
-//   "note": "string"
-// }

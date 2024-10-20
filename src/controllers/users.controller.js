@@ -40,7 +40,7 @@ const addNewUser = async (req, res) => {
   const { name } = req.body;
 
   if (!name) {
-    return res.sendStatus(404);
+    return res.sendStatus(400);
   }
 
   try {
@@ -74,6 +74,10 @@ const updateUserById = async (req, res) => {
 
   if (typeof name !== 'string' || name.trim() === '') {
     return res.status(400).send({ message: 'Invalid name provided' });
+  }
+
+  if (!id) {
+    res.status(400).send('Invalid id provided');
   }
 
   try {
