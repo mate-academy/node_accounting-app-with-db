@@ -4,7 +4,7 @@ const normalize = ({ id, name }) => {
   return { id, name };
 };
 const getAll = () => {
-  return User.findAll();
+  return User.findAll({ raw: true });
 };
 
 const getById = (id) => {
