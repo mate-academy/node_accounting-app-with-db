@@ -2,15 +2,17 @@ const expenseService = require('../services/expense.service');
 const { getById: getUserById } = require('../services/user.service');
 
 const get = async (req, res) => {
-  const expenses = await expenseService.getAll(req.query);
+  const expenses = await expenseService
+    .getAll(req.query)
+    .then((exps) => exps.map(expenseService.normalize));
 
-  res.send(expenses.map((expense) => expenseService.normalize(expense)));
+  res.send(expenses);
 };
 
-const getOne = async (req, res) => {
-  const expense = await req.entry;
+const getOne = (req, res) => {
+  const expense = expenseService.normalize(req.entry);
 
-  res.send(expenseService.normalize(expense));
+  res.send(expense);
 };
 
 const create = async (req, res) => {
@@ -31,16 +33,11 @@ const create = async (req, res) => {
     return;
   }
 
-  const expense = await expenseService.create(
-    userId,
-    spentAt,
-    title,
-    amount,
-    category,
-    note,
-  );
+  const expense = await expenseService
+    .create(userId, spentAt, title, amount, category, note)
+    .then(expenseService.normalize);
 
-  res.status(201).send(expenseService.normalize(expense));
+  res.status(201).send(expense);
 };
 
 const remove = async (req, res) => {
@@ -55,9 +52,11 @@ const update = async (req, res) => {
 
   await expenseService.update(id, req.body);
 
-  const expense = await expenseService.getById(id);
+  const expense = await expenseService
+    .getById(id)
+    .then(expenseService.normalize);
 
-  res.send(expenseService.normalize(expense));
+  res.send(expense);
 };
 
 module.exports = {

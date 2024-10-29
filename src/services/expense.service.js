@@ -12,8 +12,7 @@ const normalize = ({ amount, category, id, note, spentAt, title, userId }) => {
   };
 };
 
-const getAll = async (filterParams = {}) => {
-  const { categories, from, to, ...query } = filterParams;
+const getAll = async ({ categories, from, to, ...query }) => {
   const where = { ...query };
 
   if (categories) {

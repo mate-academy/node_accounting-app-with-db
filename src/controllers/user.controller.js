@@ -1,23 +1,25 @@
 const userService = require('../services/user.service');
 
 const get = async (req, res) => {
-  const users = await userService.getAll();
+  const users = await userService
+    .getAll()
+    .then((usrs) => usrs.map(userService.normalize));
 
-  res.send(users.map((user) => userService.normalize(user)));
+  res.send(users);
 };
 
 const getOne = (req, res) => {
-  const user = req.entry;
+  const user = userService.normalize(req.entry);
 
-  res.send(userService.normalize(user));
+  res.send(user);
 };
 
 const create = async (req, res) => {
   const { name } = req.body;
 
-  const user = await userService.create(name);
+  const user = await userService.create(name).then(userService.normalize);
 
-  res.status(201).send(userService.normalize(user));
+  res.status(201).send(user);
 };
 
 const remove = async (req, res) => {
@@ -33,9 +35,9 @@ const update = async (req, res) => {
 
   await userService.update({ id, name });
 
-  const user = await userService.getById(id);
+  const user = await userService.getById(id).then(userService.normalize);
 
-  res.send(userService.normalize(user));
+  res.send(user);
 };
 
 module.exports = {

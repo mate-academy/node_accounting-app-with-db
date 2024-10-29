@@ -1,17 +1,17 @@
 const express = require('express');
-const { validateFields } = require('./../middlewares/validateFields');
-const { validateUser } = require('./../middlewares/validateUser');
+const { checkRequiredFields } = require('../middlewares/checkRequiredFields');
 const userController = require('./../controllers/user.controller');
+const { checkIfExists } = require('../middlewares/checkIfExists');
 const router = express.Router();
 
 router.get('/', userController.get);
 
-router.post('/', validateFields(['name']), userController.create);
+router.post('/', checkRequiredFields(['name']), userController.create);
 
-router.get('/:id', validateUser(), userController.getOne);
+router.get('/:id', checkIfExists('user'), userController.getOne);
 
-router.delete('/:id', validateUser(), userController.remove);
+router.delete('/:id', checkIfExists('user'), userController.remove);
 
-router.patch('/:id', validateUser(), userController.update);
+router.patch('/:id', checkIfExists('user'), userController.update);
 
 module.exports = { router };
