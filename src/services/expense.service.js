@@ -9,7 +9,11 @@ const getAllExpense = async ({ userId, categories, from, to }) => {
   }
 
   if (categories) {
-    params.category = categories;
+    if (Array.isArray(categories)) {
+      params.category = { [Op.in]: categories };
+    } else {
+      params.category = categories;
+    }
   }
 
   if (from || to) {

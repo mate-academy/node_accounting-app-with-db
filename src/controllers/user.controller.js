@@ -29,7 +29,7 @@ const createUser = async (req, res) => {
   const { name } = req.body;
 
   if (!name) {
-    return res.sendStatus(400);
+    return res.status(400).send('Name is required');
   }
 
   try {
@@ -52,7 +52,7 @@ const updateUser = async (req, res) => {
       return res.status(404).send('User not found');
     }
 
-    if (typeof name !== 'string') {
+    if (typeof name !== 'string' || name.length === 0) {
       return res.status(422).send('Invalid name');
     }
 

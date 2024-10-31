@@ -25,7 +25,7 @@ const getOneExpense = async (req, res) => {
     const expense = await expenseService.getExpenseById(id);
 
     if (!expense) {
-      return res.status(404).send('Not found');
+      return res.status(404).send('Expense not found');
     }
     res.send(expense);
   } catch (error) {
@@ -40,7 +40,7 @@ const createExpense = async (req, res) => {
     const user = await userService.getUserById(data.userId);
 
     if (!user) {
-      return res.sendStatus(400);
+      return res.status(400).send('User not found');
     }
 
     const expense = await expenseService.createExpense(data);
@@ -59,7 +59,7 @@ const updateExpense = async (req, res) => {
     const expense = await expenseService.getExpenseById(id);
 
     if (!expense) {
-      return res.status(404).send('Error');
+      return res.status(404).send('Expense not found');
     }
 
     const updatedExpense = await expenseService.updateExpense(id, {
@@ -83,7 +83,7 @@ const removeExpense = async (req, res) => {
     const exp = await expenseService.getExpenseById(id);
 
     if (!exp) {
-      return res.status(404).send('Error');
+      return res.status(404).send('Expense not found');
     }
 
     await expenseService.removeExpense(id);
