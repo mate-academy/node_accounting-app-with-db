@@ -22,9 +22,7 @@ const getAll = async (params) => {
   }
 
   const filteredExpenses = await Expense.findAll({
-    where: {
-      ...query,
-    },
+    where: query,
   });
 
   return filteredExpenses;

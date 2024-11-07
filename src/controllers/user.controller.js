@@ -1,6 +1,5 @@
 const { validationResult, matchedData } = require('express-validator');
 const userService = require('../services/user.service');
-const { User } = require('../models/User.model');
 
 const getAll = async (req, res) => {
   const users = await userService.getAll();
@@ -56,7 +55,7 @@ const update = async (req, res) => {
     return res.status(404).send('Not Found');
   }
 
-  res.send(await User.findByPk(userId));
+  res.send(await userService.getById(userId));
 };
 
 const remove = async (req, res) => {
