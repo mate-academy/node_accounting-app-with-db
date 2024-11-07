@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const expenseService = require('../services/expense.service');
 const userService = require('../services/user.service');
 
@@ -9,13 +10,21 @@ const checkIfExists = (entryType) => {
       expense: expenseService,
     };
 
-    const entry = await entryServices[entryType].getById(id);
+    try {
+      const entry = await entryServices[entryType].getById(id);
 
-    if (!entry) {
-      res.sendStatus(404);
-    } else {
+      if (!entry) {
+        return res.sendStatus(404);
+      }
+
       req.entry = entry;
       next();
+    } catch (error) {
+      console.error(`Error fetching ${entryType} with ID ${id}:`, error);
+
+      res.status(500).send({
+        error: `An error occurred while retrieving the ${entryType}.`,
+      });
     }
   };
 };

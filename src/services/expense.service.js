@@ -22,9 +22,9 @@ const getAll = async ({ categories, from, to, ...query }) => {
   if (from && to) {
     where.spentAt = { [Op.between]: [new Date(from), new Date(to)] };
   } else if (from) {
-    where.spentAt = { [Op.gte]: [from] };
+    where.spentAt = { [Op.gte]: new Date(from) };
   } else if (to) {
-    where.spentAt = { [Op.lte]: [to] };
+    where.spentAt = { [Op.lte]: new Date(to) };
   }
 
   return Expense.findAll({ raw: true, where });
