@@ -6,12 +6,19 @@ const { sequelize } = require('../db.js');
 const Expense = sequelize.define(
   'Expense',
   {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+      allowNull: false,
+    },
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
     spentAt: {
       type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
       allowNull: false,
     },
     title: {
@@ -19,7 +26,7 @@ const Expense = sequelize.define(
       allowNull: false,
     },
     amount: {
-      type: DataTypes.DECIMAL(10, 2),
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     category: {
@@ -29,7 +36,11 @@ const Expense = sequelize.define(
       type: DataTypes.STRING,
     },
   },
-  { tableName: 'Expenses' },
+  {
+    tableName: 'expenses',
+    updatedAt: false,
+    createdAt: false,
+  },
 );
 
 module.exports = {

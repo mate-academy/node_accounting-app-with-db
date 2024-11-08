@@ -1,20 +1,21 @@
 'use strict';
 
 const express = require('express');
-const app = express();
-const cors = require('cors');
-const { router: userRouter } = require('./routes/user.route');
-const { router: expenseRouter } = require('./routes/expense.route');
+const userRouter = require('./routes/usersRouter');
+const expenseRouter = require('./routes/expensesRouter');
+const { sequelize } = require('./db');
 
-const createServer = () => {
-  app.use(cors());
+function createServer() {
+  const app = express();
+
   app.use(express.json());
-  app.use(express.static('public'));
+
   app.use('/users', userRouter);
   app.use('/expenses', expenseRouter);
+  sequelize.sync();
 
   return app;
-};
+}
 
 module.exports = {
   createServer,
