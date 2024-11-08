@@ -60,7 +60,7 @@ const updateExpense = async (
 };
 
 const removeExpense = async (id) => {
-  await Expense.destroy({
+  return Expense.destroy({
     where: { id },
   });
 };

@@ -62,7 +62,7 @@ const removeUser = async (req, res) => {
 
     await userService.deleteUser(id);
 
-    res.status(204);
+    res.status(204).send();
   } catch (error) {
     res.status(500).send(serverError);
   }
@@ -79,11 +79,11 @@ const updateUser = async (req, res) => {
       return res.status(404).send(userNotFound);
     }
 
-    if (typeof name !== 'string' || name.length === 0) {
-      return res.status(422).send({ message: 'Invalid name' });
+    if (!name) {
+      return res.status(400).send({ message: 'Invalid name' });
     }
 
-    const updatedUser = userService.updateUser({ id, name });
+    const updatedUser = await userService.updateUser({ id, name });
 
     res.status(200).send(updatedUser);
   } catch (error) {
