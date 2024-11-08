@@ -1,7 +1,7 @@
 const { Op } = require('sequelize');
 const { Expense } = require('./../models/Expense.model');
 
-const getAllExpenses = async ({ userId, categories, from, to }) => {
+const getAllExpense = async ({ userId, categories, from, to }) => {
   const params = {};
 
   if (userId) {
@@ -28,7 +28,7 @@ const getAllExpenses = async ({ userId, categories, from, to }) => {
     }
   }
 
-  const expList = await Expense.findAll({ where: params });
+  const expList = Expense.findAll({ where: params });
 
   return expList;
 };
@@ -59,14 +59,16 @@ const updateExpense = async (
   return Expense.findByPk(id);
 };
 
-const deleteExpense = async (id) => {
-  return Expense.destroy({ where: { id } });
+const removeExpense = async (id) => {
+  await Expense.destroy({
+    where: { id },
+  });
 };
 
 module.exports = {
-  getAllExpenses,
+  getAllExpense,
   getExpenseById,
   createExpense,
   updateExpense,
-  deleteExpense,
+  removeExpense,
 };
