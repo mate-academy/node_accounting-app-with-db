@@ -28,7 +28,7 @@ const getAllExpense = async ({ userId, categories, from, to }) => {
     }
   }
 
-  const expList = Expense.findAll({ where: params });
+  const expList = await Expense.findAll({ where: params });
 
   return expList;
 };

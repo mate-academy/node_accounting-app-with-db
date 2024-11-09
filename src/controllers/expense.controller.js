@@ -39,9 +39,9 @@ const createExpense = async (req, res) => {
   if (
     !data.userId ||
     !data.title ||
-    !data.categories ||
-    !data.spentAt ||
-    !data.amount
+    !typeof data.categories ||
+    !typeof data.spentAt ||
+    !typeof data.amount
   ) {
     return res.status(400).send({ message: 'Params required' });
   }
