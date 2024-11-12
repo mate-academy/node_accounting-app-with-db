@@ -1,20 +1,21 @@
 const express = require('express');
-const expenseRouter = express.Router();
+const { checkRequiredFields } = require('../middlewares/checkRequiredFields');
+const expenseController = require('../controllers/expensesController');
+const { checkIfExists } = require('../middlewares/checkIfExist');
+const router = express.Router();
 
-const {
-  getAllExpenses,
-  addExpense,
-  getExpenseById,
-  deleteExpense,
-  updateExpense,
-} = require('./expensesController.js');
+router.get('/', expenseController.get);
 
-const service = require('./expensesServices.js');
+router.get('/:id', checkIfExists('expense'), expenseController.getOne);
 
-expenseRouter.get('/', getAllExpenses);
-expenseRouter.post('/', service.validateNewExpense, addExpense);
-expenseRouter.get('/:id', getExpenseById);
-expenseRouter.delete('/:id', deleteExpense);
-expenseRouter.patch('/:id', updateExpense);
+router.post(
+  '/',
+  checkRequiredFields(['userId', 'spentAt', 'title', 'amount']),
+  expenseController.create,
+);
 
-module.exports = { expenseRouter };
+router.delete('/:id', checkIfExists('expense'), expenseController.remove);
+
+router.patch('/:id', checkIfExists('expense'), expenseController.update);
+
+module.exports = { router };

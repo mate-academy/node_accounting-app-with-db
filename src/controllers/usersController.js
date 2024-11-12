@@ -1,107 +1,50 @@
 /* eslint-disable no-console */
-const service = require('../services/usersServices');
+const userService = require('../services/usersServices');
 
-const getAllUsers = async (req, res) => {
-  try {
-    const users = await service.getAllUsers();
+const get = async (req, res) => {
+  const users = await userService
+    .getAll()
+    .then((usrs) => usrs.map(userService.normalize));
 
-    res.status(200).json(users);
-  } catch {
-    res.sendStatus(404);
-  }
+  res.send(users);
 };
 
-const addUser = async (req, res) => {
-  const name = req.body.name;
+const getOne = (req, res) => {
+  const user = userService.normalize(req.entry);
 
-  if (!name) {
-    return res.sendStatus(400);
-  }
-
-  try {
-    const user = await service.addUser(name);
-
-    res.status(201).json(user);
-  } catch {
-    res.sendStatus(500);
-  }
+  res.send(user);
 };
 
-const getUser = async (req, res) => {
-  const userId = req.params.id;
+const create = async (req, res) => {
+  const { name } = req.body;
 
-  if (!userId) {
-    return res.sendStatus(400);
-  }
+  const user = await userService.create(name).then(userService.normalize);
 
-  try {
-    const foundUser = await service.getUser(userId);
-
-    if (!foundUser) {
-      return res.sendStatus(404);
-    }
-
-    res.status(200).json(foundUser);
-  } catch (err) {
-    throw err;
-  }
+  res.status(201).send(user);
 };
 
-const deleteUser = async (req, res) => {
-  const userId = req.params.id;
+const remove = async (req, res) => {
+  const { id } = req.entry;
 
-  if (!userId) {
-    return res.sendStatus(404);
-  }
-
-  try {
-    const isUser = await service.getUser(userId);
-
-    if (!isUser) {
-      return res.sendStatus(404);
-    }
-  } catch (err) {
-    throw err;
-  }
-
-  try {
-    await service.deleteUser(userId);
-
-    res.sendStatus(204);
-  } catch (err) {
-    throw err;
-  }
+  await userService.remove(id);
+  res.sendStatus(204);
 };
 
-const updateUser = async (req, res) => {
-  const userToUpdateId = req.params.id;
-  const userName = req.body.name;
+const update = async (req, res) => {
+  const { name } = req.body;
+  const { id } = req.entry;
 
-  if (!userToUpdateId || !userName) {
-    return res.sendStatus(400);
-  }
+  await userService.update({ id, name });
 
-  try {
-    const isUser = await service.getUser(userToUpdateId);
+  const user = await userService.getById(id).then(userService.normalize);
 
-    if (!isUser) {
-      return res.sendStatus(404);
-    }
-
-    await service.updateUser(userToUpdateId, userName);
-
-    const updatedUser = await service.getUser(userToUpdateId);
-
-    res.status(200).json(updatedUser);
-  } catch (err) {
-    throw err;
-  }
+  res.send(user);
 };
 
 module.exports = {
-  getAllUsers,
-  addUser,
-  getUser,
-  deleteUser,
-  updateUser,
+  get,
+  create,
+  getOne,
+  remove,
+  update,
 };

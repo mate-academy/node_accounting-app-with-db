@@ -1,21 +1,17 @@
 const express = require('express');
+const { checkRequiredFields } = require('../middlewares/checkRequiredFields');
+const userController = require('../controllers/usersController');
+const { checkIfExists } = require('../middlewares/checkIfExist');
+const router = express.Router();
 
-const userRouter = express.Router();
+router.get('/', userController.get);
 
-const {
-  getAllUsers,
-  addUser,
-  getUser,
-  deleteUser,
-  updateUser,
-} = require('./usersController');
+router.post('/', checkRequiredFields(['name']), userController.create);
 
-const service = require('./usersServices');
+router.get('/:id', checkIfExists('user'), userController.getOne);
 
-userRouter.get('/', getAllUsers);
-userRouter.post('/', service.validateNewUser, addUser);
-userRouter.get('/:id', getUser);
-userRouter.delete('/:id', deleteUser);
-userRouter.patch('/:id', updateUser);
+router.delete('/:id', checkIfExists('user'), userController.remove);
 
-module.exports = { userRouter };
+router.patch('/:id', checkIfExists('user'), userController.update);
+
+module.exports = { router };

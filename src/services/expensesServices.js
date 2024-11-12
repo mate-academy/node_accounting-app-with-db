@@ -1,97 +1,62 @@
-const { Expense } = require('../models/Expense.model');
+const { Expense } = require('./../models/Expense.model');
 const { Op } = require('sequelize');
+const normalize = ({ amount, category, id, note, spentAt, title, userId }) => {
+  return {
+    amount,
+    category,
+    id,
+    note,
+    spentAt,
+    title,
+    userId,
+  };
+};
 
-function getAllExpenses(queries) {
-  const whereConditions = {};
+const getAll = async ({ categories, from, to, ...query }) => {
+  const where = { ...query };
 
-  if (!queries || Object.keys(queries).length === 0) {
-    try {
-      return Expense.findAll();
-    } catch (err) {
-      throw err;
-    }
+  if (categories) {
+    where.category = categories;
   }
 
-  if (queries.userId) {
-    whereConditions.userId = queries.userId;
+  if (from && to) {
+    where.spentAt = { [Op.between]: [new Date(from), new Date(to)] };
+  } else if (from) {
+    where.spentAt = { [Op.gte]: [from] };
+  } else if (to) {
+    where.spentAt = { [Op.lte]: [to] };
   }
 
-  if (queries.categories) {
-    whereConditions.category = queries.categories;
-  }
+  return Expense.findAll({ raw: true, where });
+};
 
-  if (queries.from) {
-    whereConditions.spentAt = { [Op.gte]: queries.from };
-  }
+const getById = (id) => {
+  return Expense.findByPk(id);
+};
+const create = (userId, spentAt, title, amount, category, note) => {
+  return Expense.create({
+    userId,
+    spentAt,
+    title,
+    amount,
+    category,
+    note,
+  });
+};
 
-  if (queries.to) {
-    whereConditions.spentAt = {
-      ...whereConditions.spentAt,
-      [Op.lte]: queries.to,
-    };
-  }
+const remove = async (id) => {
+  await Expense.destroy({ where: { id } });
+};
 
-  try {
-    return Expense.findAll({ where: whereConditions });
-  } catch (err) {
-    throw err;
-  }
-}
-
-function getExpenseById(expenseId) {
-  try {
-    return Expense.findByPk(expenseId);
-  } catch (err) {
-    throw err;
-  }
-}
-
-function addExpense(userId, spentAt, amount, title, category, note) {
-  try {
-    return Expense.create({
-      userId: userId,
-      spentAt: spentAt,
-      amount: amount,
-      title: title,
-      category: category,
-      note: note,
-    });
-  } catch (err) {
-    throw err;
-  }
-}
-
-function deleteExpense(expenseId) {
-  try {
-    return Expense.destroy({ where: { id: expenseId } });
-  } catch (err) {
-    throw err;
-  }
-}
-
-function updateExpense(expenseId, updating) {
-  try {
-    return Expense.update(updating, { where: { id: expenseId } });
-  } catch (err) {
-    throw err;
-  }
-}
-
-function validateNewExpense(req, res, next) {
-  const { userId, spentAt, title, amount } = req.body;
-
-  if (!userId || !spentAt || !title || !amount) {
-    return res.sendStatus(400);
-  }
-
-  next();
-}
+const update = (id, param = {}) => {
+  return Expense.update(param, { where: { id } });
+};
 
 module.exports = {
-  getAllExpenses,
-  addExpense,
-  getExpenseById,
-  deleteExpense,
-  updateExpense,
-  validateNewExpense,
+  normalize,
+  getAll,
+  getById,
+  create,
+  remove,
+  update,
 };

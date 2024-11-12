@@ -1,60 +1,33 @@
-const { User } = require('../models/User.model');
+const { User } = require('./../models/User.model');
 
-function getAllUsers() {
-  try {
-    return User.findAll();
-  } catch (err) {
-    throw err;
-  }
-}
+const normalize = ({ id, name }) => {
+  return { id, name };
+};
+const getAll = () => {
+  return User.findAll({ raw: true });
+};
 
-function addUser(userName) {
-  try {
-    return User.create({
-      name: userName,
-    });
-  } catch (err) {
-    throw err;
-  }
-}
+const getById = (id) => {
+  return User.findByPk(id);
+};
 
-function getUser(userId) {
-  try {
-    return User.findByPk(userId);
-  } catch (err) {
-    throw err;
-  }
-}
+const create = (name) => {
+  return User.create({ name });
+};
 
-function deleteUser(userId) {
-  try {
-    return User.destroy({ where: { id: userId } });
-  } catch (err) {
-    throw err;
-  }
-}
+const remove = async (id) => {
+  await User.destroy({ where: { id } });
+};
 
-function updateUser(userId, userName) {
-  try {
-    return User.update({ name: userName }, { where: { id: userId } });
-  } catch (err) {
-    throw err;
-  }
-}
-
-function validateNewUser(req, res, next) {
-  if (!req.body.name) {
-    return res.sendStatus(400);
-  }
-
-  next();
-}
+const update = ({ id, name }) => {
+  return User.update({ name }, { where: { id } });
+};
 
 module.exports = {
-  getAllUsers,
-  addUser,
-  getUser,
-  deleteUser,
-  updateUser,
-  validateNewUser,
+  normalize,
+  getAll,
+  getById,
+  create,
+  remove,
+  update,
 };
