@@ -33,11 +33,12 @@ const Expense = sequelize.define(
     },
     note: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
   },
   {
     tableName: 'expenses',
+    createdAt: false,
+    updatedAt: false,
   },
 );
 
