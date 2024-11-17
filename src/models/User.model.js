@@ -7,8 +7,9 @@ const User = sequelize.define(
   'user',
   {
     id: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       primaryKey: true,
+      autoIncrement: true,
     },
     name: {
       type: DataTypes.STRING,
@@ -17,6 +18,8 @@ const User = sequelize.define(
   },
   {
     tableName: 'users',
+    createdAt: false,
+    updatedAt: false,
   },
 );
 

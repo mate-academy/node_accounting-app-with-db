@@ -1,14 +1,12 @@
-const { Router } = require('express');
 const usersService = require('../services/users.service');
-const usersRouter = Router();
 
-usersRouter.get('/', async (req, res) => {
+const getAllUsers = async (req, res) => {
   const users = await usersService.getAll();
 
   res.send(users);
-});
+};
 
-usersRouter.get('/:id', async (req, res) => {
+const getUserById = async (req, res) => {
   const id = Number(req.params.id);
   const user = await usersService.getById(id);
 
@@ -17,9 +15,9 @@ usersRouter.get('/:id', async (req, res) => {
   }
 
   res.status(200).json(user);
-});
+};
 
-usersRouter.post('/', async (req, res) => {
+const createUser = async (req, res) => {
   const name = req.body.name;
 
   if (!name) {
@@ -29,9 +27,9 @@ usersRouter.post('/', async (req, res) => {
   const user = await usersService.create(name);
 
   res.status(201).send(user);
-});
+};
 
-usersRouter.delete('/:id', async (req, res) => {
+const deleteUser = async (req, res) => {
   const id = Number(req.params.id);
   const user = await usersService.getById(id);
 
@@ -42,9 +40,9 @@ usersRouter.delete('/:id', async (req, res) => {
   await usersService.deleteById(id);
 
   res.sendStatus(204);
-});
+};
 
-usersRouter.patch('/:id', async (req, res) => {
+const updateUser = async (req, res) => {
   const id = Number(req.params.id);
   const user = await usersService.getById(id);
   const newName = req.body.name;
@@ -53,11 +51,15 @@ usersRouter.patch('/:id', async (req, res) => {
     return res.sendStatus(404);
   }
 
-  const updatedUser = await usersService.update(id, newName);
+  const updatedUser = await usersService.updateById(id, { name: newName });
 
   res.send(updatedUser);
-});
+};
 
 module.exports = {
-  usersRouter,
+  getAllUsers,
+  getUserById,
+  createUser,
+  deleteUser,
+  updateUser,
 };
