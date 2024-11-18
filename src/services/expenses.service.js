@@ -1,9 +1,35 @@
 const { models } = require('../models/models');
 const Expense = models.Expense;
+const { Op } = require('sequelize');
 
 const getAll = async (queryParams) => {
+  const { userId, categories, from, to } = queryParams;
+  const filter = {};
+
+  if (userId) {
+    filter.userId = userId;
+  }
+
+  if (categories) {
+    filter.category = Array.isArray(categories)
+      ? { [Op.in]: categories }
+      : categories;
+  }
+
+  if (from || to) {
+    filter.spentAt = {};
+
+    if (from) {
+      filter.spentAt[Op.gte] = from;
+    }
+
+    if (to) {
+      filter.spentAt[Op.lte] = to;
+    }
+  }
+
   const result = await Expense.findAll({
-    where: queryParams,
+    where: filter,
   });
 
   return result;

@@ -19,13 +19,13 @@ const getExpenseById = async (req, res) => {
 };
 
 const createExpense = async (req, res) => {
-  if (!usersService.getById(Number(req.body.userId))) {
+  const { spentAt, title, amount, category, userId } = req.body;
+
+  if (!spentAt || !title || !amount || !category || !userId) {
     return res.sendStatus(400);
   }
 
-  const { spentAt, title, amount, category } = req.body;
-
-  if (!spentAt || !title || !amount || !category) {
+  if (!usersService.getById(Number(req.body.userId))) {
     return res.sendStatus(400);
   }
 
