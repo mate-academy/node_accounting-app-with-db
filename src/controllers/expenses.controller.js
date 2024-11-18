@@ -19,9 +19,9 @@ const getExpenseById = async (req, res) => {
 };
 
 const createExpense = async (req, res) => {
-  const { spentAt, title, amount, category, userId } = req.body;
+  const { spentAt, title, amount, userId } = req.body;
 
-  if (!spentAt || !title || !amount || !category || !userId) {
+  if (!spentAt || !title || !amount || !userId) {
     return res.sendStatus(400);
   }
 
