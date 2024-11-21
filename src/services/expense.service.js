@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const { Expense } = require('../models/Expense.model');
 
 const getAll = async () => {
@@ -19,36 +20,31 @@ const create = async (expense) => {
 const update = async (expense) => {
   const { id } = expense;
 
-  return Expense.update({ ...expense }, { where: { id } });
+  await Expense.update({ ...expense }, { where: { id } });
+  return Expense.findByPk(id);
 };
 
-async function filterExpenses(params) {
+const filterExpenses = async (params) => {
   const { userId, categories } = params;
-  let expenses = await Expense.findAll();
+
+  const where = {};
 
   if (userId) {
-    expenses = expenses.filter((expense) => expense.userId === +userId);
+    where.userId = userId;
   }
 
   if (categories) {
-    expenses = expenses.filter(
-      (expense) =>
-        // eslint-disable-next-line comma-dangle
-        categories.includes(expense.category),
-      // eslint-disable-next-line function-paren-newline
-    );
+    where.category = {
+      [Op.eq]: categories,
+    };
   }
 
-  // if (from) {
-  //   expenses = expenses.filter((expense) => expense.spentAt > from);
-  // }
-
-  // if (to) {
-  //   expenses = expenses.filter((expense) => expense.spentAt < to);
-  // }
+  const expenses = await Expense.findAll({
+    where,
+  });
 
   return expenses;
-}
+};
 
 const expenseService = {
   getAll,

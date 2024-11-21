@@ -19,7 +19,7 @@ const sequelize = new Sequelize({
   username: POSTGRES_USER,
   host: POSTGRES_HOST,
   dialect: 'postgres',
-  port: POSTGRES_PORT,
+  port: parseInt(POSTGRES_PORT, 10),
   password: POSTGRES_PASSWORD,
 });
 

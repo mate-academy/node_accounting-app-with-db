@@ -2,9 +2,9 @@ const { expenseService } = require('../services/expense.service');
 const { userService } = require('../services/user.service');
 
 const getAll = async (req, res) => {
-  const { userId, categories, from, to } = req.query;
-
-  if (userId || categories || from || to) {
+  const { userId, categories } = req.query;
+  
+  if (userId || categories) {
     const filtered = await expenseService.filterExpenses(req.query);
 
     res.statusCode = 200;
@@ -89,7 +89,7 @@ const update = async (req, res) => {
   const { id } = req.params;
 
   if (!id) {
-    res.sendStatus(404);
+    res.sendStatus(400);
 
     return;
   }
@@ -104,7 +104,7 @@ const update = async (req, res) => {
 
   const newExpense = Object.assign(expense, req.body);
 
-  await expense.update(newExpense);
+  await expenseService.update(newExpense);
   res.send(newExpense);
 };
 

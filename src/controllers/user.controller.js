@@ -59,11 +59,9 @@ const update = async (req, res) => {
     return;
   }
 
-  const newUser = { id: +id, name };
+  await userService.update({ id, name });
 
-  await userService.update(newUser);
-
-  res.send(newUser);
+  res.send({ id: +id, name });
 };
 
 const remove = async (req, res) => {
