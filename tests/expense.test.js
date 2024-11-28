@@ -51,7 +51,7 @@ describe('Expense', () => {
       User.create({ name: 'John Doe' }),
       User.create({ name: 'Jane Doe' }),
     ]);
-  });
+  }, 3500);
 
   beforeEach(async () => {
     server = createServer();
@@ -61,7 +61,7 @@ describe('Expense', () => {
       console.log(HOST);
     });
 
-    await Expense.destroy({ truncate: true });
+    await Expense.destroy({ truncate: true, cascade: true });
   });
 
   afterEach(async () => {
@@ -80,6 +80,9 @@ describe('Expense', () => {
         ...laptop,
         userId: user.id,
       };
+
+      // eslint-disable-next-line no-console
+      console.log('essa foi a data: ', data);
 
       const response = await api.post('expenses', data);
 
