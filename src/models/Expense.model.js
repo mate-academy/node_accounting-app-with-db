@@ -1,9 +1,10 @@
 'use strict';
 
 const { sequelize } = require('../db.js');
+// const { User } = require('./User.model.js');
 
 const Expense = sequelize.define(
-  'expense',
+  'Expense',
   {
     id: {
       type: sequelize.Sequelize.INTEGER,
@@ -14,9 +15,9 @@ const Expense = sequelize.define(
       type: sequelize.Sequelize.STRING,
       allowNull: false,
     },
-    description: {
+    category: {
       type: sequelize.Sequelize.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     amount: {
       type: sequelize.Sequelize.FLOAT,
@@ -33,16 +34,12 @@ const Expense = sequelize.define(
     userId: {
       type: sequelize.Sequelize.INTEGER,
       allowNull: false,
-      references: {
-        model: 'users',
-        key: 'id',
-      },
     },
   },
   {
-    updatedAt: false,
-    createdAt: false,
     tableName: 'expenses',
+    createdAt: false,
+    updatedAt: false,
   },
 );
 

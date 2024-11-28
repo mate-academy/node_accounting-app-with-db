@@ -9,13 +9,15 @@ const { expensesRouter } = require('./api/expenses.router');
 const cors = require('cors');
 
 const express = require('express');
+// const { sequelize } = require('./db');
 
 function createServer() {
+  // sequelize.sync({ force: true });
+
   const app = express();
 
   app.use(express.json());
   app.use(cors());
-
   app.use('/expenses', expensesRouter);
   app.use('/users', usersRouter);
 

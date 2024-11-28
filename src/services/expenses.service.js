@@ -2,7 +2,7 @@ const { getUserById } = require('./users.service');
 
 const { Expense } = require('../models/Expense.model');
 
-const sequelize = require('../db');
+const { sequelize } = require('../db');
 
 async function getAllExpenses() {
   const allExpenses = await Expense.findAll();
@@ -48,7 +48,7 @@ async function getExpenseById(id) {
 }
 
 async function createExpense(expense) {
-  const { userId } = expense;
+  const userId = expense.userId;
   const user = await getUserById(userId);
 
   if (!user) {
