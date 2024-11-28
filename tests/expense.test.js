@@ -51,7 +51,7 @@ describe('Expense', () => {
       User.create({ name: 'John Doe' }),
       User.create({ name: 'Jane Doe' }),
     ]);
-  });
+  }, 3500);
 
   beforeEach(async () => {
     server = createServer();
