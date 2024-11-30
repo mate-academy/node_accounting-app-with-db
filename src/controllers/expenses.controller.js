@@ -1,4 +1,4 @@
-const { expenseSchema } = require('../shemas');
+const { expenseSchema } = require('../schemas');
 const { dynamicSchema } = require('../utils');
 const { expensesService, usersService } = require('../services');
 
@@ -43,9 +43,9 @@ const create = async (req, res) => {
     return;
   }
 
-  const user = await expensesService.create(value);
+  const expense = await expensesService.create(value);
 
-  res.status(201).json(user);
+  res.status(201).json(expense);
 };
 
 const update = async (req, res) => {
@@ -77,9 +77,9 @@ const update = async (req, res) => {
   }
   await expensesService.update(id, value);
 
-  const updatedUser = await expensesService.getById(id);
+  const updatedExpense = await expensesService.getById(id);
 
-  res.json(updatedUser);
+  res.json(updatedExpense);
 };
 
 const deleteOne = async (req, res) => {

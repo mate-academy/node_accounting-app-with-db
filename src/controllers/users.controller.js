@@ -1,6 +1,6 @@
-const { userSchema } = require('../shemas');
+const { userSchema } = require('../schemas');
 const { dynamicSchema } = require('../utils');
-const { usersService } = require('./../services');
+const { usersService } = require('../services');
 
 const getAll = async (req, res) => {
   const users = await usersService.getAll();
