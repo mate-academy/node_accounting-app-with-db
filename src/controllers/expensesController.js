@@ -54,8 +54,9 @@ const create = async (req, res) => {
 
 const remove = async (req, res) => {
   const { id } = req.params;
+  const expense = await expensesServices.getExpensesById(id);
 
-  if (!expensesServices.getExpensesById(id)) {
+  if (!expense) {
     res.sendStatus(404);
 
     return;
@@ -68,8 +69,15 @@ const remove = async (req, res) => {
 
 const update = async (req, res) => {
   const { id } = req.params;
-  const { title } = req.body;
-  const expense = await expensesServices.updateExpense({ id, title });
+  const { title, amount, category, spentAt, note } = req.body;
+  const expense = await expensesServices.updateExpense({
+    id,
+    title,
+    amount,
+    category,
+    spentAt,
+    note,
+  });
 
   if (!expense) {
     res.sendStatus(404);

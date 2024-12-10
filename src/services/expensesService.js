@@ -13,11 +13,13 @@ const getAllExpenses = async (userId, categories, from, to) => {
     where.category = { [Op.in]: categories };
   }
 
-  if (from) {
+  const isValidDate = (date) => !isNaN(Date.parse(date));
+
+  if (from && isValidDate(from)) {
     where.spentAt = { [Op.gte]: new Date(from) };
   }
 
-  if (to) {
+  if (to && isValidDate(to)) {
     where.spentAt = {
       ...where.spentAt,
       [Op.lte]: new Date(to),
@@ -57,8 +59,24 @@ const deleteExpense = async (id) => {
   });
 };
 
-const updateExpense = async ({ id, title }) => {
-  await Expense.update({ title }, { where: { id } });
+const updateExpense = async ({
+  id,
+  title,
+  amount,
+  category,
+  spentAt,
+  note,
+}) => {
+  await Expense.update(
+    {
+      title,
+      amount,
+      category,
+      spentAt,
+      note,
+    },
+    { where: { id } },
+  );
 
   return Expense.findByPk(id);
 };

@@ -51,16 +51,17 @@ const remove = async (req, res) => {
 const update = async (req, res) => {
   const { id } = req.params;
   const { name } = req.body;
-  const user = await usersServices.updateUser({ id, name });
 
-  if (!user) {
-    res.sendStatus(404);
+  if (typeof name !== 'string') {
+    res.sendStatus(422);
 
     return;
   }
 
-  if (typeof name !== 'string') {
-    res.sendStatus(422);
+  const user = await usersServices.updateUser({ id, name });
+
+  if (!user) {
+    res.sendStatus(404);
 
     return;
   }
