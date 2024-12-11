@@ -74,5 +74,5 @@ module.exports = {
   getUserById: asyncHandler(getUserById),
   createUser: asyncHandler(createUser),
   removeUser: asyncHandler(removeUser),
-  updateUser,
+  updateUser: asyncHandler(updateUser),
 };
