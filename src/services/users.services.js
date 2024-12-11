@@ -21,7 +21,9 @@ const createUser = async (name) => {
 const updateUser = async (id, name) => {
   await User.update({ name }, { where: { id } });
 
-  return { id, name };
+  const updatedUser = await getUserById(id);
+
+  return updatedUser;
 };
 
 const removeUser = async (id) => {

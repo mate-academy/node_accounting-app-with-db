@@ -1,6 +1,7 @@
 const usersServices = require('../services/users.services');
 const { asyncHandler } = require('../utils/asyncHandler');
 const { getErrorWithStatus } = require('../utils/getError');
+const { getValidId, getValidString } = require('../utils/validation');
 
 const getUsers = async (_, res) => {
   const users = await usersServices.getUsers();
@@ -9,12 +10,7 @@ const getUsers = async (_, res) => {
 };
 
 const getUserById = async (req, res) => {
-  const { id } = req.params;
-  const userId = Number(id);
-
-  if (isNaN(userId)) {
-    throw getErrorWithStatus(400, 'Invalid user ID');
-  }
+  const userId = getValidId(req.params.id, 'User ID is invalid');
 
   const user = await usersServices.getUserById(userId);
 
@@ -26,11 +22,7 @@ const getUserById = async (req, res) => {
 };
 
 const createUser = async (req, res) => {
-  const { name } = req.body;
-
-  if (typeof name !== 'string') {
-    throw getErrorWithStatus(400, 'Wrong name field type,must be string');
-  }
+  const name = getValidString(req.body.name, 'name');
 
   const newUser = await usersServices.createUser(name);
 
@@ -38,9 +30,8 @@ const createUser = async (req, res) => {
 };
 
 const removeUser = async (req, res) => {
-  const { id } = req.params;
+  const userId = getValidId(req.params.id, 'User ID is invalid');
 
-  const userId = Number(id);
   const user = await usersServices.getUserById(userId);
 
   if (!user) {
@@ -52,17 +43,8 @@ const removeUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  const { id } = req.params;
-  const { name } = req.body;
-  const userId = Number(id);
-
-  if (isNaN(userId)) {
-    throw getErrorWithStatus(400, 'User not found');
-  }
-
-  if (typeof name !== 'string') {
-    throw getErrorWithStatus(400, 'Type of name must be string');
-  }
+  const userId = getValidId(req.params.id, 'User ID is invalid');
+  const name = getValidString(req.body.name, 'name');
 
   const updatedUser = await usersServices.updateUser(userId, name);
 

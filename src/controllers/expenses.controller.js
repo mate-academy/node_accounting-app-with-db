@@ -4,6 +4,7 @@ const usersServices = require('../services/users.services');
 const { asyncHandler } = require('../utils/asyncHandler.js');
 const { isExpenseValid } = require('../utils/expenses.js');
 const { getErrorWithStatus } = require('../utils/getError.js');
+const { getValidId } = require('../utils/validation.js');
 
 const getExpenses = async (req, res) => {
   const { categories, userId, from, to } = req.query;
@@ -25,13 +26,7 @@ const getExpenses = async (req, res) => {
 };
 
 const getExpenseById = async (req, res) => {
-  const { id } = req.params;
-
-  const expenseId = Number(id);
-
-  if (isNaN(expenseId)) {
-    throw getErrorWithStatus(400, 'Wrong type of expenseId');
-  }
+  const expenseId = getValidId(req.params.id, 'Wrong type of expenseId');
 
   const expense = await expensesServices.getExpenseById(expenseId);
 
@@ -59,9 +54,7 @@ const createExpense = async (req, res) => {
 };
 
 const removeExpense = async (req, res) => {
-  const { id } = req.params;
-
-  const expenseId = Number(id);
+  const expenseId = getValidId(req.params.id, 'Wrong type of expenseId');
 
   const expense = await expensesServices.getExpenseById(expenseId);
 
@@ -75,7 +68,7 @@ const removeExpense = async (req, res) => {
 };
 
 const updateExpense = async (req, res) => {
-  const expenseId = Number(req.params.id);
+  const expenseId = getValidId(req.params.id, 'Wrong type of expenseId');
 
   const expense = await expensesServices.getExpenseById(expenseId);
 
