@@ -26,33 +26,33 @@ const getNewExpenseData = (expense, id) => {
   return note ? { ...newExpense, note } : newExpense;
 };
 
-const getExpensesFilterQuerry = (categories, userId, from, to) => {
+const getExpensesFilterQuery = (categories, userId, from, to) => {
   const filter = {};
 
-  /* eslint-disable no-fallthrough */
-  switch (true) {
-    case userId:
-      filter.userId = userId;
-
-    case categories && categories.length:
-      filter.category = { [Op.in]: categories };
-
-    case from:
-      filter.spentAt = { [Op.gte]: new Date(from) };
-
-    case to:
-      filter.spentAt = {
-        ...filter.spentAt,
-        [Op.lte]: new Date(to),
-      };
-
-    default:
-      return filter;
+  if (userId) {
+    filter.userId = userId;
   }
+
+  if (categories && categories.length) {
+    filter.category = { [Op.in]: categories };
+  }
+
+  if (from) {
+    filter.spentAt = { [Op.gte]: new Date(from) };
+  }
+
+  if (to) {
+    filter.spentAt = {
+      ...filter.spentAt,
+      [Op.lte]: new Date(to),
+    };
+  }
+
+  return filter;
 };
 
 module.exports = {
   isExpenseValid,
   getNewExpenseData,
-  getExpensesFilterQuerry,
+  getExpensesFilterQuery,
 };

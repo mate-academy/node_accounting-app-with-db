@@ -1,9 +1,9 @@
-const { getExpensesFilterQuerry } = require('../utils/expenses');
+const { getExpensesFilterQuery } = require('../utils/expenses');
 
 const { Expense } = require('../models/Expense.model');
 
 const getExpenses = async (categories, userId, from, to) => {
-  const where = getExpensesFilterQuerry(categories, userId, from, to);
+  const where = getExpensesFilterQuery(categories, userId, from, to);
 
   const expenses = await Expense.findAll({ where });
 

@@ -11,7 +11,7 @@ const getExpenses = async (req, res) => {
   let categoriesArray = categories;
 
   if (categories) {
-    categoriesArray = [categories];
+    categoriesArray = Array.isArray(categories) ? categories : [categories];
   }
 
   const expenses = await expensesServices.getExpenses(
@@ -63,7 +63,7 @@ const removeExpense = async (req, res) => {
 
   const expenseId = Number(id);
 
-  const expense = expensesServices.getExpenseById(expenseId);
+  const expense = await expensesServices.getExpenseById(expenseId);
 
   if (!expense) {
     throw getErrorWithStatus(404, 'Expense not found');
