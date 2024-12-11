@@ -1,29 +1,31 @@
 const { Op } = require('sequelize');
 
+const { getValidString } = require('./validation');
+const { getErrorWithStatus } = require('./getError');
+
 const isExpenseValid = (expense) => {
-  const { title, amount, category, spentAt, note } = expense;
+  const { title, category, spentAt, note } = expense;
 
-  return !!(
-    typeof title === 'string' &&
-    typeof amount === 'number' &&
-    typeof category === 'string' &&
-    typeof spentAt === 'string' &&
-    (typeof note === 'string' || typeof note === 'undefined')
-  );
-};
-
-const getNewExpenseData = (expense, id) => {
-  const { title, amount, category, userId, note } = expense;
-
-  const newExpense = {
-    id,
+  const textFields = {
     title,
-    amount,
     category,
-    userId,
+    spentAt,
+    note,
   };
 
-  return note ? { ...newExpense, note } : newExpense;
+  Object.entries(textFields).forEach(([key, value]) => {
+    const field = key.toString();
+
+    if (field === 'note' && !field) {
+      return;
+    }
+
+    getValidString(value, field);
+  });
+
+  if (typeof expense.amount !== 'number') {
+    throw getErrorWithStatus(400, `Type of amount must be string`);
+  }
 };
 
 const getExpensesFilterQuery = (categories, userId, from, to) => {
@@ -53,6 +55,5 @@ const getExpensesFilterQuery = (categories, userId, from, to) => {
 
 module.exports = {
   isExpenseValid,
-  getNewExpenseData,
   getExpensesFilterQuery,
 };

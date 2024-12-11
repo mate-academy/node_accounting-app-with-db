@@ -38,15 +38,13 @@ const getExpenseById = async (req, res) => {
 };
 
 const createExpense = async (req, res) => {
-  const user = await usersServices.getUserById(+req.body.userId);
+  const userId = getValidId(req.body.userId, 'Wrong user ID');
+  const user = await usersServices.getUserById(userId);
 
   if (!user) {
     throw getErrorWithStatus(400, 'User not found');
   }
-
-  if (!isExpenseValid(req.body)) {
-    throw getErrorWithStatus(400, 'Wrong types');
-  }
+  isExpenseValid(req.body);
 
   const newExpense = await expensesServices.createExpense(req.body);
 

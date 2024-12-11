@@ -10,7 +10,7 @@ const getValidId = (id, errorMessage) => {
   return numberId;
 };
 
-const getValidString = (value, fieldName) => {
+const getValidString = (value, fieldName, expectedType = '') => {
   if (typeof value !== 'string') {
     throw getErrorWithStatus(400, `Type of ${fieldName} must be string`);
   }
