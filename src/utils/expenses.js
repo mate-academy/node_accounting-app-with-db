@@ -16,7 +16,7 @@ const isExpenseValid = (expense) => {
   Object.entries(textFields).forEach(([key, value]) => {
     const field = key.toString();
 
-    if (field === 'note' && !field) {
+    if ((field === 'note' || field === 'category') && !value) {
       return;
     }
 
