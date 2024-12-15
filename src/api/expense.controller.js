@@ -18,14 +18,16 @@ const getExpenses = async (req, res) => {
 const createExpense = async (req, res) => {
   const { userId, spentAt, title, amount, category, note } = req.body;
 
-  if (!userId || !spentAt || !title || !amount) {
-    return res.sendStatus(400);
+  if (!userId || !spentAt || !title || !amount || amount <= 0) {
+    return res.status(400).json({
+      message: 'userId, spentAt, title, and a positive amount are required.',
+    });
   }
 
   const user = await userService.getUserById(userId);
 
   if (!user) {
-    return res.sendStatus(400);
+    return res.status(400).json({ message: 'Invalid userId.' });
   }
 
   const expense = await expenseService.createExpense({
@@ -33,8 +35,8 @@ const createExpense = async (req, res) => {
     spentAt,
     title,
     amount,
-    category,
-    note,
+    category: category || '',
+    note: note || '',
   });
 
   res.status(201).json(expense);
@@ -44,7 +46,7 @@ const getExpenseById = async (req, res) => {
   const expense = await expenseService.getExpenseById(+req.params.id);
 
   if (!expense) {
-    return res.sendStatus(404);
+    return res.status(404).json({ message: 'Expense not found.' });
   }
 
   res.json(expense);
@@ -58,7 +60,7 @@ const updateExpense = async (req, res) => {
   const expense = await expenseService.getExpenseById(normalizedId);
 
   if (!expense) {
-    return res.sendStatus(404);
+    return res.status(404).json({ message: 'Expense not found.' });
   }
 
   const updatedExpense = await expenseService.updateExpense({
@@ -70,10 +72,10 @@ const updateExpense = async (req, res) => {
 };
 
 const deleteExpense = async (req, res) => {
-  const expense = await expenseService.deleteExpense(+req.params.id);
+  const deletedExpense = await expenseService.deleteExpense(+req.params.id);
 
-  if (!expense) {
-    return res.sendStatus(404);
+  if (!deletedExpense) {
+    return res.status(404).json({ message: 'Expense not found.' });
   }
 
   res.sendStatus(204);

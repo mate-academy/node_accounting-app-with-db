@@ -9,11 +9,13 @@ const getUsers = async (req, res) => {
 const createUser = async (req, res) => {
   const name = req.body.name;
 
-  if (!name) {
-    return res.status(400).json({ message: 'Name is required' });
+  if (!name || typeof name !== 'string' || name.trim() === '') {
+    return res
+      .status(400)
+      .json({ message: 'Name is required and must be a valid string.' });
   }
 
-  const user = await userService.createUser(name);
+  const user = await userService.createUser(name.trim());
 
   res.status(201).json(user);
 };
@@ -22,7 +24,7 @@ const getUserById = async (req, res) => {
   const user = await userService.getUserById(+req.params.id);
 
   if (!user) {
-    return res.sendStatus(404);
+    return res.status(404).json({ message: 'User not found.' });
   }
 
   res.json(user);
@@ -33,19 +35,21 @@ const updateUser = async (req, res) => {
   const { id } = req.params;
   const normalizedId = +id;
 
-  if (!name) {
-    return res.sendStatus(400);
+  if (!name || typeof name !== 'string' || name.trim() === '') {
+    return res
+      .status(400)
+      .json({ message: 'Name is required and must be a valid string.' });
   }
 
   const user = await userService.getUserById(normalizedId);
 
   if (!user) {
-    return res.sendStatus(404);
+    return res.status(404).json({ message: 'User not found.' });
   }
 
   const updatedUser = await userService.updateUser({
     id: normalizedId,
-    name,
+    name: name.trim(),
   });
 
   res.json(updatedUser);
@@ -55,7 +59,7 @@ const deleteUser = async (req, res) => {
   const user = await userService.deleteUser(+req.params.id);
 
   if (!user) {
-    return res.sendStatus(404);
+    return res.status(404).json({ message: 'User not found.' });
   }
 
   res.sendStatus(204);

@@ -27,9 +27,9 @@ const updateUser = async ({ id, name }) => {
 };
 
 const deleteUser = async (id) => {
-  const deletedUser = await User.destroy({ where: { id } });
+  const deletedRows = await User.destroy({ where: { id } });
 
-  return deletedUser;
+  return deletedRows > 0;
 };
 
 const userService = {
