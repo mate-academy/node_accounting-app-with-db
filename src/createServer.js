@@ -238,6 +238,8 @@ router.patch('/expenses/:id', async (req, res) => {
       spentAt,
     });
 
+    await expense.reload();
+
     res.status(200).json(expense);
   } catch (error) {
     res.status(500).json({ message: 'Error updating expense' });
