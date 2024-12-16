@@ -44,6 +44,7 @@ const Expense = sequelize.define(
     },
   },
   {
+    tableName: 'expenses',
     timestamps: false,
   },
 );
