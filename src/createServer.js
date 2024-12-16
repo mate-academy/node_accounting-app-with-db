@@ -193,7 +193,7 @@ router.post('/expenses', async (req, res) => {
 
     const newExpense = await Expense.create({
       title,
-      amount: parsedAmount.toFixed(2),
+      amount: parsedAmount,
       userId,
       category: category || null,
       note: note || null,
