@@ -15,7 +15,14 @@ const getUserById = async (id) => {
 };
 
 const updateUser = async ({ id, name }) => {
-  const [numberOfAffectedRows] = await User.update({ name }, { where: { id } });
+  if (!name || typeof name !== 'string' || name.trim() === '') {
+    throw new Error('Name is required and must be a valid, non-empty string.');
+  }
+
+  const [numberOfAffectedRows] = await User.update(
+    { name: name.trim() },
+    { where: { id } },
+  );
 
   if (numberOfAffectedRows === 0) {
     return null;

@@ -1,9 +1,23 @@
 const { expenseService } = require('../services/expense.service.js');
 const { userService } = require('../services/user.service.js');
 
+const isValidDate = (dateString) => {
+  const date = new Date(dateString);
+
+  return !isNaN(date.getTime());
+};
+
 const getExpenses = async (req, res) => {
   const { userId, categories, from, to } = req.query;
   const categoryList = categories ? categories.split(',') : [];
+
+  if (from && !isValidDate(from)) {
+    return res.status(400).json({ message: "'from' is not a valid date." });
+  }
+
+  if (to && !isValidDate(to)) {
+    return res.status(400).json({ message: "'to' is not a valid date." });
+  }
 
   const expenses = await expenseService.getExpenses({
     userId,
@@ -56,6 +70,37 @@ const updateExpense = async (req, res) => {
   const data = req.body;
   const { id } = req.params;
   const normalizedId = +id;
+
+  const allowedFields = ['spentAt', 'title', 'amount', 'category', 'note'];
+
+  const invalidFields = Object.keys(data).filter(
+    (key) => !allowedFields.includes(key),
+  );
+
+  if (invalidFields.length > 0) {
+    return res.status(400).json({
+      message: `Invalid fields: ${invalidFields.join(', ')}. Allowed fields are: ${allowedFields.join(', ')}.`,
+    });
+  }
+
+  if (
+    data.amount !== undefined &&
+    (typeof data.amount !== 'number' || data.amount <= 0)
+  ) {
+    return res
+      .status(400)
+      .json({ message: 'Amount must be a positive number.' });
+  }
+
+  if (data.spentAt !== undefined) {
+    const spentAtDate = new Date(data.spentAt);
+
+    if (isNaN(spentAtDate.getTime())) {
+      return res
+        .status(400)
+        .json({ message: "'spentAt' must be a valid date." });
+    }
+  }
 
   const expense = await expenseService.getExpenseById(normalizedId);
 

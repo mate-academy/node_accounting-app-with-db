@@ -1,6 +1,12 @@
 const { Op } = require('sequelize');
 const { Expense } = require('../models/Expense.model.js');
 
+const isValidDate = (date) => {
+  const parsedDate = new Date(date);
+
+  return !isNaN(parsedDate.getTime());
+};
+
 const getExpenses = async ({ userId, categoryList, from, to }) => {
   const whereClause = {};
 
@@ -13,11 +19,21 @@ const getExpenses = async ({ userId, categoryList, from, to }) => {
   }
 
   if (from) {
+    if (!isValidDate(from)) {
+      throw new Error("'from' parameter is not a valid date.");
+    }
     whereClause.spentAt = { [Op.gte]: new Date(from) };
   }
 
   if (to) {
-    whereClause.spentAt = { ...whereClause.spentAt, [Op.lte]: new Date(to) };
+    if (!isValidDate(to)) {
+      throw new Error("'to' parameter is not a valid date.");
+    }
+
+    whereClause.spentAt = {
+      ...whereClause.spentAt,
+      [Op.lte]: new Date(to),
+    };
   }
 
   const expenses = await Expense.findAll({
@@ -27,7 +43,7 @@ const getExpenses = async ({ userId, categoryList, from, to }) => {
   return expenses;
 };
 
-const createExpense = ({
+const createExpense = async ({
   userId,
   spentAt,
   title,
@@ -35,9 +51,13 @@ const createExpense = ({
   category = '',
   note = '',
 }) => {
+  if (!isValidDate(spentAt)) {
+    throw new Error("'spentAt' must be a valid date.");
+  }
+
   return Expense.create({
     userId,
-    spentAt,
+    spentAt: new Date(spentAt),
     title,
     amount,
     category,
@@ -50,6 +70,28 @@ const getExpenseById = async (id) => {
 };
 
 const updateExpense = async ({ id, data }) => {
+  const allowedFields = ['spentAt', 'title', 'amount', 'category', 'note'];
+  const invalidFields = Object.keys(data).filter(
+    (key) => !allowedFields.includes(key),
+  );
+
+  if (invalidFields.length > 0) {
+    throw new Error(
+      `Invalid fields in update data: ${invalidFields.join(', ')}.`,
+    );
+  }
+
+  if (data.spentAt && !isValidDate(data.spentAt)) {
+    throw new Error("'spentAt' must be a valid date.");
+  }
+
+  if (
+    data.amount !== undefined &&
+    (typeof data.amount !== 'number' || data.amount <= 0)
+  ) {
+    throw new Error("'amount' must be a positive number.");
+  }
+
   const [numberOfAffectedRows] = await Expense.update(data, { where: { id } });
 
   if (numberOfAffectedRows === 0) {
