@@ -6,7 +6,7 @@ const get = async (req, res) => {
 
   const result = await expenseService.getAll(categories, userId, from, to);
 
-  return res.send(result);
+  res.send(result);
 };
 
 const getById = async (req, res) => {
@@ -28,7 +28,9 @@ const create = async (req, res) => {
   const existedUser = await userService.getById(userId);
 
   if (!userId || !title || !amount || !spentAt || !existedUser) {
-    return res.sendStatus(400);
+    res.sendStatus(400);
+
+    return;
   }
 
   const newExpense = await expenseService.createExpense({
@@ -42,7 +44,7 @@ const create = async (req, res) => {
 
   res.statusCode = 201;
 
-  return res.send(newExpense);
+  res.send(newExpense);
 };
 
 const remove = async (req, res) => {
