@@ -1,14 +1,14 @@
-export const serviceUsers = require('./../services/usersService');
+const usersService = require('./../services/usersService.js');
 
 const get = async (req, res) => {
-  const users = await serviceUsers.getAllUsers();
+  const users = await usersService.getAllUsers();
 
   res.status(200).send(users);
 };
 
 const getOne = async (req, res) => {
   const { id } = req.params;
-  const user = await serviceUsers.getUserById(id);
+  const user = await usersService.getUserById(id);
 
   if (!user) {
     res.sendStatus(404);
@@ -28,14 +28,14 @@ const create = async (req, res) => {
     return;
   }
 
-  const user = await serviceUsers.createUser(name);
+  const user = await usersService.createUser(name);
 
   res.status(201).send(user);
 };
 
 const remove = async (req, res) => {
   const { id } = req.params;
-  const user = await serviceUsers.getUserById(id);
+  const user = await usersService.getUserById(id);
 
   if (!user) {
     res.sendStatus(404);
@@ -43,7 +43,7 @@ const remove = async (req, res) => {
     return;
   }
 
-  await serviceUsers.removeUser(id);
+  await usersService.removeUser(id);
 
   res.sendStatus(204);
 };
@@ -51,7 +51,7 @@ const remove = async (req, res) => {
 const update = async (req, res) => {
   const { id } = req.params;
   const { name } = req.body;
-  const user = await serviceUsers.getUserById(id);
+  const user = await usersService.getUserById(id);
 
   if (typeof name !== 'string') {
     res.sendStatus(400);
@@ -65,7 +65,7 @@ const update = async (req, res) => {
     return;
   }
 
-  const updatedUser = await serviceUsers.updateUser({ id, name });
+  const updatedUser = await usersService.updateUser({ id, name });
 
   res.send(updatedUser);
 };

@@ -1,15 +1,15 @@
-const serviceExpenses = require('../services/expensesServise');
-const serviceUsers = require('../services/usersService');
+const expensesService = require('../services/expensesService.js');
+const usersService = require('../services/usersService.js');
 
 const get = async (req, res) => {
-  const expenses = await serviceExpenses.getAllExpenses(req.query);
+  const expenses = await expensesService.getAllExpenses(req.query);
 
   res.status(200).send(expenses);
 };
 
 const getOne = async (req, res) => {
   const { id } = req.params;
-  const expense = await serviceExpenses.getExpenseById(id);
+  const expense = await expensesService.getExpenseById(id);
 
   if (!expense) {
     res.sendStatus(404);
@@ -22,7 +22,7 @@ const getOne = async (req, res) => {
 
 const create = async (req, res) => {
   const data = req.body;
-  const user = await serviceUsers.getUserById(data.userId);
+  const user = await usersService.getUserById(data.userId);
 
   if (!user) {
     res.sendStatus(400);
@@ -30,14 +30,14 @@ const create = async (req, res) => {
     return;
   }
 
-  const expense = await serviceExpenses.createExpense(data);
+  const expense = await expensesService.createExpense(data);
 
   res.status(201).send(expense);
 };
 
 const remove = async (req, res) => {
   const { id } = req.params;
-  const expense = await serviceExpenses.getExpenseById(id);
+  const expense = await expensesService.getExpenseById(id);
 
   if (!expense) {
     res.sendStatus(404);
@@ -45,7 +45,7 @@ const remove = async (req, res) => {
     return;
   }
 
-  await serviceExpenses.removeExpense(id);
+  await expensesService.removeExpense(id);
 
   res.sendStatus(204);
 };
@@ -53,7 +53,7 @@ const remove = async (req, res) => {
 const update = async (req, res) => {
   const { spentAt, title, amount, category, note } = req.body;
   const { id } = req.params;
-  const expense = await serviceExpenses.getExpenseById(id);
+  const expense = await expensesService.getExpenseById(id);
 
   if (!expense) {
     res.sendStatus(404);
@@ -61,7 +61,7 @@ const update = async (req, res) => {
     return;
   }
 
-  const updatedExp = await serviceExpenses.updateExpense(id, {
+  const updatedExp = await expensesService.updateExpense(id, {
     spentAt,
     title,
     amount,
