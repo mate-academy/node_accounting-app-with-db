@@ -10,6 +10,10 @@ const createServer = () => {
 
   app.use(cors());
 
+  app.get('/', (req, res) => {
+    res.send('Welcome to the server!');
+  });
+
   app.use('/users', express.json(), userRouter);
 
   app.use('/expenses', express.json(), expensesRouter);
