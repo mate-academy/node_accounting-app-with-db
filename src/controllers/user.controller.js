@@ -39,9 +39,9 @@ const createUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   const { id } = req.params;
-  const user = req.body;
+  const userData = req.body;
 
-  await update(id, user);
+  await update(id, userData);
 
   const updatedUser = await getById(id);
 

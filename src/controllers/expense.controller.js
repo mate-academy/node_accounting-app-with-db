@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 const {
   create,
   update,
@@ -29,7 +28,9 @@ const createExpense = async (req, res) => {
   const { spentAt, title, amount, userId, note, category } = req.body;
 
   if (!spentAt || !title || !amount || !userId) {
-    return res.status(400).json({ message: 'Not all required' });
+    return res.status(400).json({
+      message: 'Missing required fields: spentAt, title, amount, userId',
+    });
   }
 
   const newValues = {
@@ -48,9 +49,9 @@ const createExpense = async (req, res) => {
 
 const updateExpense = async (req, res) => {
   const { id } = req.params;
-  const user = req.body;
+  const expenseData = req.body;
 
-  await update(id, user);
+  await update(id, expenseData);
 
   const updatedExpense = await getById(id);
 
