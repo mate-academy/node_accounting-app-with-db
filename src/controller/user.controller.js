@@ -37,6 +37,10 @@ const post = async (req, res) => {
 const remove = async (req, res) => {
   const { id } = req.params;
 
+  if (!id || isNaN(id)) {
+    return res.sendStatus(400);
+  }
+
   const user = await userService.getById(id);
 
   if (!user) {
@@ -50,6 +54,10 @@ const remove = async (req, res) => {
 const patch = async (req, res) => {
   const { id } = req.params;
   const { name } = req.body;
+
+  if (!id || isNaN(id)) {
+    return res.sendStatus(400);
+  }
 
   const user = await userService.getById(id);
 

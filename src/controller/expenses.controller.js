@@ -32,6 +32,10 @@ const post = async (req, res) => {
     return res.sendStatus(400);
   }
 
+  if (isNaN(amount) || amount <= 0) {
+    return res.sendStatus(400);
+  }
+
   const user = await userService.getById(userId);
 
   if (!user) {
@@ -53,6 +57,10 @@ const post = async (req, res) => {
 const remove = async (req, res) => {
   const { id } = req.params;
 
+  if (!id) {
+    return res.sendStatus(400);
+  }
+
   const expense = await expensesService.getById(id);
 
   if (!expense) {
@@ -66,6 +74,10 @@ const remove = async (req, res) => {
 const patch = async (req, res) => {
   const { id } = req.params;
   const { title } = req.body;
+
+  if (!id || isNaN(id)) {
+    return res.sendStatus(400);
+  }
 
   const expense = await expensesService.getById(id);
 
