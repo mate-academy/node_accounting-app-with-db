@@ -15,7 +15,7 @@ const config = {
     host: process.env.POSTGRES_HOST || 'localhost',
     dialect: 'postgres',
     port: process.env.POSTGRES_PORT || 5432,
-    password: '123123' || process.env.POSTGRES_PASSWORD,
+    password: process.env.POSTGRES_PASSWORD || '123123',
   },
   test: {
     database: process.env.TEST_POSTGRES_DB || 'postgres',
@@ -23,7 +23,7 @@ const config = {
     host: process.env.TEST_POSTGRES_HOST || 'localhost',
     dialect: 'postgres',
     port: process.env.TEST_POSTGRES_PORT || 5432,
-    password: '123123' || process.env.TEST_POSTGRES_PASSWORD,
+    password: process.env.POSTGRES_PASSWORD || 'postgres',
   },
 };
 
