@@ -1,6 +1,6 @@
 'use strict';
 
-const { sequelize } = require('../db');
+const { sequelize } = require('../db.js');
 const { DataTypes } = require('sequelize');
 
 const User = sequelize.define(
@@ -16,11 +16,9 @@ const User = sequelize.define(
       allowNull: false,
     },
   },
-
   {
     tableName: 'users',
-    createdAt: false,
-    updatedAt: false,
+    timestamps: false,
   },
 );
 

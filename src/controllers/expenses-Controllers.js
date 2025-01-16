@@ -1,30 +1,35 @@
-const expensesService = require('../services/expenses-Services');
-// const expensesControllers = require('../services/expenses-Services')
+const expenseService = require('../services/expenses-Services');
 
-const getAllExpenses = (req, res) => {
-  const { userId, categories, from, to } = req.query;
-  const expenses = expensesService.getAllExpenses(userId, categories, from, to);
+const getAllExpenses = async (req, res) => {
+  const { userId, from, to, categories: category } = req.query;
 
-  res.status(200).json(expenses);
+  const filteredExpenses = await expenseService.getAllExpenses({
+    userId,
+    from,
+    to,
+    category,
+  });
+
+  res.send(filteredExpenses);
 };
 
-const getExpensById = (req, res) => {
+const getExpensById = async (req, res) => {
   const { id } = req.params;
 
-  const expense = expensesService.getExpenseById(+id);
+  const normalizedId = +id;
+  const targetExpense = await expenseService.getExpenseById(normalizedId);
 
-  if (!expense) {
-    return res.status(400).send('Expense not found');
+  if (targetExpense.error) {
+    return res.sendStatus(404);
   }
 
-  res.status(200).json(expense);
+  return res.send(targetExpense.data);
 };
 
-const createExpense = (req, res) => {
+const createExpense = async (req, res) => {
   const { userId, spentAt, title, amount, category, note } = req.body;
 
-  //  maybe add try {}
-  const createExp = expensesService.createExpense(
+  const result = await expenseService.createExpense(
     userId,
     spentAt,
     title,
@@ -33,34 +38,36 @@ const createExpense = (req, res) => {
     note,
   );
 
-  if (!userId || !spentAt || title || amount || category || note) {
-    return res.status(400).send('Missing required fields');
+  if (result.error) {
+    return res.sendStatus(400);
   }
 
-  res.status(201).json(createExp);
+  return res.status(201).send(result.data);
 };
 
-const deleteExpense = (req, res) => {
+const deleteExpense = async (req, res) => {
   const { id } = req.params;
 
-  const expense = expensesService.deleteExpense(+id);
+  const result = await expenseService.deleteExpense(id);
 
-  if (!expense) {
-    return res.status(404).send('Expense not found');
+  if (result.error) {
+    return res.sendStatus(404);
   }
-  res.status(200).json(expense);
+
+  return res.sendStatus(204);
 };
 
-const updateExpense = (req, res) => {
+const updateExpense = async (req, res) => {
   const { id } = req.params;
-  const updatedExpense = req.body;
+  const data = req.body;
 
-  const updateExp = expensesService.updateExpense(+id, updatedExpense);
+  const result = await expenseService.updateExpense(id, data);
 
-  if (!updateExp) {
-    return res.status(404).send('Expense not found');
+  if (result.error) {
+    return res.sendStatus(404);
   }
-  res.status(200).json(updateExp);
+
+  return res.status(200).send(result.data);
 };
 
 const expensesController = {

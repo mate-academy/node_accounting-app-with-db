@@ -1,5 +1,11 @@
-const { User } = require('./models/User.model.js');
-const { Expense } = require('./models/Expense.model.js');
+const { sequelize } = require('./db.js');
 
-User.sync({ force: true });
-Expense.sync({ force: true });
+async function setupDatabase() {
+  try {
+    await sequelize.sync({ force: true });
+  } catch (error) {
+    process.exit(1);
+  }
+}
+
+setupDatabase();

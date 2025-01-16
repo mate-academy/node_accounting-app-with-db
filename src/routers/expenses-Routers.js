@@ -1,14 +1,15 @@
-const Router = require('express');
+const express = require('express');
+const expnseRouter = express.Router();
+const expenseController = require('../controllers/expenses-Controllers');
 
-const expensesController = require('../controllers/expenses-Controllers');
+expnseRouter.get('/', express.json(), expenseController.getAllExpenses);
 
-const expensesRouter = Router();
+expnseRouter.get('/:id', expenseController.getExpensById);
 
-expensesRouter.get('/', expensesController.getAllExpenses);
-expensesRouter.get('/:id', expensesController.getExpensById);
-expensesRouter.delete('/:id', expensesController.deleteExpense);
+expnseRouter.post('/', express.json(), expenseController.createExpense);
 
-expensesRouter.patch('/:id', expensesController.updateExpense);
-expensesRouter.post('/', expensesController.createExpense);
+expnseRouter.delete('/:id', expenseController.deleteExpense);
 
-module.exports = expensesRouter;
+expnseRouter.patch('/:id', express.json(), expenseController.updateExpense);
+
+module.exports = expnseRouter;

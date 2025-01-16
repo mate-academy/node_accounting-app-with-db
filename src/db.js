@@ -3,31 +3,31 @@
 const { Sequelize } = require('sequelize');
 const utils = require('util');
 
-// Needed for testing purposes, do not remove
 require('dotenv').config();
 global.TextEncoder = utils.TextEncoder;
 
-const {
-  POSTGRES_HOST,
-  POSTGRES_PORT,
-  POSTGRES_USER,
-  POSTGRES_PASSWORD,
-  POSTGRES_DB,
-} = process.env;
+const env = process.env.NODE_ENV || 'development';
 
-/*
-  All credentials setted to default values (exsept password - it is exapmle)
-  replace if needed with your own
-*/
+const config = {
+  development: {
+    database: process.env.POSTGRES_DB || 'postgres',
+    username: process.env.POSTGRES_USER || 'postgres',
+    host: process.env.POSTGRES_HOST || 'localhost',
+    dialect: 'postgres',
+    port: process.env.POSTGRES_PORT || 5432,
+    password: process.env.POSTGRES_PASSWORD || 'GEKAGEKA',
+  },
+  test: {
+    database: process.env.TEST_POSTGRES_DB || 'postgres',
+    username: process.env.TEST_POSTGRES_USER || 'postgres',
+    host: process.env.TEST_POSTGRES_HOST || 'localhost',
+    dialect: 'postgres',
+    port: process.env.TEST_POSTGRES_PORT || 5432,
+    password: process.env.POSTGRES_PASSWORD || 'postgres',
+  },
+};
 
-const sequelize = new Sequelize({
-  database: POSTGRES_DB || 'postgres',
-  username: POSTGRES_USER || 'postgres',
-  host: POSTGRES_HOST || 'localhost',
-  dialect: 'postgres',
-  port: POSTGRES_PORT || 5432,
-  password: POSTGRES_PASSWORD || 'GEKAGEKA',
-});
+const sequelize = new Sequelize(config[env]);
 
 module.exports = {
   sequelize,

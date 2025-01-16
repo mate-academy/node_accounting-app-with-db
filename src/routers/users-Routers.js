@@ -1,19 +1,14 @@
-const Router = require('express');
+const express = require('express');
+const userRouter = express.Router();
+const userController = require('../controllers/users-Controllers');
 
-const usersControllers = require('.././controllers/users-Controllers');
+userRouter.get('/', express.json(), userController.getAllUsers);
 
-const userRouters = Router();
+userRouter.post('/', express.json(), userController.createUser);
+userRouter.get('/:id', userController.getUsersById);
 
-userRouters.get('/', usersControllers.getAllUsers);
+userRouter.patch('/:id', express.json(), userController.uptadeUsers);
 
-userRouters.get('/:id', usersControllers.getUsersById);
+userRouter.delete('/:id', userController.deleteUsers);
 
-userRouters.delete('/:id', usersControllers.deleteUsers);
-
-userRouters.post('/', usersControllers.createUser);
-
-userRouters.patch('/:id', usersControllers.uptadeUsers);
-
-module.exports = {
-  userRouters,
-};
+module.exports = userRouter;

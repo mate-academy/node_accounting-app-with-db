@@ -1,56 +1,70 @@
-const usersService = require('../services/users-Services');
+const userService = require('../services/users-Services');
 
-const getAllUsers = (req, res) => {
-  const users = usersService.getAllUsers;
+const getAllUsers = async (req, res) => {
+  const result = await userService.getAllUsers();
 
-  res.status(200).json(users);
-};
-
-const getUsersById = (req, res) => {
-  const { id } = req.params;
-
-  const user = usersService.getUserBYID(+id);
-
-  if (!user) {
-    return res.status(404).send('User not found');
+  if (result.error) {
+    return res.status(500).send(result.error);
   }
 
-  res.status(200).json(user);
+  res.send(result.data);
 };
 
-const createUser = (req, res) => {
+const getUsersById = async (req, res) => {
+  const { id } = req.params;
+
+  const result = await userService.getUserById(+id);
+
+  if (result.error) {
+    return res.sendStatus(404);
+  }
+
+  return res.send(result.data);
+};
+
+const createUser = async (req, res) => {
   const { name } = req.body;
 
   if (!name) {
-    return res.status(400).send('Name is required');
+    return res.sendStatus(400);
   }
 
-  const user = usersService.createUser(name);
+  const result = await userService.createUser(name);
 
-  res.status(200).json(user);
+  if (result.error) {
+    return res.sendStatus(400);
+  }
+
+  return res.status(201).send(result.data);
 };
 
-const deleteUsers = (req, res) => {
+const deleteUsers = async (req, res) => {
   const { id } = req.params;
-  const user = usersService.deleteUsers(+id);
 
-  if (!user) {
-    return res.status(404).send('User not found');
+  const result = await userService.deleteUser(id);
+
+  if (result.error) {
+    return res.sendStatus(404);
   }
 
-  res.status(200).json(user);
+  return res.sendStatus(204);
 };
 
-const uptadeUsers = (req, res) => {
+const uptadeUsers = async (req, res) => {
   const { id } = req.params;
-  const updatedUser = req.body;
-  const user = usersService.updateUser(+id, updatedUser);
+  const { name } = req.body;
 
-  if (!user) {
-    return res.status(404).json({ message: 'User not found' });
+  if (typeof name !== 'string') {
+    return res.sendStatus(422);
   }
 
-  res.status(200).json(user);
+  const result = await userService.updateUser(id, name);
+
+  if (result.error) {
+    return res.sendStatus(404);
+  }
+
+  return res.status(200).send(result.data);
 };
 
 const usersControllers = {

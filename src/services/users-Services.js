@@ -88,4 +88,6 @@ const usersService = {
   updateUser,
 };
 
-module.exports = usersService;
+module.exports = {
+  usersService,
+};
