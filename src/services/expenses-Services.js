@@ -1,4 +1,5 @@
-const { getUserById } = require('./users.service');
+const { Op } = require('sequelize');
+const { Expense } = require('../models/Expense.model');
 
 let expenses = [];
 
@@ -6,89 +7,120 @@ const clearExpenses = () => {
   expenses = [];
 };
 
-const getAllExpenses = (
+const getAllExpenses = async (
   userId = null,
   categories = null,
   from = null,
   to = null,
 ) => {
-  return expenses.filter((expense) => {
-    let isValid = true;
+  let filterExp = await Expense.findAll();
+  const whereConditions = {};
 
-    if (userId) {
-      isValid = isValid && expense.userId === Number(userId);
-    }
+  if (userId) {
+    filterExp = await Expense.findAll({
+      where: { userId: +userId },
+    });
+  }
 
-    if (categories) {
-      isValid = isValid && categories.includes(expense.category);
-    }
+  if (from && to) {
+    whereConditions.spentAt = {
+      [Op.between]: [new Date(from), new Date(to)],
+    };
+  }
 
-    if (from) {
-      isValid = isValid && new Date(expense.spentAt) >= new Date(from);
-    }
+  if (from || to) {
+    filterExp = await Expense.findAll({
+      where: whereConditions,
+    });
+  }
 
-    if (to) {
-      isValid = isValid && new Date(expense.spentAt) <= new Date(to);
-    }
+  if (categories) {
+    filterExp = await Expense.findAll({
+      where: {
+        category: categories,
+      },
+    });
+  }
 
-    return isValid;
-  });
+  return filterExp;
 };
 
-function getExpenseById(id) {
-  return expenses.find((expense) => expense.id === id);
-}
+const getExpenseById = async (id) => {
+  try {
+    const normalizedId = +id;
+    const expenseById = await Expense.findByPk(normalizedId);
 
-function createExpense({ userId, spentAt, title, amount, category, note }) {
-  const checkUserById = getUserById(userId);
+    if (!expenseById) {
+      return { error: 'Expense not found in DB' };
+    }
 
-  if (!checkUserById) {
-    throw new Error(`User with ID ${userId} not found.`);
+    return { data: expenseById };
+  } catch (error) {
+    return { error: 'Error to get Expense by ID' };
   }
+};
 
-  const newExpense = {
-    id: Date.now(),
-    userId,
-    spentAt: new Date(spentAt).toISOString(),
-    title,
-    amount,
-    category,
-    note: note || '',
-  };
+const createExpense = async ({
+  userId,
+  spentAt,
+  title,
+  amount,
+  category,
+  note,
+}) => {
+  try {
+    const normalizedUserId = +userId;
 
-  expenses.push(newExpense);
+    const newExpense = await Expense.create({
+      userId: normalizedUserId,
+      spentAt: new Date(spentAt).toISOString(),
+      title,
+      amount,
+      category,
+      note: note || '',
+    });
 
-  return newExpense;
-}
+    // Додавання нового витратного запису до масиву expenses
+    expenses.push(newExpense);
 
-function deleteExpense(expenseId) {
-  const expenseIndex = expenses.findIndex(
-    (expense) => expense.id === expenseId,
-  );
-
-  if (expenseIndex === -1) {
-    return null;
+    return { data: newExpense };
+  } catch (error) {
+    return { error: 'Error with create Expense (Sorry!)' };
   }
+};
 
-  return expenses.splice(expenseIndex, 1)[0];
-}
+const deleteExpense = async (expenseId) => {
+  try {
+    const delExpense = await Expense.destroy({
+      where: { id: expenseId },
+    });
 
-function updateExpense(expenseId, updatedExpense) {
-  const expenseIndex = expenses.findIndex(
-    (expense) => expense.id === expenseId,
-  );
+    if (delExpense === 0) {
+      return { error: 'Expense does not exist' };
+    }
 
-  if (expenseIndex !== -1) {
-    expenses[expenseIndex] = {
-      ...expenses[expenseIndex],
-      ...updatedExpense,
-    };
-
-    return expenses[expenseIndex];
+    return { data: 'Expense deleted successfully' };
+  } catch (error) {
+    return { error: `Error deleting expense: ${error.message}` };
   }
+};
 
-  return null;
-}
+const updateExpense = async (expenseId, updatedExpense) => {
+  try {
+    const normalizedId = +expenseId;
+    const expenseToUpdate = await Expense.findByPk(normalizedId);
+
+    if (!expenseToUpdate) {
+      return { error: 'Expense not found' };
+    }
+
+    await expenseToUpdate.update({ ...updatedExpense });
+
+    return { data: expenseToUpdate }; // Повертаємо оновлену витрату
+  } catch (error) {
+    return { error: `Failed to update expense: ${error.message}` };
+  }
+};
 
 const expensesService = {
   clearExpenses,
