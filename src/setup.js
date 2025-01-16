@@ -1,14 +1,14 @@
 const { sequelize } = require('./db.js');
-const { User } = require('./models/User.model');
-const { Expense } = require('./models/Expense.model');
+// const { User } = require('./models/User.model');
+// const { Expense } = require('./models/Expense.model');
 
-User.hasMany(Expense, {
-  foreignKey: 'userId',
-});
-
-Expense.belongsTo(User, {
-  foreignKey: 'userId',
-});
+// User.hasMany(Expense, {
+//   foreignKey: 'userId',
+// });
+//
+// Expense.belongsTo(User, {
+//   foreignKey: 'userId',
+// });
 
 async function setupDatabase() {
   try {
