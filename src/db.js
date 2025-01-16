@@ -1,10 +1,10 @@
 'use strict';
 
 const { Sequelize } = require('sequelize');
-const utils = require('util');
+// const utils = require('util');
 
 require('dotenv').config();
-global.TextEncoder = utils.TextEncoder;
+// global.TextEncoder = utils.TextEncoder;
 
 const env = process.env.NODE_ENV || 'development';
 

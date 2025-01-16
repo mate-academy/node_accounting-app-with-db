@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const expenseController = require('../сontrollers/expenseController');
+const expenseController = require('../controllers/expenseController');
 
 router.get('/', express.json(), expenseController.getAllExpensesHandler);
 

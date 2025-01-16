@@ -39,7 +39,7 @@ const createUser = async (name) => {
     const newUser = await User.create({ name });
 
     return { data: newUser };
-  } catch {
+  } catch (error) {
     return { error: 'Failed to create user' };
   }
 };

@@ -3,33 +3,24 @@ const { Op } = require('sequelize');
 const { Expense } = require('../models/Expense.model');
 
 const getAllExpenses = async (filters = {}) => {
-  let filteredExpenses = await Expense.findAll();
   const { userId, from, to, category } = filters;
   const whereConditions = {};
 
   if (userId) {
-    filteredExpenses = await Expense.findAll({ where: { userId: +userId } });
+    whereConditions.userId = +userId;
   }
 
   if (from && to) {
     whereConditions.spentAt = {
       [Op.between]: [new Date(from), new Date(to)],
     };
-
-    filteredExpenses = await Expense.findAll({
-      where: whereConditions,
-    });
   }
 
   if (category) {
-    filteredExpenses = await Expense.findAll({
-      where: {
-        category,
-      },
-    });
+    whereConditions.category = category;
   }
 
-  return filteredExpenses;
+  return Expense.findAll({ where: whereConditions });
 };
 
 const getExpenseById = async (id) => {
