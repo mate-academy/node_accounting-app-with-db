@@ -11,6 +11,7 @@ const create = async (req, res) => {
 
   if (!name || typeof name !== 'string') {
     res.sendStatus(400);
+    json({ message: 'Имя должно быть строкой' });
 
     return;
   }
@@ -74,6 +75,7 @@ const update = async (req, res) => {
     res.status(200).json(updatedUser);
   } catch (error) {
     res.sendStatus(400);
+    json({ message: 'Ошибка при обновлении пользователя' });
   }
 };
 
