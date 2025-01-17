@@ -11,30 +11,20 @@ const create = async (req, res) => {
   const dataToCreate = req.body;
   const { userId, spentAt, title, amount } = dataToCreate;
 
-  const errors = [];
+  if (
+    !userId ||
+    typeof userId !== 'number' ||
+    !spentAt ||
+    typeof spentAt !== 'string' ||
+    !title ||
+    typeof title !== 'string' ||
+    !amount ||
+    typeof amount !== 'number' ||
+    !(await usersService.getById(userId))
+  ) {
+    res.sendStatus(400);
 
-  if (!userId || typeof userId !== 'number') {
-    errors.push('Поле "userId" должно быть числом.');
-  }
-
-  if (!spentAt || typeof spentAt !== 'string') {
-    errors.push('Поле "spentAt" должно быть строкой.');
-  }
-
-  if (!title || typeof title !== 'string') {
-    errors.push('Поле "title" должно быть строкой.');
-  }
-
-  if (!amount || typeof amount !== 'number') {
-    errors.push('Поле "amount" должно быть числом.');
-  }
-
-  if (!(await usersService.getById(userId))) {
-    errors.push('Пользователь с указанным "userId" не найден.');
-  }
-
-  if (errors.length > 0) {
-    return res.status(400).json({ message: 'Ошибка валидации', errors });
+    return;
   }
 
   const expense = await expensesService.create(dataToCreate);
@@ -48,9 +38,9 @@ const getOne = async (req, res) => {
   const expense = await expensesService.getById(numberId);
 
   if (!expense) {
-    return res
-      .status(404)
-      .json({ message: 'Расход с указанным ID не найден.' });
+    res.sendStatus(404);
+
+    return;
   }
 
   res.status(200).json(expense);
@@ -62,9 +52,9 @@ const deleteOne = async (req, res) => {
   const expense = await expensesService.getById(numberId);
 
   if (!expense) {
-    return res
-      .status(404)
-      .json({ message: 'Расход с указанным ID не найден.' });
+    res.sendStatus(404);
+
+    return;
   }
 
   await expensesService.deleteById(numberId);
@@ -78,9 +68,9 @@ const update = async (req, res) => {
   const expense = await expensesService.getById(numberId);
 
   if (!expense) {
-    return res
-      .status(404)
-      .json({ message: 'Расход с указанным ID не найден.' });
+    res.sendStatus(404);
+
+    return;
   }
 
   try {
@@ -91,9 +81,7 @@ const update = async (req, res) => {
 
     res.status(200).json(updatedExpense);
   } catch (error) {
-    res
-      .status(400)
-      .json({ message: 'Ошибка при обновлении данных.', error: error.message });
+    res.sendStatus(400);
   }
 };
 
