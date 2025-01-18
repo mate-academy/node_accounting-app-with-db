@@ -1,91 +1,54 @@
 const { User } = require('../models/User.model');
 
-const getAllUsers = async () => {
-  try {
-    const users = await User.findAll();
+const getAll = async () => {
+  const users = await User.findAll();
 
-    return { data: users };
-  } catch (error) {
-    return { error: 'Error to get some Users' };
-  }
+  // if (!users) {
+  //   return { error: 'Faild' };
+  // }
+
+  return users;
 };
 
-const getUserBYID = async (id) => {
-  try {
-    if (!id) {
-      return { error: 'Non corect ID' };
-    }
+const create = async (name) => {
+  const user = await User.create({
+    name,
+  });
 
-    const parseId = +id;
-
-    const targetUser = await User.findByPk(parseId);
-
-    if (!targetUser) {
-      return { error: 'User not found' };
-    }
-
-    return { data: targetUser };
-  } catch (error) {
-    return { error: 'Failed to get user' };
-  }
+  return user;
 };
 
-const crateUsers = async (name) => {
-  try {
-    if (!name) {
-      return { error: 'False Name' };
-    }
+const getById = async (id) => {
+  const user = await User.findByPk(id);
 
-    const newUser = await User.create({ name });
-
-    return { data: newUser };
-  } catch (error) {
-    return { error: 'You cant create some (Name) for User' };
-  }
+  return user;
 };
 
-const deleteUsers = async (userId) => {
-  try {
-    if (!userId) {
-      return { error: 'Invalid UserId (Sorry!)' };
-    }
-
-    const delUsers = await User.destroy({
-      where: { id: userId },
-    });
-
-    if (!delUsers) {
-      return { error: 'Not found some users with ID' };
-    }
-
-    return { data: delUsers };
-  } catch (error) {
-    return { error: 'Error to delete Users' };
-  }
+const deleteById = async (id) => {
+  await User.destroy({ where: { id } });
 };
 
-const updateUser = async (userId, updatedUser) => {
-  try {
-    const user = await User.findByPk(+userId);
+const update = async ({ id, name }) => {
+  const [affectedCount, affectedRows] = await User.update(
+    { name },
+    { where: { id }, returning: true },
+  );
 
-    if (!user) {
-      return { error: 'User not found' };
-    }
-
-    await user.update({ name: updatedUser });
-
-    return { data: user };
-  } catch (error) {
-    return { error: 'Failed to update some Users' };
+  if (affectedCount === 0) {
+    throw new Error('Something went wrong while updating the user');
   }
+
+  const updatedUser = affectedRows[0];
+
+  return updatedUser;
 };
 
 const usersService = {
-  getAllUsers,
-  getUserBYID,
-  crateUsers,
-  deleteUsers,
-  updateUser,
+  getAll,
+  create,
+  getById,
+  deleteById,
+  update,
 };
 
 module.exports = {

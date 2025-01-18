@@ -1,10 +1,9 @@
 'use strict';
 
-const { sequelize } = require('../db.js');
 const { DataTypes } = require('sequelize');
+const { sequelize } = require('../db.js');
 
 const Expense = sequelize.define(
-  // your code goes here
   'Expense',
   {
     id: {
@@ -14,14 +13,12 @@ const Expense = sequelize.define(
     },
     userId: {
       type: DataTypes.INTEGER,
+      field: 'user_id',
       allowNull: false,
-      references: {
-        model: 'users',
-        key: 'id',
-      },
     },
     spentAt: {
-      type: DataTypes.DATE,
+      type: DataTypes.STRING,
+      field: 'spent_at',
       allowNull: false,
     },
     title: {
@@ -43,7 +40,8 @@ const Expense = sequelize.define(
   },
   {
     tableName: 'expenses',
-    timestamps: false,
+    createdAt: false,
+    updatedAt: false,
   },
 );
 

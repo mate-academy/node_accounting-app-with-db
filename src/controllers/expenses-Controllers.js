@@ -1,81 +1,98 @@
-const expenseService = require('../services/expenses-Services');
+const { expensesService } = require('../services/expenses-Services.js');
+const { usersService } = require('../services/users-Services.js');
 
-const getAllExpenses = async (req, res) => {
-  const { userId, from, to, categories: category } = req.query;
+const getAll = async (req, res) => {
+  const expenses = await expensesService.getAll(req.query);
 
-  const filteredExpenses = await expenseService.getAllExpenses({
-    userId,
-    from,
-    to,
-    category,
-  });
-
-  res.send(filteredExpenses);
+  res.status(200).json(expenses);
 };
 
-const getExpensById = async (req, res) => {
-  const { id } = req.params;
+const create = async (req, res) => {
+  const dataToCreate = req.body;
+  const { userId, spentAt, title, amount } = dataToCreate;
 
-  const normalizedId = +id;
-  const targetExpense = await expenseService.getExpenseById(normalizedId);
+  if (
+    !userId ||
+    typeof userId !== 'number' ||
+    !spentAt ||
+    typeof spentAt !== 'string' ||
+    !title ||
+    typeof title !== 'string' ||
+    !amount ||
+    typeof amount !== 'number' ||
+    !(await usersService.getById(userId))
+  ) {
+    res.sendStatus(400);
 
-  if (targetExpense.error) {
-    return res.sendStatus(404);
+    return;
   }
 
-  return res.send(targetExpense.data);
+  const expense = await expensesService.create(dataToCreate);
+
+  res.status(201).json(expense);
 };
 
-const createExpense = async (req, res) => {
-  const { userId, spentAt, title, amount, category, note } = req.body;
+const getOne = async (req, res) => {
+  const { expenseId } = req.params;
+  const numberId = +expenseId;
+  const expense = await expensesService.getById(numberId);
 
-  const result = await expenseService.createExpense(
-    userId,
-    spentAt,
-    title,
-    amount,
-    category,
-    note,
-  );
+  if (!expense) {
+    res.sendStatus(404);
 
-  if (result.error) {
-    return res.sendStatus(400);
+    return;
   }
 
-  return res.status(201).send(result.data);
+  res.status(200).json(expense);
 };
 
-const deleteExpense = async (req, res) => {
-  const { id } = req.params;
+const deleteOne = async (req, res) => {
+  const { expenseId } = req.params;
+  const numberId = +expenseId;
+  const expense = await expensesService.getById(numberId);
 
-  const result = await expenseService.deleteExpense(id);
+  if (!expense) {
+    res.sendStatus(404);
 
-  if (result.error) {
-    return res.sendStatus(404);
+    return;
   }
 
-  return res.sendStatus(204);
+  await expensesService.deleteById(numberId);
+  res.sendStatus(204);
 };
 
-const updateExpense = async (req, res) => {
-  const { id } = req.params;
-  const data = req.body;
+const update = async (req, res) => {
+  const { expenseId } = req.params;
+  const reqBody = req.body;
+  const numberId = +expenseId;
+  const expense = await expensesService.getById(numberId);
 
-  const result = await expenseService.updateExpense(id, data);
+  if (!expense) {
+    res.sendStatus(404);
 
-  if (result.error) {
-    return res.sendStatus(404);
+    return;
   }
 
-  return res.status(200).send(result.data);
+  try {
+    const updatedExpense = await expensesService.update({
+      id: numberId,
+      ...reqBody,
+    });
+
+    res.status(200).json(updatedExpense);
+  } catch (error) {
+    res.sendStatus(400);
+  }
 };
 
 const expensesController = {
-  updateExpense,
-  deleteExpense,
-  createExpense,
-  getExpensById,
-  getAllExpenses,
+  getAll,
+  create,
+  getOne,
+  deleteOne,
+  update,
 };
 
-module.exports = expensesController;
+module.exports = {
+  expensesController,
+};

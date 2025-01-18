@@ -1,76 +1,90 @@
-const userService = require('../services/users-Services');
+const { usersService } = require('../services/users-Services.js');
 
-const getAllUsers = async (req, res) => {
-  const result = await userService.getAllUsers();
+const getAll = async (req, res) => {
+  const users = await usersService.getAll();
 
-  if (result.error) {
-    return res.status(500).send(result.error);
-  }
-
-  res.send(result.data);
+  res.status(200).json(users);
 };
 
-const getUsersById = async (req, res) => {
-  const { id } = req.params;
-
-  const result = await userService.getUserById(+id);
-
-  if (result.error) {
-    return res.sendStatus(404);
-  }
-
-  return res.send(result.data);
-};
-
-const createUser = async (req, res) => {
+const create = async (req, res) => {
   const { name } = req.body;
 
-  if (!name) {
-    return res.sendStatus(400);
+  if (!name || typeof name !== 'string') {
+    res.sendStatus(400);
+
+    return;
   }
 
-  const result = await userService.createUser(name);
+  const user = await usersService.create(name);
 
-  if (result.error) {
-    return res.sendStatus(400);
-  }
-
-  return res.status(201).send(result.data);
+  res.status(201).json(user);
 };
 
-const deleteUsers = async (req, res) => {
-  const { id } = req.params;
+const getOne = async (req, res) => {
+  const { userId } = req.params;
+  const numberId = +userId;
+  const user = await usersService.getById(numberId);
 
-  const result = await userService.deleteUser(id);
+  if (!user) {
+    res.sendStatus(404);
 
-  if (result.error) {
-    return res.sendStatus(404);
+    return;
   }
 
-  return res.sendStatus(204);
+  res.status(200).json(user);
 };
 
-const uptadeUsers = async (req, res) => {
-  const { id } = req.params;
+const deleteOne = async (req, res) => {
+  const { userId } = req.params;
+  const numberId = +userId;
+  const user = await usersService.getById(numberId);
+
+  if (!user) {
+    res.sendStatus(404);
+
+    return;
+  }
+
+  await usersService.deleteById(numberId);
+  res.sendStatus(204);
+};
+
+const update = async (req, res) => {
+  const { userId } = req.params;
   const { name } = req.body;
+  const numberId = +userId;
 
-  if (typeof name !== 'string') {
-    return res.sendStatus(422);
+  if (!name || typeof name !== 'string') {
+    res.sendStatus(400);
+
+    return;
   }
 
-  const result = await userService.updateUser(id, name);
+  const user = await usersService.getById(numberId);
 
-  if (result.error) {
-    return res.sendStatus(404);
+  if (!user) {
+    res.sendStatus(404);
+
+    return;
   }
 
-  return res.status(200).send(result.data);
+  try {
+    const updatedUser = await usersService.update({ id: numberId, name });
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    res.sendStatus(400);
+  }
+};
+
+const usersController = {
+  getAll,
+  create,
+  getOne,
+  deleteOne,
+  update,
 };
 
 module.exports = {
-  uptadeUsers,
-  deleteUsers,
-  createUser,
-  getUsersById,
-  getAllUsers,
+  usersController,
 };

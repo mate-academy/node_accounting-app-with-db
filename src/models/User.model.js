@@ -1,7 +1,7 @@
 'use strict';
 
-const { sequelize } = require('../db.js');
 const { DataTypes } = require('sequelize');
+const { sequelize } = require('../db.js');
 
 const User = sequelize.define(
   'User',
@@ -12,13 +12,14 @@ const User = sequelize.define(
       autoIncrement: true,
     },
     name: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.STRING,
       allowNull: false,
     },
   },
   {
     tableName: 'users',
-    timestamps: false,
+    createdAt: false,
+    updatedAt: false,
   },
 );
 
