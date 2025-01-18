@@ -67,12 +67,10 @@ const uptadeUsers = async (req, res) => {
   return res.status(200).send(result.data);
 };
 
-const usersControllers = {
+module.exports = {
   uptadeUsers,
   deleteUsers,
   createUser,
   getUsersById,
   getAllUsers,
 };
-
-module.exports = usersControllers;
