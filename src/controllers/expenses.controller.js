@@ -44,8 +44,10 @@ const createExpense = async (req, res) => {
 
   const user = await userService.getById(userId);
 
-  if (!user || !spentAt || !title || !amount || !category) {
+  if (!user || !spentAt || !title || !amount) {
     res.status(400).json({ message: 'All parameters are required' });
+
+    return;
   }
 
   const newExpense = await expensesService.create(
@@ -54,66 +56,15 @@ const createExpense = async (req, res) => {
     title,
     amount,
     category,
-    note || '',
+    note,
   );
 
   res.status(201).send(newExpense);
 };
 
-// const updateExpense = (req, res) => {
-//   const id = parseInt(req.params.id, 10);
-//
-//   if (!id) {
-//     res.status(400).json({ message: 'Expense ID is required' });
-//
-//     return;
-//   }
-//
-//   const { spentAt, title, amount, category, note } = req.body;
-//
-//   const updates = {};
-//
-//   if (spentAt !== undefined) {
-//     updates.spentAt = spentAt;
-//   }
-//
-//   if (title !== undefined) {
-//     updates.title = title;
-//   }
-//
-//   if (amount !== undefined) {
-//     updates.amount = amount;
-//   }
-//
-//   if (category !== undefined) {
-//     updates.category = category;
-//   }
-//
-//   if (note !== undefined) {
-//     updates.note = note;
-//   }
-//
-//   if (Object.keys(updates).length === 0) {
-//     res.status(400).json({ message: 'No fields provided for update' });
-//
-//     return;
-//   }
-//
-//   const existingExpense = expensesService.getById(id);
-//
-//   if (!existingExpense) {
-//     res.status(404).json({ message: 'Expense not found' });
-//
-//     return;
-//   }
-//
-//   const updatedExpense = expensesService.update(id, updates);
-//
-//   res.status(200).json(updatedExpense);
-// };
 async function updateExpense(req, res) {
   const { id } = req.params;
-  const { spentAt, title, amount, category } = req.body;
+  const { spentAt, title, amount, category, note } = req.body;
 
   const normalizedId = +id;
 
@@ -145,11 +96,11 @@ async function updateExpense(req, res) {
   res.send(
     await expensesService.update({
       id: normalizedId,
-      // spentAt,
+      spentAt,
       title,
-      // amount,
-      // category,
-      // note,
+      amount,
+      category,
+      note,
     }),
   );
 }
