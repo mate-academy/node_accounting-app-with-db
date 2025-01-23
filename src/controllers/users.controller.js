@@ -1,12 +1,12 @@
 const { userService } = require('./../services/users.service');
 
-const getAll = (req, res) => {
-  const users = userService.getAll();
+const getAll = async (req, res) => {
+  const users = await userService.getAll();
 
   res.status(200).json(users);
 };
 
-const getUser = (req, res) => {
+const getUser = async (req, res) => {
   const id = parseInt(req.params.id, 10);
 
   if (!id) {
@@ -15,7 +15,7 @@ const getUser = (req, res) => {
     return;
   }
 
-  const user = userService.getById(id);
+  const user = await userService.getById(id);
 
   if (!user) {
     res.status(404).json({ message: 'User not found' });
@@ -26,7 +26,7 @@ const getUser = (req, res) => {
   res.status(200).send(user);
 };
 
-const createUser = (req, res) => {
+const createUser = async (req, res) => {
   const name = req.body.name;
 
   if (!name) {
@@ -35,7 +35,7 @@ const createUser = (req, res) => {
     return;
   }
 
-  const user = userService.create(name);
+  const user = await userService.create(name);
 
   if (!user) {
     res.status(404).json({ message: 'User was not created' });
@@ -46,7 +46,7 @@ const createUser = (req, res) => {
   res.status(201).send(user);
 };
 
-const updateUser = (req, res) => {
+const updateUser = async (req, res) => {
   const id = parseInt(req.params.id, 10);
   const { name } = req.body;
 
@@ -56,7 +56,7 @@ const updateUser = (req, res) => {
     return;
   }
 
-  const updatedUser = userService.update({ id, name });
+  const updatedUser = await userService.update({ id, name });
 
   if (!updatedUser) {
     res.status(404).json({ message: 'User was not updated' });
@@ -67,7 +67,7 @@ const updateUser = (req, res) => {
   res.status(200).send(updatedUser);
 };
 
-const deleteUser = (req, res) => {
+const deleteUser = async (req, res) => {
   const id = parseInt(req.params.id, 10);
 
   if (!id) {
@@ -76,14 +76,14 @@ const deleteUser = (req, res) => {
     return;
   }
 
-  const user = userService.getById(id);
+  const user = await userService.getById(id);
 
   if (!user) {
     res.status(404).json({ message: 'User not found' });
 
     return;
   }
-  userService.remove(id);
+  await userService.remove(id);
 
   res.status(204).send();
 };
