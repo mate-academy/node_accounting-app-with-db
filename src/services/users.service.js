@@ -1,36 +1,29 @@
-let Users = [];
+const { User } = require('./../models/User.model');
 
-function clearAllUsers() {
-  Users = [];
+async function getAll() {
+  return User.findAll();
 }
 
-function getAll() {
-  return Users;
-}
-
-function getById(id) {
-  return Users.find((user) => user.id === id);
+async function getById(id) {
+  return User.findByPk(id);
 }
 
 function create(name) {
-  const newUser = {
-    id: Date.now(),
+  return User.create({
     name: name,
-  };
-
-  Users.push(newUser);
-
-  return newUser;
+  });
 }
 
-function remove(id) {
-  Users = Users.filter((user) => user.id !== id);
+async function remove(id) {
+  await User.destroy({ where: { id } });
 }
 
-function update({ id, name }) {
-  const user = getById(id);
+async function update({ id, name }) {
+  await User.update({ name }, { where: { id } });
 
-  return Object.assign(user, { name });
+  const updatedUser = await getById(id);
+
+  return updatedUser;
 }
 
 const userService = {
@@ -43,5 +36,4 @@ const userService = {
 
 module.exports = {
   userService,
-  clearAllUsers,
 };
