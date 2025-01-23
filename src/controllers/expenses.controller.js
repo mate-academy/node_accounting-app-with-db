@@ -80,12 +80,12 @@ async function updateExpense(req, res) {
     (amount && typeof amount !== 'number') ||
     (category && typeof category !== 'string')
   ) {
-    res.sendStatus(404);
+    res.sendStatus(400);
 
     return;
   }
 
-  if (!(await expensesService.getById(id))) {
+  if (!(await expensesService.getById(normalizedId))) {
     res.sendStatus(404);
 
     return;

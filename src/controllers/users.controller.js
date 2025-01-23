@@ -38,7 +38,7 @@ const createUser = async (req, res) => {
   const user = await userService.create(name);
 
   if (!user) {
-    res.status(404).json({ message: 'User was not created' });
+    res.status(500).json({ message: 'User was not created' });
 
     return;
   }
