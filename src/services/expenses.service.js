@@ -1,85 +1,77 @@
-let Expenses = [];
+const { Expense } = require('./../models/Expense.model');
+const { Op } = require('sequelize');
 
-function clearAllExpenses() {
-  Expenses = [];
-}
+async function getAll(userId, categories, from, to) {
+  const data = {};
 
-function getAll(userId, categories, from, to) {
-  return Expenses.filter((expense) => {
-    if (userId && userId !== expense.userId) {
-      return false;
-    }
+  if (userId) {
+    data.userId = userId;
+  }
 
-    if (
-      categories &&
-      categories.length > 0 &&
-      !categories.includes(expense.category)
-    ) {
-      return false;
-    }
+  if (categories) {
+    data.category = categories;
+  }
 
-    const expenseDate = new Date(expense.spentAt);
+  if (from && to) {
+    data.spentAt = { [Op.between]: [from, to] };
+  }
 
-    if (from && new Date(from) > expenseDate) {
-      return false;
-    }
-
-    if (to && new Date(to) < expenseDate) {
-      return false;
-    }
-
-    return true;
+  return Expense.findAll({
+    where: data,
   });
 }
 
-function getById(id) {
-  return Expenses.find((expense) => expense.id === +id);
+async function getById(id) {
+  return Expense.findByPk(id);
 }
 
-function create(userId, spentAt, title, amount, category, note) {
-  const newExpense = {
-    id: Date.now(),
+async function create(userId, spentAt, title, amount, category, note) {
+  return Expense.create({
     userId: userId,
     spentAt: spentAt,
     title: title,
     amount: amount,
     category: category,
-    note: note || '',
-  };
-
-  Expenses.push(newExpense);
-
-  return newExpense;
+    note: note,
+  });
 }
 
-function remove(id) {
-  Expenses = Expenses.filter((expense) => expense.id !== id);
+async function remove(id) {
+  await Expense.destroy({ where: { id } });
 }
 
-function update({ id, spentAt, title, amount, category, note }) {
-  const expenseToUpdate = getById(id);
+// async function update({ id, spentAt, title, amount, category, note }) {
+//   const updateData = {};
+//
+//   if (spentAt) {
+//     updateData.spentAt = spentAt;
+//   }
+//
+//   if (title) {
+//     updateData.title = title;
+//   }
+//
+//   if (amount) {
+//     updateData.amount = amount;
+//   }
+//
+//   if (category) {
+//     updateData.category = category;
+//   }
+//
+//   if (note) {
+//     updateData.note = note;
+//   }
+//
+//   await Expense.update(updateData, { where: { id } });
+//
+//   return updateData;
+// }
 
-  if (spentAt) {
-    expenseToUpdate.spentAt = spentAt;
-  }
+async function update(id, title) {
+  await Expense.update({ title }, { where: { id } });
 
-  if (title) {
-    expenseToUpdate.title = title;
-  }
-
-  if (amount) {
-    expenseToUpdate.amount = amount;
-  }
-
-  if (category) {
-    expenseToUpdate.category = category;
-  }
-
-  if (note) {
-    expenseToUpdate.note = note;
-  }
-
-  return expenseToUpdate;
+  return Expense.findByPk(id);
 }
 
 const expensesService = {
@@ -92,5 +84,4 @@ const expensesService = {
 
 module.exports = {
   expensesService,
-  clearAllExpenses,
 };
