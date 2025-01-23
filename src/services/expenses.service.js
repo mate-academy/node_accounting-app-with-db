@@ -5,10 +5,10 @@ async function getAll(userId, categories, from, to) {
   const data = {};
 
   if (userId) {
-    data.userId = userId;
+    data.userId = +userId;
   }
 
-  if (categories) {
+  if (categories && categories.length > 0) {
     data.category = categories;
   }
 
@@ -26,52 +26,54 @@ async function getById(id) {
 }
 
 async function create(userId, spentAt, title, amount, category, note) {
-  return Expense.create({
-    userId: userId,
-    spentAt: spentAt,
-    title: title,
-    amount: amount,
-    category: category,
-    note: note,
-  });
+  const data = {
+    userId,
+    spentAt,
+    title,
+    amount,
+  };
+
+  if (note !== undefined) {
+    data.note = note;
+  }
+
+  if (category !== undefined) {
+    data.category = category;
+  }
+
+  return Expense.create(data);
 }
 
 async function remove(id) {
   await Expense.destroy({ where: { id } });
 }
 
-// async function update({ id, spentAt, title, amount, category, note }) {
-//   const updateData = {};
-//
-//   if (spentAt) {
-//     updateData.spentAt = spentAt;
-//   }
-//
-//   if (title) {
-//     updateData.title = title;
-//   }
-//
-//   if (amount) {
-//     updateData.amount = amount;
-//   }
-//
-//   if (category) {
-//     updateData.category = category;
-//   }
-//
-//   if (note) {
-//     updateData.note = note;
-//   }
-//
-//   await Expense.update(updateData, { where: { id } });
-//
-//   return updateData;
-// }
+async function update({ id, spentAt, title, amount, category, note }) {
+  const updateData = {};
 
-async function update(id, title) {
-  await Expense.update({ title }, { where: { id } });
+  if (spentAt) {
+    updateData.spentAt = spentAt;
+  }
 
-  return Expense.findByPk(id);
+  if (title) {
+    updateData.title = title;
+  }
+
+  if (amount) {
+    updateData.amount = amount;
+  }
+
+  if (category) {
+    updateData.category = category;
+  }
+
+  if (note) {
+    updateData.note = note;
+  }
+
+  await Expense.update(updateData, { where: { id } });
+
+  return getById(id);
 }
 
 const expensesService = {
