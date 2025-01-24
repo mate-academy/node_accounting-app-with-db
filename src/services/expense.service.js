@@ -1,5 +1,6 @@
 const { Expense } = require('../models/Expense.model');
 const { Op } = require('sequelize');
+const { isValidDate } = require('../utils/isValidDate');
 
 const getAll = async (category, userId, from, to) => {
   const whereClause = {};
@@ -16,10 +17,16 @@ const getAll = async (category, userId, from, to) => {
     whereClause.spentAt = {};
 
     if (from) {
+      if (!isValidDate(from)) {
+        throw new Error('Invalid from date format');
+      }
       whereClause.spentAt[Op.gte] = new Date(from);
     }
 
     if (to) {
+      if (!isValidDate(to)) {
+        throw new Error('Invalid to date format');
+      }
       whereClause.spentAt[Op.lte] = new Date(to);
     }
   }
@@ -65,10 +72,24 @@ const remove = async (id) => {
   });
 };
 
-const update = async ({ id, data }) => {
-  await Expense.update(data, { where: { id } });
+const update = async (id, data) => {
+  const expense = await Expense.findByPk(id);
 
-  return Expense.findByPk(id);
+  if (!expense) {
+    return { error: 'Expense not found' };
+  }
+
+  const [affectedCount] = await Expense.update(data, {
+    where: { id },
+  });
+
+  if (affectedCount === 0) {
+    return { error: 'Expense not found or no changes made' };
+  }
+
+  const updatedExpense = await Expense.findByPk(id);
+
+  return { data: updatedExpense };
 };
 
 module.exports = {

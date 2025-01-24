@@ -9,7 +9,7 @@ const getAll = async () => {
 };
 
 const getById = async (id) => {
-  return await User.findByPk(id);
+  return User.findByPk(id);
 };
 
 const createUser = async (name) => {
@@ -25,7 +25,11 @@ const remove = async (id) => {
 };
 
 const update = async ({ id, name }) => {
-  await User.update({ name }, { where: { id } });
+  const [affectedCount] = await User.update({ name }, { where: { id } });
+
+  if (affectedCount === 0) {
+    throw new Error('User  not found or no changes made');
+  }
 
   return User.findByPk(id);
 };

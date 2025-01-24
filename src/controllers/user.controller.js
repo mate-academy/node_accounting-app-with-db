@@ -35,7 +35,7 @@ const remove = async (req, res) => {
   const user = await userService.getById(id);
 
   if (!id) {
-    res.sendStatus(200);
+    res.sendStatus(400);
 
     return;
   }
@@ -63,7 +63,7 @@ const update = async (req, res) => {
   }
 
   if (typeof name !== 'string') {
-    res.send(user);
+    res.sendStatus(400);
 
     return;
   }

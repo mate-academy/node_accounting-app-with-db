@@ -42,9 +42,7 @@ const create = async (req, res) => {
     note,
   });
 
-  res.statusCode = 201;
-
-  res.send(newExpense);
+  res.status(201).send(newExpense);
 };
 
 const remove = async (req, res) => {
@@ -63,26 +61,20 @@ const remove = async (req, res) => {
 };
 
 const update = async (req, res) => {
-  const data = req.body;
   const { id } = req.params;
+  const data = req.body;
 
   if (!id) {
     res.sendStatus(404);
-
-    return;
   }
 
-  const expense = await expenseService.getById(id);
+  const result = await expenseService.update(+id, data);
 
-  if (!expense) {
-    res.sendStatus(404);
-
-    return;
+  if (result.error) {
+    return res.sendStatus(404);
   }
 
-  const newExpense = await expenseService.update({ id: +id, data });
-
-  res.send(newExpense);
+  return res.status(200).send(result.data);
 };
 
 module.exports = {
