@@ -26,15 +26,15 @@ const create = async (req, res) => {
 const getOne = async (req, res) => {
   const { id } = req.params;
 
-  const expence = await expensesService.getExpense(id);
+  const expense = await expensesService.getExpense(id);
 
-  if (!expence) {
+  if (!expense) {
     res.sendStatus(404);
 
     return;
   }
 
-  res.send(expence);
+  res.send(expense);
 };
 
 const update = async (req, res) => {
@@ -57,9 +57,9 @@ const update = async (req, res) => {
 const remove = async (req, res) => {
   const { id } = req.params;
 
-  const expence = await expensesService.getExpense(id);
+  const expense = await expensesService.getExpense(id);
 
-  if (!expence) {
+  if (!expense) {
     res.sendStatus(404);
 
     return;
