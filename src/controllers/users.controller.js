@@ -14,7 +14,7 @@ const getOne = async (req, res) => {
   const id = req.params.id;
 
   if (!id) {
-    res.status(400).end('Id is require');
+    res.status(400).end('Id is required');
 
     return;
   }
@@ -34,7 +34,7 @@ const create = async (req, res) => {
   const name = req.body.name;
 
   if (!name) {
-    res.status(400).end('Name is require');
+    res.status(400).end('Name is required');
 
     return;
   }
@@ -52,7 +52,7 @@ const remove = async (req, res) => {
   const id = req.params.id;
 
   if (!id) {
-    res.status(400).end('Id is require');
+    res.status(400).end('Id is required');
 
     return;
   }
@@ -79,7 +79,7 @@ const update = async (req, res) => {
   const name = req.body.name;
 
   if (!id || !name) {
-    res.status(400).end('Id and name is require');
+    res.status(400).end('Id and name is required');
 
     return;
   }

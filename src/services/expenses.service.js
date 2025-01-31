@@ -40,7 +40,6 @@ const create = async (userId, spentAt, title, amount, category, note) => {
     userId,
     title,
     amount,
-    category,
   };
 
   if (category) {

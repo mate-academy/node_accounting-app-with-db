@@ -16,7 +16,7 @@ const getOne = async (req, res) => {
   const id = req.params.id;
 
   if (!id) {
-    res.status(400).end('Id is require');
+    res.status(400).end('Id is required');
 
     return;
   }
@@ -40,7 +40,7 @@ const create = async (req, res) => {
   const { userId, spentAt, title, amount, category, note } = req.body;
 
   if (!(userId && title && amount)) {
-    res.status(400).end('Id, title and amount are require');
+    res.status(400).end('Id, title and amount are required');
 
     return;
   }
@@ -65,7 +65,7 @@ const remove = async (req, res) => {
   const id = req.params.id;
 
   if (!id) {
-    res.status(400).end('Id is require');
+    res.status(400).end('Id is required');
 
     return;
   }
@@ -92,7 +92,7 @@ const update = async (req, res) => {
   const { userId, title, amount, category, note } = req.body;
 
   if (!id) {
-    res.status(400).end('Id is require');
+    res.status(400).end('Id is required');
 
     return;
   }
