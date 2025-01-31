@@ -1,16 +1,20 @@
 const usersService = require('../services/users.service');
 
 const getAll = async (req, res) => {
-  const users = await usersService.getAll();
+  try {
+    const users = await usersService.getAll();
 
-  res.json(users);
+    res.json(users);
+  } catch (error) {
+    res.status(500).end('Server error');
+  }
 };
 
 const getOne = async (req, res) => {
   const id = req.params.id;
 
   if (!id) {
-    res.status(400).end();
+    res.status(400).end('Id is require');
 
     return;
   }
@@ -23,37 +27,51 @@ const getOne = async (req, res) => {
     return;
   }
 
-  res.status(404).end();
+  res.status(404).end('User not found');
 };
 
 const create = async (req, res) => {
   const name = req.body.name;
 
   if (!name) {
-    res.status(400).end();
+    res.status(400).end('Name is require');
 
     return;
   }
 
-  const user = await usersService.create(name);
+  try {
+    const user = await usersService.create(name);
 
-  res.status(201).json(user);
+    res.status(201).json(user);
+  } catch (error) {
+    res.status(500).end('Server error');
+  }
 };
 
 const remove = async (req, res) => {
   const id = req.params.id;
 
-  const user = await usersService.getById(id);
-
-  if (!user) {
-    res.status(404).end();
+  if (!id) {
+    res.status(400).end('Id is require');
 
     return;
   }
 
-  await usersService.remove(id);
+  try {
+    const user = await usersService.getById(id);
 
-  res.status(204).end();
+    if (!user) {
+      res.status(404).end('User not found');
+
+      return;
+    }
+
+    await usersService.remove(id);
+
+    res.status(204).end('The deletion was successful');
+  } catch (error) {
+    res.status(500).end('Server error');
+  }
 };
 
 const update = async (req, res) => {
@@ -61,24 +79,28 @@ const update = async (req, res) => {
   const name = req.body.name;
 
   if (!id || !name) {
-    res.status(400).end();
+    res.status(400).end('Id and name is require');
 
     return;
   }
 
-  const user = await usersService.getById(id);
+  try {
+    const user = await usersService.getById(id);
 
-  if (!user) {
-    res.status(404).end();
+    if (!user) {
+      res.status(404).end('User not found');
 
-    return;
+      return;
+    }
+
+    await usersService.update(id, name);
+
+    const updatedUser = await usersService.getById(id);
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    res.status(500).end('Server error');
   }
-
-  await usersService.update(id, name);
-
-  const updatedUser = await usersService.getById(id);
-
-  res.status(200).json(updatedUser);
 };
 
 module.exports = {

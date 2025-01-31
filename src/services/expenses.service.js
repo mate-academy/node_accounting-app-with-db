@@ -88,7 +88,7 @@ const update = async (id, userId, title, amount, category, note) => {
   }
 
   if (Object.keys(updateData).length === 0) {
-    throw new Error('Немає полів для оновлення');
+    throw new Error('No fields to update');
   }
 
   await Expense.update(updateData, { where: { id } });

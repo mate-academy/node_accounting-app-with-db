@@ -3,72 +3,88 @@ const expensesService = require('../services/expenses.service');
 const getAll = async (req, res) => {
   const { userId, categories, from, to } = req.query;
 
-  const expenses = await expensesService.getAll(userId, categories, from, to);
+  try {
+    const expenses = await expensesService.getAll(userId, categories, from, to);
 
-  res.json(expenses);
+    res.json(expenses);
+  } catch (error) {
+    res.status(500).end('Server error');
+  }
 };
 
 const getOne = async (req, res) => {
   const id = req.params.id;
 
   if (!id) {
-    res.status(400).end();
+    res.status(400).end('Id is require');
 
     return;
   }
 
-  const expense = await expensesService.getById(id);
+  try {
+    const expense = await expensesService.getById(id);
 
-  if (!expense) {
-    res.status(404).end();
+    if (!expense) {
+      res.status(404).end('Expense not found');
 
-    return;
+      return;
+    }
+
+    res.status(200).json(expense);
+  } catch (error) {
+    res.status(500).end('Server error');
   }
-
-  res.status(200).json(expense);
 };
 
 const create = async (req, res) => {
   const { userId, spentAt, title, amount, category, note } = req.body;
 
   if (!(userId && title && amount)) {
-    res.status(400).end();
+    res.status(400).end('Id, title and amount are require');
 
     return;
   }
 
-  const expense = await expensesService.create(
-    userId,
-    spentAt,
-    title,
-    amount,
-    category,
-    note,
-  );
+  try {
+    const expense = await expensesService.create(
+      userId,
+      spentAt,
+      title,
+      amount,
+      category,
+      note,
+    );
 
-  res.status(201).json(expense);
+    res.status(201).json(expense);
+  } catch (error) {
+    res.status(500).end('Server error');
+  }
 };
 
 const remove = async (req, res) => {
   const id = req.params.id;
 
   if (!id) {
-    res.status(400).end();
+    res.status(400).end('Id is require');
 
     return;
   }
 
-  const expense = await expensesService.getById(id);
+  try {
+    const expense = await expensesService.getById(id);
 
-  if (!expense) {
-    res.status(404).end();
+    if (!expense) {
+      res.status(404).end('Expense not found');
 
-    return;
+      return;
+    }
+
+    await expensesService.remove(id);
+
+    res.status(204).end('The deletion was successful');
+  } catch (error) {
+    res.status(500).end('Server error');
   }
-
-  await expensesService.remove(id);
-
-  res.status(204).end();
 };
 
 const update = async (req, res) => {
@@ -76,7 +92,7 @@ const update = async (req, res) => {
   const { userId, title, amount, category, note } = req.body;
 
   if (!id) {
-    res.status(400).end();
+    res.status(400).end('Id is require');
 
     return;
   }
@@ -87,14 +103,18 @@ const update = async (req, res) => {
     const expense = await expensesService.getById(id);
 
     if (!expense) {
-      res.status(404).end();
+      res.status(404).end('Expense not found');
 
       return;
     }
 
     res.status(200).json(expense);
   } catch (error) {
-    res.status(400).end();
+    if (error.message === 'No fields to update') {
+      return res.status(400).end('At least one field is required for update');
+    }
+
+    res.status(500).end('Server error');
   }
 };
 
