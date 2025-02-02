@@ -69,15 +69,13 @@ const getOne = async (req, res) => {
 const create = async (req, res) => {
   const { userId, title, amount, category, note, spentAt } = req.body;
 
-  if (!userId || !title || !amount || !category || !note) {
+  if (!userId || !title || !amount) {
     res.sendStatus(400);
 
     return;
   }
 
-  const userExists = (await userService.getAll()).some(
-    (user) => user.id === userId,
-  );
+  const userExists = await userService.getByID(userId);
 
   if (!userExists) {
     res.sendStatus(400);
@@ -134,7 +132,7 @@ const update = async (req, res) => {
     return;
   }
 
-  const updatedExpense = await expenseService.update({ id, updateFields });
+  const updatedExpense = await expenseService.update(id, updateFields);
 
   res.statusCode = 200;
   res.send(updatedExpense);
