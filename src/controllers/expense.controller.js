@@ -30,7 +30,7 @@ const get = async (req, res) => {
     );
 
     if (filteredExpenses.length === 0) {
-      res.sendStatus(404);
+      res.status(404).send('no expenses match the query');
 
       return;
     }
@@ -78,7 +78,7 @@ const create = async (req, res) => {
   const userExists = await userService.getByID(userId);
 
   if (!userExists) {
-    res.sendStatus(400);
+    res.status(400).send('the user does not exist');
 
     return;
   }

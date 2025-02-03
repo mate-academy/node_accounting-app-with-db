@@ -34,7 +34,7 @@ const create = async (req, res) => {
   const { name } = req.body;
 
   if (!name) {
-    res.sendStatus(400);
+    res.status(400).send('name field is missing');
 
     return;
   }
@@ -76,7 +76,7 @@ const update = async (req, res) => {
   }
 
   if (!(await userService.getByID(id))) {
-    res.sendStatus(404);
+    res.status(404).send('the user does not exist');
 
     return;
   }
