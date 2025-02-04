@@ -51,7 +51,11 @@ const updateExpense = async (req, res) => {
   const { id } = req.params;
   const expenseData = req.body;
 
-  await update(id, expenseData);
+  try {
+    await update(id, expenseData);
+  } catch (error) {
+    return res.status(400).json({ message: 'Invalid data' });
+  }
 
   const updatedExpense = await getById(id);
 
