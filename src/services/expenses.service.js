@@ -54,7 +54,7 @@ const deleteById = async (id) => {
 const updateById = async (id, updates) => {
   await Expense.update(updates, { where: { id } });
 
-  const updatedExpense = Expense.findByPk(id);
+  const updatedExpense = await Expense.findByPk(id);
 
   return updatedExpense;
 };

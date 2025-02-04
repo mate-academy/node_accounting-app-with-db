@@ -25,7 +25,7 @@ const createExpense = async (req, res) => {
     return res.sendStatus(400);
   }
 
-  if (!usersService.getById(Number(req.body.userId))) {
+  if (!(await usersService.getById(Number(req.body.userId)))) {
     return res.sendStatus(400);
   }
 

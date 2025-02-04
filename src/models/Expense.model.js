@@ -16,7 +16,7 @@ const Expense = sequelize.define(
       allowNull: false,
     },
     spentAt: {
-      type: DataTypes.STRING,
+      type: DataTypes.DATE,
       allowNull: false,
     },
     title: {
@@ -24,7 +24,7 @@ const Expense = sequelize.define(
       allowNull: false,
     },
     amount: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.DECIMAL,
       allowNull: false,
     },
     category: {
