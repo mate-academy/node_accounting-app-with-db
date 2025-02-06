@@ -20,31 +20,25 @@ const getAll = async (queryParams) => {
     filter.spentAt = {};
 
     if (from) {
-      filter.spentAt[Op.gte] = from;
+      filter.spentAt[Op.gte] = new Date(from);
     }
 
     if (to) {
-      filter.spentAt[Op.lte] = to;
+      filter.spentAt[Op.lte] = new Date(to);
     }
   }
 
-  const result = await Expense.findAll({
-    where: filter,
-  });
+  const result = await Expense.findAll({ where: filter });
 
   return result;
 };
 
 const getById = async (id) => {
-  const result = await Expense.findByPk(id);
-
-  return result;
+  return Expense.findByPk(id);
 };
 
 const create = async (body) => {
-  const result = await Expense.create(body);
-
-  return result;
+  return Expense.create(body);
 };
 
 const deleteById = async (id) => {
@@ -54,9 +48,7 @@ const deleteById = async (id) => {
 const updateById = async (id, updates) => {
   await Expense.update(updates, { where: { id } });
 
-  const updatedExpense = Expense.findByPk(id);
-
-  return updatedExpense;
+  return Expense.findByPk(id);
 };
 
 module.exports = {
