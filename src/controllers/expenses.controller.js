@@ -10,7 +10,7 @@ const get = async (req, res) => {
 const create = async (req, res) => {
   const { userId, spentAt, title, amount, category, note } = req.body;
 
-  if (!spentAt || !title || amount < 0) {
+  if (!spentAt || !title || amount < 0 || !userId || isNaN(userId)) {
     return res.status(400).send();
   }
 
@@ -50,6 +50,11 @@ const getById = async (req, res) => {
 
 const removeExpenses = async (req, res) => {
   const id = Number(req.params.id);
+
+  if (!id || isNaN(id)) {
+    return res.status(400).send();
+  }
+
   const expense = await expensesServices.getExpenseById(id);
 
   if (!expense) {
@@ -63,6 +68,10 @@ const removeExpenses = async (req, res) => {
 
 const update = async (req, res) => {
   const id = Number(req.params.id);
+
+  if (!id || isNaN(id)) {
+    return res.status(400).send();
+  }
 
   const expense = await expensesServices.getExpenseById(id);
 
