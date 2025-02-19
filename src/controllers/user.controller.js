@@ -23,6 +23,10 @@ const create = async (req, res) => {
     return res.sendStatus(400);
   }
 
+  if (typeof name !== 'string') {
+    return res.status(400).json({ error: 'Name must be string' });
+  }
+
   const newUser = await userService.create(name);
 
   return res.status(201).json(newUser);
@@ -45,6 +49,10 @@ const update = async (req, res) => {
 
   if (!userToUpdate) {
     return res.sendStatus(404);
+  }
+
+  if (!req.body.name) {
+    return res.status(400).json({ error: 'Name must be provided' });
   }
 
   const updatedUser = {

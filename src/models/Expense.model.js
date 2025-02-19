@@ -22,10 +22,28 @@ const Expense = sequelize.define(
     title: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate: {
+        notEmpty: {
+          msg: 'Title must not be empty',
+        },
+        len: {
+          args: [1, 255],
+          msg: 'Title must be between 1 and 255 characters long',
+        },
+      },
     },
     amount: {
       type: DataTypes.FLOAT,
       allowNull: false,
+      validate: {
+        isFloat: {
+          msg: 'Amount must be a number',
+        },
+        min: {
+          args: [0],
+          msg: 'Amount must be a positive number',
+        },
+      },
     },
     category: {
       type: DataTypes.STRING,

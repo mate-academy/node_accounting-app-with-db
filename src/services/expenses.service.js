@@ -15,7 +15,7 @@ const getOne = async (id) => {
 };
 
 const create = async (expensesData) => {
-  const createdUser = Expense.create(expensesData);
+  const createdUser = await Expense.create(expensesData);
 
   return createdUser;
 };

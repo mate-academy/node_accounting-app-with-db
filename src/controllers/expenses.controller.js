@@ -1,5 +1,15 @@
+const Joi = require('joi');
 const { expensesService } = require('../services/expenses.service');
 const { userService } = require('../services/user.service');
+
+const expenseSchema = Joi.object({
+  userId: Joi.number().integer().required(),
+  spentAt: Joi.date().iso().required(),
+  title: Joi.string().required(),
+  amount: Joi.number().positive().required(),
+  category: Joi.string().optional(),
+  note: Joi.string().optional(),
+});
 
 const getAll = async (req, res) => {
   const { userId, categories, from, to } = req.query;
@@ -11,7 +21,13 @@ const getAll = async (req, res) => {
   }
 
   if (categories) {
-    expenses = expenses.filter((expense) => expense.category === categories);
+    expenses = expenses.filter((expense) => {
+      if (Array.isArray(categories)) {
+        return categories.includes(expense);
+      } else {
+        return expense.category === categories;
+      }
+    });
   }
 
   if (from) {
@@ -44,11 +60,13 @@ const getOne = async (req, res) => {
 };
 
 const create = async (req, res) => {
-  const { userId, spentAt, title, amount } = req.body;
+  const { error } = expenseSchema.validate(req.body);
 
-  if (!userId || !spentAt || !title || !amount) {
-    return res.status(400).json({ error: 'Missing required fields' });
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
   }
+
+  const { userId } = req.body;
 
   const user = await userService.getById(+userId);
 
