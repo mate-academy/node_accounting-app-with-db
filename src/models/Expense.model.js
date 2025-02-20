@@ -14,7 +14,6 @@ const Expense = sequelize.define(
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      defaultValue: 1,
     },
     spentAt: {
       type: DataTypes.DATE,

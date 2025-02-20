@@ -81,9 +81,9 @@ const expensesController = {
   },
 
   remove: async (req, res) => {
-    const userToRemove = await expensesService.getById(+req.params.id);
+    const expenseToRemove = await expensesService.getById(+req.params.id);
 
-    if (!userToRemove) {
+    if (!expenseToRemove) {
       return res.sendStatus(404);
     }
 
@@ -95,13 +95,13 @@ const expensesController = {
   update: async (req, res) => {
     const id = +req.params.id;
 
-    const updatedUser = await expensesService.updateById(id, req.body);
+    const updatedExpense = await expensesService.updateById(id, req.body);
 
-    if (!updatedUser) {
+    if (!updatedExpense) {
       return res.sendStatus(404);
     }
 
-    return res.json(updatedUser);
+    return res.json(updatedExpense);
   },
 };
 

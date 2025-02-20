@@ -1,10 +1,12 @@
 # IDE
 .idea
 .vscode
-.github
+
 
 # Node
 node_modules
+.github
+.env
 
 # MacOS
 .DS_Store

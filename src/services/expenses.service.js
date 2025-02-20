@@ -24,9 +24,9 @@ const expensesService = {
       return null;
     }
 
-    await Expense.update(expenseData, { where: { id } });
+    await expense.update(expenseData);
 
-    return expensesService.getById(id);
+    return expense;
   },
 };
 

@@ -24,9 +24,9 @@ const userService = {
       return null;
     }
 
-    await User.update({ name }, { where: { id } });
+    await user.update({ name });
 
-    return userService.getById(id);
+    return user;
   },
 
   clear: async () => {
