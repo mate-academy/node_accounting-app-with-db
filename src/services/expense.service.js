@@ -1,5 +1,6 @@
 const { Op } = require('sequelize');
 const { Expense } = require('../models/Expense.model');
+const { isValidDate } = require('../utils/isValidDate');
 
 const getAll = async ({ userId, categories, from, to }) => {
   const where = {};
@@ -17,11 +18,11 @@ const getAll = async ({ userId, categories, from, to }) => {
   if (from || to) {
     where.spentAt = {};
 
-    if (from) {
+    if (isValidDate(from)) {
       where.spentAt[Op.gte] = new Date(from);
     }
 
-    if (to) {
+    if (isValidDate(to)) {
       where.spentAt[Op.lte] = new Date(to);
     }
   }

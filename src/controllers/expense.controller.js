@@ -1,5 +1,7 @@
 const expenseService = require('../services/expense.service');
 const userService = require('../services/user.service');
+const { isValidId } = require('../utils/isValidId');
+const { isValidDate } = require('../utils/isValidDate');
 
 const getAll = async (req, res) => {
   res.json(await expenseService.getAll(req.query));
@@ -8,7 +10,7 @@ const getAll = async (req, res) => {
 const getOne = async (req, res) => {
   const { id } = req.params;
 
-  if (!id) {
+  if (!isValidId(id)) {
     return res.sendStatus(400);
   }
 
@@ -23,9 +25,9 @@ const getOne = async (req, res) => {
 
 const update = async (req, res) => {
   const { id } = req.params;
-  const { amount } = req.body;
+  const { amount, spentAt, title } = req.body;
 
-  if (!id) {
+  if (!isValidId(id)) {
     return res.sendStatus(400);
   }
 
@@ -37,6 +39,14 @@ const update = async (req, res) => {
     return res.sendStatus(400);
   }
 
+  if (spentAt && isValidDate(spentAt)) {
+    return res.sendStatus(400);
+  }
+
+  if (title && !title.trim()) {
+    return res.sendStatus(400);
+  }
+
   await expenseService.update(id, req.body);
 
   res.json(await expenseService.getById(id));
@@ -44,6 +54,10 @@ const update = async (req, res) => {
 
 const remove = async (req, res) => {
   const { id } = req.params;
+
+  if (!isValidId(id)) {
+    return res.sendStatus(400);
+  }
 
   if (!(await expenseService.getById(id))) {
     return res.sendStatus(404);
@@ -55,9 +69,20 @@ const remove = async (req, res) => {
 
 const create = async (req, res) => {
   const { userId, spentAt, title, amount } = req.body;
+
+  if (!isValidId(userId)) {
+    return res.sendStatus(400);
+  }
+
   const user = await userService.getById(userId);
 
-  if (!user || !spentAt || !title || !amount || amount < 0) {
+  if (
+    !user ||
+    !isValidDate(spentAt) ||
+    !title.trim() ||
+    !amount ||
+    amount < 0
+  ) {
     return res.sendStatus(400);
   }
 

@@ -1,4 +1,6 @@
 const userService = require('../services/user.service');
+const { isValidId } = require('../utils/isValidId');
+const { isValidText } = require('../utils/isValidText');
 
 const get = async (req, res) => {
   res.json(await userService.getAll());
@@ -6,6 +8,11 @@ const get = async (req, res) => {
 
 const getOne = async (req, res) => {
   const { id } = req.params;
+
+  if (!isValidId(id)) {
+    return res.sendStatus(400);
+  }
+
   const user = await userService.getById(id);
 
   if (!user) {
@@ -18,7 +25,7 @@ const getOne = async (req, res) => {
 const create = async (req, res) => {
   const { name } = req.body;
 
-  if (!name) {
+  if (!isValidText(name)) {
     return res.sendStatus(400);
   }
 
@@ -29,7 +36,7 @@ const update = async (req, res) => {
   const { id } = req.params;
   const { name } = req.body;
 
-  if (!name) {
+  if (!isValidText(name)) {
     return res.sendStatus(400);
   }
 
