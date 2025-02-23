@@ -26,9 +26,23 @@ const sequelize = new Sequelize({
   host: POSTGRES_HOST || 'localhost',
   dialect: 'postgres',
   port: POSTGRES_PORT || 5432,
-  password: POSTGRES_PASSWORD || '123',
+  password: POSTGRES_PASSWORD || '2513',
 });
+
+/* eslint-disable no-console */
+const connectDB = async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('Connected to PostgreSQL');
+
+    await sequelize.sync({ alter: true });
+    console.log('Database synced');
+  } catch (error) {
+    console.error('Database connection error:', error);
+  }
+};
 
 module.exports = {
   sequelize,
+  connectDB,
 };
