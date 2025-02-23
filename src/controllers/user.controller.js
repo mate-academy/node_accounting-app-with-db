@@ -20,8 +20,7 @@ const create = async (req, res) => {
 
   if (!name) {
     return res.status(400).json({
-      message:
-        'the server could not understand the request due to invalid syntax',
+      message: 'Name is required',
     });
   }
 
@@ -37,9 +36,9 @@ const remove = async (req, res) => {
     return res.sendStatus(404);
   }
 
-  const succes = await usersService.remove(id);
+  const success = await usersService.remove(id);
 
-  if (!succes) {
+  if (!success) {
     return res.sendStatus(500);
   }
 
@@ -53,8 +52,7 @@ const update = async (req, res) => {
 
     if (!name) {
       return res.status(400).json({
-        message:
-          'The server could not understand the request due to invalid syntax.',
+        message: 'Name is required',
       });
     }
 

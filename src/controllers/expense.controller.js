@@ -64,7 +64,10 @@ const create = async (req, res) => {
     });
 
     res.status(201).send(newExpense);
-  } catch {
+  } catch (e) {
+    /* eslint-disable no-console */
+    console.log(e);
+
     res.status(500).json({
       message:
         'The server failed to complete the request due to an unexpected error.',
@@ -80,9 +83,9 @@ const remove = async (req, res) => {
     return res.sendStatus(404);
   }
 
-  const succes = await expensesService.remove(id);
+  const success = await expensesService.remove(id);
 
-  if (!succes) {
+  if (!success) {
     return res.sendStatus(404);
   }
 

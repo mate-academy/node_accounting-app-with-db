@@ -30,7 +30,7 @@ const create = ({ userId, spentAt, title, amount, category, note }) => {
     userId,
     spentAt,
     title,
-    amount,
+    amount: parseFloat(amount),
     category,
     note,
   });
