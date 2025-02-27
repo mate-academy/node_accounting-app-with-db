@@ -15,7 +15,7 @@ export const getOne = async (req, res) => {
     return res.status(404).json({ error: 'User not found' });
   }
 
-  res.statusCode = 200;
+  res.status(200)
   res.send(user);
 };
 
@@ -29,7 +29,7 @@ export const create = async (req, res) => {
   try {
     const newUser = await usersService.create(name);
 
-    res.statusCode = 201;
+    res.status(201)
     res.send(newUser);
   } catch (error) {
     return res.status(500).send({ error: 'Internal Server Error' });

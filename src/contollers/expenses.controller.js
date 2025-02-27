@@ -1,5 +1,5 @@
 import * as expensesService from '../services/expenses.service.js';
-import { uuid } from 'uuidv4';
+
 
 export const get = async (req, res) => {
   const expense = await expensesService.getAll();
@@ -20,7 +20,8 @@ export const getOne = async (req, res) => {
 };
 
 export const create = async (req, res) => {
-  const { title, amount, category, note } = req.body;
+  const {userId, title, amount, category, note } = req.body;
+
 
   if (!title || !amount) {
     return res.status(400).json({ error: 'title, and amount are required' });
@@ -28,7 +29,7 @@ export const create = async (req, res) => {
 
   try {
     const newExpense = await expensesService.create({
-      userId: uuid(),
+      userId,
       title,
       amount,
       category,
@@ -56,17 +57,20 @@ export const remove = async (req, res) => {
 
 export const update = async (req, res) => {
   const { id } = req.params;
-  const { title, amount, category, note } = req.body;
+  const { userId, title, amount, category, note } = req.body;
 
   const expense = await expensesService.getById(id);
 
   if (!expense) {
     return res
       .status(400)
+
+
       .json({ error: 'userId, title, and amount are required for update' });
   }
 
   await expensesService.update({
+    userId,
     id,
     title,
     amount,

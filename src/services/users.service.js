@@ -1,28 +1,7 @@
-import { sequelize } from '../db.js';
-import { DataTypes } from 'sequelize';
-
-const Users = sequelize.define(
-  'Users',
-  {
-    id: {
-      type: DataTypes.UUID,
-      primaryKey: true,
-      defaultValue: DataTypes.UUIDV4,
-    },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-  },
-  {
-    tableName: 'users',
-    updatedAt: false,
-    createdAt: false,
-  },
-);
+import { User } from '../models/models.js';
 
 export const getAll = async () => {
-  return await Users.findAll();
+  return await User.findAll();
 };
 
 export const getById = async (id) => {

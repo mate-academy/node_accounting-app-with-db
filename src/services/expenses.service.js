@@ -10,7 +10,7 @@ const Expenses = sequelize.define(
       defaultValue: DataTypes.UUIDV4,
     },
     userId: {
-      type: DataTypes.UUID,
+      type: DataTypes.INTEGER,
       allowNull: true,
     },
     spentAt: {
