@@ -39,7 +39,9 @@ const remove = async (req, res) => {
   const success = await usersService.remove(id);
 
   if (!success) {
-    return res.sendStatus(500);
+    return res
+      .status(404)
+      .json({ message: 'User not found or already deleted' });
   }
 
   res.sendStatus(204);

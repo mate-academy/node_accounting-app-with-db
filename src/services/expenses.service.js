@@ -8,8 +8,15 @@ const getAll = ({ userId, categories, from, to }) => {
     whereClause.userId = userId;
   }
 
-  if (categories) {
-    whereClause.category = { [Op.in]: categories.split(',') };
+  if (categories && typeof categories === 'string') {
+    const categoryList = categories
+      .split(',')
+      .map((category) => category.trim()) // Trim whitespace
+      .filter((category) => category.length > 0); // Remove empty values
+
+    if (categoryList.length > 0) {
+      whereClause.category = { [Op.in]: categoryList };
+    }
   }
 
   if (from) {
@@ -26,11 +33,17 @@ const getAll = ({ userId, categories, from, to }) => {
 const getById = (id) => Expense.findByPk(id);
 
 const create = ({ userId, spentAt, title, amount, category, note }) => {
+  const parsedAmount = parseFloat(amount);
+
+  if (isNaN(parsedAmount) || parsedAmount <= 0) {
+    throw new Error('Amount must be a valid positive number');
+  }
+
   return Expense.create({
     userId,
     spentAt,
     title,
-    amount: parseFloat(amount),
+    amount: parsedAmount,
     category,
     note,
   });
