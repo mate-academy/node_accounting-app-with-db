@@ -1,11 +1,13 @@
 'use strict';
+import 'dotenv/config';
+import Sequelize from 'sequelize';
 
-const { Sequelize } = require('sequelize');
-const utils = require('util');
 
 // Needed for testing purposes, do not remove
-require('dotenv').config();
-global.TextEncoder = utils.TextEncoder;
+// eslint-disable-next-line no-shadow
+import { TextEncoder } from 'util';
+
+global.TextEncoder = TextEncoder;
 
 const {
   POSTGRES_HOST,
@@ -15,12 +17,7 @@ const {
   POSTGRES_DB,
 } = process.env;
 
-/*
-  All credentials setted to default values (exsept password - it is exapmle)
-  replace if needed with your own
-*/
-
-const sequelize = new Sequelize({
+export const sequelize = new Sequelize({
   database: POSTGRES_DB || 'postgres',
   username: POSTGRES_USER || 'postgres',
   host: POSTGRES_HOST || 'localhost',
@@ -28,7 +25,3 @@ const sequelize = new Sequelize({
   port: POSTGRES_PORT || 5432,
   password: POSTGRES_PASSWORD || '123',
 });
-
-module.exports = {
-  sequelize,
-};
