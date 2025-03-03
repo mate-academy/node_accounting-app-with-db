@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 'use strict';
 
 const { Sequelize } = require('sequelize');
@@ -26,8 +27,19 @@ const sequelize = new Sequelize({
   host: POSTGRES_HOST || 'localhost',
   dialect: 'postgres',
   port: POSTGRES_PORT || 5432,
-  password: POSTGRES_PASSWORD || '123',
+  password: POSTGRES_PASSWORD || '1234',
 });
+
+async function connectionTest() {
+  try {
+    await sequelize.authenticate();
+    console.log('Connection has been established successfully.');
+  } catch (error) {
+    console.error('Unable to connect to the database:', error);
+  }
+}
+
+connectionTest();
 
 module.exports = {
   sequelize,
