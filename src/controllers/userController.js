@@ -57,7 +57,9 @@ const updateUser = async (req, res) => {
     const updatedUser = await userService.patchUser({ id, name });
 
     if (!updatedUser) {
-      res.sendStatus(404);
+      res.status(400).json({
+        message: 'Failed to update user, validation error or other issue',
+      });
 
       return;
     }
@@ -72,13 +74,21 @@ const removeUser = async (req, res) => {
   try {
     const { id } = req.params;
 
-    if (!(await userService.getUserById(id))) {
+    const userExists = await userService.getUserById(id);
+
+    if (!userExists) {
       res.sendStatus(404);
 
       return;
     }
 
-    await userService.deleteUser(id);
+    const wasDeleted = await userService.deleteUser(id);
+
+    if (!wasDeleted) {
+      res.sendStatus(404);
+
+      return;
+    }
 
     res.sendStatus(204);
   } catch (error) {

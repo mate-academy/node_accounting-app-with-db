@@ -19,11 +19,11 @@ const patchUser = async ({ id, name }) => {
 };
 
 const deleteUser = async (id) => {
-  await User.destroy({
-    where: {
-      id,
-    },
+  const deletedRows = await User.destroy({
+    where: { id },
   });
+
+  return deletedRows > 0;
 };
 
 module.exports = {

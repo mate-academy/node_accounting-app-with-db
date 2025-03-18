@@ -30,7 +30,14 @@ const getExpense = async (req, res) => {
 
 const createExpense = async (req, res) => {
   try {
-    const { userId, spentAt, title, amount, category, note } = req.body;
+    const {
+      userId,
+      spentAt,
+      title,
+      amount,
+      category = null,
+      note = null,
+    } = req.body;
 
     if (!userId || !spentAt || !amount || !title || !isValidDate(spentAt)) {
       res.sendStatus(400);
@@ -49,7 +56,7 @@ const createExpense = async (req, res) => {
 
     res.status(201).json(expense);
   } catch (error) {
-    res.sendStatus(500);
+    res.sendStatus(500); // Отправка общего ответа об ошибке
   }
 };
 
@@ -66,7 +73,9 @@ const updateExpense = async (req, res) => {
     const updatedExpense = await expenseService.patchExpense(id, req.body);
 
     if (!updatedExpense) {
-      res.sendStatus(404);
+      res.status(400).json({
+        message: 'Failed to update expense, validation error or other issue',
+      });
 
       return;
     }
