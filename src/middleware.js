@@ -1,7 +1,5 @@
-const { getUserById } = require('./services/userService');
-
-const isValidDate = (userId) => {
-  return getUserById(userId);
+const isValidDate = (date) => {
+  return !isNaN(new Date(date).getTime());
 };
 
 module.exports = {

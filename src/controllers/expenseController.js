@@ -32,7 +32,7 @@ const createExpense = async (req, res) => {
   try {
     const { userId, spentAt, title, amount, category, note } = req.body;
 
-    if (!userId || !spentAt || !amount || !title || !isValidDate(userId)) {
+    if (!userId || !spentAt || !amount || !title || !isValidDate(spentAt)) {
       res.sendStatus(400);
 
       return;
@@ -86,8 +86,6 @@ const removeExpense = async (req, res) => {
 
       return;
     }
-
-    await expenseService.deleteUser(id);
 
     res.sendStatus(204);
   } catch (error) {

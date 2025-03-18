@@ -12,12 +12,16 @@ const getAllExpenses = async (userId, categories, from, to) => {
     whereClause.category = categories;
   }
 
-  if (from) {
-    whereClause.spentAt = { [Op.gte]: from };
-  }
+  if (from || to) {
+    whereClause.spentAt = {};
 
-  if (to) {
-    whereClause.spentAt = { [Op.lte]: to };
+    if (from) {
+      whereClause.spentAt[Op.gte] = from;
+    }
+
+    if (to) {
+      whereClause.spentAt[Op.lte] = to;
+    }
   }
 
   return Expense.findAll({ where: whereClause });
@@ -45,7 +49,7 @@ const createExpense = async (
   });
 };
 
-const patchExpense = async ({ id, data }) => {
+const patchExpense = async (id, data) => {
   await Expense.update(data, {
     where: { id },
   });
@@ -54,11 +58,11 @@ const patchExpense = async ({ id, data }) => {
 };
 
 const deleteExpense = async (id) => {
-  await Expense.destroy({
-    where: {
-      id,
-    },
+  const deletedRows = await Expense.destroy({
+    where: { id },
   });
+
+  return deletedRows > 0;
 };
 
 module.exports = {
