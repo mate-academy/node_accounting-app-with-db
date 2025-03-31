@@ -58,7 +58,6 @@ const expensesService = {
 
     const updated = await Expense.update(
       {
-        id,
         userId,
         spendAt,
         title,

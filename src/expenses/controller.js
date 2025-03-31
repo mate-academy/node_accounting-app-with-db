@@ -73,7 +73,7 @@ async function removeExpense(req, res) {
     if (!response) {
       res.status(404).json('Expense not found');
     } else {
-      res.status(204).json('Deleted');
+      res.status(204).send();
     }
   } catch (err) {
     console.error(err.message);

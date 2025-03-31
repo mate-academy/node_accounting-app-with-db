@@ -93,7 +93,7 @@ async function updateUser(req, res) {
     if (!response) {
       res.status(404).json('User not found');
     } else {
-      res.status(200).json('Updated');
+      res.status(200).json(response);
     }
   } catch (err) {
     console.error(err.message);
