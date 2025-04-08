@@ -22,7 +22,7 @@ const {
 
 const sequelize = new Sequelize({
   database: POSTGRES_DB || 'postgres',
-  username: POSTGRES_USER || 'postgres',
+  username: POSTGRES_USER || 'korshuns',
   host: POSTGRES_HOST || 'localhost',
   dialect: 'postgres',
   port: POSTGRES_PORT || 5432,
