@@ -83,16 +83,25 @@ const createServer = () => {
     }
 
     if (categories) {
+      const categoriesArr = Array.isArray(categories)
+        ? categories
+        : categories.split(',');
+
       newExpenses = newExpenses.filter(
-        (exp) => categories.includes(exp.category),
+        (exp) => categoriesArr.includes(exp.category),
         // eslint-disable-next-line function-paren-newline
       );
     }
 
     if (from && to) {
-      newExpenses = newExpenses.filter(
-        (exp) => exp.spentAt >= from && exp.spentAt <= to,
-      );
+      const fromDate = new Date(from);
+      const toDate = new Date(to);
+
+      newExpenses = newExpenses.filter((exp) => {
+        const spentDate = new Date(exp.spentAt);
+
+        return spentDate >= fromDate && spentDate <= toDate;
+      });
     }
 
     res.send(newExpenses);
