@@ -21,7 +21,7 @@ const remove = (id) => {
 
 const update = (id, name) => {
   return User.update(
-    { id, name },
+    { name },
     {
       where: { id },
       returning: true,
