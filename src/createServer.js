@@ -2,23 +2,13 @@
 
 const express = require('express');
 const { models } = require('./models/models');
-/* const { sequelize } = require('./db'); */
 const { Op } = require('sequelize');
-
-/* async function initDatabase() {
-  try {
-    await sequelize.authenticate();
-    await sequelize.sync({ force: true });
-  } catch (error) {}
-} */
 
 function createServer() {
   const app = express();
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
-
-  /*  initDatabase(); */
 
   app.get('/users', async (req, res) => {
     const users = await models.User.findAll();
@@ -138,8 +128,8 @@ function createServer() {
       userId == null ||
       spentAt == null ||
       title == null ||
-      amount == null ||
-      category == null
+      amount == null /* ||
+      category == null */
     ) {
       res
         .status(400)
