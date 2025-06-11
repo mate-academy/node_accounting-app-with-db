@@ -1,23 +1,17 @@
-let expenses = [];
-const clearExpensesForTest = () => {
-  expenses = [];
-};
+const { Op } = require('sequelize');
+const { Expense } = require('../models/Expense.model');
 
 const getAllExpenses = (filters = {}) => {
-  let result = [...expenses];
+  const filterConditions = {};
 
   if (filters.userId) {
-    result = result.filter((expense) => expense.userId === filters.userId);
+    filterConditions.userId = filters.userId;
   }
 
   if (filters.from && filters.to) {
-    result = result.filter((expense) => {
-      const spentDate = new Date(expense.spentAt);
-
-      return (
-        spentDate >= new Date(filters.from) && spentDate <= new Date(filters.to)
-      );
-    });
+    filterConditions.spentAt = {
+      [Op.between]: [new Date(filters.from), new Date(filters.to)],
+    };
   }
 
   if (filters.categories) {
@@ -25,47 +19,36 @@ const getAllExpenses = (filters = {}) => {
       ? filters.categories
       : [filters.categories];
 
-    result = result.filter((expense) => {
-      return categoriesArray.includes(expense.category);
-    });
+    filterConditions.category = {
+      [Op.in]: categoriesArray,
+    };
   }
 
-  return result;
+  return Expense.findAll({ where: filterConditions });
 };
 
-const getExpenseById = (id) => {
-  return expenses.find((expense) => expense.id === id) || null;
+const getExpenseById = async (id) => {
+  return Expense.findByPk(id);
 };
 
-const createExpense = (expense) => {
-  const newExpense = {
-    id: Date.now() + Math.floor(Math.random() * 1000),
-    ...expense,
-  };
-
-  expenses.push(newExpense);
-
-  return newExpense;
+const createExpense = async (expense) => {
+  return Expense.create(expense);
 };
 
-const removeExpense = (id) => {
-  expenses = expenses.filter((expense) => expense.id !== id);
+const removeExpense = async (id) => {
+  return Expense.destroy({ where: { id } });
 };
 
-const updateExpense = (id, updateData) => {
-  const expense = getExpenseById(id);
+const updateExpense = async (id, updateData) => {
+  const [, [updatedExpense]] = await Expense.update(updateData, {
+    where: { id },
+    returning: true,
+  });
 
-  if (!expense) {
-    return null;
-  }
-
-  Object.assign(expense, updateData);
-
-  return expense;
+  return updatedExpense;
 };
 
 module.exports = {
-  clearExpensesForTest,
   getAllExpenses,
   getExpenseById,
   createExpense,

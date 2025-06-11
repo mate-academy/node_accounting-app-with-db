@@ -1,41 +1,31 @@
-let users = [];
-const clearUsersForTest = () => {
-  users = [];
+const { User } = require('../models/User.model');
+
+const getAllUsers = async () => {
+  return User.findAll();
 };
 
-const getAllUsers = () => {
-  return users;
+const getUserById = async (id) => {
+  return User.findByPk(id);
 };
 
-const createUser = (name) => {
-  const newUser = {
-    id: Date.now() + Math.floor(Math.random() * 1000),
-    name,
-  };
-
-  users.push(newUser);
-
-  return newUser;
+const createUser = async (name) => {
+  return User.create({ name });
 };
 
-const getUserById = (id) => {
-  return users.find((user) => user.id === id) || null;
+const removeUser = async (id) => {
+  return User.destroy({ where: { id } });
 };
 
-const removeUser = (id) => {
-  users = users.filter((user) => user.id !== id);
-};
+const updateUser = async (id, name) => {
+  const [, [updatedUser]] = await User.update(
+    { name },
+    {
+      where: { id },
+      returning: true,
+    },
+  );
 
-const updateUser = (id, name) => {
-  const user = getUserById(id);
-
-  if (!user) {
-    return null;
-  }
-
-  Object.assign(user, { name });
-
-  return user;
+  return updatedUser;
 };
 
 module.exports = {
@@ -44,5 +34,4 @@ module.exports = {
   getUserById,
   removeUser,
   updateUser,
-  clearUsersForTest,
 };

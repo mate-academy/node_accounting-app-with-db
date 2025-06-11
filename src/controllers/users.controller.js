@@ -1,10 +1,12 @@
 const usersService = require('../services/users.service.js');
 
-const getAllUsers = (req, res) => {
-  res.status(200).send(usersService.getAllUsers());
+const getAllUsers = async (req, res) => {
+  const users = await usersService.getAllUsers();
+
+  res.status(200).send(users);
 };
 
-const createUser = (req, res) => {
+const createUser = async (req, res) => {
   const { name } = req.body;
 
   if (!name) {
@@ -13,15 +15,15 @@ const createUser = (req, res) => {
     return;
   }
 
-  const newUser = usersService.createUser(name);
+  const newUser = await usersService.createUser(name);
 
   res.status(201).send(newUser);
 };
 
-const getUser = (req, res) => {
+const getUser = async (req, res) => {
   const { id } = req.params;
 
-  const user = usersService.getUserById(+id);
+  const user = await usersService.getUserById(+id);
 
   if (!user) {
     res.status(404).send('User not found!');
@@ -32,20 +34,22 @@ const getUser = (req, res) => {
   res.status(200).send(user);
 };
 
-const removeUser = (req, res) => {
+const removeUser = async (req, res) => {
   const { id } = req.params;
 
-  if (!usersService.getUserById(+id)) {
+  const user = await usersService.getUserById(+id);
+
+  if (!user) {
     res.status(404).send('User not found!');
 
     return;
   }
 
-  usersService.removeUser(+id);
+  await usersService.removeUser(+id);
   res.status(204).send('User removed successfully!');
 };
 
-const updateUser = (req, res) => {
+const updateUser = async (req, res) => {
   const { id } = req.params;
   const { name } = req.body;
 
@@ -55,7 +59,7 @@ const updateUser = (req, res) => {
     return;
   }
 
-  const user = usersService.getUserById(+id);
+  const user = await usersService.getUserById(+id);
 
   if (!user) {
     res.status(404).send('User not found!');
@@ -63,7 +67,7 @@ const updateUser = (req, res) => {
     return;
   }
 
-  const updatedUser = usersService.updateUser(+id, name);
+  const updatedUser = await usersService.updateUser(+id, name);
 
   res.status(200).send(updatedUser);
 };
