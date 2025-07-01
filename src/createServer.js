@@ -1,195 +1,246 @@
 'use strict';
 
 const express = require('express');
-const { expensesService } = require('./services/expensesService');
-const { usersService } = require('./services/usersService');
+const { models } = require('./models/models');
+const { Op } = require('sequelize');
 
 function createServer() {
   const app = express();
 
   app.use(express.json());
-
-  app.get('/expenses', async (req, res) => {
-    const { userId, categories, from, to } = req.query;
-
-    let expenses = await expensesService.getExpenses();
-
-    if (userId) {
-      expenses = expenses.filter((e) => Number(e.userId) === Number(userId));
-    }
-
-    if (categories) {
-      const categoriesArray = categories.split(',').map((cat) => cat.trim());
-
-      // Тепер використовуйте отриманий масив для фільтрації
-      expenses = expenses.filter((e) => categoriesArray.includes(e.category));
-    }
-
-    if (from) {
-      const fromDate = new Date(from);
-
-      expenses = expenses.filter((e) => new Date(e.spentAt) >= fromDate);
-    }
-
-    if (to) {
-      const toDate = new Date(to);
-
-      expenses = expenses.filter((e) => new Date(e.spentAt) <= toDate);
-    }
-
-    res.json(expenses);
-  });
-
-  app.get('/expenses/:id', async (req, res) => {
-    const id = req.params.id;
-
-    if (!id || typeof id !== 'string') {
-      return res.status(400).send('Invalid id');
-    }
-
-    const expense = await expensesService.getExpense(id);
-
-    if (!expense) {
-      return res.status(404).send('Not found');
-    }
-
-    return res.json(expense);
-  });
-
-  app.post('/expenses', async (req, res) => {
-    const { userId, spentAt, title, amount, category, note } = req.body;
-
-    if (!userId || !spentAt || !title || !amount) {
-      return res.status(400).send('Bad request');
-    }
-
-    const user = await usersService.getUser(userId);
-
-    if (!user) {
-      return res.status(400).json({ error: 'User not found' });
-    }
-
-    const expense = await expensesService.createExpense(
-      userId,
-      spentAt,
-      title,
-      amount,
-      category,
-      note,
-    );
-
-    return res.status(201).json(expense);
-  });
-
-  app.delete('/expenses/:id', async (req, res) => {
-    const id = Number(req.params.id);
-
-    if (!id || isNaN(id)) {
-      return res.status(400).send('Invalid id');
-    }
-
-    const deleted = await expensesService.deleteExpense(id);
-
-    if (!deleted) {
-      return res.status(404).send('Not found');
-    }
-
-    return res.sendStatus(204);
-  });
-
-  app.patch('/expenses/:id', async (req, res) => {
-    const { spentAt, title, amount, category, note } = req.body;
-    const id = Number(req.params.id);
-
-    if (!id || isNaN(id)) {
-      return res.status(400).send('Invalid id');
-    }
-
-    if (!spentAt && !title && !amount && !category && !note) {
-      return res.status(400).send('Bad request');
-    }
-
-    const expense = await expensesService.updateExpense(
-      id,
-      spentAt,
-      title,
-      amount,
-      category,
-      note,
-    );
-
-    if (!expense) {
-      return res.status(404).send('Not found');
-    }
-
-    return res.json(expense);
-  });
+  app.use(express.urlencoded({ extended: true }));
 
   app.get('/users', async (req, res) => {
-    const users = await usersService.getUsers();
+    const users = await models.User.findAll();
 
-    res.json(users);
-  });
-
-  app.get('/users/:id', async (req, res) => {
-    const id = Number(req.params.id);
-
-    if (!id || isNaN(id)) {
-      return res.status(400).send('Invalid id');
-    }
-
-    const user = await usersService.getUser(id);
-
-    if (!user) {
-      return res.status(404).send('Not found');
-    }
-
-    return res.json(user);
+    res.status(200).json(users);
   });
 
   app.post('/users', async (req, res) => {
     const { name } = req.body;
 
-    if (!name) {
-      return res.status(400).send('Bad request');
+    if (name == null) {
+      res.status(400).json({ error: 'One or more fields are missing' });
+
+      return;
     }
 
-    const user = await usersService.createUser(name);
+    const createdUser = await models.User.create({ name });
 
-    return res.status(201).json(user);
+    res.status(201).json(createdUser);
+  });
+
+  app.get('/users/:id', async (req, res) => {
+    const id = parseInt(req.params.id);
+
+    if (Number.isNaN(id)) {
+      res.status(400).json({ error: 'Invalid ID' });
+    }
+
+    const user = await models.User.findOne({ where: { id: id } });
+
+    if (user == null) {
+      res.status(404).json({ error: 'User not found' });
+
+      return;
+    }
+    res.status(200).json(user);
   });
 
   app.delete('/users/:id', async (req, res) => {
-    const id = Number(req.params.id);
+    const id = parseInt(req.params.id);
 
-    if (!id || isNaN(id)) {
-      return res.status(400).send('Invalid id');
+    const user = await models.User.findByPk(id);
+
+    if (user == null) {
+      res.status(404).json({ error: 'User not found' });
+
+      return;
     }
-
-    const success = await usersService.deleteUser(id);
-
-    if (!success) {
-      return res.sendStatus(404);
-    }
-
-    return res.sendStatus(204);
+    await models.User.destroy({ where: { id: id } });
+    res.status(204).end();
   });
 
   app.patch('/users/:id', async (req, res) => {
+    const id = parseInt(req.params.id);
     const { name } = req.body;
 
-    const id = Number(req.params.id);
+    if (name == null) {
+      res.status(400).json({ error: 'One or more fields are missing' });
 
-    if (!id || isNaN(id)) {
-      return res.status(400).send('Invalid id');
+      return;
     }
 
-    const updated = await usersService.updateUser(id, name);
+    const [affectedRowsCount, updatedRows] = await models.User.update(
+      { name: name },
+      { where: { id: id }, returning: true },
+    );
 
-    if (!updated) {
-      return res.status(404).send('Not found');
+    if (affectedRowsCount === 0) {
+      res.status(404).json({ error: 'User not found' });
+
+      return;
     }
-    res.json(updated);
+
+    res.status(200).json(updatedRows.at(0));
+  });
+
+  app.get('/expenses', async (req, res) => {
+    const { userId, categories, from, to } = req.query;
+    const filters = {};
+
+    if (userId) {
+      filters.userId = parseInt(userId);
+    }
+
+    if (categories) {
+      if (Array.isArray(categories)) {
+        filters.category = { [Op.in]: categories };
+      } else {
+        filters.category = categories;
+      }
+    }
+
+    // Filter by date range
+    if (from || to) {
+      filters.spentAt = {};
+
+      if (from) {
+        filters.spentAt[Op.gte] = new Date(from);
+      }
+
+      if (to) {
+        filters.spentAt[Op.lte] = new Date(to);
+      }
+    }
+
+    const expenses = await models.Expense.findAll({
+      where: filters,
+    });
+
+    res.status(200).json(expenses);
+  });
+
+  app.post('/expenses', async (req, res) => {
+    const { userId, spentAt, title, amount, category, note } = req.body;
+
+    if (
+      userId == null ||
+      spentAt == null ||
+      title == null ||
+      amount == null /* ||
+      category == null */
+    ) {
+      res
+        .status(400)
+        .json({ error: 'One or more required fields are missing' });
+
+      return;
+    }
+
+    const user = await models.User.findByPk(userId);
+
+    if (!user) {
+      res.status(400).json({ error: 'Invalid user ID' });
+
+      return;
+    }
+
+    const newExpense = await models.Expense.create({
+      userId: userId,
+      spentAt: spentAt,
+      title: title,
+      amount: amount,
+      category: category,
+      note: note ?? null,
+    });
+
+    res.status(201).json(newExpense);
+  });
+
+  app.get('/expenses/:id', async (req, res) => {
+    const id = parseInt(req.params.id);
+
+    if (Number.isNaN(id)) {
+      res.status(400).json({ error: 'Invalid ID' });
+
+      return;
+    }
+
+    const expense = await models.Expense.findByPk(id);
+
+    if (expense == null) {
+      res.status(404).json({ error: 'User not found' });
+
+      return;
+    }
+    res.status(200).json(expense);
+  });
+
+  app.delete('/expenses/:id', async (req, res) => {
+    const id = parseInt(req.params.id);
+
+    const expense = await models.Expense.findByPk(id);
+
+    if (expense == null) {
+      res.status(404).json({ error: 'Expense not found' });
+
+      return;
+    }
+    await models.Expense.destroy({ where: { id: id } });
+    res.status(204).end();
+  });
+
+  app.patch('/expenses/:id', async (req, res) => {
+    const id = parseInt(req.params.id);
+    const { spentAt, title, amount, category, note } = req.body;
+
+    const expense = await models.Expense.findByPk(id);
+
+    if (expense == null) {
+      res.status(404).json({ error: 'Expense not found' });
+
+      return;
+    }
+
+    const changedFields = {};
+
+    if (spentAt != null) {
+      changedFields.spentAt = spentAt;
+    }
+
+    if (title != null) {
+      changedFields.title = title;
+    }
+
+    if (amount != null) {
+      changedFields.amount = amount;
+    }
+
+    if (category != null) {
+      changedFields.category = category;
+    }
+
+    if (note != null) {
+      changedFields.note = note;
+    }
+
+    if (changedFields.length === 0) {
+      res.status(400).json({ error: 'At least one field is required' });
+
+      return;
+    }
+
+    // eslint-disable-next-line no-unused-vars
+    const [affectedRowsCount, updatedRows] = await models.Expense.update(
+      changedFields,
+      {
+        where: { id: id },
+        returning: true,
+      },
+    );
+
+    res.status(200).json(updatedRows.at(0));
   });
 
   return app;
