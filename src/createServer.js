@@ -2,7 +2,7 @@
 
 const express = require('express');
 const { models } = require('./models/models');
-const { User, Expense } = models;
+const { User, Expense, Category } = models;
 const { Op } = require('sequelize');
 
 function createServer() {
@@ -209,7 +209,7 @@ function createServer() {
     });
 
     if (Object.keys(updates).length === 0) {
-      return res.status(404).json({ error: 'No valid fields to update' });
+      return res.status(400).json({ error: 'No valid fields to update' });
     }
 
     try {
@@ -243,6 +243,88 @@ function createServer() {
         return res.status(404).json({ error: 'Not found' });
       }
 
+      res.status(204).end();
+    } catch (err) {
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+
+  app.get('/categories', async (req, res) => {
+    try {
+      const categories = await Category.findAll();
+
+      res.status(200).json(categories);
+    } catch (err) {
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+
+  app.post('/categories', async (req, res) => {
+    const { name } = req.body;
+
+    if (!name) {
+      return res.status(400).json({ error: 'Name is required' });
+    }
+
+    try {
+      const newCategory = await Category.create({ name });
+
+      res.status(201).json(newCategory);
+    } catch (err) {
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+
+  app.get('/categories/:categoryId', async (req, res) => {
+    const categoryId = req.params.categoryId;
+
+    try {
+      const category = await Category.findByPk(categoryId);
+
+      if (!category) {
+        return res.status(404).json({ error: 'Not found' });
+      }
+      res.status(200).json(category);
+    } catch (err) {
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+
+  app.patch('/categories/:categoryId', async (req, res) => {
+    const categoryId = req.params.categoryId;
+    const { name } = req.body;
+
+    if (!name) {
+      return res.status(400).json({ error: 'Name is required' });
+    }
+
+    try {
+      const [updated] = await Category.update(
+        { name },
+        { where: { id: categoryId } },
+      );
+
+      if (updated === 0) {
+        return res.status(404).json({ error: 'Not found' });
+      }
+
+      const updatedCategory = await Category.findByPk(categoryId);
+
+      res.status(200).json(updatedCategory);
+    } catch (err) {
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+
+  app.delete('/categories/:categoryId', async (req, res) => {
+    const categoryId = req.params.categoryId;
+
+    try {
+      const deleted = await Category.destroy({ where: { id: categoryId } });
+
+      if (!deleted) {
+        return res.status(404).json({ error: 'Not found' });
+      }
       res.status(204).end();
     } catch (err) {
       res.status(500).json({ error: 'Internal Server Error' });
