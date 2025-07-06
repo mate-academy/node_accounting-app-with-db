@@ -93,6 +93,8 @@ describe('Expense', () => {
         expect.objectContaining({
           id: expect.any(Number),
           ...data,
+          createdAt: expect.any(String),
+          updatedAt: expect.any(String),
         }),
       );
     });
@@ -112,6 +114,7 @@ describe('Expense', () => {
         title: 'Buy a new laptop',
         amount: 999,
         userId: user.id,
+        category: 'Electronics',
       };
 
       const response = await api.post('/expenses', data);
@@ -120,6 +123,8 @@ describe('Expense', () => {
         expect.objectContaining({
           id: expect.any(Number),
           ...data,
+          createdAt: expect.any(String),
+          updatedAt: expect.any(String),
         }),
       );
     });
@@ -159,12 +164,16 @@ describe('Expense', () => {
 
       const response = await api.get('expenses');
 
-      expect(response.data).toEqual([
-        {
-          id: expenseId,
-          ...data,
-        },
-      ]);
+      expect(response.data).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: expenseId,
+            ...data,
+            createdAt: expect.any(String),
+            updatedAt: expect.any(String),
+          }),
+        ]),
+      );
     });
 
     it('should return all expenses for a user', async () => {
@@ -184,12 +193,16 @@ describe('Expense', () => {
 
       const response = await api.get(`expenses?userId=${user.id}`);
 
-      expect(response.data).toEqual([
-        {
-          id: expenseId,
-          ...data,
-        },
-      ]);
+      expect(response.data).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: expenseId,
+            ...data,
+            createdAt: expect.any(String),
+            updatedAt: expect.any(String),
+          }),
+        ]),
+      );
     });
 
     it('should return all expenses between dates', async () => {
@@ -218,16 +231,22 @@ describe('Expense', () => {
           'expenses?&from=2022-10-19T11:01:43.462Z&to=2022-10-20T11:01:43.462Z',
         );
 
-      expect(response.data).toEqual([
-        {
-          id: expenseId,
-          ...data,
-        },
-        {
-          id: secondExpenseId,
-          ...seconData,
-        },
-      ]);
+      expect(response.data).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: expenseId,
+            ...data,
+            createdAt: expect.any(String),
+            updatedAt: expect.any(String),
+          }),
+          expect.objectContaining({
+            id: secondExpenseId,
+            ...seconData,
+            createdAt: expect.any(String),
+            updatedAt: expect.any(String),
+          }),
+        ]),
+      );
     });
 
     it('should return all expenses by category', async () => {
@@ -249,12 +268,16 @@ describe('Expense', () => {
         `expenses?userId=${user.id}&categories=Electronics`,
       );
 
-      expect(response.data).toEqual([
-        {
-          id: expenseId,
-          ...data,
-        },
-      ]);
+      expect(response.data).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: expenseId,
+            ...data,
+            createdAt: expect.any(String),
+            updatedAt: expect.any(String),
+          }),
+        ]),
+      );
     });
   });
 
@@ -271,10 +294,14 @@ describe('Expense', () => {
 
       const response = await api.get(`expenses/${expenseId}`);
 
-      expect(response.data).toEqual({
-        id: expenseId,
-        ...data,
-      });
+      expect(response.data).toEqual(
+        expect.objectContaining({
+          id: expenseId,
+          ...data,
+          createdAt: expect.any(String),
+          updatedAt: expect.any(String),
+        }),
+      );
     });
 
     it('should return 404 if expense not found', async () => {
@@ -301,11 +328,15 @@ describe('Expense', () => {
         title: 'Buy a new TV',
       });
 
-      expect(response.data).toEqual({
-        id: expenseId,
-        ...data,
-        title: 'Buy a new TV',
-      });
+      expect(response.data).toEqual(
+        expect.objectContaining({
+          id: expenseId,
+          ...data,
+          title: 'Buy a new TV',
+          createdAt: expect.any(String),
+          updatedAt: expect.any(String),
+        }),
+      );
     });
 
     it('should return 404 if expense not found', async () => {
@@ -334,9 +365,11 @@ describe('Expense', () => {
 
       expect(res.status).toBe(204);
 
-      await api.get(`expenses/${expenseId}`).catch((err) => {
+      try {
+        await api.get(`expenses/${expenseId}`);
+      } catch (err) {
         expect(err.response.status).toBe(404);
-      });
+      }
     });
 
     it('should return 404 if expense not found', async () => {

@@ -72,6 +72,8 @@ describe('User', () => {
         expect.objectContaining({
           id: expect.any(Number),
           name,
+          createdAt: expect.any(String),
+          updatedAt: expect.any(String),
         }),
       );
     });
@@ -124,7 +126,18 @@ describe('User', () => {
         'application/json; charset=utf-8',
       );
 
-      expect(response.data).toEqual(expect.arrayContaining(createdUsers));
+      expect(response.data).toEqual(
+        expect.arrayContaining(
+          createdUsers.map((user) =>
+            expect.objectContaining({
+              id: expect.any(Number),
+              name: user.name,
+              createdAt: expect.any(String),
+              updatedAt: expect.any(String),
+            }),
+          ),
+        ),
+      );
     });
   });
 
@@ -178,10 +191,14 @@ describe('User', () => {
         'application/json; charset=utf-8',
       );
 
-      expect(response.data).toEqual({
-        ...createdUser,
-        name: 'Jane Doe',
-      });
+      expect(response.data).toEqual(
+        expect.objectContaining({
+          id: createdUser.id,
+          name: 'Jane Doe',
+          createdAt: expect.any(String),
+          updatedAt: expect.any(String),
+        }),
+      );
     });
   });
 
