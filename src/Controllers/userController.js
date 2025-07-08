@@ -40,7 +40,7 @@ const userController = {
       return res.sendStatus(404);
     }
     await userService.update(Number(req.params.id), req.body.name);
-    res.json(await userService.getById(req.params.id));
+    res.json(await userService.getById(Number(req.params.id)));
   },
 
   async delete(req, res) {

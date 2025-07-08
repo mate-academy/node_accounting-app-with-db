@@ -35,7 +35,7 @@ const expenseController = {
       !req.body.userId ||
       !(await userService.getById(Number(req.body.userId))) ||
       !req.body.spentAt ||
-      // Date(req.body.spentAt) === 'Invalid Date' ||
+      Date(req.body.spentAt) === 'Invalid Date' ||
       !req.body.title ||
       !req.body.amount ||
       !req.body.category
@@ -62,14 +62,14 @@ const expenseController = {
     }
     await expenseService.update(Number(req.params.id), req.body);
 
-    res.status(200).json(await expenseService.getById(req.params.id));
+    res.status(200).json(await expenseService.getById(Number(req.params.id)));
   },
 
   async delete(req, res) {
     if (!(await expenseService.getById(Number(req.params.id)))) {
       return res.sendStatus(404);
     }
-    expenseService.delete(Number(req.params.id));
+    await expenseService.delete(Number(req.params.id));
     res.sendStatus(204);
   },
 };
