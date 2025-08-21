@@ -1,11 +1,264 @@
-# Accounting app (with Node.js and PostgreSQL)
-Take the Accounting app from prev lesson and use PostgreSQL as a storage
+# 🧮 Бухгалтерський застосунок з Node.js та PostgreSQL
 
-- Implement CRUD page to manage categories
+Повноцінний бухгалтерський застосунок для керування витратами з використанням Node.js, Express та PostgreSQL.
 
-# Note
-- You can sync models by running `npm run test`
-- in local env, tests interect with your local database, so rows can be changed or removed
+## ✨ Функціональність
 
+- **📁 CRUD операції для категорій** - створення, читання, оновлення та видалення категорій витрат
+- **👥 Керування користувачами** - реєстрація та управління користувачами
+- **💰 Керування витратами** - додавання, редагування та видалення витрат
+- **📊 Статистика** - аналіз витрат по категоріях та періодах
+- **🌐 RESTful API** - повний набір ендпоінтів для роботи з даними
+- **🎨 Веб-інтерфейс** - зручний UI для тестування API
 
-**Read [the guideline](https://github.com/mate-academy/js_task-guideline/blob/master/README.md) before start**
+## 🛠️ Технології
+
+- **Backend**: Node.js, Express.js
+- **База даних**: PostgreSQL
+- **ORM**: Sequelize
+- **Валідація**: Sequelize validators
+- **CORS**: підтримка cross-origin запитів
+- **Тестування**: Jest, Axios для API тестів
+
+## 🚀 Швидкий старт
+
+### Передумови
+
+- Node.js (версія 14 або вище)
+- PostgreSQL (версія 12 або вище)
+- npm або yarn
+
+### Встановлення та запуск
+
+1. **Клонуйте репозиторій**
+   ```bash
+   git clone <your-repo-url>
+   cd node_accounting-app-with-db
+   ```
+
+2. **Автоматичний запуск (рекомендовано)**
+   ```bash
+   chmod +x start.sh
+   ./start.sh
+   ```
+
+3. **Ручний запуск**
+   ```bash
+   npm install
+   node src/initDb.js
+   npm start
+   ```
+
+## 📚 Документація
+
+- **[QUICK_START.md](QUICK_START.md)** - Швидкий старт гід
+- **[examples/api_examples.md](examples/api_examples.md)** - Приклади використання API
+- **[test_api.js](test_api.js)** - Скрипт для тестування API
+
+## 🌐 Доступ до застосунку
+
+- **API**: http://localhost:5700/api
+- **Веб-інтерфейс**: http://localhost:5700
+- **Health check**: http://localhost:5700/health
+
+## 📊 Початкові дані
+
+Після ініціалізації бази даних у вас буде:
+
+### Категорії
+- 🍎 Продукти (червоний)
+- 🚗 Транспорт (блакитний)
+- 🎬 Розваги (синій)
+- 🏠 Комунальні послуги (зелений)
+- 👕 Одяг (жовтий)
+- 🏥 Здоров'я (фіолетовий)
+- 📚 Освіта (бірюзовий)
+- 🔧 Інше (золотистий)
+
+### Користувач
+- Email: admin@example.com
+- Пароль: password123
+- Ім'я: Адміністратор Системи
+
+### Приклади витрат
+- Продукти на тиждень: 150.50 грн
+- Бензин: 45.00 грн
+- Кіно: 200.00 грн
+
+## 🔌 API Ендпоінти
+
+### 📁 Категорії (Categories)
+- `GET /api/categories` - отримати всі категорії
+- `GET /api/categories/:id` - отримати категорію за ID
+- `POST /api/categories` - створити нову категорію
+- `PUT /api/categories/:id` - оновити категорію
+- `DELETE /api/categories/:id` - видалити категорію
+
+### 👥 Користувачі (Users)
+- `GET /api/users` - отримати всіх користувачів
+- `GET /api/users/:id` - отримати користувача за ID
+- `POST /api/users` - створити нового користувача
+
+### 💰 Витрати (Expenses)
+- `GET /api/expenses` - отримати всі витрати (з фільтрами)
+- `GET /api/expenses/:id` - отримати витрату за ID
+- `POST /api/expenses` - створити нову витрату
+- `PUT /api/expenses/:id` - оновити витрату
+- `DELETE /api/expenses/:id` - видалити витрату
+
+### 📊 Статистика
+- `GET /api/statistics` - отримати статистику витрат
+
+## 🧪 Тестування
+
+### Тестування API
+```bash
+# Запустити тести API (потребує запущеного сервера)
+node test_api.js
+
+# Або
+npm run test:api
+```
+
+### Unit тести
+```bash
+# Запустити тести (потребує PostgreSQL)
+npm test
+
+# Тільки тести (без лінтингу)
+npm run test:only
+```
+
+### Лінтинг та форматування
+```bash
+npm run lint
+npm run format
+```
+
+## 🔧 Налаштування
+
+### База даних
+Відредагуйте `config.js`:
+```javascript
+database: {
+  host: 'localhost',
+  port: 5432,
+  username: 'your_username',
+  password: 'your_password',
+  database: 'accounting_app'
+}
+```
+
+### Змінні середовища
+Створіть файл `.env`:
+```bash
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_USER=your_username
+POSTGRES_PASSWORD=your_password
+POSTGRES_DB=accounting_app
+PORT=5700
+NODE_ENV=development
+```
+
+## 📁 Структура проекту
+
+```
+├── src/
+│   ├── models/           # Моделі Sequelize
+│   │   ├── Category.model.js
+│   │   ├── User.model.js
+│   │   ├── Expense.model.js
+│   │   └── models.js     # Зв'язки між моделями
+│   ├── db.js            # Налаштування бази даних
+│   ├── createServer.js  # Express сервер
+│   ├── initDb.js        # Ініціалізація БД
+│   ├── logger.js        # Логування
+│   └── index.js         # Точка входу
+├── public/               # Статичні файли (веб-інтерфейс)
+├── tests/                # Unit тести
+├── examples/             # Приклади використання
+├── config.js             # Конфігурація
+├── start.sh              # Скрипт запуску
+├── test_api.js           # Тестування API
+└── QUICK_START.md        # Швидкий старт
+```
+
+## 🗄️ Моделі даних
+
+### Category
+- `id` - унікальний ідентифікатор
+- `name` - назва категорії (унікальна)
+- `description` - опис категорії
+- `color` - колір для відображення
+- `isActive` - чи активна категорія
+- `createdAt`, `updatedAt` - часові мітки
+
+### User
+- `id` - унікальний ідентифікатор
+- `email` - email адреса (унікальна)
+- `password` - пароль
+- `firstName` - ім'я
+- `lastName` - прізвище
+- `isActive` - чи активний користувач
+- `createdAt`, `updatedAt` - часові мітки
+
+### Expense
+- `id` - унікальний ідентифікатор
+- `userId` - посилання на користувача
+- `categoryId` - посилання на категорію
+- `amount` - сума витрати
+- `description` - опис витрати
+- `date` - дата витрати
+- `isRecurring` - чи повторюється
+- `recurringPeriod` - період повторення
+- `notes` - додаткові нотатки
+- `createdAt`, `updatedAt` - часові мітки
+
+## 🎯 Особливості реалізації
+
+- **Валідація даних** - Sequelize validators для перевірки вхідних даних
+- **Обробка помилок** - централізована обробка помилок з детальними повідомленнями
+- **Безпека** - перевірка існування пов'язаних записів перед видаленням
+- **Фільтрація** - підтримка фільтрів для витрат (користувач, категорія, дата)
+- **Статистика** - агреговані дані по категоріях та періодах
+- **Логування** - структуроване логування для відстеження помилок
+
+## 🆘 Вирішення проблем
+
+### Помилка з'єднання з PostgreSQL
+1. Перевірте, чи запущений PostgreSQL
+2. Перевірте налаштування в `config.js`
+3. Переконайтеся, що база даних існує
+
+### Помилки тестів
+- Unit тести потребують запущеного PostgreSQL
+- API тести потребують запущеного сервера
+- Перевірте налаштування з'єднання
+
+### Помилки порту
+- Змініть порт в `config.js` або `.env`
+- Переконайтеся, що порт не зайнятий
+
+## 📞 Підтримка
+
+Якщо виникли проблеми:
+1. Перевірте логи сервера
+2. Перевірте налаштування бази даних
+3. Переконайтеся, що всі залежності встановлені
+4. Запустіть `node test_api.js` для діагностики API
+
+## 📝 Ліцензія
+
+GPL-3.0
+
+## 👨‍💻 Автор
+
+Mate Academy
+
+---
+
+**🎉 Готово!** Ваш бухгалтерський застосунок готовий до роботи!
+
+Для швидкого старту дивіться [QUICK_START.md](QUICK_START.md)
+Для прикладів API дивіться [examples/api_examples.md](examples/api_examples.md)

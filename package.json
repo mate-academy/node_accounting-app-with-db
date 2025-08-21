@@ -9,6 +9,7 @@
     "lint": "npm run format && mate-scripts lint",
     "format": "prettier --ignore-path .prettierignore --write './src/**/*.{js,ts}'",
     "test:only": "mate-scripts test",
+    "test:api": "node test_api.js",
     "update": "mate-scripts update",
     "postinstall": "npm run update",
     "test": "npm run lint && npm run test:only"
@@ -23,7 +24,7 @@
   },
   "devDependencies": {
     "@mate-academy/eslint-config": "latest",
-    "@mate-academy/scripts": "^1.8.6",
+    "@mate-academy/scripts": "^2.1.1",
     "axios": "^1.7.2",
     "eslint": "^8.57.0",
     "eslint-plugin-jest": "^28.6.0",
