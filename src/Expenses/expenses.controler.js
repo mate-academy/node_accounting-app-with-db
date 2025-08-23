@@ -48,11 +48,11 @@ class ExpensesController {
       const expenseItem = req.body;
       const { userId, spentAt, title, amount } = expenseItem;
 
-      const userExists = await usersService.getOneUser(userId);
-
       if (userId === undefined || !spentAt || !title || amount === undefined) {
         return res.status(400).json({ message: 'Missing required fields' });
       }
+
+      const userExists = await usersService.getOneUser(userId);
 
       if (!userExists) {
         return res.status(400).send({ message: 'User not found' });

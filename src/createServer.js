@@ -2,6 +2,7 @@
 
 const userRouter = require('./Users/users.routes');
 const expensesRouter = require('./Expenses/expenses.routes');
+const categoriesRouter = require('./Categories/categories.routes');
 // const usersData = require('./resources/usersData');
 // const expensesData = require('./resources/expenseData');
 const express = require('express');
@@ -22,6 +23,7 @@ const createServer = () => {
   app.use(express.json());
   app.use('/users', express.json(), userRouter);
   app.use('/expenses', express.json(), expensesRouter);
+  app.use('/categories', express.json(), categoriesRouter);
 
   return app;
 };
