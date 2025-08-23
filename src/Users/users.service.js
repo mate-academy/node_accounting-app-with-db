@@ -1,48 +1,36 @@
-const usersData = require('../resources/usersData');
-const { users, userCount } = usersData;
+const { User } = require('../models/User.model');
 
 const getAllUsers = async () => {
-  return users;
+  return User.findAll();
 };
 
 const getOneUser = async (id) => {
-  return users.find((u) => u.id === id) || null;
+  return User.findByPk(id);
 };
 
 const createUser = async (userData) => {
-  const newUser = {
-    id: userCount(),
-    ...userData,
-  };
-
-  users.push(newUser);
-  usersData.incrementCount();
+  const newUser = await User.create(userData);
 
   return newUser;
 };
 
 const updateUser = async (id, paramsToUpdate) => {
-  const userToUpdate = users.find((u) => u.id === id);
+  const [updatedCount, updatedUsers] = await User.update(paramsToUpdate, {
+    where: { id },
+    returning: true,
+  });
 
-  if (!userToUpdate) {
+  if (updatedCount === 0) {
     return null;
   }
 
-  Object.assign(userToUpdate, paramsToUpdate);
-
-  return userToUpdate;
+  return updatedUsers[0];
 };
 
 const deleteUser = async (id) => {
-  const index = users.findIndex((u) => u.id === id);
+  const deletedCount = await User.destroy({ where: { id } });
 
-  if (index === -1) {
-    return null;
-  }
-
-  const deletedUser = users.splice(index, 1);
-
-  return deletedUser[0];
+  return deletedCount > 0;
 };
 
 module.exports = {

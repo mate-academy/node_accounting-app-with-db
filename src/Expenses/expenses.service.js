@@ -1,62 +1,51 @@
-const expensesData = require('../resources/expenseData');
-const { expenses, expenseCount } = expensesData;
+/* eslint-disable indent */
+const { Op } = require('sequelize');
+const { Expense } = require('../models/Expense.model');
 
 const getAllExpenses = async ({ userId, categories, from, to }) => {
-  return expenses.filter((expense) => {
-    if (userId && expense.userId !== userId) {
-      return false;
-    }
-
-    if (categories && !categories.includes(expense.category)) {
-      return false;
-    }
-
-    if (from && new Date(expense.spentAt) < from) {
-      return false;
-    }
-
-    if (to && new Date(expense.spentAt) > to) {
-      return false;
-    }
-
-    return true;
+  return Expense.findAll({
+    where: {
+      ...(userId && { userId }),
+      ...(categories && { category: { [Op.in]: categories } }),
+      ...(from || to
+        ? {
+            spentAt: {
+              ...(from && { [Op.gte]: from }),
+              ...(to && { [Op.lte]: to }),
+            },
+          }
+        : {}),
+    },
   });
 };
 
 const getOneExpense = async (id) => {
-  return expenses.find((e) => e.id === id) || null;
+  return Expense.findByPk(id);
 };
 
 const createExpense = async (expenseItem) => {
-  const newItem = {
-    id: expenseCount(),
-    ...expenseItem,
-  };
+  const newExpense = await Expense.create(expenseItem);
 
-  expenses.push(newItem);
-  expensesData.incrementCount();
-
-  return newItem;
+  return newExpense;
 };
 
 const updateExpense = async (id, paramsToUpdate) => {
-  const itemToUpdate = expenses.find((e) => e.id === id);
+  const [updatedCount, updatedExpense] = await Expense.update(paramsToUpdate, {
+    where: { id },
+    returning: true,
+  });
 
-  Object.assign(itemToUpdate, paramsToUpdate);
-
-  return itemToUpdate;
-};
-
-const deleteExpense = async (id) => {
-  const index = expenses.findIndex((e) => e.id === id);
-
-  if (index === -1) {
+  if (updatedCount === 0) {
     return null;
   }
 
-  const deletedExpense = expenses.splice(index, 1);
+  return updatedExpense[0];
+};
 
-  return deletedExpense[0];
+const deleteExpense = async (id) => {
+  const deletedCount = await Expense.destroy({ where: { id } });
+
+  return deletedCount > 0;
 };
 
 module.exports = {
