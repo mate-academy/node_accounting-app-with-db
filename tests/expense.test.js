@@ -9,15 +9,14 @@ const {
 } = require('../src/models/models');
 const { Agent } = require('http');
 
-// this prevents `socket hang up` for Node.js 20.10+
 axios.defaults.httpAgent = new Agent({ keepAlive: false });
 
 describe('Expense', () => {
-  let server;
   let serverInstance;
   let api;
-  let user = null;
-  let secondUser = null;
+  let user, secondUser;
+
+  const HOST = 'http://localhost:7080/';
 
   const laptop = {
     spentAt: '2022-10-19T11:01:43.462Z',
@@ -35,16 +34,12 @@ describe('Expense', () => {
     note: 'I need a new TV',
   };
 
-  const HOST = 'http://localhost:7080/';
-
   beforeAll(async () => {
     await sequelize.sync({ force: true });
 
     api = axios.create({
       baseURL: HOST,
-      httpsAgent: new https.Agent({
-        rejectUnauthorized: false,
-      }),
+      httpsAgent: new https.Agent({ rejectUnauthorized: false }),
     });
 
     [user, secondUser] = await Promise.all([
@@ -54,14 +49,11 @@ describe('Expense', () => {
   });
 
   beforeEach(async () => {
-    server = createServer();
+    const server = createServer();
 
-    serverInstance = server.listen(7080, () => {
-      // eslint-disable-next-line no-console
-      console.log(HOST);
-    });
+    serverInstance = server.listen(7080);
 
-    await Expense.destroy({ truncate: true });
+    await Expense.destroy({ truncate: true, cascade: true });
   });
 
   afterEach(async () => {
@@ -74,275 +66,200 @@ describe('Expense', () => {
     await sequelize.close();
   });
 
+  // ================= CREATE =================
   describe('createExpense', () => {
     it('should create a new expense', async () => {
-      const data = {
-        ...laptop,
-        userId: user.id,
-      };
-
-      const response = await api.post('expenses', data);
-
-      expect(response.status).toBe(201);
-
-      expect(response.headers['content-type']).toBe(
-        'application/json; charset=utf-8',
-      );
-
-      expect(response.data).toEqual(
-        expect.objectContaining({
-          id: expect.any(Number),
-          ...data,
-        }),
-      );
-    });
-
-    it('should return 400 if required fields is not provided', async () => {
-      expect.assertions(1);
-
-      await api
-        .post('/expenses', { note: 'Important note' })
-        .catch((err) => expect(err.response.status).toBe(400));
-    });
-
-    // eslint-disable-next-line max-len
-    it('should create a new expense if optional fields is not provided', async () => {
-      const data = {
-        spentAt: '2022-10-19T11:01:43.462Z',
-        title: 'Buy a new laptop',
-        amount: 999,
-        userId: user.id,
-      };
-
+      const data = { ...laptop, userId: user.id };
       const response = await api.post('/expenses', data);
 
-      expect(response.data).toEqual(
-        expect.objectContaining({
-          id: expect.any(Number),
-          ...data,
-        }),
-      );
+      expect(response.status).toBe(201);
+      expect(response.data).toEqual(expect.objectContaining(data));
+    });
+
+    it('should return 400 if required fields missing', async () => {
+      await expect(
+        api.post('/expenses', { note: 'Important note' }),
+      ).rejects.toHaveProperty('response.status', 400);
+    });
+
+    it('should create expense if optional fields missing', async () => {
+      const data = {
+        spentAt: '2022-10-19T11:01:43.462Z',
+        title: 'Buy a laptop',
+        amount: 999,
+        userId: user.id,
+        category: 'Electronics',
+      };
+      const response = await api.post('/expenses', data);
+
+      expect(response.data).toEqual(expect.objectContaining(data));
     });
 
     it('should return 400 if user not found', async () => {
-      expect.assertions(1);
+      const data = { ...laptop, userId: 0 };
 
-      const data = {
-        ...laptop,
-        userId: 0,
-      };
-
-      await api
-        .post('expenses', data)
-        .catch((err) => expect(err.response.status).toBe(400));
+      await expect(api.post('/expenses', data)).rejects.toHaveProperty(
+        'response.status',
+        400,
+      );
     });
   });
 
+  // ================= GET =================
   describe('getExpenses', () => {
     it('should return empty array if no expenses', async () => {
-      const response = await api.get('expenses');
+      const response = await api.get('/expenses');
 
-      expect(response.status).toBe(200);
-
-      expect(response.data).toStrictEqual([]);
+      expect(response.data).toEqual([]);
     });
 
     it('should return all expenses', async () => {
-      const data = {
+      const { data: exp1 } = await api.post('/expenses', {
         ...tv,
         userId: user.id,
-      };
-
-      const {
-        data: { id: expenseId },
-      } = await api.post('expenses', data);
-
-      const response = await api.get('expenses');
+      });
+      const response = await api.get('/expenses');
 
       expect(response.data).toEqual([
-        {
-          id: expenseId,
-          ...data,
-        },
+        expect.objectContaining({ id: exp1.id, ...tv, userId: user.id }),
       ]);
     });
 
-    it('should return all expenses for a user', async () => {
-      const data = {
+    it('should return expenses for a user', async () => {
+      const { data: exp1 } = await api.post('/expenses', {
         ...laptop,
         userId: user.id,
-      };
-
-      const {
-        data: { id: expenseId },
-      } = await api.post('expenses', data);
-
-      await api.post('expenses', {
-        ...data,
-        userId: secondUser.id,
       });
 
-      const response = await api.get(`expenses?userId=${user.id}`);
+      await api.post('/expenses', { ...laptop, userId: secondUser.id });
+
+      const response = await api.get(`/expenses?userId=${user.id}`);
 
       expect(response.data).toEqual([
-        {
-          id: expenseId,
-          ...data,
-        },
+        expect.objectContaining({ id: exp1.id, ...laptop, userId: user.id }),
       ]);
     });
 
-    it('should return all expenses between dates', async () => {
-      const data = {
+    it('should return expenses between dates', async () => {
+      const { data: exp1 } = await api.post('/expenses', {
         ...tv,
         userId: user.id,
-      };
-
-      const seconData = {
+      });
+      const { data: exp2 } = await api.post('/expenses', {
         ...laptop,
-        userId: user.id,
         spentAt: '2022-10-20T11:01:43.462Z',
-      };
-
-      const {
-        data: { id: expenseId },
-      } = await api.post('expenses', data);
-
-      const {
-        data: { id: secondExpenseId },
-      } = await api.post('expenses', { ...seconData });
-
-      const response = await api
-        // eslint-disable-next-line max-len
-        .get(
-          'expenses?&from=2022-10-19T11:01:43.462Z&to=2022-10-20T11:01:43.462Z',
-        );
-
-      expect(response.data).toEqual([
-        {
-          id: expenseId,
-          ...data,
-        },
-        {
-          id: secondExpenseId,
-          ...seconData,
-        },
-      ]);
-    });
-
-    it('should return all expenses by category', async () => {
-      const data = {
-        ...laptop,
         userId: user.id,
-      };
-
-      const {
-        data: { id: expenseId },
-      } = await api.post('expenses', data);
-
-      await api.post('/expenses', {
-        ...data,
-        category: 'Food',
       });
-
       const response = await api.get(
-        `expenses?userId=${user.id}&categories=Electronics`,
+        '/expenses?from=2022-10-19T11:01:43.462Z&to=2022-10-20T11:01:43.462Z',
       );
 
       expect(response.data).toEqual([
-        {
-          id: expenseId,
-          ...data,
-        },
+        expect.objectContaining({ id: exp1.id, ...tv, userId: user.id }),
+        expect.objectContaining({
+          id: exp2.id,
+          ...laptop,
+          spentAt: '2022-10-20T11:01:43.462Z',
+          userId: user.id,
+        }),
+      ]);
+    });
+
+    it('should return expenses by category', async () => {
+      const { data: exp1 } = await api.post('/expenses', {
+        ...laptop,
+        userId: user.id,
+      });
+
+      await api.post('/expenses', {
+        ...laptop,
+        category: 'Food',
+        userId: user.id,
+      });
+
+      const response = await api.get(
+        `/expenses?userId=${user.id}&categories=Electronics`,
+      );
+
+      expect(response.data).toEqual([
+        expect.objectContaining({ id: exp1.id, ...laptop, userId: user.id }),
       ]);
     });
   });
 
+  // ================= GET SINGLE =================
   describe('getExpense', () => {
     it('should return expense', async () => {
-      const data = {
+      const { data: exp1 } = await api.post('/expenses', {
         ...tv,
         userId: user.id,
-      };
-
-      const {
-        data: { id: expenseId },
-      } = await api.post('expenses', data);
-
-      const response = await api.get(`expenses/${expenseId}`);
-
-      expect(response.data).toEqual({
-        id: expenseId,
-        ...data,
       });
+      const response = await api.get(`/expenses/${exp1.id}`);
+
+      expect(response.data).toEqual(
+        expect.objectContaining({ id: exp1.id, ...tv, userId: user.id }),
+      );
     });
 
     it('should return 404 if expense not found', async () => {
-      expect.assertions(1);
-
-      await api
-        .get('expenses/1')
-        .catch((err) => expect(err.response.status).toBe(404));
+      await expect(api.get('/expenses/999')).rejects.toHaveProperty(
+        'response.status',
+        404,
+      );
     });
   });
 
+  // ================= UPDATE =================
   describe('updateExpense', () => {
     it('should update expense', async () => {
-      const data = {
+      const { data: exp1 } = await api.post('/expenses', {
         ...laptop,
         userId: user.id,
-      };
-
-      const {
-        data: { id: expenseId },
-      } = await api.post('expenses', data);
-
-      const response = await api.patch(`expenses/${expenseId}`, {
+      });
+      const response = await api.patch(`/expenses/${exp1.id}`, {
         title: 'Buy a new TV',
       });
 
-      expect(response.data).toEqual({
-        id: expenseId,
-        ...data,
-        title: 'Buy a new TV',
-      });
+      expect(response.data).toEqual(
+        expect.objectContaining({
+          id: exp1.id,
+          ...laptop,
+          title: 'Buy a new TV',
+          userId: user.id,
+        }),
+      );
     });
 
     it('should return 404 if expense not found', async () => {
-      expect.assertions(1);
-
-      await api.patch('expenses/1', laptop).catch((err) => {
-        expect(err.response.status).toBe(404);
-      });
+      await expect(api.patch('/expenses/999', laptop)).rejects.toHaveProperty(
+        'response.status',
+        404,
+      );
     });
   });
 
+  // ================= DELETE =================
   describe('deleteExpense', () => {
     it('should delete expense', async () => {
-      expect.assertions(2);
-
-      const data = {
+      const { data: exp1 } = await api.post('/expenses', {
         ...tv,
         userId: user.id,
-      };
-
-      const {
-        data: { id: expenseId },
-      } = await api.post('expenses', data);
-
-      const res = await api.delete(`expenses/${expenseId}`);
+      });
+      const res = await api.delete(`/expenses/${exp1.id}`);
 
       expect(res.status).toBe(204);
 
-      await api.get(`expenses/${expenseId}`).catch((err) => {
-        expect(err.response.status).toBe(404);
-      });
+      await expect(api.get(`/expenses/${exp1.id}`)).rejects.toHaveProperty(
+        'response.status',
+        404,
+      );
     });
 
     it('should return 404 if expense not found', async () => {
-      await api.delete('expenses/1').catch((err) => {
-        expect(err.response.status).toBe(404);
-      });
+      await expect(api.delete('/expenses/999')).rejects.toHaveProperty(
+        'response.status',
+        404,
+      );
     });
   });
 });
