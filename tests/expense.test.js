@@ -35,7 +35,7 @@ describe('Expense', () => {
     note: 'I need a new TV',
   };
 
-  const HOST = 'http://localhost:7080/';
+  const HOST = 'http://localhost:5432/';
 
   beforeAll(async () => {
     await sequelize.sync({ force: true });
@@ -56,7 +56,7 @@ describe('Expense', () => {
   beforeEach(async () => {
     server = createServer();
 
-    serverInstance = server.listen(7080, () => {
+    serverInstance = server.listen(5432, () => {
       // eslint-disable-next-line no-console
       console.log(HOST);
     });
