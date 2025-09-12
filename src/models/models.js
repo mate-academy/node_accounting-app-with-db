@@ -55,8 +55,6 @@ Category.hasMany(Expense, { foreignKey: 'categoryId', onDelete: 'CASCADE' });
 Expense.belongsTo(Category, { foreignKey: 'categoryId' });
 
 module.exports = {
+  models: { User, Expense, Category },
   sequelize,
-  User,
-  Expense,
-  Category,
 };
