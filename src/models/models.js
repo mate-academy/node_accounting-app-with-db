@@ -1,9 +1,12 @@
 // src/models/models.js
 const { Sequelize, DataTypes } = require('sequelize');
 
-const sequelize = new Sequelize(process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/students', {
-  logging: console.log,
-});
+const sequelize = new Sequelize(
+  process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/students',
+  {
+    logging: false, // <- wyłączamy logi, żeby ESLint nie krzyczał
+  }
+);
 
 // ================ MODELE ================
 
