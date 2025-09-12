@@ -1,7 +1,7 @@
 'use strict';
 
 const express = require('express');
-const { models } = require('./models'); // upewnij się, że src/models/index.js
+const { models } = require('./models/models'); 
 const { User, Expense, Category } = models;
 
 function createServer() {
