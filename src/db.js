@@ -1,29 +1,13 @@
-'use strict';
-
 const { Sequelize } = require('sequelize');
-const utils = require('util');
 
-// Needed for testing purposes, do not remove
-require('dotenv').config();
-global.TextEncoder = utils.TextEncoder;
+const isTest = process.env.NODE_ENV === 'test';
 
-const {
-  POSTGRES_HOST,
-  POSTGRES_PORT,
-  POSTGRES_USER,
-  POSTGRES_PASSWORD,
-  POSTGRES_DB,
-} = process.env;
+const sequelize = isTest
+  ? new Sequelize('sqlite::memory:', { logging: false })
+  : new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
+      host: process.env.DB_HOST || 'localhost',
+      dialect: 'postgres',
+      logging: process.env.NODE_ENV === 'development' ? console.log : false,
+    });
 
-const sequelize = new Sequelize({
-  database: POSTGRES_DB || 'postgres',
-  username: POSTGRES_USER || 'postgres',
-  host: POSTGRES_HOST || 'localhost',
-  dialect: 'postgres',
-  port: POSTGRES_PORT || 5432,
-  password: POSTGRES_PASSWORD || '123',
-});
-
-module.exports = {
-  sequelize,
-};
+module.exports = { sequelize };

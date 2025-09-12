@@ -1,60 +1,39 @@
-// src/models/models.js
 const { Sequelize, DataTypes } = require('sequelize');
 
-const sequelize = new Sequelize(
-  process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/students',
-  {
-    logging: false, // <- wyłączamy logi, żeby ESLint nie krzyczał
-  }
-);
+const isTest = process.env.NODE_ENV === 'test';
 
-// ================ MODELE ================
+const sequelize = isTest
+  ? new Sequelize('sqlite::memory:', { logging: false }) // dla testów
+  : new Sequelize(process.env.DATABASE_URL || 'postgres://user:pass@localhost:5432/dbname', {
+      logging: console.log,
+    });
 
-// --------- User ---------
 const User = sequelize.define('User', {
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
+  name: { type: DataTypes.STRING, allowNull: false },
 });
 
-// --------- Category ---------
 const Category = sequelize.define('Category', {
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true,
-  },
+  name: { type: DataTypes.STRING, allowNull: false },
 });
 
-// --------- Expense ---------
 const Expense = sequelize.define('Expense', {
-  title: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  amount: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  spentAt: {
-    type: DataTypes.DATE,
-    allowNull: false,
-  },
-  note: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
+  amount: { type: DataTypes.FLOAT, allowNull: false },
+  description: { type: DataTypes.STRING, allowNull: true },
 });
 
-// ================ RELACJE ================
-User.hasMany(Expense, { foreignKey: 'userId', onDelete: 'CASCADE' });
-Expense.belongsTo(User, { foreignKey: 'userId' });
+// Relacje
+User.hasMany(Expense);
+Expense.belongsTo(User);
 
-Category.hasMany(Expense, { foreignKey: 'categoryId', onDelete: 'CASCADE' });
-Expense.belongsTo(Category, { foreignKey: 'categoryId' });
+Category.hasMany(Expense);
+Expense.belongsTo(Category);
+
+const initDB = async () => {
+  await sequelize.sync({ force: isTest }); // testy w pamięci = force
+};
 
 module.exports = {
   models: { User, Expense, Category },
   sequelize,
+  initDB,
 };
