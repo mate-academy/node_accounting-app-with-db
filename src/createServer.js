@@ -1,5 +1,5 @@
 const express = require('express');
-const { User, Expense, Category, sequelize } = require('./models/models');
+const { User, Expense, sequelize } = require('./models/models');
 
 // Funkcja inicjalizacji bazy
 const initDB = async () => {
