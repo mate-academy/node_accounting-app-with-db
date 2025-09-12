@@ -1,39 +1,44 @@
-const { Sequelize, DataTypes } = require('sequelize');
-
-const isTest = process.env.NODE_ENV === 'test';
-
-const sequelize = isTest
-  ? new Sequelize('sqlite::memory:', { logging: false }) // dla testów
-  : new Sequelize(process.env.DATABASE_URL || 'postgres://user:pass@localhost:5432/dbname', {
-      logging: console.log,
-    });
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../db');
 
 const User = sequelize.define('User', {
-  name: { type: DataTypes.STRING, allowNull: false },
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
 });
 
 const Category = sequelize.define('Category', {
-  name: { type: DataTypes.STRING, allowNull: false },
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
 });
 
 const Expense = sequelize.define('Expense', {
-  amount: { type: DataTypes.FLOAT, allowNull: false },
-  description: { type: DataTypes.STRING, allowNull: true },
+    description: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    amount: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+    },
 });
 
 // Relacje
-User.hasMany(Expense);
-Expense.belongsTo(User);
+User.hasMany(Expense, { foreignKey: 'userId' });
+Expense.belongsTo(User, { foreignKey: 'userId' });
 
-Category.hasMany(Expense);
-Expense.belongsTo(Category);
+Category.hasMany(Expense, { foreignKey: 'categoryId' });
+Expense.belongsTo(Category, { foreignKey: 'categoryId' });
 
-const initDB = async () => {
-  await sequelize.sync({ force: isTest }); // testy w pamięci = force
-};
+// Inicjalizacja bazy
+async function initDB() {
+    await sequelize.sync({ force: true });
+}
 
 module.exports = {
-  models: { User, Expense, Category },
-  sequelize,
-  initDB,
+    models: { User, Category, Expense },
+    initDB,
 };
