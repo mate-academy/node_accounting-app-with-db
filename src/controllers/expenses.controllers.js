@@ -1,8 +1,8 @@
 function createExpensesController(expensesService, usersService) {
-  function getAll(req, res) {
+  async function getAll(req, res) {
     const { userId, from, to, categories } = req.query;
 
-    const result = expensesService.getAll({
+    const result = await expensesService.getAll({
       userId,
       from,
       to,
@@ -12,9 +12,9 @@ function createExpensesController(expensesService, usersService) {
     res.json(result);
   }
 
-  function getById(req, res) {
+  async function getById(req, res) {
     const { id } = req.params;
-    const expense = expensesService.getById({ id });
+    const expense = await expensesService.getById({ id });
 
     if (!expense) {
       return res.sendStatus(404);
@@ -40,7 +40,7 @@ function createExpensesController(expensesService, usersService) {
       return res.sendStatus(400);
     }
 
-    const expense = expensesService.create({
+    const expense = await expensesService.create({
       userId,
       spentAt,
       title,
@@ -52,11 +52,11 @@ function createExpensesController(expensesService, usersService) {
     res.status(201).json(expense);
   }
 
-  function update(req, res) {
+  async function update(req, res) {
     const { id } = req.params;
     const { userId, spentAt, title, amount, category, note } = req.body;
 
-    const expense = expensesService.update({
+    const expense = await expensesService.update({
       id: +id,
       userId,
       spentAt,
@@ -73,14 +73,14 @@ function createExpensesController(expensesService, usersService) {
     res.status(200).json(expense);
   }
 
-  function remove(req, res) {
+  async function remove(req, res) {
     const { id } = req.params;
 
     if (!expensesService.getById({ id })) {
       return res.sendStatus(404);
     }
 
-    expensesService.remove({ id });
+    await expensesService.remove({ id });
     res.sendStatus(204);
   }
 
