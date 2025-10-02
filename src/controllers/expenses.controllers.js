@@ -76,11 +76,11 @@ function createExpensesController(expensesService, usersService) {
   async function remove(req, res) {
     const { id } = req.params;
 
-    if (!expensesService.getById({ id })) {
+    if (!(await expensesService.getById({ id }))) {
       return res.sendStatus(404);
     }
 
-    await expensesService.remove({ id });
+    expensesService.remove({ id });
     res.sendStatus(204);
   }
 

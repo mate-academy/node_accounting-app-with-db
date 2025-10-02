@@ -1,8 +1,11 @@
 function createUsersController(usersService) {
   async function getAll(req, res) {
-    const users = await usersService.getAll({
-      order: [['createdAt', 'DESC']],
-    });
+    const users = await usersService
+      .getAll
+      // {
+      //   order: [['createdAt', 'DESC']],
+      // }
+      ();
 
     res.json(users.map(usersService.normalize));
   }
@@ -54,11 +57,11 @@ function createUsersController(usersService) {
 
     const user = await usersService.getById(id);
 
-    if (!user) {
+    if (!(await user)) {
       return res.sendStatus(404);
     }
 
-    usersService.remove(id);
+    await usersService.remove(id);
 
     res.sendStatus(204);
   }
