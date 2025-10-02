@@ -80,7 +80,7 @@ function createExpensesController(expensesService, usersService) {
       return res.sendStatus(404);
     }
 
-    expensesService.remove({ id });
+    await expensesService.remove({ id });
     res.sendStatus(204);
   }
 

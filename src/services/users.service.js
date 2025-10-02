@@ -34,7 +34,7 @@ function createUsersService() {
     await User.update({ name }, { where: { id } });
 
     /// /////////////////////////////////////
-    return User.findByPk(id);
+    return User.findByPk(id).toJSON();
     /// /////////////////////////////////////
   }
 

@@ -57,7 +57,7 @@ function createUsersController(usersService) {
 
     const user = await usersService.getById(id);
 
-    if (!(await user)) {
+    if (!user) {
       return res.sendStatus(404);
     }
 
