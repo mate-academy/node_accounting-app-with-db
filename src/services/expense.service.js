@@ -35,11 +35,11 @@ async function create({ userId, title, amount, category, note }) {
 }
 
 async function remove(id) {
-  await Expense.destroy({ where: id });
+  await Expense.destroy({ where: { id } });
 }
 
 async function update({ id, userId, spentAt, title, amount, category, note }) {
-  return Expense.update(
+  const [affectedCount, affectedRows] = await Expense.update(
     {
       userId,
       spentAt,
@@ -48,8 +48,17 @@ async function update({ id, userId, spentAt, title, amount, category, note }) {
       category,
       note,
     },
-    { where: { id } },
+    {
+      where: { id },
+      returning: true,
+    },
   );
+
+  if (affectedCount === 0) {
+    throw new Error('No record found to update');
+  }
+
+  return affectedRows[0];
 }
 
 module.exports = {

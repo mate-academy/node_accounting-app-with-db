@@ -16,7 +16,7 @@ async function create(name) {
 }
 
 async function remove(id) {
-  await User.destroy({ where: id });
+  await User.destroy({ where: { id } });
 }
 
 async function update({ id, name }) {
