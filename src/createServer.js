@@ -2,7 +2,11 @@
 
 const express = require('express');
 
-const { userRouter, expenseRouter } = require('./routers/routers');
+const {
+  userRouter,
+  expenseRouter,
+  categoryRouter,
+} = require('./routers/routers');
 
 const createServer = () => {
   // your code goes here
@@ -12,6 +16,7 @@ const createServer = () => {
 
   server.use('/users', userRouter);
   server.use('/expenses', expenseRouter);
+  server.use('/categories', categoryRouter);
 
   return server;
 };
