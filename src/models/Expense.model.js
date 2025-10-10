@@ -16,17 +16,21 @@ const Expense = sequelize.define(
       type: DataTypes.UUID,
       allowNull: false,
     },
-    categories: {
-      type: DataTypes.ARRAY(DataTypes.TEXT),
+    title: {
+      type: DataTypes.STRING,
       allowNull: false,
     },
-    dateFrom: {
-      type: DataTypes.DATE,
+    amount: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
-    dateTo: {
-      type: DataTypes.DATE,
+    category: {
+      type: DataTypes.STRING,
       allowNull: false,
+    },
+    note: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {

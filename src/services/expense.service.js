@@ -62,11 +62,9 @@ async function update({ id, userId, spentAt, title, amount, category, note }) {
 }
 
 module.exports = {
-  expenseService: {
-    getAll,
-    getSingle,
-    create,
-    remove,
-    update,
-  },
+  getAll,
+  getSingle,
+  create,
+  remove,
+  update,
 };

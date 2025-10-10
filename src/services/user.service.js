@@ -24,11 +24,9 @@ async function update({ id, name }) {
 }
 
 module.exports = {
-  userService: {
-    getAll,
-    getSingle,
-    create,
-    remove,
-    update,
-  },
+  getAll,
+  getSingle,
+  create,
+  remove,
+  update,
 };

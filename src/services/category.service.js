@@ -24,11 +24,9 @@ async function update({ id, name }) {
 }
 
 module.exports = {
-  categoryService: {
-    getAll,
-    getSingle,
-    create,
-    remove,
-    update,
-  },
+  getAll,
+  getSingle,
+  create,
+  remove,
+  update,
 };

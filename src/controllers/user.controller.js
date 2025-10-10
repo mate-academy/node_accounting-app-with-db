@@ -32,7 +32,7 @@ const create = async (req, res, next) => {
       return res.sendStatus(400);
     }
 
-    const user = await userService.addUser(name);
+    const user = await userService.create(name);
 
     res.status(201).json(user);
   } catch (err) {
@@ -42,7 +42,7 @@ const create = async (req, res, next) => {
 
 const remove = async (req, res, next) => {
   try {
-    const deletedUser = await userService.removeUser(req.params.id);
+    const deletedUser = await userService.remove(req.params.id);
 
     if (!deletedUser) {
       return res.sendStatus(404);
@@ -57,13 +57,13 @@ const remove = async (req, res, next) => {
 const update = async (req, res, next) => {
   try {
     const { name } = req.body;
-    const user = await userService.getSingleUser(req.params.id);
+    const user = await userService.getSingle(req.params.id);
 
     if (!user) {
       return res.sendStatus(404);
     }
 
-    const updatedUser = await userService.updateUser({
+    const updatedUser = await userService.update({
       id: req.params.id,
       name,
     });
