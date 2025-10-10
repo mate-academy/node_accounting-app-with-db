@@ -6,7 +6,7 @@ const expenseRouter = Router();
 expenseRouter.get(`/`, expensesController.getAll);
 expenseRouter.get(`/:id`, expensesController.getSingle);
 expenseRouter.post(`/`, expensesController.create);
-expenseRouter.delete(`/:id`, expensesController.deleteExpense);
+expenseRouter.delete(`/:id`, expensesController.remove);
 expenseRouter.patch(`/:id`, expensesController.update);
 
 module.exports = {

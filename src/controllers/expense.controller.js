@@ -3,7 +3,7 @@ const { expenseService } = require('../services/services');
 const getAll = async (req, res) => {
   const { userId, categories, dateFrom, dateTo } = req.query;
 
-  const expenses = await expenseService.getAllExpenses(
+  const expenses = await expenseService.getAll(
     userId,
     categories,
     dateFrom,
@@ -14,7 +14,7 @@ const getAll = async (req, res) => {
 };
 
 const getSingle = async (req, res) => {
-  const exp = await expenseService.getSingleExpense(req.params.id);
+  const exp = await expenseService.getSingle(req.params.id);
 
   if (!exp) {
     return res.sendStatus(404);
@@ -36,7 +36,7 @@ const create = async (req, res) => {
     return res.sendStatus(400);
   }
 
-  const exp = await expenseService.addExpense({
+  const exp = await expenseService.create({
     userId,
     title,
     amount,
@@ -47,8 +47,8 @@ const create = async (req, res) => {
   res.status(201).json(exp);
 };
 
-const deleteExpense = async (req, res) => {
-  const deletedExpense = await expenseService.removeExpense(req.params.id);
+const remove = async (req, res) => {
+  const deletedExpense = await expenseService.remove(req.params.id);
 
   if (!deletedExpense) {
     return res.sendStatus(404);
@@ -59,13 +59,13 @@ const deleteExpense = async (req, res) => {
 
 const update = async (req, res) => {
   const { userId, title, amount, category, note } = req.body;
-  const exp = await expenseService.getSingleExpense(req.params.id);
+  const exp = await expenseService.getSingle(req.params.id);
 
   if (!exp) {
     return res.sendStatus(404);
   }
 
-  const updatedExpense = await expenseService.updateExpense({
+  const updatedExpense = await expenseService.update({
     id: req.params.id,
     userId,
     title,
@@ -82,7 +82,7 @@ module.exports = {
     getAll,
     getSingle,
     create,
-    deleteExpense,
+    remove,
     update,
   },
 };

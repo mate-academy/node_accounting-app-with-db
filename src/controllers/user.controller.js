@@ -28,7 +28,7 @@ const create = async (req, res) => {
   res.status(201).json(user);
 };
 
-const deleteUser = async (req, res) => {
+const remove = async (req, res) => {
   const deletedUser = await userService.removeUser(req.params.id);
 
   if (!deletedUser) {
@@ -59,7 +59,7 @@ module.exports = {
     getAll,
     getSingle,
     create,
-    deleteUser,
+    remove,
     update,
   },
 };

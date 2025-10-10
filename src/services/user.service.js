@@ -1,34 +1,34 @@
 const { v4: uuidv4 } = require('uuid');
 const { User } = require('../models/models');
 
-async function getAllUsers() {
+async function getAll() {
   return User.findAll();
 }
 
-async function getSingleUser(id) {
+async function getSingle(id) {
   return User.findByPk(id);
 }
 
-async function addUser(name) {
+async function create(name) {
   const id = uuidv4();
 
   return User.create({ id, name });
 }
 
-async function removeUser(id) {
+async function remove(id) {
   await User.destroy({ where: id });
 }
 
-async function updateUser({ id, name }) {
-  return User.update({ name }, { where: id });
+async function update({ id, name }) {
+  return User.update({ name }, { where: { id } });
 }
 
 module.exports = {
   userService: {
-    getAllUsers,
-    getSingleUser,
-    addUser,
-    removeUser,
-    updateUser,
+    getAll,
+    getSingle,
+    create,
+    remove,
+    update,
   },
 };

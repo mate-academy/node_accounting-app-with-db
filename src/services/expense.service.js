@@ -2,7 +2,7 @@ const { v4: uuidv4 } = require('uuid');
 const { Op } = require('sequelize');
 const { Expense } = require('../models/models');
 
-async function getAllExpenses(userId, categories, dateFrom, dateTo) {
+async function getAll(userId, categories, dateFrom, dateTo) {
   return Expense.findAll({
     where: {
       userId: userId,
@@ -15,11 +15,11 @@ async function getAllExpenses(userId, categories, dateFrom, dateTo) {
   });
 }
 
-async function getSingleExpense(id) {
+async function getSingle(id) {
   return Expense.findByPk(id);
 }
 
-async function addExpense({ userId, title, amount, category, note }) {
+async function create({ userId, title, amount, category, note }) {
   const date = new Date();
   const id = uuidv4();
 
@@ -34,19 +34,11 @@ async function addExpense({ userId, title, amount, category, note }) {
   });
 }
 
-async function removeExpense(id) {
+async function remove(id) {
   await Expense.destroy({ where: id });
 }
 
-async function updateExpense({
-  id,
-  userId,
-  spentAt,
-  title,
-  amount,
-  category,
-  note,
-}) {
+async function update({ id, userId, spentAt, title, amount, category, note }) {
   return Expense.update(
     {
       userId,
@@ -56,16 +48,16 @@ async function updateExpense({
       category,
       note,
     },
-    { where: id },
+    { where: { id } },
   );
 }
 
 module.exports = {
   expenseService: {
-    getAllExpenses,
-    getSingleExpense,
-    addExpense,
-    removeExpense,
-    updateExpense,
+    getAll,
+    getSingle,
+    create,
+    remove,
+    update,
   },
 };

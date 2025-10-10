@@ -1,7 +1,7 @@
 'use strict';
 
-const expenseController = require('../controllers/expense.controller');
-const userController = require('../controllers/user.controller');
+const { userController } = require('../controllers/user.controller');
+const { expenseController } = require('../controllers/expense.controller');
 
 module.exports = {
   userController,
