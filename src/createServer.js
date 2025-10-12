@@ -14,6 +14,10 @@ const createServer = () => {
   app.use('/users', usersRouter);
   app.use('/expenses', expensesRouter);
 
+  app.use((err, req, res, next) => {
+    res.status(500).json({ message: err.message || 'Internal server error' });
+  });
+
   return app;
 };
 

@@ -9,6 +9,11 @@ const Expense = sequelize.define(
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      // references: {
+      //   model: 'users',
+      //   key: 'id',
+      // },
+      // onDelete: 'CASCADE',
     },
     spentAt: {
       type: DataTypes.DATE,
