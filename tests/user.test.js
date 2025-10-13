@@ -11,15 +11,12 @@ const { createServer } = require('../src/createServer');
 const { sequelize } = require('../src/db');
 const { Agent } = require('http');
 
-// this prevents `socket hang up` for Node.js 20.10+
 axios.defaults.httpAgent = new Agent({ keepAlive: false });
 
 describe('User', () => {
   let server;
   let serverInstance;
   let api;
-
-  const HOST = 'http://localhost:7080/';
 
   beforeAll(async () => {
     try {
@@ -28,32 +25,32 @@ describe('User', () => {
       console.log(err);
     }
 
+    server = createServer();
+    serverInstance = server.listen(0);
+
+    const port = serverInstance.address().port;
+    const HOST = `http://localhost:${port}/`;
+
     api = axios.create({
       baseURL: HOST,
       httpsAgent: new https.Agent({
         rejectUnauthorized: false,
       }),
     });
-  }, 7000);
 
-  beforeEach(async () => {
-    server = createServer();
-
-    serverInstance = server.listen(7080, () => {
-      console.log(HOST);
-    });
-
-    await User.destroy({ truncate: true });
-  });
-
-  afterEach(async () => {
-    if (serverInstance) {
-      await serverInstance.close();
-    }
+    console.log('Test server running at', HOST);
   });
 
   afterAll(async () => {
+    if (serverInstance) {
+      await serverInstance.close();
+    }
     await sequelize.close();
+  });
+
+  beforeEach(async () => {
+    await User.destroy({ truncate: true });
+    await User.destroy({ where: {} });
   });
 
   describe('createUser', () => {
