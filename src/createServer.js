@@ -29,17 +29,17 @@ function createServer() {
       const user = await User.create({ name: trimmed });
 
       res.status(201).json(user);
-    } catch {
+    } catch (err) {
       res.status(500).json({ error: 'Server error' });
     }
   });
 
-  app.get('/users', async (req, res) => {
+  app.get('/users', async (_req, res) => {
     try {
       const users = await User.findAll();
 
       res.json(users);
-    } catch {
+    } catch (err) {
       res.status(500).json({ error: 'Server error' });
     }
   });
@@ -52,7 +52,7 @@ function createServer() {
         return res.status(404).json({ error: 'User not found' });
       }
       res.json(user);
-    } catch {
+    } catch (err) {
       res.status(500).json({ error: 'Server error' });
     }
   });
@@ -75,7 +75,7 @@ function createServer() {
 
       await user.save();
       res.json(user);
-    } catch {
+    } catch (err) {
       res.status(500).json({ error: 'Server error' });
     }
   });
@@ -88,7 +88,7 @@ function createServer() {
         return res.status(404).json({ error: 'User not found' });
       }
       res.status(204).end();
-    } catch {
+    } catch (err) {
       res.status(500).json({ error: 'Server error' });
     }
   });
@@ -99,7 +99,12 @@ function createServer() {
       const where = {};
 
       if (userId) {
-        where.userId = userId;
+        const id = Number(userId);
+
+        if (!Number.isInteger(id) || id <= 0) {
+          return res.status(400).json({ error: 'Invalid userId' });
+        }
+        where.userId = id;
       }
 
       if (from || to) {
@@ -125,7 +130,7 @@ function createServer() {
       const expenses = await Expense.findAll({ where });
 
       res.json(expenses);
-    } catch {
+    } catch (err) {
       res.status(500).json({ error: 'Server error' });
     }
   });
@@ -135,7 +140,7 @@ function createServer() {
       const { userId, spentAt, title, amount, category, note } = req.body || {};
       const parsedUserId = Number(userId);
 
-      if (!parsedUserId || parsedUserId <= 0) {
+      if (!Number.isInteger(parsedUserId) || parsedUserId <= 0) {
         return res.status(400).json({ error: 'Invalid userId' });
       }
 
@@ -168,7 +173,7 @@ function createServer() {
       const expense = await Expense.create(expenseData);
 
       res.status(201).json(expense);
-    } catch {
+    } catch (err) {
       res.status(500).json({ error: 'Server error' });
     }
   });
@@ -181,7 +186,7 @@ function createServer() {
         return res.status(404).json({ error: 'Expense not found' });
       }
       res.json(expense);
-    } catch {
+    } catch (err) {
       res.status(500).json({ error: 'Server error' });
     }
   });
@@ -194,14 +199,38 @@ function createServer() {
         return res.status(404).json({ error: 'Expense not found' });
       }
 
-      const fields = ['spentAt', 'title', 'amount', 'category', 'note'];
+      const { spentAt, title, amount, category, note } = req.body || {};
       let updated = false;
 
-      for (const field of fields) {
-        if (req.body[field] !== undefined) {
-          expense[field] = req.body[field];
-          updated = true;
+      if (spentAt !== undefined) {
+        expense.spentAt = new Date(spentAt);
+        updated = true;
+      }
+
+      if (title !== undefined) {
+        if (typeof title !== 'string' || title.trim() === '') {
+          return res.status(400).json({ error: 'Invalid title' });
         }
+        expense.title = title.trim();
+        updated = true;
+      }
+
+      if (amount !== undefined) {
+        if (typeof amount !== 'number') {
+          return res.status(400).json({ error: 'Invalid amount' });
+        }
+        expense.amount = amount;
+        updated = true;
+      }
+
+      if (category !== undefined) {
+        expense.category = category;
+        updated = true;
+      }
+
+      if (note !== undefined) {
+        expense.note = note;
+        updated = true;
       }
 
       if (!updated) {
@@ -212,7 +241,7 @@ function createServer() {
 
       await expense.save();
       res.json(expense);
-    } catch {
+    } catch (err) {
       res.status(500).json({ error: 'Server error' });
     }
   });
@@ -225,17 +254,17 @@ function createServer() {
         return res.status(404).json({ error: 'Expense not found' });
       }
       res.status(204).end();
-    } catch {
+    } catch (err) {
       res.status(500).json({ error: 'Server error' });
     }
   });
 
-  app.get('/categories', async (req, res) => {
+  app.get('/categories', async (_req, res) => {
     try {
       const categories = await Category.findAll();
 
       res.json(categories);
-    } catch {
+    } catch (err) {
       res.status(500).json({ error: 'Server error' });
     }
   });
@@ -244,11 +273,15 @@ function createServer() {
     try {
       const { name } = req.body || {};
 
-      if (typeof name !== 'string' || name.trim() === '') {
-        return res.status(400).json({ error: 'Name is required' });
+      if (typeof name !== 'string') {
+        return res.status(400).json({ error: 'Name must be a string' });
       }
 
       const trimmed = name.trim();
+
+      if (trimmed === '') {
+        return res.status(400).json({ error: 'Name cannot be empty' });
+      }
 
       const category = await Category.create({ name: trimmed });
 
@@ -269,7 +302,7 @@ function createServer() {
         return res.status(404).json({ error: 'Not found' });
       }
       res.json(category);
-    } catch {
+    } catch (err) {
       res.status(500).json({ error: 'Server error' });
     }
   });
@@ -292,7 +325,7 @@ function createServer() {
 
       await category.save();
       res.json(category);
-    } catch {
+    } catch (err) {
       res.status(500).json({ error: 'Server error' });
     }
   });
@@ -307,7 +340,7 @@ function createServer() {
         return res.status(404).json({ error: 'Not found' });
       }
       res.status(204).end();
-    } catch {
+    } catch (err) {
       res.status(500).json({ error: 'Server error' });
     }
   });
