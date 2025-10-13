@@ -14,39 +14,23 @@ function createServer() {
 
   app.post('/users', async (req, res) => {
     try {
-      // Verifica se req.body existe e é um objeto
-      if (!req.body || typeof req.body !== 'object') {
-        return res.status(400).json({ message: 'Invalid request body' });
-      }
-
-      const { name } = req.body;
-
-      // Validação passo a passo
-      if (name === undefined) {
-        return res.status(400).json({ message: 'Name field is required' });
-      }
-
-      if (name === null) {
-        return res.status(400).json({ message: 'Name cannot be null' });
-      }
+      const { name } = req.body || {};
 
       if (typeof name !== 'string') {
-        return res.status(400).json({ message: 'Name must be a string' });
+        return res.status(400).json({ error: 'Name must be a string' });
       }
 
-      const trimmedName = name.trim();
+      const trimmed = name.trim();
 
-      if (trimmedName === '') {
-        return res.status(400).json({
-          message: 'Name cannot be empty or only whitespace',
-        });
+      if (trimmed === '') {
+        return res.status(400).json({ error: 'Name cannot be empty' });
       }
 
-      const newUser = await User.create({ name: trimmedName });
+      const user = await User.create({ name: trimmed });
 
-      res.status(201).json(newUser);
-    } catch (error) {
-      res.status(500).json({ message: 'Server error' });
+      res.status(201).json(user);
+    } catch {
+      res.status(500).json({ error: 'Server error' });
     }
   });
 
@@ -55,8 +39,8 @@ function createServer() {
       const users = await User.findAll();
 
       res.json(users);
-    } catch (error) {
-      res.status(500).json({ message: 'Server error' });
+    } catch {
+      res.status(500).json({ error: 'Server error' });
     }
   });
 
@@ -65,69 +49,47 @@ function createServer() {
       const user = await User.findByPk(req.params.id);
 
       if (!user) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(404).json({ error: 'User not found' });
       }
       res.json(user);
-    } catch (error) {
-      res.status(500).json({ message: 'Server error' });
+    } catch {
+      res.status(500).json({ error: 'Server error' });
     }
   });
 
   app.patch('/users/:id', async (req, res) => {
     try {
-      // Verifica se req.body existe
-      if (!req.body || typeof req.body !== 'object') {
-        return res.status(400).json({ message: 'Invalid request body' });
-      }
-
-      const { name } = req.body;
-
-      // A mesma validação robusta
-      if (name === undefined) {
-        return res.status(400).json({ message: 'Name field is required' });
-      }
-
-      if (name === null) {
-        return res.status(400).json({ message: 'Name cannot be null' });
-      }
-
-      if (typeof name !== 'string') {
-        return res.status(400).json({ message: 'Name must be a string' });
-      }
-
-      const trimmedName = name.trim();
-
-      if (trimmedName === '') {
-        return res.status(400).json({
-          message: 'Name cannot be empty or only whitespace',
-        });
-      }
-
+      const { name } = req.body || {};
       const user = await User.findByPk(req.params.id);
 
       if (!user) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(404).json({ error: 'User not found' });
       }
 
-      user.name = trimmedName;
-      await user.save();
+      if (name !== undefined) {
+        if (typeof name !== 'string' || name.trim() === '') {
+          return res.status(400).json({ error: 'Invalid name' });
+        }
+        user.name = name.trim();
+      }
 
+      await user.save();
       res.json(user);
-    } catch (error) {
-      res.status(500).json({ message: 'Server error' });
+    } catch {
+      res.status(500).json({ error: 'Server error' });
     }
   });
 
   app.delete('/users/:id', async (req, res) => {
     try {
-      const deletedCount = await User.destroy({ where: { id: req.params.id } });
+      const deleted = await User.destroy({ where: { id: req.params.id } });
 
-      if (deletedCount === 0) {
-        return res.status(404).json({ message: 'User not found' });
+      if (!deleted) {
+        return res.status(404).json({ error: 'User not found' });
       }
-      res.status(204).send();
-    } catch (error) {
-      res.status(500).json({ message: 'Server error' });
+      res.status(204).end();
+    } catch {
+      res.status(500).json({ error: 'Server error' });
     }
   });
 
@@ -163,52 +125,51 @@ function createServer() {
       const expenses = await Expense.findAll({ where });
 
       res.json(expenses);
-    } catch (error) {
-      res.status(500).json({ message: 'Server error' });
+    } catch {
+      res.status(500).json({ error: 'Server error' });
     }
   });
 
   app.post('/expenses', async (req, res) => {
-    const { userId, spentAt, title, amount, category, note } = req.body;
-
-    const parsedUserId = Number(userId);
-
-    if (isNaN(parsedUserId) || parsedUserId <= 0) {
-      return res.status(400).json({ message: 'Invalid userId' });
-    }
-
-    if (
-      typeof spentAt !== 'string' ||
-      typeof title !== 'string' ||
-      title.trim() === '' ||
-      typeof amount !== 'number'
-    ) {
-      return res
-        .status(400)
-        .json({ message: 'Missing or invalid required fields' });
-    }
-
     try {
-      const user = await User.findByPk(userId);
+      const { userId, spentAt, title, amount, category, note } = req.body || {};
+      const parsedUserId = Number(userId);
+
+      if (!parsedUserId || parsedUserId <= 0) {
+        return res.status(400).json({ error: 'Invalid userId' });
+      }
+
+      if (
+        typeof spentAt !== 'string' ||
+        typeof title !== 'string' ||
+        title.trim() === '' ||
+        typeof amount !== 'number'
+      ) {
+        return res
+          .status(400)
+          .json({ error: 'Missing or invalid required fields' });
+      }
+
+      const user = await User.findByPk(parsedUserId);
 
       if (!user) {
-        return res.status(400).json({ message: 'User not found' });
+        return res.status(400).json({ error: 'User not found' });
       }
 
       const expenseData = {
-        userId,
+        userId: parsedUserId,
         spentAt: new Date(spentAt),
-        title,
+        title: title.trim(),
         amount,
         category: category || null,
         note: note || null,
       };
 
-      const newExpense = await Expense.create(expenseData);
+      const expense = await Expense.create(expenseData);
 
-      res.status(201).json(newExpense);
-    } catch (error) {
-      res.status(500).json({ message: 'Server error' });
+      res.status(201).json(expense);
+    } catch {
+      res.status(500).json({ error: 'Server error' });
     }
   });
 
@@ -217,11 +178,11 @@ function createServer() {
       const expense = await Expense.findByPk(req.params.id);
 
       if (!expense) {
-        return res.status(404).json({ message: 'Expense not found' });
+        return res.status(404).json({ error: 'Expense not found' });
       }
       res.json(expense);
-    } catch (error) {
-      res.status(500).json({ message: 'Server error' });
+    } catch {
+      res.status(500).json({ error: 'Server error' });
     }
   });
 
@@ -230,36 +191,42 @@ function createServer() {
       const expense = await Expense.findByPk(req.params.id);
 
       if (!expense) {
-        return res.status(404).json({ message: 'Expense not found' });
+        return res.status(404).json({ error: 'Expense not found' });
       }
 
       const fields = ['spentAt', 'title', 'amount', 'category', 'note'];
+      let updated = false;
 
-      fields.forEach((field) => {
+      for (const field of fields) {
         if (req.body[field] !== undefined) {
           expense[field] = req.body[field];
+          updated = true;
         }
-      });
+      }
+
+      if (!updated) {
+        return res
+          .status(400)
+          .json({ error: 'No valid fields provided for update' });
+      }
 
       await expense.save();
       res.json(expense);
-    } catch (error) {
-      res.status(500).json({ message: 'Server error' });
+    } catch {
+      res.status(500).json({ error: 'Server error' });
     }
   });
 
   app.delete('/expenses/:id', async (req, res) => {
     try {
-      const deletedCount = await Expense.destroy({
-        where: { id: req.params.id },
-      });
+      const deleted = await Expense.destroy({ where: { id: req.params.id } });
 
-      if (deletedCount === 0) {
-        return res.status(404).json({ message: 'Expense not found' });
+      if (!deleted) {
+        return res.status(404).json({ error: 'Expense not found' });
       }
-      res.status(204).send();
-    } catch (error) {
-      res.status(500).json({ message: 'Server error' });
+      res.status(204).end();
+    } catch {
+      res.status(500).json({ error: 'Server error' });
     }
   });
 
@@ -267,81 +234,81 @@ function createServer() {
     try {
       const categories = await Category.findAll();
 
-      res.status(200).json(categories);
-    } catch (err) {
-      res.status(500).json({ error: 'Internal Server Error' });
+      res.json(categories);
+    } catch {
+      res.status(500).json({ error: 'Server error' });
     }
   });
 
   app.post('/categories', async (req, res) => {
-    const { name } = req.body;
-
-    if (!name) {
-      return res.status(400).json({ error: 'Name is required' });
-    }
-
     try {
-      const newCategory = await Category.create({ name });
+      const { name } = req.body || {};
 
-      res.status(201).json(newCategory);
+      if (typeof name !== 'string' || name.trim() === '') {
+        return res.status(400).json({ error: 'Name is required' });
+      }
+
+      const trimmed = name.trim();
+
+      const category = await Category.create({ name: trimmed });
+
+      res.status(201).json(category);
     } catch (err) {
-      res.status(500).json({ error: 'Internal Server Error' });
+      if (err.name === 'SequelizeUniqueConstraintError') {
+        return res.status(409).json({ error: 'Category name already exists' });
+      }
+      res.status(500).json({ error: 'Server error' });
     }
   });
 
   app.get('/categories/:categoryId', async (req, res) => {
-    const categoryId = req.params.categoryId;
-
     try {
-      const category = await Category.findByPk(categoryId);
+      const category = await Category.findByPk(req.params.categoryId);
 
       if (!category) {
         return res.status(404).json({ error: 'Not found' });
       }
-      res.status(200).json(category);
-    } catch (err) {
-      res.status(500).json({ error: 'Internal Server Error' });
+      res.json(category);
+    } catch {
+      res.status(500).json({ error: 'Server error' });
     }
   });
 
   app.patch('/categories/:categoryId', async (req, res) => {
-    const categoryId = req.params.categoryId;
-    const { name } = req.body;
-
-    if (!name) {
-      return res.status(400).json({ error: 'Name is required' });
-    }
-
     try {
-      const [updated] = await Category.update(
-        { name },
-        { where: { id: categoryId } },
-      );
+      const { name } = req.body || {};
+      const category = await Category.findByPk(req.params.categoryId);
 
-      if (updated === 0) {
+      if (!category) {
         return res.status(404).json({ error: 'Not found' });
       }
 
-      const updatedCategory = await Category.findByPk(categoryId);
+      if (name !== undefined) {
+        if (typeof name !== 'string' || name.trim() === '') {
+          return res.status(400).json({ error: 'Invalid name' });
+        }
+        category.name = name.trim();
+      }
 
-      res.status(200).json(updatedCategory);
-    } catch (err) {
-      res.status(500).json({ error: 'Internal Server Error' });
+      await category.save();
+      res.json(category);
+    } catch {
+      res.status(500).json({ error: 'Server error' });
     }
   });
 
   app.delete('/categories/:categoryId', async (req, res) => {
-    const categoryId = req.params.categoryId;
-
     try {
-      const deleted = await Category.destroy({ where: { id: categoryId } });
+      const deleted = await Category.destroy({
+        where: { id: req.params.categoryId },
+      });
 
       if (!deleted) {
         return res.status(404).json({ error: 'Not found' });
       }
       res.status(204).end();
-    } catch (err) {
-      res.status(500).json({ error: 'Internal Server Error' });
+    } catch {
+      res.status(500).json({ error: 'Server error' });
     }
   });
 
