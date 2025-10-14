@@ -60,13 +60,14 @@ const update = async (req, res) => {
     return res.sendStatus(400);
   }
 
-  const updatedUser = await userService.update({
+  const updated = { ...user, ...req.body };
+
+  await userService.update({
     id: userId,
-    name,
+    ...req.body,
   });
 
-  res.set('Content-type', 'application/json');
-  res.json(updatedUser);
+  res.json(updated);
 };
 
 const userController = {

@@ -23,7 +23,12 @@ const getAll = async (req, res) => {
   }
 
   if (categories) {
-    query.category = { [Op.in]: categories.split(',').map((c) => c.trim()) };
+    query.category = {
+      [Op.in]: categories
+        .split(',')
+        .map((c) => c.trim())
+        .filter(Boolean),
+    };
   }
 
   const expenses = await expenseService.getAll(query);
