@@ -24,6 +24,7 @@ const getAll = async ({ userId, from, to, categories }) => {
     where,
     attributes: { exclude: ['createdAt', 'updatedAt'] },
     order: [['id', 'ASC']],
+    raw: true,
   });
 
   return expenses;

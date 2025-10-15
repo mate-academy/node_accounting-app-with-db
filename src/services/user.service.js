@@ -23,15 +23,20 @@ const remove = async (id) => {
 };
 
 const update = async (newUser) => {
-  const user = await getById(newUser.id);
+  // const user = await getById(newUser.id);
+
+  const user = await User.findByPk(newUser.id, {
+    attributes: { exclude: ['createdAt', 'updatedAt'] },
+  });
 
   if (!user) {
     return;
   }
+  await User.update({ name: newUser.name }, { where: { id: newUser.id } });
 
-  await user.update(newUser, { fields: Object.keys(newUser) });
+  const updatedUser = await getById(newUser.id);
 
-  return { ...user.toJSON(), ...newUser };
+  return updatedUser.get({ plain: true });
 };
 
 const userService = {
