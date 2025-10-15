@@ -46,7 +46,7 @@ const create = async (req, res) => {
   const isUser = await userService.getUser(userId);
 
   if (!isUser) {
-    return res.status(400).send({ message: 'Invalid user id' });
+    return res.status(400).send({ message: 'Invalid data' });
   }
 
   const newExpense = await expenseService.createExpense({
@@ -69,7 +69,7 @@ const remove = async (req, res) => {
     return res.status(404).send({ message: 'Expense not found' });
   }
   await expenseService.deleteExpense(id);
-  res.status(204).send({ message: 'Expense deleted' });
+  res.sendStatus(204);
 };
 
 const update = async (req, res) => {

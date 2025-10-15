@@ -1,6 +1,6 @@
 const { Category } = require('../models/Category.model');
 
-Category.sync({ force: true });
+Category.sync();
 
 const getCategories = async () => {
   const result = await Category.findAll();
@@ -9,21 +9,21 @@ const getCategories = async () => {
 };
 
 const getCategory = async (id) => {
-  const category = await Category.findByPk(id);
+  const category = await Category.findByPk(+id);
 
   return category;
 };
 
 const createCategory = async ({ title, expenseId }) => {
-  const category = await Category.create({ title, expenseId });
+  const category = await Category.create({ title, expenseId: +expenseId });
 
   return category;
 };
 
 const deleteCategory = async (id) => {
-  const category = await getCategory(id);
+  const category = await getCategory(+id);
 
-  await Category.destroy({ where: { id } });
+  await Category.destroy({ where: { id: +id } });
 
   return category || null;
 };
@@ -44,9 +44,9 @@ const updateCategory = async ({ id, expenseId, title }) => {
     updateFields.title = title;
   }
 
-  await Category.update(updateFields, { where: { id } });
+  await Category.update(updateFields, { where: { id: +id } });
 
-  const updatedCategory = await getCategory(id);
+  const updatedCategory = await getCategory(+id);
 
   return updatedCategory;
 };

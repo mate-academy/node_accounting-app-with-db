@@ -1,6 +1,6 @@
 const { User } = require('../models/User.model');
 
-User.sync({ force: true });
+User.sync();
 
 const getUsers = async () => {
   const result = await User.findAll();
@@ -9,7 +9,7 @@ const getUsers = async () => {
 };
 
 const getUser = async (id) => {
-  return User.findByPk(id);
+  return User.findByPk(+id);
 };
 
 const createUser = async (name) => {
@@ -21,21 +21,21 @@ const createUser = async (name) => {
 };
 
 const deleteUser = async (id) => {
-  const user = await getUser(id);
+  const user = await getUser(+id);
 
   if (!user) {
     return null;
   }
 
-  await User.destroy({ where: { id } });
+  await User.destroy({ where: { id: +id } });
 
   return user;
 };
 
 const updateUser = async ({ id, name }) => {
-  await User.update({ name }, { where: { id } });
+  await User.update({ name }, { where: { id: +id } });
 
-  const updatedUser = await getUser(id);
+  const updatedUser = await getUser(+id);
 
   return updatedUser;
 };

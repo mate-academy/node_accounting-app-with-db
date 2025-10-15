@@ -34,7 +34,7 @@ const remove = async (req, res) => {
     return res.status(404).send({ message: 'User not found' });
   }
   await userService.deleteUser(id);
-  res.status(204).send();
+  res.sendStatus(204);
 };
 
 const update = async (req, res) => {

@@ -7,7 +7,6 @@ const get = async (req, res) => {
 
 const getById = async (req, res) => {
   const { id } = req.params;
-
   const category = await categoryService.getCategory(id);
 
   if (!category) {
@@ -32,7 +31,7 @@ const create = async (req, res) => {
   const isExpense = await expenseService.getExpense(expenseId);
 
   if (!isExpense) {
-    return res.status(400).send({ message: 'Such expense does not exist' });
+    return res.status(400).send({ message: 'Invalid data' });
   }
 
   const newCategory = await categoryService.createCategory({
@@ -50,9 +49,7 @@ const remove = async (req, res) => {
   if (!category) {
     return res.status(404).send({ message: 'Category not found' });
   }
-
   await categoryService.deleteCategory(id);
-
   res.sendStatus(204);
 };
 
@@ -66,10 +63,8 @@ const update = async (req, res) => {
   }
 
   if (
-    typeof expenseId !== 'number' ||
-    !expenseId ||
-    typeof title !== 'string' ||
-    !title
+    (expenseId !== undefined && typeof expenseId !== 'number') ||
+    (title !== undefined && typeof title !== 'string')
   ) {
     return res.status(400).send({ message: 'Invalid data' });
   }

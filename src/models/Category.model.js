@@ -16,12 +16,12 @@ const Category = sequelize.define(
       allowNull: false,
     },
     title: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: false,
     },
   },
   {
-    tableName: 'category',
+    tableName: 'categories',
     createdAt: false,
     updatedAt: false,
   },

@@ -1,7 +1,7 @@
 const { Op } = require('sequelize');
 const { Expense } = require('../models/Expense.model');
 
-Expense.sync({ force: true });
+Expense.sync();
 
 const getExpenses = async ({ categories, userId, from, to }) => {
   const where = {};
@@ -11,7 +11,7 @@ const getExpenses = async ({ categories, userId, from, to }) => {
   }
 
   if (userId) {
-    where.userId = userId;
+    where.userId = +userId;
   }
 
   if (from || to) {
@@ -31,7 +31,7 @@ const getExpenses = async ({ categories, userId, from, to }) => {
   return result;
 };
 const getExpense = async (id) => {
-  const result = await Expense.findByPk(id);
+  const result = await Expense.findByPk(+id);
 
   return result;
 };
@@ -45,7 +45,7 @@ const createExpense = async ({
   note,
 }) => {
   const expense = await Expense.create({
-    userId,
+    userId: +userId,
     spentAt,
     title,
     amount,
@@ -57,9 +57,9 @@ const createExpense = async ({
 };
 
 const deleteExpense = async (id) => {
-  const expense = await getExpense(id);
+  const expense = await getExpense(+id);
 
-  await Expense.destroy({ where: { id } });
+  await Expense.destroy({ where: { id: +id } });
 
   return expense;
 };
@@ -72,7 +72,7 @@ const updateExpense = async ({
   category,
   note,
 }) => {
-  const expenseToUpdate = await getExpense(id);
+  const expenseToUpdate = await getExpense(+id);
 
   if (!expenseToUpdate) {
     return null;
@@ -88,7 +88,7 @@ const updateExpense = async ({
     updateFields.note = note;
   }
 
-  if (amount !== undefined) {
+  if (amount !== undefined && amount > 0) {
     updateFields.amount = amount;
   }
 
@@ -100,9 +100,9 @@ const updateExpense = async ({
     updateFields.spentAt = spentAt;
   }
 
-  await Expense.update(updateFields, { where: { id } });
+  await Expense.update(updateFields, { where: { id: +id } });
 
-  const updatedExpense = await getExpense(id);
+  const updatedExpense = await getExpense(+id);
 
   return updatedExpense;
 };
