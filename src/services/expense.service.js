@@ -1,6 +1,8 @@
 const { Op } = require('sequelize');
 const { Expense } = require('../models/Expense.model');
 
+Expense.sync({ force: true });
+
 const getExpenses = async ({ categories, userId, from, to }) => {
   const where = {};
 
@@ -55,7 +57,7 @@ const createExpense = async ({
 };
 
 const deleteExpense = async (id) => {
-  const expense = await Expense.findByPk(id);
+  const expense = await getExpense(id);
 
   await Expense.destroy({ where: { id } });
 

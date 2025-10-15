@@ -1,0 +1,30 @@
+'use strict';
+
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../db.js');
+
+const Category = sequelize.define(
+  'Category',
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    expenseId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    title: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+  },
+  {
+    tableName: 'category',
+    createdAt: false,
+    updatedAt: false,
+  },
+);
+
+module.exports = { Category };

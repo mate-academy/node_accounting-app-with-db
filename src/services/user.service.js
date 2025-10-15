@@ -1,5 +1,7 @@
 const { User } = require('../models/User.model');
 
+User.sync({ force: true });
+
 const getUsers = async () => {
   const result = await User.findAll();
 
@@ -19,7 +21,7 @@ const createUser = async (name) => {
 };
 
 const deleteUser = async (id) => {
-  const user = await User.findByPk(id);
+  const user = await getUser(id);
 
   if (!user) {
     return null;
@@ -33,7 +35,7 @@ const deleteUser = async (id) => {
 const updateUser = async ({ id, name }) => {
   await User.update({ name }, { where: { id } });
 
-  const updatedUser = await User.findByPk(id);
+  const updatedUser = await getUser(id);
 
   return updatedUser;
 };

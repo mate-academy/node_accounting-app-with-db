@@ -1,5 +1,5 @@
 const express = require('express');
-const expensesController = require('../controllers/expenses.controller.js');
+const expensesController = require('../controllers/expenses.controller');
 const router = express.Router();
 
 router.get('/', expensesController.get);
