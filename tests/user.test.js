@@ -50,7 +50,6 @@ describe('User', () => {
 
   beforeEach(async () => {
     await User.destroy({ truncate: true });
-    await User.destroy({ where: {} });
   });
 
   describe('createUser', () => {

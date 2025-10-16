@@ -1,37 +1,15 @@
 const { expenseService } = require('../services/expense.service');
 const { userService } = require('../services/user.service');
-const { Op } = require('sequelize');
 
 const getAll = async (req, res) => {
   const { userId, from, to, categories } = req.query;
-  const query = {};
 
-  if (userId) {
-    query.userId = parseInt(userId);
-  }
-
-  if (from || to) {
-    query.spentAt = {};
-  }
-
-  if (from) {
-    query.spentAt[Op.gte] = new Date(from);
-  }
-
-  if (to) {
-    query.spentAt[Op.lte] = new Date(to);
-  }
-
-  if (categories) {
-    query.category = {
-      [Op.in]: categories
-        .split(',')
-        .map((c) => c.trim())
-        .filter(Boolean),
-    };
-  }
-
-  const expenses = await expenseService.getAll(query);
+  const expenses = await expenseService.getAll({
+    userId,
+    from,
+    to,
+    categories,
+  });
 
   res.status(200).json(expenses);
 };

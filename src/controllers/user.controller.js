@@ -47,7 +47,8 @@ const remove = async (req, res) => {
 };
 
 const update = async (req, res) => {
-  const userId = parseInt(req.params.id);
+  const userId = parseInt(req.params.id, 10);
+
   const user = await userService.getById(userId);
 
   if (!user) {
@@ -60,11 +61,9 @@ const update = async (req, res) => {
     return res.sendStatus(400);
   }
 
-  const updated = { ...user, ...req.body };
-
-  await userService.update({
+  const updated = await userService.update({
     id: userId,
-    ...req.body,
+    name,
   });
 
   res.json(updated);

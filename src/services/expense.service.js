@@ -1,14 +1,14 @@
 const { Op } = require('sequelize');
 const { Expense } = require('../models/Expense.model');
 
-const getAll = async ({ userId, from, to, categories }) => {
+const getAll = async ({ userId, from, to, categories } = {}) => {
   const where = {};
 
   if (userId) {
     where.userId = parseInt(userId, 10);
   }
 
-  if (categories) {
+  if (categories && categories.trim()) {
     const list = categories.split(',').map((c) => c.trim());
 
     where.category = { [Op.in]: list };
@@ -33,6 +33,7 @@ const getAll = async ({ userId, from, to, categories }) => {
 const getById = async (id) => {
   const result = await Expense.findByPk(id, {
     attributes: { exclude: ['createdAt', 'updatedAt'] },
+    raw: true,
   });
 
   return result;
@@ -55,7 +56,7 @@ const remove = async (id) => {
 };
 
 const update = async (newExpense) => {
-  const expense = await getById(newExpense.id);
+  const expense = await Expense.findByPk(newExpense.id);
 
   if (!expense) {
     return;

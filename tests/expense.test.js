@@ -51,7 +51,6 @@ describe('Expense', () => {
       }),
     });
 
-    // Створюємо користувачів для тестів
     [user, secondUser] = await Promise.all([
       User.create({ name: 'John Doe' }),
       User.create({ name: 'Jane Doe' }),
@@ -69,7 +68,6 @@ describe('Expense', () => {
 
   beforeEach(async () => {
     await Expense.destroy({ truncate: true });
-    await Expense.destroy({ where: {} });
   });
 
   describe('createExpense', () => {
