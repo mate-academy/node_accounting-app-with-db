@@ -21,6 +21,7 @@ const getById = async (req, res) => {
   if (!expense) {
     return res.sendStatus(404);
   }
+
   res.json(expense);
 };
 
@@ -57,6 +58,7 @@ const remove = async (req, res) => {
   if (!expense) {
     return res.sendStatus(404);
   }
+
   await expenseService.remove(expenseId);
   res.sendStatus(204);
 };

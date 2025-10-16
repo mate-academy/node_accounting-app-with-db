@@ -5,7 +5,7 @@ const getAll = async ({ userId, from, to, categories } = {}) => {
   const where = {};
 
   if (userId) {
-    where.userId = parseInt(userId, 10);
+    where.userId = parseInt(userId);
   }
 
   if (categories && categories.trim()) {

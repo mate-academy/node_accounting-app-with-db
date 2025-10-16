@@ -3,7 +3,6 @@ const { userService } = require('../services/user.service');
 const getAll = async (req, res) => {
   const users = await userService.getAll(req.query);
 
-  res.set('Content-Type', 'application/json');
   res.status(200).json(users);
 };
 
@@ -14,8 +13,7 @@ const getById = async (req, res) => {
     return res.sendStatus(404);
   }
 
-  res.set('Content-Type', 'application/json');
-  res.json(user);
+  res.status(200).json(user);
 };
 
 const add = async (req, res) => {
@@ -29,7 +27,6 @@ const add = async (req, res) => {
     name,
   });
 
-  res.set('Content-Type', 'application/json');
   res.status(201).json(user);
 };
 
@@ -47,15 +44,13 @@ const remove = async (req, res) => {
 };
 
 const update = async (req, res) => {
-  const userId = parseInt(req.params.id, 10);
-
+  const userId = parseInt(req.params.id);
   const user = await userService.getById(userId);
+  const { name } = req.body;
 
   if (!user) {
     return res.sendStatus(404);
   }
-
-  const { name } = req.body;
 
   if (!name) {
     return res.sendStatus(400);

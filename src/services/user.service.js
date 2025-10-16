@@ -22,22 +22,6 @@ const remove = async (id) => {
   });
 };
 
-// const update = async (newUser) => {
-//   const user = await User.findByPk(newUser.id, {
-//     attributes: { exclude: ['createdAt', 'updatedAt'] },
-//   });
-
-//   if (!user) {
-//     return;
-//   }
-
-//   await User.update({ name: newUser.name }, { where: { id: newUser.id } });
-
-//   const updatedUser = await getById(newUser.id);
-
-//   return updatedUser.get({ plain: true });
-// };
-
 const update = async (newUser) => {
   const user = await User.findByPk(newUser.id);
 
