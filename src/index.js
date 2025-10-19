@@ -6,32 +6,47 @@
 const { createServer } = require('./createServer');
 const { sequelize } = require('./db');
 
+const User = require('./models/User.model');
+const Expense = require('./models/Expense.model');
+
+User.hasMany(Expense, { foreignKey: 'userId' });
+Expense.belongsTo(User, { foreignKey: 'userId' });
+
 if (require.main === module) {
-  const server = createServer().listen(0, () => {
-    const { port } = server.address();
+  (async () => {
+    try {
+      sequelize.sync({ alter: true });
+      console.log('Database synchronized');
 
-    console.log(`Server is running on http://localhost:${port}/`);
-  });
+      const server = createServer().listen(0, () => {
+        const { port } = server.address();
 
-  function cleanUp() {
-    server.close(async () => {
-      await sequelize.close();
-      process.exit(0);
-    });
-  }
+        console.log(`Server is running on http://localhost:${port}/`);
+      });
 
-  process.on('SIGTERM', cleanUp);
-  process.on('SIGINT', cleanUp);
+      function cleanUp() {
+        server.close(async () => {
+          await sequelize.close();
+          process.exit(0);
+        });
+      }
 
-  process.on('unhandledRejection', (err) => {
-    console.error(err);
-    cleanUp();
-  });
+      process.on('SIGTERM', cleanUp);
+      process.on('SIGINT', cleanUp);
 
-  process.on('uncaughtException', (err) => {
-    console.error(err);
-    cleanUp();
-  });
+      process.on('unhandledRejection', (err) => {
+        console.error(err);
+        cleanUp();
+      });
+
+      process.on('uncaughtException', (err) => {
+        console.error(err);
+        cleanUp();
+      });
+    } catch (err) {
+      process.exit(1);
+    }
+  })();
 }
 
 module.exports = { createServer };
