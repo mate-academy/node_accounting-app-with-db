@@ -15,10 +15,10 @@ const getAll = async (req, res) => {
 };
 
 const getById = async (req, res) => {
-  const expenseId = parseInt(req.params.id);
+  const expenseId = parseInt(req.params.id, 10);
   const expense = await expenseService.getById(expenseId);
 
-  if (!expense) {
+  if (!Number.isInteger(expense)) {
     return res.sendStatus(404);
   }
 

@@ -7,9 +7,9 @@ const getAll = async (req, res) => {
 };
 
 const getById = async (req, res) => {
-  const user = await userService.getById(parseInt(req.params.id));
+  const user = await userService.getById(parseInt(req.params.id, 10));
 
-  if (!user) {
+  if (!Number.isInteger(user)) {
     return res.sendStatus(404);
   }
 
