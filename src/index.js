@@ -6,8 +6,8 @@
 const { createServer } = require('./createServer');
 const { sequelize } = require('./db');
 
-const User = require('./models/User.model');
-const Expense = require('./models/Expense.model');
+const { User } = require('./models/User.model');
+const { Expense } = require('./models/Expense.model');
 
 User.hasMany(Expense, { foreignKey: 'userId' });
 Expense.belongsTo(User, { foreignKey: 'userId' });
@@ -15,7 +15,7 @@ Expense.belongsTo(User, { foreignKey: 'userId' });
 if (require.main === module) {
   (async () => {
     try {
-      sequelize.sync({ alter: true });
+      await sequelize.sync({ force: true });
       console.log('Database synchronized');
 
       const server = createServer().listen(0, () => {

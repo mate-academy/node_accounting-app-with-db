@@ -7,9 +7,9 @@ const getAll = async (req, res) => {
 };
 
 const getById = async (req, res) => {
-  const user = await userService.getById(parseInt(req.params.id, 10));
+  const user = await userService.getById(parseInt(req.params.id));
 
-  if (!Number.isInteger(user)) {
+  if (!user) {
     return res.sendStatus(404);
   }
 
@@ -29,7 +29,11 @@ const add = async (req, res) => {
 };
 
 const remove = async (req, res) => {
-  const userId = parseInt(req.params.id);
+  const userId = parseInt(req.params.id, 10);
+
+  if (!Number.isFinite(Number(userId))) {
+    return res.sendStatus(400);
+  }
 
   const user = await userService.getById(userId);
 
@@ -42,7 +46,12 @@ const remove = async (req, res) => {
 };
 
 const update = async (req, res) => {
-  const userId = parseInt(req.params.id);
+  const userId = parseInt(req.params.id, 10);
+
+  if (!Number.isFinite(Number(userId))) {
+    return res.sendStatus(400);
+  }
+
   const user = await userService.getById(userId);
   const { name } = req.body;
 
