@@ -44,8 +44,10 @@ const create = async (req, res) => {
   if (
     typeof userId !== 'number' ||
     !userId ||
-    (note !== undefined && typeof note !== 'string') ||
-    (category !== undefined && typeof category !== 'string') ||
+    (note !== undefined && note !== null && typeof note !== 'string') ||
+    (category !== undefined &&
+      category !== null &&
+      typeof category !== 'string') ||
     typeof title !== 'string' ||
     !title ||
     typeof amount !== 'number' ||
@@ -98,9 +100,11 @@ const update = async (req, res) => {
 
   if (
     (title !== undefined && typeof title !== 'string') ||
-    (note !== undefined && typeof note !== 'string') ||
+    (note !== undefined && note !== null && typeof note !== 'string') ||
     (amount !== undefined && typeof amount !== 'number') ||
-    (category !== undefined && typeof category !== 'string') ||
+    (category !== undefined &&
+      category !== null &&
+      typeof category !== 'string') ||
     (spentAt !== undefined &&
       (typeof spentAt !== 'string' || isNaN(Date.parse(spentAt))))
   ) {

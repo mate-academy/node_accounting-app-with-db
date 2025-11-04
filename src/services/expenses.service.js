@@ -120,11 +120,15 @@ const updateExpense = async ({
   }
 
   if (category !== undefined) {
-    const categoryRecord =
-      (await Category.findOne({ where: { name: category } })) ||
-      (await Category.create({ name: category }));
+    if (category === null) {
+      updateFields.categoryId = null;
+    } else {
+      const categoryRecord =
+        (await Category.findOne({ where: { name: category } })) ||
+        (await Category.create({ name: category }));
 
-    updateFields.categoryId = categoryRecord.id;
+      updateFields.categoryId = categoryRecord.id;
+    }
   }
 
   await Expense.update(updateFields, { where: { id } });
