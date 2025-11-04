@@ -2,6 +2,7 @@
 
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../db.js');
+const { Category } = require('./Category.model.js');
 
 const Expense = sequelize.define(
   'Expense',
@@ -15,6 +16,15 @@ const Expense = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    categoryId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'categories',
+        key: 'id',
+      },
+      onDelete: 'SET NULL',
+    },
     spentAt: {
       type: DataTypes.DATE,
       allowNull: false,
@@ -26,10 +36,6 @@ const Expense = sequelize.define(
     amount: {
       type: DataTypes.FLOAT,
       allowNull: false,
-    },
-    category: {
-      type: DataTypes.STRING,
-      allowNull: true,
     },
     note: {
       type: DataTypes.STRING,
@@ -43,6 +49,8 @@ const Expense = sequelize.define(
   },
 );
 
-module.exports = {
-  Expense,
-};
+// Встановлюємо зв’язок
+Expense.belongsTo(Category, { foreignKey: 'categoryId' });
+Category.hasMany(Expense, { foreignKey: 'categoryId' });
+
+module.exports = { Expense };

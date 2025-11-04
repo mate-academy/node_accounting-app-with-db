@@ -1,9 +1,22 @@
 const expenseService = require('../services/expenses.service.js');
 const userService = require('../services/user.service.js');
 
+const transformExpense = (expense) => {
+  if (!expense) {
+    return expense;
+  }
+
+  const plain = expense.toJSON();
+
+  plain.category = plain.Category ? plain.Category.name : null;
+  delete plain.Category;
+  delete plain.categoryId;
+
+  return plain;
+};
+
 const get = async (req, res) => {
   const { categories, userId, from, to } = req.query;
-
   const result = await expenseService.getExpenses({
     categories,
     userId,
@@ -11,7 +24,7 @@ const get = async (req, res) => {
     to,
   });
 
-  res.status(200).send(result);
+  res.status(200).send(result.map(transformExpense));
 };
 
 const getById = async (req, res) => {
@@ -22,7 +35,7 @@ const getById = async (req, res) => {
     return res.status(404).send({ message: 'Expense not found' });
   }
 
-  res.status(200).send(expense);
+  res.status(200).send(transformExpense(expense));
 };
 
 const create = async (req, res) => {
@@ -59,7 +72,7 @@ const create = async (req, res) => {
     note,
   });
 
-  res.status(201).send(newExpense);
+  res.status(201).send(transformExpense(newExpense));
 };
 
 const remove = async (req, res) => {
@@ -71,7 +84,6 @@ const remove = async (req, res) => {
   }
 
   await expenseService.deleteExpense(id);
-
   res.status(204).send();
 };
 
@@ -95,10 +107,6 @@ const update = async (req, res) => {
     return res.status(400).send({ message: 'Invalid data' });
   }
 
-  if (amount !== undefined && typeof amount === 'number' && !amount) {
-    return res.status(400).send({ message: 'Invalid data' });
-  }
-
   const updatedExpense = await expenseService.updateExpense({
     id,
     spentAt,
@@ -108,7 +116,7 @@ const update = async (req, res) => {
     note,
   });
 
-  res.status(200).send(updatedExpense);
+  res.status(200).send(transformExpense(updatedExpense));
 };
 
 module.exports = {

@@ -1,14 +1,19 @@
 /* eslint-disable no-return-await */
 /* eslint-disable function-paren-newline */
-
 const { Op } = require('sequelize');
 const { Expense } = require('../models/Expense.model');
+const { Category } = require('../models/Category.model');
 
 const getExpenses = async ({ categories, userId, from, to }) => {
   const where = {};
 
   if (categories) {
-    where.category = categories;
+    const category = await Category.findOne({ where: { name: categories } });
+
+    if (!category) {
+      return [];
+    }
+    where.categoryId = category.id;
   }
 
   if (userId) {
@@ -27,13 +32,23 @@ const getExpenses = async ({ categories, userId, from, to }) => {
     }
   }
 
-  const result = await Expense.findAll({ where });
+  const result = await Expense.findAll({
+    where,
+    include: [
+      {
+        model: Category,
+        attributes: ['name'],
+      },
+    ],
+  });
 
   return result;
 };
 
 const getExpense = async (id) => {
-  return await Expense.findByPk(id);
+  return await Expense.findByPk(id, {
+    include: [{ model: Category, attributes: ['name'] }],
+  });
 };
 
 const createExpense = async ({
@@ -44,22 +59,32 @@ const createExpense = async ({
   category,
   note,
 }) => {
-  return await Expense.create({
+  let categoryId = null;
+
+  if (category) {
+    const categoryRecord =
+      (await Category.findOne({ where: { name: category } })) ||
+      (await Category.create({ name: category }));
+
+    categoryId = categoryRecord.id;
+  }
+
+  const expense = await Expense.create({
     userId,
     spentAt,
     title,
     amount,
-    category,
+    categoryId,
     note,
   });
+
+  const fullExpense = await getExpense(expense.id);
+
+  return fullExpense;
 };
 
 const deleteExpense = async (id) => {
-  return await Expense.destroy({
-    where: {
-      id,
-    },
-  });
+  return await Expense.destroy({ where: { id } });
 };
 
 const updateExpense = async ({
@@ -70,7 +95,7 @@ const updateExpense = async ({
   category,
   note,
 }) => {
-  const expenseToUpdate = await getExpense(id);
+  const expenseToUpdate = await Expense.findByPk(id);
 
   if (!expenseToUpdate) {
     return null;
@@ -90,19 +115,21 @@ const updateExpense = async ({
     updateFields.amount = amount;
   }
 
-  if (category !== undefined) {
-    updateFields.category = category;
-  }
-
   if (spentAt !== undefined) {
     updateFields.spentAt = spentAt;
   }
 
+  if (category !== undefined) {
+    const categoryRecord =
+      (await Category.findOne({ where: { name: category } })) ||
+      (await Category.create({ name: category }));
+
+    updateFields.categoryId = categoryRecord.id;
+  }
+
   await Expense.update(updateFields, { where: { id } });
 
-  const updatedExpense = await getExpense(id);
-
-  return updatedExpense;
+  return await getExpense(id);
 };
 
 module.exports = {
