@@ -29,12 +29,15 @@ const getUserById = async (req, res) => {
 const addUser = async (req, res) => {
   const { name } = req.body;
 
+  // eslint-disable-next-line no-console
+  console.log('name', name);
+
   try {
     const newUser = await userService.create(name);
 
     res.status(201).json(newUser);
   } catch (error) {
-    res.status(501).send('User not added!');
+    res.status(500).send('User not added!');
   }
 };
 

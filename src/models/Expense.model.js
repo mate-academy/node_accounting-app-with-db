@@ -33,9 +33,13 @@ const Expense = sequelize.define(
       allowNull: false,
     },
 
-    category: {
-      type: DataTypes.TEXT,
+    categoryId: {
+      type: DataTypes.INTEGER,
       allowNull: true,
+      references: {
+        model: 'category',
+        key: 'id',
+      },
     },
 
     note: {

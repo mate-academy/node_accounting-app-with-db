@@ -24,14 +24,10 @@ const isValidBody = (req, res, next) => {
       return typeof name === 'string' && name.trim().length > 0;
     },
     '/expenses': (body) => {
-      const { userId, spentAt, title, amount, category } = body;
+      const { userId, spentAt, title, amount } = body;
 
       return (
-        userId !== null &&
-        spentAt !== null &&
-        title !== null &&
-        amount !== null &&
-        category !== null
+        userId !== null && spentAt !== null && title !== null && amount !== null
       );
     },
   };

@@ -1,22 +1,21 @@
 const { Op } = require('sequelize');
-const {
-  models: { Expense },
-} = require('../models/models');
 
 const {
-  models: { User },
+  models: { User, Expense, Category: CategoryModel },
 } = require('../models/models');
+
+const categoryService = require('./categoryService');
 
 const getAll = async (params) => {
-  const emptyResult = [];
-
   if (!params) {
-    return emptyResult;
+    return [];
   }
 
   const { userId, categories: cats, from, to } = params;
 
   const where = {};
+
+  let categoriesByParams = [];
 
   if (userId) {
     where.userId = userId;
@@ -41,38 +40,79 @@ const getAll = async (params) => {
     where.spentAt = spentAt;
   }
 
-  let normalCats = cats;
+  let categoryNames = [];
 
-  if (!Array.isArray(cats)) {
-    if (typeof cats === 'string') {
-      normalCats = cats
-        .split(',')
-        .map((c) => c.trim())
-        .filter(Boolean);
-    } else {
-      normalCats = [];
+  if (Array.isArray(cats)) {
+    categoryNames = cats.filter(Boolean);
+  } else if (typeof cats === 'string') {
+    categoryNames = cats
+      .split(',')
+      .map((c) => c.trim())
+      .filter(Boolean);
+  }
+
+  if (categoryNames.length > 0) {
+    categoriesByParams = await categoryService.getByName(categoryNames);
+
+    if (categoriesByParams.length > 0) {
+      const catsIds = categoriesByParams.map((cat) => cat.id);
+
+      where.categoryId = {
+        [Op.in]: catsIds,
+      };
     }
   }
 
-  if (normalCats.length > 0) {
-    where.category = {
-      [Op.in]: normalCats,
-    };
-  }
-
   try {
-    const data = await Expense.findAll({ where });
+    const data = await Expense.findAll({
+      where,
+      include: [
+        {
+          model: CategoryModel,
+          attributes: ['id', 'name'],
+        },
+      ],
+      order: [['spentAt', 'ASC']],
+    });
 
-    return data;
+    const formattedData = data.map((expense) => {
+      const plain = expense.get({ plain: true });
+
+      const { categoryId, Category, ...rest } = plain;
+
+      return {
+        ...rest,
+        category: plain.Category?.name || null,
+      };
+    });
+
+    return formattedData;
   } catch (error) {
     throw new Error(error.message);
   }
 };
 
 const getById = async (id) => {
-  const exById = await Expense.findByPk(id);
+  const exById = await Expense.findByPk(id, {
+    include: [
+      {
+        model: CategoryModel,
+        attributes: ['id', 'name'],
+      },
+    ],
+  });
 
-  return exById;
+  if (!exById) {
+    return null;
+  }
+
+  const plain = exById.get({ plain: true });
+  const { categoryId, Category, ...rest } = plain;
+
+  return {
+    ...rest,
+    category: Category?.name || null,
+  };
 };
 
 const create = async (content) => {
@@ -84,16 +124,28 @@ const create = async (content) => {
     throw new Error('user not found');
   }
 
-  const newEx = await Expense.create({
+  let newCategory = null;
+
+  if (category) {
+    newCategory = await categoryService.create(category);
+  }
+
+  const newExpense = await Expense.create({
     userId: userId,
     spentAt: spentAt,
     title: title,
     amount: amount,
-    category: category ?? null,
+    categoryId: newCategory ? newCategory.id : null,
     note: note,
   });
 
-  return newEx;
+  const plain = newExpense.get({ plain: true });
+  const { categoryId, ...rest } = plain;
+
+  return {
+    ...rest,
+    category: newCategory ? newCategory.name : null,
+  };
 };
 
 const update = async (expId, content) => {
@@ -105,22 +157,45 @@ const update = async (expId, content) => {
 
   const { spentAt, title, amount, category, note } = content;
 
-  const [updated] = await Expense.update(
-    {
-      spentAt: spentAt,
-      title: title,
-      amount: amount,
-      category: category,
-      note: note,
-    },
-    {
-      where: {
-        id: expId,
-      },
-    },
-  );
+  const updatePayload = {
+    spentAt,
+    title,
+    amount,
+    note,
+  };
 
-  return updated;
+  if (category !== undefined) {
+    const getCategory = await categoryService.create(category);
+
+    updatePayload.categoryId = getCategory?.id ?? null;
+  }
+
+  await Expense.update(updatePayload, {
+    where: {
+      id: expId,
+    },
+  });
+
+  const updated = await Expense.findByPk(expId, {
+    include: [
+      {
+        model: CategoryModel,
+        attributes: ['id', 'name'],
+      },
+    ],
+  });
+
+  if (!updated) {
+    return null;
+  }
+
+  const plain = updated.get({ plain: true });
+  const { categoryId, Category, ...rest } = plain;
+
+  return {
+    ...rest,
+    category: Category?.name || null,
+  };
 };
 
 const remove = async (id) => {
