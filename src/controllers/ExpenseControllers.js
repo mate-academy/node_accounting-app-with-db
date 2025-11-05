@@ -19,12 +19,12 @@ const getExById = async (req, res) => {
     const expbyId = await expenseService.getById(id);
 
     if (!expbyId) {
-      return res.status(404).send('User not found');
+      return res.status(404).send('Expense not found');
     }
 
     res.status(200).send(expbyId);
   } catch (error) {
-    res.status(404).send('file not exist');
+    res.status(500).send('Internal Server Error');
   }
 };
 
@@ -44,17 +44,11 @@ const updateExp = async (req, res) => {
   try {
     const updated = await expenseService.update(id, req.body);
 
-    if (updated === 0) {
+    if (!updated) {
       return res.status(404).send('exp for update not found');
     }
 
-    const expById = await expenseService.getById(id);
-
-    if (!expById) {
-      return res.status(404).send('Exp not found after update');
-    }
-
-    res.status(200).send(expById);
+    res.status(200).send(updated);
   } catch (error) {
     res.status(500).send('Internal server error');
   }

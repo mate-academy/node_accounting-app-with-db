@@ -22,15 +22,12 @@ const getUserById = async (req, res) => {
 
     res.status(200).send(userbyId);
   } catch (error) {
-    res.status(404).send('file not exist');
+    res.status(500).send('Internal Server Error');
   }
 };
 
 const addUser = async (req, res) => {
   const { name } = req.body;
-
-  // eslint-disable-next-line no-console
-  console.log('name', name);
 
   try {
     const newUser = await userService.create(name);

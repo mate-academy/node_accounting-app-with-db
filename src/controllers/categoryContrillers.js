@@ -22,7 +22,7 @@ const getCatById = async (req, res) => {
 
     res.status(200).send(catById);
   } catch (error) {
-    res.status(404).send('file not exist');
+    res.status(500).send('Internal Server Error');
   }
 };
 
@@ -45,17 +45,11 @@ const updateCat = async (req, res) => {
   try {
     const updated = await categoryService.update(name, id);
 
-    if (updated === 0) {
+    if (updated === null) {
       return res.status(404).send('cat for update not found');
     }
 
-    const catById = await categoryService.getById(id);
-
-    if (!catById) {
-      return res.status(404).send('Category not found after update');
-    }
-
-    res.status(200).send(catById);
+    res.status(200).send(updated);
   } catch (error) {
     res.status(500).send('Internal server error');
   }

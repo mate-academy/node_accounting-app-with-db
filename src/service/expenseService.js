@@ -54,13 +54,15 @@ const getAll = async (params) => {
   if (categoryNames.length > 0) {
     categoriesByParams = await categoryService.getByName(categoryNames);
 
-    if (categoriesByParams.length > 0) {
-      const catsIds = categoriesByParams.map((cat) => cat.id);
-
-      where.categoryId = {
-        [Op.in]: catsIds,
-      };
+    if (categoriesByParams.length === 0) {
+      return [];
     }
+
+    const catsIds = categoriesByParams.map((cat) => cat.id);
+
+    where.categoryId = {
+      [Op.in]: catsIds,
+    };
   }
 
   try {

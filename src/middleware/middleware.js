@@ -23,6 +23,11 @@ const isValidBody = (req, res, next) => {
 
       return typeof name === 'string' && name.trim().length > 0;
     },
+    '/categories': (body) => {
+      const { name } = body;
+
+      return typeof name === 'string' && name.trim().length > 0;
+    },
     '/expenses': (body) => {
       const { userId, spentAt, title, amount } = body;
 

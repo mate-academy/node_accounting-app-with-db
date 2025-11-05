@@ -4,31 +4,31 @@ const {
 } = require('../models/models');
 
 const getByName = async (input) => {
-  let caregory = [];
+  let category = [];
 
   if (Array.isArray(input)) {
     if (input.length === 0) {
       return [];
     }
 
-    caregory = await Category.findAll({
+    category = await Category.findAll({
       where: {
         name: { [Op.in]: input },
       },
     });
 
-    return caregory;
+    return category;
   }
 
   if (typeof input === 'string') {
-    caregory = await Category.findOne({
+    category = await Category.findOne({
       where: { name: input },
     });
 
-    return caregory;
+    return category;
   }
 
-  return caregory;
+  return category;
 };
 
 const getAll = async () => {
@@ -65,7 +65,13 @@ const update = async (data, id) => {
     },
   );
 
-  return updated;
+  if (updated !== 0) {
+    const catById = await Category.findByPk(id);
+
+    return catById;
+  }
+
+  return null;
 };
 
 const remove = async (id) => {
