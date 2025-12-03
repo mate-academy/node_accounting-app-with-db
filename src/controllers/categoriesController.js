@@ -45,7 +45,7 @@ async function updateCategory(req, res) {
   const { title } = req.body;
 
   try {
-    const updated = await categoriesService.update(Number(id), title);
+    const updated = await categoriesService.update(id, title);
 
     res.status(200).json(updated);
   } catch (err) {
@@ -54,14 +54,22 @@ async function updateCategory(req, res) {
 }
 
 async function deleteCategory(req, res) {
-  const { id } = req.params;
-  const deleted = await categoriesService.remove(Number(id));
+  const { id } = Number(req.params.id);
 
-  if (!deleted) {
-    return res.status(404).json({ error: 'Category not found' });
+  try {
+    const deleted = await categoriesService.remove(id);
+
+    if (!deleted) {
+      return res.status(404).json({ error: 'Category not found' });
+    }
+
+    res.sendStatus(204);
+  } catch (err) {
+    res.status(500).json({
+      error: 'Failed to delete category due to server error',
+      details: err.message,
+    });
   }
-
-  res.sendStatus(204);
 }
 
 module.exports = {

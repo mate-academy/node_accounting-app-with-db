@@ -34,10 +34,7 @@ async function update(id, name) {
   const user = await User.findByPk(id);
 
   if (!user) {
-    const error = new Error('User not found');
-
-    error.code = 404;
-    throw error;
+    return null;
   }
 
   if (!name || typeof name !== 'string') {

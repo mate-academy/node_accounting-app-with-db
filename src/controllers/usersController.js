@@ -55,15 +55,19 @@ async function deleteUser(req, res) {
 }
 
 async function updateUser(req, res) {
-  const { id } = req.params;
+  const id = Number(req.params.id);
   const { name } = req.body;
 
   try {
-    const updated = await usersService.update(Number(id), name);
+    const updated = await usersService.update(id, name);
+
+    if (!updated) {
+      return res.status(404).send({ message: 'User not found' });
+    }
 
     res.status(200).send(updated);
   } catch (err) {
-    res.status(err.code || 400).send({ message: err.message });
+    res.status(err.code || 500).send({ message: err.message });
   }
 }
 
