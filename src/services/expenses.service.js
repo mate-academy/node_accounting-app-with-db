@@ -2,10 +2,6 @@ const { Op } = require('sequelize');
 const { models, normalizeExpenses } = require('../models/models');
 const { Expense } = models;
 
-const reset = async () => {
-  await Expense.destroy({ where: {} });
-};
-
 const getAll = async (query = {}) => {
   const { userId, from, to, categories } = query;
 
@@ -29,7 +25,7 @@ const getAll = async (query = {}) => {
 
   if (categories) {
     where.category = {
-      [Op.iLike]: categories,
+      [Op.iLike]: `%${categories}%`,
     };
   }
 
@@ -39,16 +35,29 @@ const getAll = async (query = {}) => {
 };
 
 const getOne = async (id) => {
-  const expense = await Expense.findOne({ where: { id } });
+  const expense = await Expense.findOne({ where: { id: Number(id) } });
+
+  if (!expense) {
+    return null;
+  }
 
   return normalizeExpenses([expense]);
 };
 
 const create = async (data, user) => {
-  const { spentAt, title, amount, category, note } = data;
+  // eslint-disable-next-line prefer-const
+  let { spentAt, title, amount, category, note } = data;
 
-  if (!spentAt || !title || amount === undefined || !category || !note) {
+  if (!spentAt || !title || amount === undefined) {
     throw new Error('Missing required fields');
+  }
+
+  if (!category) {
+    category = 'Other';
+  }
+
+  if (!note) {
+    note = null;
   }
 
   const newExpense = await Expense.create({
@@ -64,15 +73,19 @@ const create = async (data, user) => {
 };
 
 const update = async (id, data) => {
-  await Expense.update(data, { where: { id } });
+  const [affected] = await Expense.update(data, { where: { id: Number(id) } });
 
-  const updatedExpesnse = await getOne(id);
+  if (affected === 0) {
+    return null;
+  }
 
-  return updatedExpesnse;
+  const updatedExpense = await getOne(id);
+
+  return updatedExpense;
 };
 
 const remove = async (id) => {
-  const deletedCount = await Expense.destroy({ where: id });
+  const deletedCount = await Expense.destroy({ where: { id: Number(id) } });
 
   return deletedCount > 0;
 };
@@ -83,5 +96,4 @@ module.exports = {
   create,
   update,
   remove,
-  reset,
 };

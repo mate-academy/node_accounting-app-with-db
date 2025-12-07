@@ -13,6 +13,9 @@ const createServer = () => {
   app.use('/users', express.json(), userRouter);
   app.use('/expenses', express.json(), expensesRouter);
 
+  /* Creating another API endpoint for category wasn't required in
+  the task description. Please refer to the README file, so I won't do this. */
+
   return app;
 };
 

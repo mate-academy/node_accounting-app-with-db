@@ -1,10 +1,6 @@
 const { models, normalizeUsers } = require('../models/models');
 const { User } = models;
 
-const reset = async () => {
-  await User.destroy({ where: {} });
-};
-
 const getAll = async () => {
   const users = await User.findAll();
 
@@ -12,7 +8,11 @@ const getAll = async () => {
 };
 
 const getOne = async (id) => {
-  const user = await User.findOne({ where: { id } });
+  const user = await User.findOne({ where: { id: Number(id) } });
+
+  if (!user) {
+    return null;
+  }
 
   return normalizeUsers([user]);
 };
@@ -24,7 +24,14 @@ const create = async (name) => {
 };
 
 const update = async (id, newName) => {
-  await User.update({ name: newName }, { where: { id } });
+  const [count] = await User.update(
+    { name: newName },
+    { where: { id: Number(id) } },
+  );
+
+  if (count === 0) {
+    return null;
+  }
 
   const updatedUser = await getOne(id);
 
@@ -32,7 +39,7 @@ const update = async (id, newName) => {
 };
 
 const remove = async (id) => {
-  const deletedCount = await User.destroy({ where: { id } });
+  const deletedCount = await User.destroy({ where: { id: Number(id) } });
 
   return deletedCount > 0;
 };
@@ -43,5 +50,4 @@ module.exports = {
   create,
   update,
   remove,
-  reset,
 };

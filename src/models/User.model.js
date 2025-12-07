@@ -7,8 +7,8 @@ const User = sequelize.define(
   'User',
   {
     id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
       primaryKey: true,
     },
 
@@ -29,7 +29,16 @@ const normalizeUser = ({ id, name }) => ({ id, name });
 const normalizeUsers = (usersArray) => {
   const normalized = usersArray
     .filter((user) => user)
-    .map((user) => normalizeUser(user.get({ plain: true })));
+    .map((user) => {
+      const plain =
+        typeof user.get === 'function' ? user.get({ plain: true }) : user;
+
+      return normalizeUser(plain);
+    });
+
+  if (normalized.length === 0) {
+    return null;
+  }
 
   return normalized.length === 1 ? normalized[0] : normalized;
 };

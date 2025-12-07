@@ -3,7 +3,7 @@ const userService = require('../services/user.service');
 const get = async (req, res) => {
   const users = await userService.getAll();
 
-  res.status(200).send(users);
+  res.status(200).json(users || []);
 };
 
 const getOne = async (req, res) => {

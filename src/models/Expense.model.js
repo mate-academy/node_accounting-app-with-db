@@ -7,13 +7,13 @@ const Expense = sequelize.define(
   'Expense',
   {
     id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
       primaryKey: true,
     },
 
     userId: {
-      type: DataTypes.UUID,
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
 
@@ -35,11 +35,13 @@ const Expense = sequelize.define(
     category: {
       type: DataTypes.STRING,
       allowNull: false,
+      defaultValue: 'Other',
     },
 
     note: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
+      defaultValue: null,
     },
   },
   {
@@ -68,9 +70,18 @@ const normalizeExpense = ({
 });
 
 const normalizeExpenses = (expenses) => {
-  const normalized = expenses
-    .filter((expense) => expense)
-    .map((expense) => normalizeExpense(expense.get({ plain: true })));
+  const normalized = expenses.filter(Boolean).map((expense) => {
+    const plain =
+      typeof expense.get === 'function'
+        ? expense.get({ plain: true })
+        : expense;
+
+    return normalizeExpense(plain);
+  });
+
+  if (normalized.length === 0) {
+    return null;
+  }
 
   return normalized.length === 1 ? normalized[0] : normalized;
 };
