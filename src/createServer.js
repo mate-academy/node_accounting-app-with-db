@@ -19,6 +19,8 @@ const createServer = () => {
   app.use('/users', userRouter);
   app.use('/category', categoryRouter);
   app.use('/expenses', expenseRouter);
+
+  return app;
 };
 
 sequelize
