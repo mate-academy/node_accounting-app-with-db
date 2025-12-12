@@ -1,9 +1,9 @@
 'use strict';
 
+const { sequelize } = require('../db.js');
 const { User } = require('./User.model');
 const { Expense } = require('./Expense.model');
 const { Category } = require('./Category.model');
-const { sequelize } = require('../db');
 
 User.hasMany(Expense, {
   foreignKey: 'userId',

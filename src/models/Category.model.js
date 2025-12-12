@@ -1,7 +1,7 @@
 'use strict';
 
 const { DataTypes } = require('sequelize');
-const { sequelize } = require('../db');
+const { sequelize } = require('../db.js');
 
 const Category = sequelize.define(
   'Category',
@@ -10,11 +10,11 @@ const Category = sequelize.define(
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
-      allawNull: false,
+      allowNull: false,
     },
     name: {
       type: DataTypes.STRING,
-      allawNull: false,
+      allowNull: false,
       unique: true,
     },
   },

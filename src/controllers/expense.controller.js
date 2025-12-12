@@ -1,19 +1,17 @@
 'use strict';
 
-'use strict';
-
 const { models } = require('../models/models');
 const { Expense, Category } = models;
 
 const createExpense = async (req, res) => {
-  const userId = req.userId;
+  const userId = req.user.id;
 
   try {
     const { categoryId, spentAt, title, amount, note } = req.body;
 
     if (!categoryId || !spentAt || !title || !amount) {
       return res.status(400).json({
-        message: "'Обов'язкові поля: categoryId, spentAt, title, amount.'",
+        message: "Обов'язкові поля: categoryId, spentAt, title, amount.",
       });
     }
 
@@ -48,11 +46,13 @@ const createExpense = async (req, res) => {
 const getExpenses = async (req, res) => {
   const userId = req.user.id;
 
+  if (!userId) {
+    return res.status(400).json({ message: 'userId is required' });
+  }
+
   try {
     const expenses = await Expense.findAll({
-      where: {
-        userId,
-      },
+      where: { userId },
       include: [
         { model: Category, attributes: ['name'] },
         { model: models.User, attributes: ['name'] },
@@ -71,11 +71,9 @@ const deleteExpense = async (req, res) => {
 
   try {
     const { id } = req.params;
+
     const result = await Expense.destroy({
-      where: {
-        id,
-        userId,
-      },
+      where: { id, userId },
     });
 
     if (result === 0) {
