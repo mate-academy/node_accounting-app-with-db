@@ -34,7 +34,7 @@ const getCategories = async (req, res) => {
       order: [['name', 'ASC']],
     });
 
-    res.status(200).json(categories);
+    return res.status(200).json(categories);
   } catch (error) {
     return res
       .status(500)

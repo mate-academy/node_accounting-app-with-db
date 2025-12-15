@@ -1,11 +1,17 @@
 'use strict';
 
 const express = require('express');
-const { createUser } = require('../controllers/user.controller');
+const {
+  createUser,
+  getUsers,
+  getUserById,
+} = require('../controllers/user.controller');
 
 const router = express.Router();
 
 router.post('/', createUser);
+router.get('/', getUsers);
+router.get('/:id', getUserById);
 
 module.exports = {
   userRouter: router,

@@ -1,95 +1,165 @@
 'use strict';
 
+const { Op } = require('sequelize');
 const { models } = require('../models/models');
-const { Expense, Category } = models;
+
+const { Expense, Category, User } = models;
 
 const createExpense = async (req, res) => {
-  const userId = req.user.id;
-
   try {
-    const { categoryId, spentAt, title, amount, note } = req.body;
+    const { category, spentAt, title, amount, note, userId } = req.body;
 
-    if (!categoryId || !spentAt || !title || !amount) {
-      return res.status(400).json({
-        message: "Обов'язкові поля: categoryId, spentAt, title, amount.",
+    if (!userId || !spentAt || !title || amount === undefined) {
+      return res.status(400).json({ message: 'Invalid data' });
+    }
+
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res.status(400).json({ message: 'User not found' });
+    }
+
+    let categoryInstance = null;
+
+    if (category) {
+      [categoryInstance] = await Category.findOrCreate({
+        where: { name: category },
       });
     }
 
-    const category = await Category.findByPk(categoryId);
-
-    if (!category) {
-      return res.status(404).json({ message: 'Категорія не знайдена.' });
-    }
-
-    const newExpense = await Expense.create({
-      userId,
-      categoryId,
+    const expense = await Expense.create({
       spentAt,
       title,
       amount,
       note,
+      userId,
+      categoryId: categoryInstance ? categoryInstance.id : null,
     });
 
-    res.status(201).json(newExpense);
+    res.status(201).json({
+      id: expense.id,
+      spentAt,
+      title,
+      amount: Number(amount),
+      note,
+      userId,
+      category: category || null,
+    });
   } catch (error) {
-    if (error.name === 'SequelizeValidationError') {
-      return res.status(400).json({
-        message: 'Помилка валідації даних.',
-        details: error.errors.map((e) => e.message),
-      });
-    }
-
-    res.status(500).json({ message: 'Помилка сервера при створенні витрати.' });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
 const getExpenses = async (req, res) => {
-  const userId = req.user.id;
-
-  if (!userId) {
-    return res.status(400).json({ message: 'userId is required' });
-  }
-
   try {
+    const { userId, from, to, categories } = req.query;
+
+    const where = {
+      ...(userId && { userId }),
+      ...((from || to) && {
+        spentAt: {
+          ...(from && { [Op.gte]: from }),
+          ...(to && { [Op.lte]: to }),
+        },
+      }),
+    };
+
+    const include = [
+      {
+        model: Category,
+        attributes: ['name'],
+        ...(categories && {
+          where: {
+            name: {
+              [Op.in]: categories.split(','),
+            },
+          },
+        }),
+      },
+    ];
+
     const expenses = await Expense.findAll({
-      where: { userId },
-      include: [
-        { model: Category, attributes: ['name'] },
-        { model: models.User, attributes: ['name'] },
-      ],
-      order: [['spentAt', 'DESC']],
+      where,
+      include,
+      order: [['spentAt', 'ASC']],
     });
 
-    res.status(200).json(expenses);
+    res.json(
+      expenses.map((e) => ({
+        id: e.id,
+        spentAt: e.spentAt,
+        title: e.title,
+        amount: Number(e.amount),
+        note: e.note,
+        userId: e.userId,
+        category: e.Category ? e.Category.name : null,
+      })),
+    );
   } catch (error) {
-    res.status(500).json({ message: 'Помилка сервера при отриманні витрат.' });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-const deleteExpense = async (req, res) => {
-  const userId = req.user.id;
+const getExpenseById = async (req, res) => {
+  const expense = await Expense.findByPk(req.params.id, {
+    include: { model: Category, attributes: ['name'] },
+  });
 
-  try {
-    const { id } = req.params;
-
-    const result = await Expense.destroy({
-      where: { id, userId },
-    });
-
-    if (result === 0) {
-      return res.status(404).json({
-        message: 'Витрата не знайдена або недостатньо прав для видалення.',
-      });
-    }
-
-    res.status(204).send();
-  } catch (error) {
-    res.status(500).json({ message: 'Помилка сервера при видаленні витрати.' });
+  if (!expense) {
+    return res.sendStatus(404);
   }
+
+  res.json({
+    id: expense.id,
+    spentAt: expense.spentAt,
+    title: expense.title,
+    amount: Number(expense.amount),
+    note: expense.note,
+    userId: expense.userId,
+    category: expense.Category ? expense.Category.name : null,
+  });
+};
+
+const updateExpense = async (req, res) => {
+  const expense = await Expense.findByPk(req.params.id, {
+    include: Category,
+  });
+
+  if (!expense) {
+    return res.sendStatus(404);
+  }
+
+  await expense.update(req.body);
+
+  res.json({
+    id: expense.id,
+    spentAt: expense.spentAt,
+    title: expense.title,
+    amount: Number(expense.amount),
+    note: expense.note,
+    userId: expense.userId,
+    category: expense.Category ? expense.Category.name : null,
+  });
+};
+
+const deleteExpense = async (req, res) => {
+  const { id } = req.params;
+
+  const deleted = await Expense.destroy({
+    where: { id },
+  });
+
+  if (!deleted) {
+    return res.sendStatus(404);
+  }
+
+  res.sendStatus(204);
 };
 
 module.exports = {
   createExpense,
   getExpenses,
+  getExpenseById,
+  updateExpense,
   deleteExpense,
 };
