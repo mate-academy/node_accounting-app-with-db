@@ -101,36 +101,19 @@ const getExpenses = async (req, res) => {
 };
 
 const getExpenseById = async (req, res) => {
-  const expense = await Expense.findByPk(req.params.id, {
-    include: { model: Category, attributes: ['name'] },
-  });
-
-  if (!expense) {
-    return res.sendStatus(404);
-  }
-
-  res.json({
-    id: expense.id,
-    spentAt: expense.spentAt,
-    title: expense.title,
-    amount: Number(expense.amount),
-    note: expense.note,
-    userId: expense.userId,
-    category: expense.Category ? expense.Category.name : null,
-  });
-};
-
-const updateExpense = async (req, res) => {
   try {
     const expense = await Expense.findByPk(req.params.id, {
-      include: { model: Category, attributes: ['name'] },
+      include: [
+        {
+          model: Category,
+          attributes: ['name'],
+        },
+      ],
     });
 
     if (!expense) {
       return res.sendStatus(404);
     }
-
-    await expense.update(req.body);
 
     res.json({
       id: expense.id,
@@ -140,10 +123,57 @@ const updateExpense = async (req, res) => {
       note: expense.note,
       userId: expense.userId,
       category: expense.Category ? expense.Category.name : null,
-      ...req.body,
     });
   } catch (error) {
-    res.sendStatus(500);
+    return res.status(500).json({
+      message: 'Помилка сервера при отриманні витрати.',
+    });
+  }
+};
+
+const updateExpense = async (req, res) => {
+  try {
+    const expense = await Expense.findByPk(req.params.id);
+
+    if (!expense) {
+      return res.sendStatus(404);
+    }
+
+    const updateData = { ...req.body };
+
+    if (req.body.category) {
+      const [categoryInstance] = await Category.findOrCreate({
+        where: { name: req.body.category.trim() },
+        defaults: { name: req.body.category.trim() },
+      });
+
+      updateData.categoryId = categoryInstance ? categoryInstance.id : null;
+      delete updateData.category;
+    } else if (
+      Object.prototype.hasOwnProperty.call(req.body, 'category') &&
+      (req.body.category === null || req.body.category === '')
+    ) {
+      updateData.categoryId = null;
+      delete updateData.category;
+    }
+
+    await expense.update(updateData);
+
+    const updatedExpense = await Expense.findByPk(expense.id, {
+      include: { model: Category, attributes: ['name'] },
+    });
+
+    res.json({
+      id: updatedExpense.id,
+      spentAt: updatedExpense.spentAt,
+      title: updatedExpense.title,
+      amount: Number(updatedExpense.amount),
+      note: updatedExpense.note,
+      userId: updatedExpense.userId,
+      category: updatedExpense.Category ? updatedExpense.Category.name : null,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Server error' });
   }
 };
 

@@ -2,6 +2,7 @@
 
 const { models } = require('../models/models');
 const { Category } = models;
+const { SEQUELIZE_ERROR_NAMES } = require('../utils/errors');
 
 const createCategory = async (req, res) => {
   try {
@@ -15,7 +16,7 @@ const createCategory = async (req, res) => {
 
     res.status(201).json({ id: newCategory.id, name: newCategory.name });
   } catch (error) {
-    if (error.name === 'SequelizeUniqueConstraintError') {
+    if (error.name === SEQUELIZE_ERROR_NAMES.UNIQUE_CONSTRAINT) {
       return res
         .status(409)
         .json({ message: 'Категорія з такою назвою вже існує.' });
@@ -82,8 +83,10 @@ const updateCategory = async (req, res) => {
       name: category.name,
     });
   } catch (error) {
-    if (error.name === 'SequelizeUniqueConstraintError') {
-      return res.status(409).json({ message: 'Category is exist' });
+    if (error.name === SEQUELIZE_ERROR_NAMES.UNIQUE_CONSTRAINT) {
+      return res.status(409).json({
+        message: 'A category with this name already exists.',
+      });
     }
 
     return res.status(500).json({ message: 'Помилка сервера.' });
@@ -103,11 +106,11 @@ const deleteCategory = async (req, res) => {
     return res.status(204).send();
   } catch (error) {
     if (
-      error.name === 'SequelizeForeignKeyConstraintError' ||
+      error.name === SEQUELIZE_ERROR_NAMES.FOREIGN_KEY_CONSTRAINT ||
       error.parent?.code === '23503'
     ) {
       return res.status(409).json({
-        message: "related expenses exist'",
+        message: 'Cannot delete category because it has related expenses.',
       });
     }
 
