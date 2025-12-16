@@ -96,8 +96,8 @@ const deleteCategory = async (req, res) => {
       where: { id },
     });
 
-    if (result === 0) {
-      return res.status(404).json({ message: 'Категорію не знайдено.' });
+    if (!result) {
+      return res.status(404).json({ message: 'Category not found' });
     }
 
     return res.status(204).send();
@@ -107,11 +107,11 @@ const deleteCategory = async (req, res) => {
       error.parent?.code === '23503'
     ) {
       return res.status(409).json({
-        message: "'Існують пов'язані витрати.'",
+        message: "related expenses exist'",
       });
     }
 
-    return res.status(500).json({ message: 'Помилка сервера.' });
+    return res.status(500).json({ message: 'Server error' });
   }
 };
 

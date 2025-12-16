@@ -41,7 +41,7 @@ const createExpense = async (req, res) => {
       spentAt,
       title,
       amount: Number(amount),
-      note,
+      note: note || null,
       userId,
       category: category || null,
     });
@@ -121,39 +121,48 @@ const getExpenseById = async (req, res) => {
 };
 
 const updateExpense = async (req, res) => {
-  const expense = await Expense.findByPk(req.params.id, {
-    include: Category,
-  });
+  try {
+    const expense = await Expense.findByPk(req.params.id, {
+      include: { model: Category, attributes: ['name'] },
+    });
 
-  if (!expense) {
-    return res.sendStatus(404);
+    if (!expense) {
+      return res.sendStatus(404);
+    }
+
+    await expense.update(req.body);
+
+    res.json({
+      id: expense.id,
+      spentAt: expense.spentAt,
+      title: expense.title,
+      amount: Number(expense.amount),
+      note: expense.note,
+      userId: expense.userId,
+      category: expense.Category ? expense.Category.name : null,
+      ...req.body,
+    });
+  } catch (error) {
+    res.sendStatus(500);
   }
-
-  await expense.update(req.body);
-
-  res.json({
-    id: expense.id,
-    spentAt: expense.spentAt,
-    title: expense.title,
-    amount: Number(expense.amount),
-    note: expense.note,
-    userId: expense.userId,
-    category: expense.Category ? expense.Category.name : null,
-  });
 };
 
 const deleteExpense = async (req, res) => {
-  const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-  const deleted = await Expense.destroy({
-    where: { id },
-  });
+    const deleted = await Expense.destroy({
+      where: { id },
+    });
 
-  if (!deleted) {
-    return res.sendStatus(404);
+    if (!deleted) {
+      return res.sendStatus(404);
+    }
+
+    res.sendStatus(204);
+  } catch (error) {
+    res.sendStatus(500);
   }
-
-  res.sendStatus(204);
 };
 
 module.exports = {

@@ -7,11 +7,12 @@ const { Category } = require('./Category.model');
 
 User.hasMany(Expense, {
   foreignKey: 'userId',
+  onDelete: 'CASCADE',
+  hooks: true,
 });
 
 Expense.belongsTo(User, {
   foreignKey: 'userId',
-  onDelete: 'CASCADE',
 });
 
 Category.hasMany(Expense, {
