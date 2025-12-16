@@ -8,7 +8,7 @@ const createCategory = async (req, res) => {
     const { name } = req.body;
 
     if (!name || typeof name !== 'string' || name.trim() === '') {
-      return res.status(400).json({ message: 'Invalid name.' });
+      return res.status(400).json({ message: 'Invalid name' });
     }
 
     const newCategory = await Category.create({ name: name.trim() });
