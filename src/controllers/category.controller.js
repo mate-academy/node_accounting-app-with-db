@@ -8,7 +8,7 @@ const createCategory = async (req, res) => {
     const { name } = req.body;
 
     if (!name || typeof name !== 'string' || name.trim() === '') {
-      return res.status(400).json({ message: 'Некоректне поле name.' });
+      return res.status(400).json({ message: 'Invalid name.' });
     }
 
     const newCategory = await Category.create({ name: name.trim() });
@@ -47,7 +47,7 @@ const getCategoryById = async (req, res) => {
     const category = await Category.findByPk(id);
 
     if (!category) {
-      return res.status(404).json({ message: 'категорія не знайдена' });
+      return res.status(404).json({ message: 'Category not found' });
     }
 
     return res.status(200).json({
@@ -65,13 +65,13 @@ const updateCategory = async (req, res) => {
     const { name } = req.body;
 
     if (!name || typeof name !== 'string' || name.trim() === '') {
-      return res.status(400).json({ message: 'Некоректне поле name.' });
+      return res.status(400).json({ message: 'Invalid name.' });
     }
 
     const category = await Category.findByPk(id);
 
     if (!category) {
-      return res.status(404).json({ message: 'Категорію не знайдено.' });
+      return res.status(404).json({ message: 'Category not found' });
     }
 
     category.name = name.trim();
@@ -83,7 +83,7 @@ const updateCategory = async (req, res) => {
     });
   } catch (error) {
     if (error.name === 'SequelizeUniqueConstraintError') {
-      return res.status(409).json({ message: 'Категорія вже існує.' });
+      return res.status(409).json({ message: 'Category is exist' });
     }
 
     return res.status(500).json({ message: 'Помилка сервера.' });
