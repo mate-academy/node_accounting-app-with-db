@@ -11,6 +11,19 @@ const createServer = () => {
   app.use(express.json());
   app.use(cors());
 
+  const cleanExpense = (expenseInstance) => {
+    const json = expenseInstance.toJSON();
+
+    if (json.Category) {
+      json.category = json.Category.name;
+    }
+
+    delete json.Category;
+    delete json.categoryId;
+
+    return json;
+  };
+
   app.get('/users', async (req, res) => {
     const users = await models.User.findAll();
 
@@ -23,7 +36,6 @@ const createServer = () => {
     if (!name) {
       res.status(400).json({ message: 'Name is required' });
 
-      // eslint-disable-next-line no-useless-return
       return;
     }
 
@@ -38,7 +50,6 @@ const createServer = () => {
     if (!user) {
       res.status(404).json({ message: 'User not found' });
 
-      // eslint-disable-next-line no-useless-return
       return;
     }
 
@@ -51,7 +62,6 @@ const createServer = () => {
     if (!user) {
       res.status(404).json({ message: 'User not found' });
 
-      // eslint-disable-next-line no-useless-return
       return;
     }
 
@@ -69,7 +79,6 @@ const createServer = () => {
     if (!user) {
       res.status(404).json({ message: 'User not found' });
 
-      // eslint-disable-next-line no-useless-return
       return;
     }
 
@@ -77,8 +86,62 @@ const createServer = () => {
     res.status(204).end();
   });
 
+  app.get('/categories', async (req, res) => {
+    const categories = await models.Category.findAll();
+
+    res.json(categories);
+  });
+
+  app.post('/categories', async (req, res) => {
+    const { name } = req.body;
+
+    if (!name) {
+      res.status(400).json({ message: 'Name is required' });
+
+      return;
+    }
+
+    const newCategory = await models.Category.create({ name });
+
+    res.status(201).json(newCategory);
+  });
+
+  app.patch('/categories/:categoryId', async (req, res) => {
+    const category = await models.Category.findByPk(req.params.categoryId);
+
+    if (!category) {
+      res.status(404).json({ message: 'Category not found' });
+
+      return;
+    }
+
+    if (req.body.name) {
+      category.name = req.body.name;
+      await category.save();
+    }
+    res.status(200).json(category);
+  });
+
+  app.delete('/categories/:categoryId', async (req, res) => {
+    const category = await models.Category.findByPk(req.params.categoryId);
+
+    if (!category) {
+      res.status(404).json({ message: 'Category not found' });
+
+      return;
+    }
+    await category.destroy();
+    res.status(204).end();
+  });
+
   app.get('/expenses', async (req, res) => {
     const where = {};
+    const include = [
+      {
+        model: models.Category,
+        attributes: ['name', 'id'],
+      },
+    ];
 
     if (req.query.userId) {
       where.userId = Number(req.query.userId);
@@ -89,7 +152,9 @@ const createServer = () => {
         ? req.query.categories
         : [req.query.categories];
 
-      where.category = { [Op.in]: categoriesToMatch };
+      include[0].where = {
+        name: { [Op.in]: categoriesToMatch },
+      };
     }
 
     if (req.query.from || req.query.to) {
@@ -104,13 +169,17 @@ const createServer = () => {
       }
     }
 
-    const expenses = await models.Expense.findAll({ where });
+    const expenses = await models.Expense.findAll({
+      where,
+      include,
+    });
 
-    res.json(expenses);
+    res.json(expenses.map(cleanExpense));
   });
 
   app.post('/expenses', async (req, res) => {
     const { userId, spentAt, title, amount, category, note } = req.body;
+    let { categoryId } = req.body;
 
     if (!userId || !spentAt || !title || amount === undefined) {
       res.status(400).json({ message: 'Missing required fields' });
@@ -126,42 +195,59 @@ const createServer = () => {
       return;
     }
 
+    if (!categoryId && category) {
+      const [catInstance] = await models.Category.findOrCreate({
+        where: { name: category },
+        defaults: { name: category },
+      });
+
+      categoryId = catInstance.id;
+    }
+
     const newExpense = await models.Expense.create({
       userId,
       spentAt,
       title,
       amount,
-      category: category || null,
+      categoryId: categoryId || null,
       note: note || null,
     });
 
-    res.status(201).json(newExpense);
+    const responseData = newExpense.toJSON();
+
+    if (category) {
+      responseData.category = category;
+    }
+
+    delete responseData.categoryId;
+
+    res.status(201).json(responseData);
   });
 
   app.get('/expenses/:expenseId', async (req, res) => {
-    const expense = await models.Expense.findByPk(req.params.expenseId);
+    const expense = await models.Expense.findByPk(req.params.expenseId, {
+      include: [models.Category],
+    });
 
     if (!expense) {
-      res.status(404).json({ message: 'Expanse not found' });
+      res.status(404).json({ message: 'Expense not found' });
 
-      // eslint-disable-next-line no-useless-return
       return;
     }
 
-    res.json(expense);
+    res.json(cleanExpense(expense));
   });
 
   app.patch('/expenses/:expenseId', async (req, res) => {
     const expense = await models.Expense.findByPk(req.params.expenseId);
 
     if (!expense) {
-      res.status(404).json({ message: 'Expanse not found' });
+      res.status(404).json({ message: 'Expense not found' });
 
-      // eslint-disable-next-line no-useless-return
       return;
     }
 
-    const allowedUpdates = ['spentAt', 'title', 'amount', 'category', 'note'];
+    const allowedUpdates = ['spentAt', 'title', 'amount', 'categoryId', 'note'];
 
     allowedUpdates.forEach((key) => {
       if (req.body[key] !== undefined) {
@@ -170,16 +256,18 @@ const createServer = () => {
     });
 
     await expense.save();
-    res.status(200).json(expense);
+
+    const reloaded = await expense.reload({ include: [models.Category] });
+
+    res.status(200).json(cleanExpense(reloaded));
   });
 
   app.delete('/expenses/:expenseId', async (req, res) => {
     const expense = await models.Expense.findByPk(req.params.expenseId);
 
     if (!expense) {
-      res.status(404).json({ message: 'Expanse not found' });
+      res.status(404).json({ message: 'Expense not found' });
 
-      // eslint-disable-next-line no-useless-return
       return;
     }
 
