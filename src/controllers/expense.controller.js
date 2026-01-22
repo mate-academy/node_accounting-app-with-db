@@ -1,4 +1,5 @@
 const { getUserById } = require('../services/user.service');
+const { getCategoryById } = require('../services/category.service');
 
 const {
   getAll,
@@ -44,28 +45,35 @@ const getOne = async (req, res) => {
 };
 
 const createExpense = async (req, res) => {
-  const { title, amount, category, note, userId, spentAt } = req.body;
+  const { title, amount, categoryId, note, userId, spentAt } = req.body;
 
   const isUserIdMissing = userId === undefined || userId === null;
+  const isCategoryIdMissing = categoryId === undefined || categoryId === null;
 
   let userExists = false;
+  let categoryExists = false;
 
   if (!isUserIdMissing) {
     userExists = await getUserById(userId);
   }
 
+  if (!isCategoryIdMissing) {
+    categoryExists = await getCategoryById(categoryId);
+  }
+
   const isTitleInvalid = title === undefined || title === null;
   const isAmountInvalid = amount === undefined || amount === null;
   const isUserInvalid = isUserIdMissing || !userExists;
+  const isCategoryInvalid = isCategoryIdMissing || !categoryExists;
 
-  if (isTitleInvalid || isAmountInvalid || isUserInvalid) {
+  if (isTitleInvalid || isAmountInvalid || isUserInvalid || isCategoryInvalid) {
     return res.sendStatus(400);
   }
 
   const newExpense = await create({
     title,
     amount,
-    category,
+    categoryId,
     note,
     userId,
     spentAt,
@@ -82,6 +90,13 @@ const updateExpense = async (req, res) => {
     res.sendStatus(404);
 
     return;
+  }
+
+  if (
+    req.body.categoryId !== undefined &&
+    typeof req.body.categoryId !== 'number'
+  ) {
+    return res.sendStatus(400);
   }
 
   if (req.body.title !== undefined && typeof req.body.title !== 'string') {

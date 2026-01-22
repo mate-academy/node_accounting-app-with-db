@@ -1,18 +1,27 @@
 const { models } = require('../models/models');
 
 const getAll = async (query = {}) => {
-  const { userId, categories } = query;
+  const { userId, categoryId } = query;
   const where = {};
 
   if (userId) {
     where.userId = userId;
   }
 
-  if (categories) {
-    where.category = categories;
+  if (categoryId) {
+    where.category = categoryId;
   }
 
-  const result = await models.Expense.findAll({ where });
+  const result = await models.Expense.findAll({
+    where,
+    include: [
+      {
+        model: models.Category,
+        as: 'category',
+        attributes: ['id', 'name'],
+      },
+    ],
+  });
 
   return result.map((exp) => exp.get({ plain: true }));
 };
@@ -26,7 +35,7 @@ const getById = async (id) => {
 const create = async ({
   title,
   amount,
-  category,
+  categoryId,
   note = '',
   userId,
   spentAt,
@@ -36,7 +45,7 @@ const create = async ({
     spentAt: spentAt || new Date().toISOString(),
     title,
     amount,
-    category,
+    categoryId,
     note,
   });
 

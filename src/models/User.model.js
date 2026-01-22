@@ -32,7 +32,6 @@ User.destroy = function (options) {
 
   return originalDestroy.call(this, options);
 };
-// ----------------------------------------------
 
 module.exports = {
   User,
