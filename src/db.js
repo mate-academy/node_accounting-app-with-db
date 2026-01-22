@@ -26,7 +26,17 @@ const sequelize = new Sequelize({
   host: POSTGRES_HOST || 'localhost',
   dialect: 'postgres',
   port: POSTGRES_PORT || 5432,
-  password: POSTGRES_PASSWORD || '123',
+  password: POSTGRES_PASSWORD || 'rpk332Xyp9x',
+  logging: false,
+  define: {
+    hooks: true,
+    freezeTableName: true,
+    onDelete: 'CASCADE',
+  },
+  query: {
+    raw: false,
+  },
+  cascade: true,
 });
 
 module.exports = {
