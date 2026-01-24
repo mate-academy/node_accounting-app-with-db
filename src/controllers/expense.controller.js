@@ -91,6 +91,8 @@ const createExpense = async (req, res) => {
 };
 const updateExpense = async (req, res) => {
   const { id } = req.params;
+  const { title, amount, category, categories, note, spentAt } = req.body;
+  const categoryName = category || categories;
 
   const expense = await getById(id);
 
@@ -100,13 +102,41 @@ const updateExpense = async (req, res) => {
     return;
   }
 
-  if (req.body.title !== undefined && typeof req.body.title !== 'string') {
+  if (title !== undefined && typeof title !== 'string') {
     return res.sendStatus(400);
+  }
+
+  if (amount !== undefined && typeof amount !== 'number') {
+    return res.sendStatus(400);
+  }
+
+  const updateData = {
+    title,
+    amount,
+    note,
+    spentAt,
+  };
+
+  if (categoryName) {
+    const [categoryInstance] = await models.Category.findOrCreate({
+      where: { name: categoryName },
+      defaults: { name: categoryName },
+    });
+
+    updateData.categoryId = categoryInstance.id;
   }
 
   const updatedExpense = await update(id, req.body);
 
-  res.send(updatedExpense);
+  res.send({
+    id: updatedExpense.id,
+    title: updatedExpense.title,
+    amount: updatedExpense.amount,
+    spentAt: updatedExpense.spentAt,
+    note: updatedExpense.note,
+    userId: updatedExpense.userId,
+    category: categoryName || updatedExpense.category,
+  });
 };
 
 const removeExpense = async (req, res) => {

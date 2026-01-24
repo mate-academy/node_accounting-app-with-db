@@ -22,6 +22,12 @@ Category.belongsTo(Expense, {
   onDelete: 'CASCUDE',
 });
 
+Category.hasMany(Expense, {
+  foreignKey: 'categoryId',
+  as: 'category',
+  onDelete: 'CASCUDE',
+});
+
 Expense.belongsTo(Category, {
   foreignKey: 'categoryId',
   as: 'category',
