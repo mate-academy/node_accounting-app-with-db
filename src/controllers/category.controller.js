@@ -56,8 +56,6 @@ const updateCategory = async (req, res) => {
     return res.sendStatus(404);
   }
 
-  await update(id);
-
   const updatedCategory = await update(id, name);
 
   res.status(200).send(updatedCategory);
