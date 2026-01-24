@@ -1,7 +1,7 @@
 const { models } = require('../models/models');
 
 const getAll = async (query = {}) => {
-  const { userId, categoryId } = query;
+  const { userId, categoryId, categories } = query;
   const where = {};
 
   if (userId) {
@@ -9,7 +9,7 @@ const getAll = async (query = {}) => {
   }
 
   if (categoryId) {
-    where.category = categoryId;
+    where.categoryId = categoryId;
   }
 
   const result = await models.Expense.findAll({
@@ -19,17 +19,53 @@ const getAll = async (query = {}) => {
         model: models.Category,
         as: 'category',
         attributes: ['id', 'name'],
+
+        where: categories ? { name: categories } : undefined,
       },
     ],
   });
 
-  return result.map((exp) => exp.get({ plain: true }));
+  return result.map((exp) => {
+    const plainExp = exp.get({ plain: true });
+
+    return {
+      id: plainExp.id,
+      title: plainExp.title,
+      amount: plainExp.amount,
+      spentAt: plainExp.spentAt,
+      note: plainExp.note,
+      userId: plainExp.userId,
+      category: plainExp.category ? plainExp.category.name : null,
+    };
+  });
 };
 
 const getById = async (id) => {
-  const expense = await models.Expense.findByPk(id);
+  const expense = await models.Expense.findByPk(id, {
+    include: [
+      {
+        model: models.Category,
+        as: 'category',
+        attributes: ['name'],
+      },
+    ],
+  });
 
-  return expense ? expense.get({ plain: true }) : null;
+  if (!expense) {
+    return null;
+  }
+
+  const plainExp = expense.get({ plain: true });
+
+  return {
+    id: plainExp.id,
+    title: plainExp.title,
+    amount: plainExp.amount,
+    spentAt: plainExp.spentAt,
+    note: plainExp.note,
+    userId: plainExp.userId,
+    category: plainExp.category ? plainExp.category.name : null,
+  };
 };
 
 const create = async ({

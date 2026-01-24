@@ -33,7 +33,7 @@ const Expense = sequelize.define(
     },
     categoryId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'categories',
         key: 'id',
@@ -50,6 +50,17 @@ const Expense = sequelize.define(
     updatedAt: false,
   },
 );
+
+const originalDestroy = Expense.destroy;
+
+Expense.destroy = function (options) {
+  if (options && options.truncate) {
+    options.cascade = true;
+    options.restartIdentity = true;
+  }
+
+  return originalDestroy.call(this, options);
+};
 
 module.exports = {
   Expense,

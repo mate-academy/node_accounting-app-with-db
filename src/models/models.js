@@ -16,17 +16,15 @@ Expense.belongsTo(User, {
   onDelete: 'CASCADE',
 });
 
-Expense.hasMany(Category, {
-  foreignKey: 'categoryId',
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE',
-  hooks: true,
-});
-
 Category.belongsTo(Expense, {
   foreignKey: 'categoryId',
   as: 'category',
   onDelete: 'CASCUDE',
+});
+
+Expense.belongsTo(Category, {
+  foreignKey: 'categoryId',
+  as: 'category',
 });
 
 module.exports = {
