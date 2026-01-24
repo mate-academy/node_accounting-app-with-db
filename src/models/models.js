@@ -24,7 +24,6 @@ Category.belongsTo(Expense, {
 
 Category.hasMany(Expense, {
   foreignKey: 'categoryId',
-  as: 'category',
   onDelete: 'CASCUDE',
 });
 
