@@ -27,6 +27,15 @@ const requiredFields = {
   [ent.usr]: {
     [mthds.post]: [fields[ent.usr].name],
   },
+  [ent.exp]: {
+    [mthds.post]: [
+      fields[ent.exp].userId,
+      fields[ent.exp].spentAt,
+      fields[ent.exp].title,
+      fields[ent.exp].amount,
+      fields[ent.exp].categoryId,
+    ],
+  },
   [ent.cat]: {
     [mthds.post]: [fields[ent.cat].name],
   },
