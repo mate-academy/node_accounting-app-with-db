@@ -14,6 +14,13 @@ const Expense = sequelize.define(
     userId: {
       type: DataTypes.UUID,
       allowNull: false,
+      field: 'user_id',
+      references: {
+        model: 'users',
+        key: 'id',
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
     },
     spentAt: {
       type: DataTypes.DATE,
@@ -27,9 +34,16 @@ const Expense = sequelize.define(
       type: DataTypes.DECIMAL,
       allowNull: false,
     },
-    category: {
-      type: DataTypes.STRING,
+    categoryId: {
+      type: DataTypes.UUID,
       allowNull: false,
+      field: 'category_id',
+      references: {
+        model: 'categories',
+        key: 'id',
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
     },
     note: {
       type: DataTypes.STRING,

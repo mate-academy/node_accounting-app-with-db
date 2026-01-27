@@ -1,6 +1,7 @@
 const ent = {
   usr: 'users',
   exp: 'expenses',
+  cat: 'categories',
 };
 
 const mthds = {
@@ -29,8 +30,12 @@ const fields = {
     spentAt: 'spentAt',
     title: 'title',
     amount: 'amount',
-    category: 'category',
+    categoryId: 'categoryId',
     note: 'note',
+  },
+  [ent.cat]: {
+    id: 'id',
+    name: 'name',
   },
 };
 

@@ -8,10 +8,10 @@ const { controllerRouter } = require('./controllers/controllers');
 const { contentTypes } = require('./static/vocab');
 const { errorHandler } = require('./errors');
 
-function createServer() {
-  // create instance of DB
-  models.User.sync({ force: true });
-  models.Expense.sync({ force: true });
+async function createServer() {
+  await models.User.sync({ force: true });
+  await models.Category.sync({ force: true });
+  await models.Expense.sync({ force: true });
 
   return http.createServer(async (req, res) => {
     setCORS(res);

@@ -4,7 +4,7 @@ const expSchema = {
   [fields[ent.exp].spentAt]: 'dateIsoString',
   [fields[ent.exp].title]: 'string',
   [fields[ent.exp].amount]: 0,
-  [fields[ent.exp].category]: 'string',
+  [fields[ent.exp].categoryId]: 'uuid',
   [fields[ent.exp].note]: 'string',
 };
 
@@ -16,6 +16,10 @@ const bodySchemas = {
   [ent.exp]: {
     [mthds.post]: { [fields[ent.exp].userId]: 'uuid', ...expSchema },
     [mthds.patch]: { ...expSchema },
+  },
+  [ent.cat]: {
+    [mthds.post]: { [fields[ent.cat].name]: 'string' },
+    [mthds.patch]: { [fields[ent.cat].name]: 'string' },
   },
 };
 

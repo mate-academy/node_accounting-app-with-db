@@ -2,7 +2,7 @@ const { contentTypes } = require('../static/vocab');
 
 function errorHandler(error, res) {
   const statusCode = error.statusCode;
-  console.log(error);
+
   res.setHeader('Content-Type', contentTypes.json);
 
   if (!statusCode) {

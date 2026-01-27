@@ -1,5 +1,5 @@
 const { models } = require('../models/models');
-const { ent, fields } = require('../static/vocab');
+const { ent } = require('../static/vocab');
 const { get, patch } = require('./general.service');
 const { NotFoundError } = require('../errors');
 
@@ -21,8 +21,6 @@ const deleteUser = async (id) => {
   }
 
   await user.destroy();
-
-  await models.Expense.destroy({ where: { [fields[ent.exp].userId]: id } });
 
   return true;
 };

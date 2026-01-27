@@ -6,7 +6,7 @@ const { NotFoundError, ValidationError } = require('../errors');
   fields[ent.exp].spentAt,
   fields[ent.exp].title,
   fields[ent.exp].amount,
-  fields[ent.exp].category,
+  fields[ent.exp].categoryId,
   fields[ent.exp].note,
 ]; */
 
@@ -23,6 +23,16 @@ const postExpense = async (body) => {
 
   if (user === null) {
     throw new NotFoundError(ent.usr, uid);
+  }
+
+  const categoryId = body[fields[ent.exp].categoryId];
+
+  if (categoryId) {
+    const category = await get(ent.cat, categoryId);
+
+    if (category === null) {
+      throw new NotFoundError(ent.cat, categoryId);
+    }
   }
 
   const newExpense = await models.Expense.create({ ...body });

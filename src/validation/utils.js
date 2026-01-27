@@ -13,6 +13,12 @@ const validationTable = {
     [mthds.post]: (exp) => exp === `/${ent.exp}`,
     [mthds.delete]: (exp) => /^\/expenses\/[0-9a-f-]+$/.test(exp),
   },
+  [ent.cat]: {
+    [mthds.get]: (path) => /^\/categories(\/[0-9a-f-]+)?$/.test(path),
+    [mthds.patch]: (path) => /^\/categories\/[0-9a-f-]+$/.test(path),
+    [mthds.post]: (path) => path === `/${ent.cat}`,
+    [mthds.delete]: (path) => /^\/categories\/[0-9a-f-]+$/.test(path),
+  },
 };
 
 const edgeCaseHandler = {

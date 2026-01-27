@@ -1,6 +1,12 @@
 const { mthds, ent, httpStatus } = require('../static/vocab');
 const services = require('../services');
-const { userDTO, userListDTO, expenseDTO, expenseListDTO } = require('../dto');
+const {
+  userDTO,
+  userListDTO,
+  expenseDTO,
+  expenseListDTO,
+  categoryDto,
+} = require('../dto');
 
 const serviceMap = {
   [ent.usr]: {
@@ -15,6 +21,12 @@ const serviceMap = {
     [mthds.patch]: services.patchExpense,
     [mthds.delete]: services.deleteExpense,
   },
+  [ent.cat]: {
+    [mthds.get]: services.getCategory,
+    [mthds.post]: services.postCategory,
+    [mthds.patch]: services.patchCategory,
+    [mthds.delete]: services.deleteCategory,
+  },
 };
 
 const dtoMap = {
@@ -26,6 +38,7 @@ const dtoMap = {
     single: expenseDTO,
     list: expenseListDTO,
   },
+  [ent.cat]: categoryDto,
 };
 
 const statusCodeMap = {

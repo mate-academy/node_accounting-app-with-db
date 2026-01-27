@@ -5,6 +5,12 @@ const {
   getExpense,
   patchExpense,
 } = require('./expense.service');
+const {
+  getCategory,
+  postCategory,
+  patchCategory,
+  deleteCategory,
+} = require('./category.service');
 
 module.exports = {
   getUser,
@@ -15,4 +21,8 @@ module.exports = {
   deleteExpense,
   getExpense,
   patchExpense,
+  getCategory,
+  postCategory,
+  patchCategory,
+  deleteCategory,
 };
