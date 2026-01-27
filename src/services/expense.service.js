@@ -52,7 +52,20 @@ const deleteExpense = async (id) => {
   return true;
 };
 
-const patchExpense = async (id, body) => patch(ent.exp, id, body);
+const patchExpense = async (id, body) => {
+  // validate categoryId if provided
+  const categoryId = body[fields[ent.exp].categoryId];
+
+  if (categoryId) {
+    const category = await get(ent.cat, categoryId);
+
+    if (category === null) {
+      throw new NotFoundError(ent.cat, categoryId);
+    }
+  }
+
+  return patch(ent.exp, id, body);
+};
 
 module.exports = {
   postExpense,

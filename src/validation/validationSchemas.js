@@ -23,4 +23,13 @@ const bodySchemas = {
   },
 };
 
-module.exports = { bodySchemas };
+const requiredFields = {
+  [ent.usr]: {
+    [mthds.post]: [fields[ent.usr].name],
+  },
+  [ent.cat]: {
+    [mthds.post]: [fields[ent.cat].name],
+  },
+};
+
+module.exports = { bodySchemas, requiredFields };

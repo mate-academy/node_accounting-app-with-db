@@ -1,5 +1,5 @@
-const { httpStatus } = require('../static/vocab');
-const { bodySchemas } = require('./validationSchemas');
+const { httpStatus, mthds } = require('../static/vocab');
+const { bodySchemas, requiredFields } = require('./validationSchemas');
 const { edgeCaseHandler } = require('./utils');
 const { ValidationError, errorMsg } = require('../errors');
 
@@ -7,6 +7,19 @@ function validateBody(body, ent, method) {
   const schema = bodySchemas[ent][method];
   const scKeys = Object.keys(schema);
   const bKeys = Object.keys(body);
+
+  // check required fields for POST requests
+  if (method === mthds.post) {
+    const required = requiredFields[ent]?.[method] || [];
+    const missingFields = required.filter((field) => !bKeys.includes(field));
+
+    if (missingFields.length > 0) {
+      throw new ValidationError(
+        `Missing required fields: ${missingFields.join(', ')}`,
+        httpStatus.badRequest,
+      );
+    }
+  }
 
   // length check
   if (bKeys.length > scKeys.length) {
