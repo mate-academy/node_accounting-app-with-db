@@ -9,7 +9,7 @@ function validateBody(body, ent, method) {
   const bKeys = Object.keys(body);
 
   // length check
-  if (bKeys.length === 0) {
+  if (body === null || bKeys.length === 0) {
     throw new ValidationError(errorMsg.noBody, httpStatus.badRequest);
   }
 
