@@ -8,6 +8,15 @@ function validateBody(body, ent, method) {
   const scKeys = Object.keys(schema);
   const bKeys = Object.keys(body);
 
+  // length check
+  if (bKeys.length === 0) {
+    throw new ValidationError(errorMsg.noBody, httpStatus.badRequest);
+  }
+
+  if (bKeys.length > scKeys.length) {
+    throw new ValidationError(errorMsg.bodyStructure(), httpStatus.badRequest);
+  }
+
   // check required fields for POST requests
   if (method === mthds.post) {
     const required = requiredFields[ent]?.[method] || [];
@@ -15,15 +24,10 @@ function validateBody(body, ent, method) {
 
     if (missingFields.length > 0) {
       throw new ValidationError(
-        `Missing required fields: ${missingFields.join(', ')}`,
+        errorMsg.noObligateFields,
         httpStatus.badRequest,
       );
     }
-  }
-
-  // length check
-  if (bKeys.length > scKeys.length) {
-    throw new ValidationError(errorMsg.bodyStructure(), httpStatus.badRequest);
   }
 
   // key check

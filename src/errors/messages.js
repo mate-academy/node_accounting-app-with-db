@@ -7,6 +7,9 @@ const errorMsg = {
   keys: (keys) => `Unexpected body keys in body: ${keys}`,
   valueType: (value, datatype) =>
     `Unexpected body values: ${value} expected to be of ${datatype} type`,
+  noBody: () => 'Expected a body',
+  noObligateFields: (missingFields) =>
+    `Missing required fields: ${missingFields}`,
 };
 
 module.exports = { errorMsg };
