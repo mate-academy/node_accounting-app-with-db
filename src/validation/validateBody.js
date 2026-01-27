@@ -1,19 +1,7 @@
-const { getValError } = require('./utils');
-const { bodySchemas, edgeCases } = require('../static/constants');
-
-const edgeCaseHandler = {
-  [edgeCases.date]: (received) => {
-    const isoDateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?$/;
-
-    if (!isoDateRegex.test(received)) {
-      return false;
-    }
-
-    const date = new Date(received);
-
-    return !isNaN(date.getTime());
-  },
-};
+const { httpStatus } = require('../static/vocab');
+const { bodySchemas } = require('./validationSchemas');
+const { edgeCaseHandler } = require('./utils');
+const { ValidationError, errorMsg } = require('../errors');
 
 function validateBody(body, ent, method) {
   const schema = bodySchemas[ent][method];
@@ -22,29 +10,38 @@ function validateBody(body, ent, method) {
 
   // length check
   if (bKeys.length > scKeys.length) {
-    return getValError(400, 'Invalid body structure');
+    throw new ValidationError(errorMsg.bodyStructure(), httpStatus.badRequest);
   }
 
   // key check
-  if (!bKeys.every((el) => scKeys.includes(el))) {
-    return getValError(400, 'Unexpected keys in body');
+  const unknownKeys = [...bKeys].filter((el) => !scKeys.includes(el));
+
+  if (unknownKeys.length > 0) {
+    throw new ValidationError(
+      errorMsg.keys(unknownKeys),
+      httpStatus.badRequest,
+    );
   }
 
   for (const key of bKeys) {
     // check data type
     if (typeof schema[key] !== typeof body[key]) {
-      return getValError(400, `Unexpected keys: ${key}; ${typeof body[key]}`);
+      throw new ValidationError(
+        errorMsg.valueType(body[key], schema[key]),
+        httpStatus.badRequest,
+      );
     }
 
     // validate edge cases (date in our case)\
     const edgeValidator = edgeCaseHandler[key];
 
     if (edgeValidator && !edgeValidator(body[key])) {
-      return getValError(400, `Invalid value for field: ${key}`);
+      throw new ValidationError(
+        errorMsg.valueType(body[key], schema[key]),
+        httpStatus.badRequest,
+      );
     }
   }
-
-  return { ok: true, body: body };
 }
 
 module.exports = { validateBody };

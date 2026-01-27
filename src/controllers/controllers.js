@@ -1,29 +1,33 @@
-const { dbActions, mthds, ent } = require('../static/constants');
-const { User, Expense } = require('../models/models');
+const { mthds } = require('../static/vocab');
+const { ValidationError } = require('../errors');
+const { serviceMap, dtoMap, statusCodeMap } = require('./maps');
 
-const entToActionMap = {
-  [ent.usr]: User,
-  [ent.exp]: Expense,
-};
-
-const methodsToDbActions = {
-  [mthds.post]: dbActions.post,
-  [mthds.patch]: dbActions.patch,
-  [mthds.delete]: dbActions.delete,
-};
-
-const controllerRouter = (entity, method, id = null, body = null) => {
-  const table = entToActionMap[entity];
-
-  let action = methodsToDbActions[method];
+const controllerRouter = async (entity, method, id = null, body = null) => {
+  const action = serviceMap[entity]?.[method];
 
   if (!action) {
-    action = id === null ? table.findAll() : table.getOne;
+    throw new ValidationError('Unsupported method', 405);
   }
 
-  const args = [entity, id, body].filter((arg) => arg !== null);
+  const args = [id, body].filter((arg) => arg !== null);
+  const result = await action(...args);
 
-  return { action: action, args: args };
+  let data = null;
+
+  if (method !== mthds.delete) {
+    const dto = dtoMap[entity];
+
+    if (method === mthds.get) {
+      data = id !== null ? dto.single(result) : dto.list(result);
+    } else {
+      data = dto.single(result);
+    }
+  }
+
+  return {
+    statusCode: statusCodeMap[method],
+    data,
+  };
 };
 
 module.exports = { controllerRouter };

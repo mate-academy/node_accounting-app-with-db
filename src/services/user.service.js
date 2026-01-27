@@ -1,31 +1,37 @@
-const { User, Expense } = require('../models/models');
+const { models } = require('../models/models');
 const { ent, fields } = require('../static/vocab');
-const { get } = require('./general.service');
+const { get, patch } = require('./general.service');
+const { NotFoundError } = require('../errors');
 
 // const allowedList = [fields[ent.usr].name];
 
+const getUser = async (id = null) => get(ent.usr, id);
+
 const postUser = async (body) => {
-  return User.create({ ...body });
+  const user = await models.User.create({ ...body });
+
+  return user;
 };
 
 const deleteUser = async (id) => {
   const user = await get(ent.usr, id);
 
   if (user === null) {
-    return false;
+    throw new NotFoundError(ent.usr, id);
   }
 
   await user.destroy();
 
-  const usrExp = Expense.findAll({
-    where: {
-      [fields[ent.exp].userId]: id,
-    },
-  });
-
-  await Promise.all(usrExp.forEach((el) => el.destroy()));
+  await models.Expense.destroy({ where: { [fields[ent.exp].userId]: id } });
 
   return true;
 };
 
-module.exports = { postUser, deleteUser };
+const patchUser = async (id, body) => patch(ent.usr, id, body);
+
+module.exports = {
+  getUser,
+  postUser,
+  deleteUser,
+  patchUser,
+};

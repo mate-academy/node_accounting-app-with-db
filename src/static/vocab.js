@@ -10,6 +10,15 @@ const mthds = {
   delete: 'DELETE',
 };
 
+const httpStatus = {
+  ok: 200,
+  created: 201,
+  noContent: 204,
+  badRequest: 400,
+  notFound: 404,
+  serverError: 500,
+};
+
 const fields = {
   [ent.usr]: {
     id: 'id',
@@ -25,8 +34,14 @@ const fields = {
   },
 };
 
+const contentTypes = {
+  json: 'application/json; charset=utf-8',
+};
+
 module.exports = {
   fields,
   ent,
   mthds,
+  httpStatus,
+  contentTypes,
 };

@@ -1,7 +1,7 @@
-const { User, Expense } = require('../models/models');
+const { models } = require('../models/models');
 const { ent, fields } = require('../static/vocab');
-const { get } = require('./general.service');
-
+const { get, patch } = require('./general.service');
+const { NotFoundError, ValidationError } = require('../errors');
 /* const allowedList = [
   fields[ent.exp].spentAt,
   fields[ent.exp].title,
@@ -10,27 +10,31 @@ const { get } = require('./general.service');
   fields[ent.exp].note,
 ]; */
 
+const getExpense = async (id = null) => get(ent.exp, id);
+
 const postExpense = async (body) => {
   const uid = body[fields[ent.exp].userId];
 
   if (!uid) {
-    return Expense.create({ ...body });
+    throw new ValidationError('userId is required', 400);
   }
 
-  const user = get([ent.usr], uid);
+  const user = await get(ent.usr, uid);
 
   if (user === null) {
-    return false;
+    throw new NotFoundError(ent.usr, uid);
   }
 
-  return User.create({ ...body });
+  const newExpense = await models.Expense.create({ ...body });
+
+  return newExpense;
 };
 
 const deleteExpense = async (id) => {
   const expense = await get(ent.exp, id);
 
   if (expense === null) {
-    return false;
+    throw new NotFoundError(ent.exp, id);
   }
 
   await expense.destroy();
@@ -38,4 +42,11 @@ const deleteExpense = async (id) => {
   return true;
 };
 
-module.exports = { postExpense, deleteExpense };
+const patchExpense = async (id, body) => patch(ent.exp, id, body);
+
+module.exports = {
+  postExpense,
+  deleteExpense,
+  getExpense,
+  patchExpense,
+};

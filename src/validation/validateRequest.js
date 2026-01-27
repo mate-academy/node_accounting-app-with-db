@@ -1,20 +1,6 @@
-const { ent, mthds } = require('../static/constants');
-const { getValError } = require('./utils');
-
-const validationTable = {
-  [ent.usr]: {
-    [mthds.get]: (path) => /^\/users(\/\d+)?$/.test(path),
-    [mthds.patch]: (path) => /^\/users\/\d+$/.test(path),
-    [mthds.post]: (path) => path === `/${ent.usr}`,
-    [mthds.delete]: (path) => /^\/users\/\d+$/.test(path),
-  },
-  [ent.exp]: {
-    [mthds.get]: (exp) => /^\/expenses(\/\d+)?$/.test(exp),
-    [mthds.patch]: (exp) => /^\/expenses(\/\d+)$/.test(exp),
-    [mthds.post]: (exp) => exp === `/${ent.exp}`,
-    [mthds.delete]: (exp) => /^\/expenses(\/\d+)$/.test(exp),
-  },
-};
+const { ent, mthds, httpStatus } = require('../static/vocab');
+const { ValidationError, errorMsg } = require('../errors');
+const { validationTable } = require('./utils');
 
 function validateRequest(req) {
   // parse URL and method
@@ -23,7 +9,7 @@ function validateRequest(req) {
 
   // validate method in mthds
   if (!Object.values(mthds).includes(method)) {
-    return getValError(400, 'Unexpected request method');
+    throw new ValidationError(errorMsg.method(method), httpStatus.badRequest);
   }
 
   // validate path
@@ -33,28 +19,22 @@ function validateRequest(req) {
 
   // validate length
   if (segments.length > 3 || segments.length === 1) {
-    return getValError(
-      400,
-      `Expected endpoint to be /entity/id?, received: ${path}`,
-    );
+    throw new ValidationError(errorMsg.endpoint(path), httpStatus.badRequest);
   }
 
   // check requested entity is in whitelist
   if (!Object.values(ent).includes(reqEnt)) {
-    return getValError(400, `Unexpected entity: ${reqEnt}`);
+    throw new ValidationError(errorMsg.entity(reqEnt), httpStatus.badRequest);
   }
 
   // check whole url
   if (!validationTable[reqEnt][method](path)) {
-    return getValError(400, `Unexpected path`);
+    throw new ValidationError(errorMsg.wholeUrl(path), httpStatus.badRequest);
   }
 
-  // make it return entity + id if needed
-
-  const id = segments[2] ? Number(segments[2]) : null;
+  const id = segments[2] ? segments[2] : null;
 
   return {
-    ok: true,
     ent: reqEnt,
     method,
     id,

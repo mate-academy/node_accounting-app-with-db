@@ -1,6 +1,8 @@
 // since the only body we can receive, I hardcode JSON parse to the function
+const { MaxSizeError, NotJSON, RequestCancel } = require('../errors');
+const maxSizeLimit = 1048576;
 
-async function readBody(req, maxSize = 1048576) {
+async function readBody(req, maxSize = maxSizeLimit) {
   return new Promise((resolve, reject) => {
     let data = '';
     let size = 0;
@@ -23,7 +25,7 @@ async function readBody(req, maxSize = 1048576) {
       if (size > maxSize && !settled) {
         settled = true;
         req.destroy();
-        reject(new Error('Request body too large'));
+        reject(new MaxSizeError());
 
         return;
       }
@@ -45,7 +47,7 @@ async function readBody(req, maxSize = 1048576) {
       } catch {
         if (!settled) {
           settled = true;
-          reject(new Error('Invalid JSON'));
+          reject(new NotJSON());
         }
       }
     });
@@ -53,7 +55,7 @@ async function readBody(req, maxSize = 1048576) {
     req.on('close', () => {
       if (!settled) {
         settled = true;
-        reject(new Error('Request cancelled'));
+        reject(new RequestCancel());
       }
     });
   });

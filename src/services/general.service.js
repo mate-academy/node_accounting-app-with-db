@@ -1,4 +1,5 @@
 const { tableMap } = require('../static/constants');
+const { NotFoundError } = require('../errors');
 
 const get = async (entity, id = null) => {
   if (id === null) {
@@ -12,12 +13,12 @@ const patch = async (entity, id, body) => {
   const obj = await get(entity, id);
 
   if (obj === null) {
-    return false;
+    throw new NotFoundError(entity, id);
   }
 
-  await obj.update(body);
+  const newObj = await obj.update(body);
 
-  return true;
+  return newObj;
 };
 
 module.exports = { get, patch };

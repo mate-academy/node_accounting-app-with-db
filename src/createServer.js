@@ -1,19 +1,19 @@
 'use strict';
 
 const http = require('http');
-const { User, Expense } = require('./models/models');
-const { validateRequest } = require('./validation/validateRequest');
-const { readBody, setCORS } = require('./helpers/helpers');
-const { bodySchemas } = require('./static/constants');
-const { validateBody } = require('./validation/validateBody');
+const { models } = require('./models/models');
+const { validate } = require('./validation');
+const { setCORS } = require('./helpers/helpers');
 const { controllerRouter } = require('./controllers/controllers');
+const { contentTypes } = require('./static/vocab');
+const { errorHandler } = require('./errors');
 
 function createServer() {
   // create instance of DB
-  User.sync({ force: true });
-  Expense.sync({ force: true });
+  models.User.sync({ force: true });
+  models.Expense.sync({ force: true });
 
-  return http.create(async (req, res) => {
+  return http.createServer(async (req, res) => {
     setCORS(res);
 
     if (req.method === 'OPTIONS') {
@@ -23,68 +23,22 @@ function createServer() {
       return;
     }
 
-    // validate request
-    const parsedRequest = validateRequest(req);
+    try {
+      const { ent, method, id, body } = await validate(req);
 
-    if (!parsedRequest.ok) {
-      res.statusCode = parsedRequest.statusCode;
-      res.end(parsedRequest.message);
+      const result = await controllerRouter(ent, method, id, body);
 
-      return;
-    }
+      res.statusCode = result.statusCode;
 
-    // get entity, id from path
-    const { method, ent, id } = parsedRequest;
-    let body = null;
-
-    // check if method has body
-    if (bodySchemas[ent][method]) {
-      try {
-        // parse body && JSON in body
-        body = await readBody(req);
-
-        // validate body by schema
-        const validated = validateBody(body, ent, method);
-
-        if (!validated.ok) {
-          res.statusCode = validated.statusCode;
-          res.end(validated.message);
-
-          return;
-        }
-      } catch (e) {
-        res.statusCode = 400;
-        res.end(e.message);
-
-        return;
+      if (result.data !== null) {
+        res.setHeader('Content-Type', contentTypes.json);
+        res.end(JSON.stringify(result.data));
+      } else {
+        res.end();
       }
+    } catch (error) {
+      errorHandler(error, res);
     }
-
-    // getting key for DB class method
-    const { action, args } = controllerRouter(ent, method, id, body);
-
-    // db action
-    const result = db[action](...args);
-
-    res.statusCode = result.statusCode;
-
-    // if db object not found or any error
-    if (!result.ok) {
-      res.end(result.msg);
-
-      return;
-    }
-
-    // if method doesn't return value
-    if (!result.data) {
-      res.end();
-
-      return;
-    }
-
-    // since by specification we can return only JSON
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(result.data));
   });
 }
 
