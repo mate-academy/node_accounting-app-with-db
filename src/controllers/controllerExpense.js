@@ -33,9 +33,7 @@ const create = async (req, res) => {
   if (!userId || !spentAt || !title || amount === undefined) {
     return res
       .status(400)
-      .send(
-        'All fields are required: userId, spentAt, title, amount, category',
-      );
+      .send('All fields are required: userId, spentAt, title, amount');
   }
 
   const user = await userService.getUserById(Number(userId));
@@ -50,7 +48,7 @@ const create = async (req, res) => {
     title,
     Number(amount),
     category || '',
-    note,
+    note || '',
   );
 
   res.status(201).json(expense);

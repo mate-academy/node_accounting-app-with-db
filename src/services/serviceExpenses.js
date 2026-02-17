@@ -1,7 +1,5 @@
 'use strict';
 
-/* eslint-disable comma-dangle, prettier/prettier */
-
 const { Expense } = require('../models/Expense.model');
 const { Op } = require('sequelize');
 
@@ -15,19 +13,21 @@ const getAllExpenses = async (userId, categories, from, to) => {
   if (categories) {
     const categoryList = Array.isArray(categories) ? categories : [categories];
 
-    where.category = {
-      [Op.in]: categoryList,
-    };
+    if (categoryList.length > 0) {
+      where.category = {
+        [Op.in]: categoryList,
+      };
+    }
   }
 
   if (from || to) {
     where.spentAt = {};
 
-    if (from) {
+    if (from && !isNaN(Date.parse(from))) {
       where.spentAt[Op.gte] = new Date(from);
     }
 
-    if (to) {
+    if (to && !isNaN(Date.parse(to))) {
       where.spentAt[Op.lte] = new Date(to);
     }
   }
@@ -58,7 +58,7 @@ const createExpense = async (
     spentAt,
     title,
     amount: Number(amount),
-    category,
+    category: category || '',
     note: note || '',
   });
 
@@ -115,6 +115,7 @@ const clearExpenses = async () => {
   await Expense.destroy({
     where: {},
     truncate: true,
+    restartIdentity: true,
   });
 };
 

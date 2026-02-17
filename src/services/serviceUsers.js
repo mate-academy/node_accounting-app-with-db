@@ -1,3 +1,5 @@
+'use strict';
+
 const { User } = require('../models/User.model');
 
 const getAllUsers = async () => {
@@ -21,9 +23,11 @@ const createUser = async (name) => {
 const updateUser = async (id, name) => {
   const user = await getUserById(id);
 
-  if (user) {
-    await user.update({ name });
+  if (!user) {
+    return null;
   }
+
+  await user.update({ name });
 
   return user;
 };
@@ -31,18 +35,20 @@ const updateUser = async (id, name) => {
 const deleteUser = async (id) => {
   const user = await getUserById(id);
 
-  if (user) {
-    await user.destroy();
-
-    return true;
+  if (!user) {
+    return false;
   }
 
-  return false;
+  await user.destroy();
+
+  return true;
 };
 
 const clearUsers = async () => {
   await User.destroy({
     where: {},
+    truncate: true,
+    restartIdentity: true,
   });
 };
 
