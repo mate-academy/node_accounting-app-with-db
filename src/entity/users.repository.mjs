@@ -44,7 +44,7 @@ const update = async (id, name) => {
     },
   );
 
-  return res[1];
+  return res;
 };
 
 export default {

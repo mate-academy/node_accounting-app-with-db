@@ -1,3 +1,4 @@
+import { Op } from 'sequelize';
 import { Expense } from '../models/Expense.model.mjs';
 
 const getAll = async () => {
@@ -14,27 +15,48 @@ const getById = async (id) => {
   return res;
 };
 
-const getByParams = async (userId, category, from, to) => {
-  let exps = await getAll();
+const filterOptions = (params) => {
+  const options = {};
 
-  if (userId !== null) {
-    exps = exps.filter((exp) => exp.userId === userId);
-  }
+  try {
+    Object.entries(params).forEach(([key, value]) => {
+      if (value) {
+        switch (key) {
+          case 'spentAt': {
+            if (value.from && value.to) {
+              options.spentAt = {
+                [Op.between]: [value.from, value.to],
+              };
+            }
+            break;
+          }
 
-  if (category?.trim()) {
-    exps = exps.filter((exp) => exp.category === category);
-  }
-
-  if (from && to) {
-    exps = exps.filter((exp) => {
-      return (
-        new Date(from).getTime() < new Date(exp.spentAt).getTime() &&
-        new Date(exp.spentAt).getTime() < new Date(to).getTime()
-      );
+          default: {
+            if (value) {
+              options[key] = value;
+            }
+          }
+        }
+      }
     });
-  }
 
-  return exps;
+    return options;
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
+const getByParams = async (filterParams) => {
+  try {
+    const exps = await Expense.findAll({
+      where: filterOptions(filterParams),
+      raw: true,
+    });
+
+    return exps;
+  } catch (err) {
+    throw new Error(err);
+  }
 };
 
 const create = async (userId, spentAt, title, amount, category, note) => {

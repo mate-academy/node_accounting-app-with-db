@@ -11,6 +11,7 @@ router.get('/', async (_, res) => {
     res.send(data);
   } catch (error) {
     res.statusCode = 500;
+    res.end();
   }
 });
 
@@ -31,6 +32,7 @@ router.get('/:id', async (req, res) => {
     res.send(targetUser);
   } catch (error) {
     res.statusCode = 500;
+    res.end();
   }
 });
 
@@ -51,6 +53,7 @@ router.post('/', express.json(), async (req, res) => {
     res.send(user);
   } catch (error) {
     res.statusCode = 500;
+    res.end();
   }
 });
 
@@ -72,6 +75,7 @@ router.delete('/:id', async (req, res) => {
     res.end();
   } catch (error) {
     res.statusCode = 500;
+    res.end();
   }
 });
 
@@ -87,9 +91,9 @@ router.patch('/:id', express.json(), async (req, res) => {
       return;
     }
 
-    const user = await userController.update(id, name);
+    const updateData = await userController.update(id, name);
 
-    if (!user) {
+    if (!updateData[0]) {
       res.statusCode = 404;
       res.end();
 
@@ -97,7 +101,7 @@ router.patch('/:id', express.json(), async (req, res) => {
     }
 
     res.statusCode = 200;
-    res.send(user);
+    res.send(updateData[1]);
   } catch (error) {
     res.statusCode = 500;
     res.end();

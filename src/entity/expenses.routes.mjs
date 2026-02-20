@@ -11,18 +11,27 @@ const keys = ['spentAt', 'title', 'amount', 'category', 'note'];
 
 router.get('/', async (req, res) => {
   try {
-    if (req.query) {
-      const userId = req.query['userId'] || null;
+    if (Object.keys(req.query).length) {
+      const userId = req.query['userId']?.trim() || null;
       const category = req.query['category']?.trim() || null;
       const from = req.query['from'] || null;
       const to = req.query['to'] || null;
 
-      const expenses = await expensesController.getByParams(
+      if ((from && !to) || (to && !from)) {
+        res.statusCode = 400;
+        res.end();
+
+        return;
+      }
+
+      const expenses = await expensesController.getByParams({
         userId,
         category,
-        from,
-        to,
-      );
+        spentAt: {
+          from,
+          to,
+        },
+      });
 
       res.statusCode = 200;
       res.send(expenses);
@@ -35,6 +44,8 @@ router.get('/', async (req, res) => {
   } catch (error) {
     res.statusCode = 500;
     res.end();
+
+    throw new Error(error);
   }
 });
 
