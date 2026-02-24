@@ -105,15 +105,23 @@ const updateExpense = async (req, res) => {
   const expense = await services.expenseService.getExpenseById(id);
 
   if (!expense) {
-    res.sendStatus(404);
-
-    return;
+    return res.sendStatus(404);
   }
 
   if (!userId && !spentAt && !title && !amount && !category && !note) {
-    res.sendStatus(400);
+    return res.sendStatus(400);
+  }
 
-    return;
+  let categoryEntity = null;
+
+  if (category) {
+    categoryEntity = await services.categoryService.getCategoryByName(category);
+
+    if (!categoryEntity) {
+      categoryEntity = await services.categoryService.createCategory({
+        name: category,
+      });
+    }
   }
 
   const updatedExpense = await services.expenseService.updateExpense(id, {
@@ -121,7 +129,7 @@ const updateExpense = async (req, res) => {
     ...(spentAt ? { spentAt } : {}),
     ...(title ? { title } : {}),
     ...(amount ? { amount } : {}),
-    ...(category ? { category } : {}),
+    ...(categoryEntity ? { categoryId: categoryEntity.id } : {}),
     ...(note ? { note } : {}),
   });
 
