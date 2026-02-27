@@ -5,6 +5,8 @@ const { Category, User, Expense } = require('./models/models').models;
 
 function createServer() {
   const app = express();
+  const { Op } = require('sequelize');
+
 
   app.use(express.json());
 
@@ -154,32 +156,31 @@ function createServer() {
 
   app.get('/expenses', async (req, res) => {
     const { userId, from, to, categories } = req.query;
-    const expenses = await Expense.findAll();
-    let result = [...expenses];
+    const where = {};
 
-    if (from) {
-      const fromDate = new Date(from);
-
-      result = result.filter((data) => new Date(data.spentAt) >= fromDate);
+    if (userId) {
+      where.userId = Number(userId);
     }
 
-    if (to) {
-      const toDate = new Date(to);
+    if (from || to) {
+      where.spentAt = {};
 
-      result = result.filter((data) => new Date(data.spentAt) <= toDate);
+      if (from) {
+        where.spentAt[Op.gte] = new Date(from);
+      }
+
+      if (to) {
+        where.spentAt[Op.lte] = new Date(to);
+      }
     }
 
     if (categories) {
-      const categoryList = categories.split(',');
-
-      result = result.filter((data) => categoryList.includes(data.category));
+      where.category = { [Op.in]: categories.split(',') };
     }
 
-    if (userId) {
-      result = result.filter((e) => e.userId === Number(userId));
-    }
+    const expenses = await Expense.findAll({ where });
 
-    res.json(result);
+    res.json(expenses);
   });
 
   app.get('/expenses/:id', async (req, res) => {
@@ -199,7 +200,7 @@ function createServer() {
     const { id } = req.params;
     const deleteExpense = await Expense.destroy({ where: { id } });
 
-    if (deleteExpense.length === 0) {
+    if (deleteExpense === 0) {
       res.sendStatus(404);
 
       return;
