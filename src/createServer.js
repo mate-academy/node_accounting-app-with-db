@@ -1,73 +1,19 @@
 'use strict';
 
 const express = require('express');
-const { Category, User, Expense } = require('./models/models').models;
+const { User, Expense } = require('./models/models').models;
 
 function createServer() {
   const app = express();
   const { Op } = require('sequelize');
 
-
   app.use(express.json());
-
-  app.get('/categories', async (req, res) => {
-    const category = await Category.findAll();
-
-    res.json(category);
-  });
-
-  app.post('/categories', async (req, res) => {
-    const { name } = req.body;
-
-    if (!name) {
-      res.sendStatus(400);
-
-      return;
-    }
-
-    const category = await Category.create({ name });
-
-    res.status(201).json(category);
-  });
-
-  app.patch('/categories/:id', async (req, res) => {
-    const { id } = req.params;
-    const { name } = req.body;
-
-    const category = await Category.findByPk(id);
-
-    if (!category) {
-      res.sendStatus(404);
-
-      return;
-    }
-
-    category.name = name;
-    await category.save();
-
-    res.status(200).json(category);
-  });
-
-  app.delete('/categories/:id', async (req, res) => {
-    const { id } = req.params;
-    const deleteCategory = await Category.destroy({ where: { id } });
-
-    if (deleteCategory === 0) {
-      res.sendStatus(404);
-
-      return;
-    }
-
-    res.sendStatus(204);
-  });
 
   app.post('/users', async (req, res) => {
     const { name } = req.body;
 
     if (!name) {
-      res.sendStatus(400);
-
-      return;
+      return res.sendStatus(400);
     }
 
     const user = await User.create({ name });
@@ -82,64 +28,60 @@ function createServer() {
   });
 
   app.get('/users/:id', async (req, res) => {
-    const { id } = req.params;
-    const user = await User.findByPk(id);
+    const user = await User.findByPk(Number(req.params.id));
 
     if (!user) {
-      res.sendStatus(404);
-
-      return;
+      return res.sendStatus(404);
     }
 
-    res.status(200).json(user);
-  });
-
-  app.delete('/users/:id', async (req, res) => {
-    const { id } = req.params;
-    const deleteUser = await User.destroy({ where: { id } });
-
-    if (deleteUser === 0) {
-      res.sendStatus(404);
-
-      return;
-    }
-    res.sendStatus(204);
+    res.json(user);
   });
 
   app.patch('/users/:id', async (req, res) => {
-    const { id } = req.params;
-    const { name } = req.body;
-    const user = await User.findByPk(id);
+    const user = await User.findByPk(Number(req.params.id));
 
     if (!user) {
-      res.sendStatus(404);
-
-      return;
+      return res.sendStatus(404);
     }
 
-    if (name) {
+    const { name } = req.body;
+
+    if (name !== undefined) {
       user.name = name;
       await user.save();
     }
 
-    res.status(200).json(user);
+    res.json(user);
+  });
+
+  app.delete('/users/:id', async (req, res) => {
+    const deleted = await User.destroy({
+      where: { id: Number(req.params.id) },
+    });
+
+    if (!deleted) {
+      return res.sendStatus(404);
+    }
+
+    res.sendStatus(204);
   });
 
   app.post('/expenses', async (req, res) => {
     const { userId, spentAt, title, amount, category, note } = req.body;
 
-    if (!userId || !spentAt || !title || !amount) {
-      res.sendStatus(400);
-
-      return;
+    if (
+      userId === undefined ||
+      spentAt === undefined ||
+      title === undefined ||
+      amount === undefined
+    ) {
+      return res.sendStatus(400);
     }
 
-    const checkUser = await User.findByPk(userId);
+    const user = await User.findByPk(userId);
 
-    if (!checkUser) {
-      res.sendStatus(400);
-
-      return;
+    if (!user) {
+      return res.sendStatus(400);
     }
 
     const expense = await Expense.create({
@@ -184,56 +126,49 @@ function createServer() {
   });
 
   app.get('/expenses/:id', async (req, res) => {
-    const { id } = req.params;
-    const expense = await Expense.findByPk(id);
+    const expense = await Expense.findByPk(Number(req.params.id));
 
     if (!expense) {
-      res.sendStatus(404);
-
-      return;
+      return res.sendStatus(404);
     }
 
     res.json(expense);
   });
 
-  app.delete('/expenses/:id', async (req, res) => {
-    const { id } = req.params;
-    const deleteExpense = await Expense.destroy({ where: { id } });
-
-    if (deleteExpense === 0) {
-      res.sendStatus(404);
-
-      return;
-    }
-    res.sendStatus(204);
-  });
-
   app.patch('/expenses/:id', async (req, res) => {
-    const { id } = req.params;
+    const expense = await Expense.findByPk(Number(req.params.id));
+
+    if (!expense) {
+      return res.sendStatus(404);
+    }
+
     const { userId } = req.body;
 
-    const expens = await Expense.findByPk(id);
+    if (userId !== undefined) {
+      const user = await User.findByPk(userId);
 
-    if (!expens) {
-      res.sendStatus(404);
-
-      return;
-    }
-
-    if (userId) {
-      const checkUser = await User.findByPk(userId);
-
-      if (!checkUser) {
-        res.sendStatus(404);
-
-        return;
+      if (!user) {
+        return res.sendStatus(400);
       }
     }
 
-    Object.assign(expens, req.body);
-    await expens.save();
+    Object.assign(expense, req.body);
 
-    res.status(200).json(expens);
+    await expense.save();
+
+    res.json(expense);
+  });
+
+  app.delete('/expenses/:id', async (req, res) => {
+    const deleted = await Expense.destroy({
+      where: { id: Number(req.params.id) },
+    });
+
+    if (!deleted) {
+      return res.sendStatus(404);
+    }
+
+    res.sendStatus(204);
   });
 
   return app;
