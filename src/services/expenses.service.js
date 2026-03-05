@@ -1,16 +1,34 @@
 const { Op } = require('sequelize');
 const { Expense } = require('../models/Expense.model');
+const { Category } = require('../models/Category.model');
+
+const normalize = (item, category) => {
+  const { id, userId, spentAt, title, amount, note } = item.toJSON();
+
+  return {
+    id,
+    userId,
+    spentAt,
+    title,
+    amount,
+    category: category || item.Category?.name,
+    note,
+  };
+};
 
 async function getAll({ userId, categories, from, to }) {
   const where = {};
+  const categoryWhere = {};
 
   if (userId) {
     where.userId = userId;
   }
 
   if (categories?.length) {
-    where.category = {
-      [Op.in]: Array.isArray(categories) ? categories : [categories],
+    const normalized = Array.isArray(categories) ? categories : [categories];
+
+    categoryWhere.name = {
+      [Op.in]: normalized,
     };
   }
 
@@ -20,11 +38,23 @@ async function getAll({ userId, categories, from, to }) {
     };
   }
 
-  return Expense.findAll({ where });
+  return Expense.findAll({
+    where,
+    include: {
+      model: Category,
+      attributes: ['name'],
+      where: Object.keys(categoryWhere).length ? categoryWhere : undefined,
+    },
+  });
 }
 
 async function getById(id) {
-  return Expense.findByPk(id);
+  return Expense.findByPk(id, {
+    include: {
+      model: Category,
+      attributes: ['name'],
+    },
+  });
 }
 
 async function create(params) {
@@ -40,10 +70,17 @@ async function deleteById(id) {
 }
 
 async function update(id, params) {
-  return Expense.update(params, { where: { id } });
+  return Expense.update(params, {
+    where: { id },
+    include: {
+      model: Category,
+      attributes: ['name'],
+    },
+  });
 }
 
 module.exports = {
+  normalize,
   getAll,
   getById,
   create,

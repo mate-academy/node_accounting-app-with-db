@@ -1,16 +1,26 @@
 const expensesService = require('../services/expenses.service');
 const usersService = require('../services/users.service');
+const categoriesService = require('../services/categories.service');
 
 const getAll = async (req, res) => {
   const expenses = await expensesService.getAll(req.query);
 
-  res.json(expenses);
+  res.json(expenses.map((item) => expensesService.normalize(item)));
 };
 
 const create = async (req, res) => {
-  const { userId, spentAt, title, amount, category } = req.body;
+  const { userId, spentAt, title, amount, category, note } = req.body;
 
-  if (!spentAt || !title || !amount || !category) {
+  if (!userId || !spentAt || !title || !amount) {
+    return res.sendStatus(400);
+  }
+
+  if (
+    Number.isNaN(+userId) ||
+    Number.isNaN(+amount) ||
+    +userId <= 0 ||
+    +amount < 0
+  ) {
     return res.sendStatus(400);
   }
 
@@ -20,9 +30,30 @@ const create = async (req, res) => {
     return res.sendStatus(400);
   }
 
-  const expense = await expensesService.create(req.body);
+  let categoryId;
 
-  res.status(201).json(expense);
+  if (category != null) {
+    const categoryByName = await categoriesService.getByName(category);
+
+    categoryId = categoryByName?.id;
+
+    if (!categoryByName) {
+      const { id } = await categoriesService.create(category);
+
+      categoryId = id;
+    }
+  }
+
+  const expense = await expensesService.create({
+    userId,
+    spentAt,
+    title,
+    amount,
+    categoryId,
+    note,
+  });
+
+  res.status(201).json(expensesService.normalize(expense, category));
 };
 
 const getOne = async (req, res) => {
@@ -32,7 +63,7 @@ const getOne = async (req, res) => {
     return res.sendStatus(404);
   }
 
-  res.json(expense);
+  res.json(expensesService.normalize(expense));
 };
 
 const deleteOne = async (req, res) => {
@@ -58,7 +89,7 @@ const update = async (req, res) => {
 
   const updatedExpense = await expensesService.getById(req.params.id);
 
-  res.json(updatedExpense);
+  res.json(expensesService.normalize(updatedExpense));
 };
 
 module.exports = {

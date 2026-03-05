@@ -20,6 +20,12 @@ const User = sequelize.define(
     tableName: 'users',
     updatedAt: false,
     createdAt: false,
+    hooks: {
+      beforeBulkDestroy(options) {
+        options.truncate = true;
+        options.cascade = true;
+      },
+    },
   },
 );
 
