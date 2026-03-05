@@ -7,14 +7,9 @@ const { expensesRouter } = require('./routes/expenses.router');
 const { categoriesRouter } = require('./routes/categories.router');
 
 const createServer = () => {
-  const { models } = require('./models/models');
-  const { User, Category, Expense } = models;
+  require('./models/models');
 
   const app = express();
-
-  User.sync();
-  Category.sync();
-  Expense.sync();
 
   app.use(cors());
 

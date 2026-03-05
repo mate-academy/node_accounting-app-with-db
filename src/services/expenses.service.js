@@ -72,10 +72,6 @@ async function deleteById(id) {
 async function update(id, params) {
   return Expense.update(params, {
     where: { id },
-    include: {
-      model: Category,
-      attributes: ['name'],
-    },
   });
 }
 

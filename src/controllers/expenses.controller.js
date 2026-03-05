@@ -85,7 +85,29 @@ const update = async (req, res) => {
     return res.sendStatus(404);
   }
 
-  await expensesService.update(req.params.id, req.body);
+  const { spentAt, title, amount, category, note } = req.body;
+
+  let categoryId;
+
+  if (category != null) {
+    const categoryByName = await categoriesService.getByName(category);
+
+    categoryId = categoryByName?.id;
+
+    if (!categoryByName) {
+      const { id } = await categoriesService.create(category);
+
+      categoryId = id;
+    }
+  }
+
+  await expensesService.update(req.params.id, {
+    spentAt,
+    title,
+    amount,
+    categoryId,
+    note,
+  });
 
   const updatedExpense = await expensesService.getById(req.params.id);
 
