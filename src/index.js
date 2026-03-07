@@ -2,8 +2,14 @@
 
 'use strict';
 
+const { sequelize } = require('./db');
+
+require('./models/models');
+
 const { createServer } = require('./createServer');
 
-createServer().listen(5700, () => {
-  console.log('Server is running on localhost:5700');
+sequelize.sync().then(() => {
+  createServer().listen(5700, () => {
+    console.log('Server is running on localhost:5700');
+  });
 });
