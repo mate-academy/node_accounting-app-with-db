@@ -1,3 +1,7 @@
-const { User } = require('./services/user.service');
+import { Category } from './models/Category.js';
+import { Expense } from './models/Expense.js';
 
-User.sync({ force: true });
+export async function setup() {
+  await Category.sync();
+  await Expense.sync();
+}

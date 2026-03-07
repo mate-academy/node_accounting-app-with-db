@@ -41,6 +41,10 @@ const Expense = sequelize.define(
       primaryKey: false,
       allowNull: true,
     },
+    categoryId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
   },
   {
     tableName: 'expenses',
