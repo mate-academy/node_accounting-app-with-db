@@ -7,13 +7,14 @@ const get = async (req, res) => {
 };
 
 const getOne = async (req, res) => {
-  const category = await categoryService.getById(req.params.id);
+  const id = Number(req.params.id);
+  const category = await categoryService.getById({ id });
 
   if (!category) {
     return res.sendStatus(404);
   }
 
-  res.send(category);
+  res.send(categoryService.normalize(category));
 };
 
 const create = async (req, res) => {
@@ -29,22 +30,27 @@ const create = async (req, res) => {
 };
 
 const update = async (req, res) => {
-  const category = await categoryService.update(req.params.id, req.body);
+  const id = Number(req.params.id);
+  const existing = await categoryService.getById({ id });
 
-  if (!category) {
+  if (!existing) {
     return res.sendStatus(404);
   }
 
-  res.send(category);
+  const updated = await categoryService.update({ id, ...req.body });
+
+  res.send(categoryService.normalize(updated));
 };
 
 const remove = async (req, res) => {
-  const category = await categoryService.remove(req.params.id);
+  const id = Number(req.params.id);
+  const existing = await categoryService.getById({ id });
 
-  if (!category) {
+  if (!existing) {
     return res.sendStatus(404);
   }
 
+  await categoryService.remove(id);
   res.sendStatus(204);
 };
 

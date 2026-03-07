@@ -1,22 +1,36 @@
 const { Expense } = require('../models/Expense.model');
+const { Category } = require('../models/Category.model');
 
 const getAll = async (where = {}) => {
-  return Expense.findAll({ where });
+  return Expense.findAll({
+    where,
+    include: {
+      model: Category,
+      attributes: ['name'],
+    },
+  });
 };
 
 const getById = async (id) => {
-  return Expense.findByPk(id);
+  return Expense.findByPk(id, {
+    include: {
+      model: Category,
+      attributes: ['name'],
+    },
+  });
 };
 
-const create = async ({ userId, spentAt, title, amount, category, note }) => {
-  return Expense.create({
+const create = async ({ userId, spentAt, title, amount, categoryId, note }) => {
+  const expense = await Expense.create({
     userId,
     spentAt,
     title,
     amount,
-    category,
+    categoryId,
     note,
   });
+
+  return getById(expense.id);
 };
 
 const update = async ({ id, ...fields }) => {
@@ -29,13 +43,21 @@ const remove = async (id) => {
   await Expense.destroy({ where: { id } });
 };
 
-const normalize = ({ id, userId, spentAt, title, amount, category, note }) => ({
+const normalize = ({
   id,
   userId,
   spentAt,
   title,
   amount,
-  category,
+  Category: category,
+  note,
+}) => ({
+  id,
+  userId,
+  spentAt,
+  title,
+  amount,
+  category: category ? category.name : null,
   note,
 });
 

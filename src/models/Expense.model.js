@@ -2,6 +2,7 @@
 
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../db.js');
+const { Category } = require('./Category.model.js');
 
 const Expense = sequelize.define(
   'Expense',
@@ -30,19 +31,13 @@ const Expense = sequelize.define(
       primaryKey: false,
       allowNull: false,
     },
-    category: {
-      type: DataTypes.STRING,
-      primaryKey: false,
-      allowNull: false,
-      defaultValue: 'other',
+    categoryId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
     },
     note: {
       type: DataTypes.STRING,
       primaryKey: false,
-      allowNull: true,
-    },
-    categoryId: {
-      type: DataTypes.INTEGER,
       allowNull: true,
     },
   },
@@ -50,6 +45,10 @@ const Expense = sequelize.define(
     tableName: 'expenses',
   },
 );
+
+Expense.belongsTo(Category, {
+  foreignKey: 'categoryId',
+});
 
 module.exports = {
   Expense,

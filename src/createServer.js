@@ -6,6 +6,8 @@ const { router: userRouter } = require('./routes/user.route.js');
 const { router: expensesRouter } = require('./routes/expenses.route.js');
 const { router: categoryRouter } = require('./routes/category.route.js');
 
+require('./models/models');
+
 const createServer = () => {
   const app = express();
 

@@ -13,6 +13,10 @@ const getById = async ({ id }) => {
   return Category.findByPk(id);
 };
 
+const getByName = async (name) => {
+  return Category.findOne({ where: { name } });
+};
+
 const create = async ({ name }) => {
   return Category.create({ name });
 };
@@ -34,4 +38,5 @@ module.exports = {
   update,
   remove,
   normalize,
+  getByName,
 };

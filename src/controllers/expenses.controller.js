@@ -1,6 +1,7 @@
 const expensesServise = require('../services/expenses.service.js');
 const userServise = require('../services/user.service.js');
 const { Op } = require('sequelize');
+const categoryService = require('../services/category.service');
 
 const get = async (req, res) => {
   const { userId, categories, from, to } = req.query;
@@ -12,9 +13,12 @@ const get = async (req, res) => {
   }
 
   if (categories) {
-    where.category = {
-      [Op.in]: categories.split(','),
-    };
+    const cats = await Promise.all(
+      categories.split(',').map((name) => categoryService.getByName(name)),
+    );
+    const ids = cats.filter(Boolean).map((c) => c.id);
+
+    where.categoryId = { [Op.in]: ids };
   }
 
   if (from || to) {
@@ -63,12 +67,24 @@ const create = async (req, res) => {
     return res.sendStatus(400);
   }
 
+  let categoryId = null;
+
+  if (category) {
+    let cat = await categoryService.getByName(category);
+
+    if (!cat) {
+      cat = await categoryService.create({ name: category });
+    }
+
+    categoryId = cat.id;
+  }
+
   const expense = await expensesServise.create({
     userId,
     spentAt,
     title,
     amount,
-    category,
+    categoryId,
     note,
   });
 
@@ -77,7 +93,6 @@ const create = async (req, res) => {
 
 const update = async (req, res) => {
   const id = Number(req.params.id);
-
   const existingExpense = await expensesServise.getById(id);
 
   if (!existingExpense) {
@@ -91,10 +106,18 @@ const update = async (req, res) => {
     return res.status(400).send();
   }
 
-  const updatedExpense = await expensesServise.update({
-    id,
-    ...req.body,
-  });
+  const { category, ...fields } = req.body;
+
+  if (category) {
+    let cat = await categoryService.getByName(category);
+
+    if (!cat) {
+      cat = await categoryService.create({ name: category });
+    }
+    fields.categoryId = cat.id;
+  }
+
+  const updatedExpense = await expensesServise.update({ id, ...fields });
 
   res.send(expensesServise.normalize(updatedExpense));
 };
