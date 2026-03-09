@@ -3,6 +3,7 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../db.js');
 const { User } = require('./User.model');
+const { Category } = require('./Category');
 
 const Expense = sequelize.define(
   'Expense',
@@ -24,9 +25,9 @@ const Expense = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    category: {
-      type: DataTypes.STRING,
-      allowNull: true,
+    categoryId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
     note: {
       type: DataTypes.STRING,
@@ -46,6 +47,9 @@ const Expense = sequelize.define(
     timestamps: false,
   },
 );
+
+Expense.belongsTo(Category, { foreignKey: 'categoryId' });
+Category.hasMany(Expense, { foreignKey: 'categoryId' });
 
 module.exports = {
   Expense,

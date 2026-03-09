@@ -113,11 +113,29 @@ const createServer = () => {
     res.sendStatus(204);
   });
 
+  app.put('/categories/:id', async (req, res) => {
+    const category = await Category.findByPk(req.params.id);
+
+    if (!category) {
+      return res.status(404).send('Category not found');
+    }
+
+    const { name } = req.body;
+
+    if (!name) {
+      return res.status(400).send('Name required');
+    }
+
+    await category.update({ name });
+
+    return res.send(category);
+  });
+
   app.post('/expenses', async (req, res) => {
     let { title } = req.body;
-    const { spentAt, amount, userId, category, note } = req.body;
+    const { spentAt, amount, userId, categoryId, note } = req.body;
 
-    if (!spentAt || !title || !amount || !userId) {
+    if (!spentAt || !title || !amount || !userId || !categoryId) {
       return res.status(400).send('Missing fields');
     }
 
@@ -129,12 +147,18 @@ const createServer = () => {
       return res.status(400).send('User not found');
     }
 
+    const category = await Category.findByPk(categoryId);
+
+    if (!category) {
+      return res.status(400).send('Category not found');
+    }
+
     const expense = await Expense.create({
       spentAt,
       title,
       amount,
       userId,
-      category,
+      categoryId,
       note,
     });
 
@@ -163,16 +187,25 @@ const createServer = () => {
       };
     }
 
+    const include = [];
+
     if (categories) {
-      where.category = {
-        [Op.in]: String(categories)
-          .split(',')
-          .map((value) => value.trim()),
-      };
+      include.push({
+        model: Category,
+        where: {
+          name: {
+            [Op.in]: String(categories)
+              .split(',')
+              .map((value) => value.trim()),
+          },
+        },
+        required: true,
+      });
     }
 
     const expenses = await Expense.findAll({
       where,
+      include,
       order: [['id', 'ASC']],
     });
 
@@ -197,17 +230,25 @@ const createServer = () => {
     }
 
     let { title } = req.body;
-    const { spentAt, amount, category, note } = req.body;
+    const { spentAt, amount, categoryId, note } = req.body;
 
     if (title) {
       title = title.trim();
+    }
+
+    if (categoryId) {
+      const category = await Category.findByPk(categoryId);
+
+      if (!category) {
+        return res.status(400).send('Category not found');
+      }
     }
 
     await expense.update({
       spentAt,
       title,
       amount,
-      category,
+      categoryId,
       note,
     });
 
