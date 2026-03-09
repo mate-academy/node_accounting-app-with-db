@@ -2,7 +2,6 @@
 
 const express = require('express');
 const { Op } = require('sequelize');
-const { sequelize } = require('./db');
 
 const { User } = require('./models/User.model');
 const { Expense } = require('./models/Expense.model');
@@ -12,8 +11,6 @@ const createServer = () => {
   const app = express();
 
   app.use(express.json());
-
-  sequelize.sync();
 
   app.post('/users', async (req, res) => {
     const { name } = req.body;
