@@ -12,6 +12,27 @@ const createServer = () => {
 
   app.use(express.json());
 
+  const formatExpense = (expense) => {
+    const data = expense.toJSON();
+    const result = {
+      id: data.id,
+      spentAt: data.spentAt,
+      title: data.title,
+      amount: data.amount,
+      userId: data.userId,
+    };
+
+    if (data.Category?.name) {
+      result.category = data.Category.name;
+    }
+
+    if (data.note !== undefined && data.note !== null) {
+      result.note = data.note;
+    }
+
+    return result;
+  };
+
   app.post('/users', async (req, res) => {
     const { name } = req.body;
 
@@ -133,9 +154,11 @@ const createServer = () => {
 
   app.post('/expenses', async (req, res) => {
     let { title } = req.body;
-    const { spentAt, amount, userId, categoryId, note } = req.body;
+    const { spentAt, amount, userId, note } = req.body;
+    const rawCategoryId = req.body.categoryId;
+    const rawCategory = req.body.category;
 
-    if (!spentAt || !title || !amount || !userId || !categoryId) {
+    if (!spentAt || !title || !amount || !userId) {
       return res.status(400).send('Missing fields');
     }
 
@@ -147,22 +170,40 @@ const createServer = () => {
       return res.status(400).send('User not found');
     }
 
-    const category = await Category.findByPk(categoryId);
+    let category = null;
+
+    if (rawCategoryId) {
+      category = await Category.findByPk(rawCategoryId);
+    } else if (rawCategory) {
+      [category] = await Category.findOrCreate({
+        where: { name: String(rawCategory).trim() },
+        defaults: { name: String(rawCategory).trim() },
+      });
+    } else {
+      [category] = await Category.findOrCreate({
+        where: { name: 'Uncategorized' },
+        defaults: { name: 'Uncategorized' },
+      });
+    }
 
     if (!category) {
       return res.status(400).send('Category not found');
     }
 
-    const expense = await Expense.create({
+    const createdExpense = await Expense.create({
       spentAt,
       title,
       amount,
       userId,
-      categoryId,
+      categoryId: category.id,
       note,
     });
 
-    res.status(201).send(expense);
+    const expense = await Expense.findByPk(createdExpense.id, {
+      include: [{ model: Category }],
+    });
+
+    res.status(201).send(formatExpense(expense));
   });
 
   app.get('/expenses', async (req, res) => {
@@ -187,20 +228,17 @@ const createServer = () => {
       };
     }
 
-    const include = [];
+    const include = [{ model: Category }];
 
     if (categories) {
-      include.push({
-        model: Category,
-        where: {
-          name: {
-            [Op.in]: String(categories)
-              .split(',')
-              .map((value) => value.trim()),
-          },
+      include[0].where = {
+        name: {
+          [Op.in]: String(categories)
+            .split(',')
+            .map((value) => value.trim()),
         },
-        required: true,
-      });
+      };
+      include[0].required = true;
     }
 
     const expenses = await Expense.findAll({
@@ -209,17 +247,19 @@ const createServer = () => {
       order: [['id', 'ASC']],
     });
 
-    res.send(expenses);
+    res.send(expenses.map(formatExpense));
   });
 
   app.get('/expenses/:id', async (req, res) => {
-    const expense = await Expense.findByPk(req.params.id);
+    const expense = await Expense.findByPk(req.params.id, {
+      include: [{ model: Category }],
+    });
 
     if (!expense) {
       return res.status(404).send('Expense not found');
     }
 
-    res.send(expense);
+    res.send(formatExpense(expense));
   });
 
   app.patch('/expenses/:id', async (req, res) => {
@@ -230,29 +270,46 @@ const createServer = () => {
     }
 
     let { title } = req.body;
-    const { spentAt, amount, categoryId, note } = req.body;
+    const { spentAt, amount, note } = req.body;
+    const rawCategoryId = req.body.categoryId;
+    const rawCategory = req.body.category;
 
     if (title) {
       title = title.trim();
     }
 
-    if (categoryId) {
-      const category = await Category.findByPk(categoryId);
+    let nextCategoryId;
+
+    if (rawCategoryId) {
+      const category = await Category.findByPk(rawCategoryId);
 
       if (!category) {
         return res.status(400).send('Category not found');
       }
+
+      nextCategoryId = category.id;
+    } else if (rawCategory) {
+      const [category] = await Category.findOrCreate({
+        where: { name: String(rawCategory).trim() },
+        defaults: { name: String(rawCategory).trim() },
+      });
+
+      nextCategoryId = category.id;
     }
 
     await expense.update({
       spentAt,
       title,
       amount,
-      categoryId,
+      categoryId: nextCategoryId,
       note,
     });
 
-    res.send(expense);
+    const updatedExpense = await Expense.findByPk(req.params.id, {
+      include: [{ model: Category }],
+    });
+
+    res.send(formatExpense(updatedExpense));
   });
 
   app.delete('/expenses/:id', async (req, res) => {
