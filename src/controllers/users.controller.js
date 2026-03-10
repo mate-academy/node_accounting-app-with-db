@@ -44,6 +44,10 @@ const update = async (req, res) => {
   const { name } = req.body;
   const user = await usersService.getById(req.params.id);
 
+  if (!name) {
+    return res.sendStatus(400);
+  }
+
   if (!user) {
     return res.sendStatus(404);
   }
@@ -53,7 +57,7 @@ const update = async (req, res) => {
     name,
   });
 
-  res.json(updatedUser); // Тест чекає на об'єкт користувача тут
+  res.json(updatedUser);
 };
 
 const usersController = {

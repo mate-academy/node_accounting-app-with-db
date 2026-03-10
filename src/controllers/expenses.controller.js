@@ -24,7 +24,7 @@ const getOne = async (req, res) => {
     return res.sendStatus(404);
   }
 
-  res.json(expense);
+  res.json(expensesService.normalize(expense));
 };
 
 const create = async (req, res) => {
@@ -78,11 +78,7 @@ const update = async (req, res) => {
 
   const updates = { ...req.body };
 
-  // if (updates.userId) {
-  //   updates.userId = +updates.userId;
-  // }
-
-  if (updates.amount) {
+  if (updates.amount !== undefined) {
     updates.amount = +updates.amount;
   }
 
