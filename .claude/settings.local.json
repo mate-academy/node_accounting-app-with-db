@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm test:*)",
+      "Bash(npm run:*)",
+      "Bash(node -e \"const { sequelize } = require\\('./src/db'\\); sequelize.authenticate\\(\\).then\\(\\(\\) => console.log\\('OK'\\)\\).catch\\(err => console.error\\('FAIL:', err.message\\)\\);\" 2>&1)",
+      "Bash(cd \"C:/Users/Hanna/projects/node/node_accounting-app-with-db\" && node -e \"const { sequelize } = require\\('./src/db'\\); sequelize.authenticate\\(\\).then\\(\\(\\) => { console.log\\('OK'\\); process.exit\\(0\\); }\\).catch\\(err => { console.error\\('FAIL:', err.message\\); process.exit\\(1\\); }\\);\" 2>&1)",
+      "Bash(cd \"C:/Users/Hanna/projects/node/node_accounting-app-with-db\" && npx jest tests/user.test.js --no-coverage --forceExit 2>&1 | grep -v \"console.log\\\\|Executing \\(default\\)\" | grep -A 10 \"●\" | head -80)",
+      "Bash(netstat -ano | grep 7080 2>&1 || echo \"no process\")",
+      "Bash(taskkill /PID 17824 /F 2>&1; taskkill /PID 30880 /F 2>&1; taskkill /PID 3544 /F 2>&1; taskkill /PID 912 /F 2>&1)",
+      "Bash(cmd //c \"taskkill /PID 17824 /F & taskkill /PID 30880 /F & taskkill /PID 3544 /F & taskkill /PID 912 /F\" 2>&1)",
+      "Bash(netstat -ano | grep \":7080 \" 2>&1 | head -5)",
+      "Bash(cmd //c \"taskkill /PID 14308 /F\" 2>&1)",
+      "Bash(netstat -ano | grep \":7080 \" 2>&1 | head -3)",
+      "Bash(cmd //c \"taskkill /PID 30728 /F\" 2>&1)"
+    ]
+  }
+}
