@@ -4,6 +4,12 @@
 
 const { createServer } = require('./createServer');
 
-createServer().listen(5700, () => {
-  console.log('Server is running on localhost:5700');
+const { sequelize } = require('./db');
+
+const app = createServer();
+
+sequelize.sync().then(() => {
+  app.listen(5700, () => {
+    console.log('Server is running on localhost:5700');
+  });
 });
