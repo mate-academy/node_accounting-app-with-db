@@ -3,8 +3,9 @@
 'use strict';
 
 const { createServer } = require('./createServer');
+const { sequelize } = require('./config/db');
 
-const { sequelize } = require('./db');
+require('./models/models');
 
 const app = createServer();
 
