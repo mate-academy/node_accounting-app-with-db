@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Accounting App</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: system-ui, sans-serif;
+        background: #f0f2f5;
+        color: #333;
+        padding: 24px;
+      }
+      h1 {
+        font-size: 1.6rem;
+        margin-bottom: 24px;
+      }
+      h2 {
+        font-size: 1.1rem;
+        margin-bottom: 12px;
+      }
+      .sections {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+      }
+      @media (max-width: 900px) {
+        .sections {
+          grid-template-columns: 1fr;
+        }
+      }
+      .card {
+        background: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+      }
+      form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+      input,
+      select {
+        padding: 7px 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        flex: 1;
+        min-width: 120px;
+      }
+      button {
+        padding: 7px 14px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+      .btn-primary {
+        background: #4f7ef8;
+        color: #fff;
+      }
+      .btn-primary:hover {
+        background: #3a64dc;
+      }
+      .btn-danger {
+        background: #e74c3c;
+        color: #fff;
+      }
+      .btn-danger:hover {
+        background: #c0392b;
+      }
+      .btn-edit {
+        background: #f0a500;
+        color: #fff;
+      }
+      .btn-edit:hover {
+        background: #c98700;
+      }
+      .btn-sm {
+        padding: 4px 10px;
+        font-size: 0.8rem;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+      }
+      th {
+        text-align: left;
+        padding: 8px 10px;
+        background: #f5f6fa;
+        border-bottom: 2px solid #e2e4ea;
+        white-space: nowrap;
+      }
+      td {
+        padding: 8px 10px;
+        border-bottom: 1px solid #eee;
+        vertical-align: top;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      .actions {
+        display: flex;
+        gap: 6px;
+        white-space: nowrap;
+      }
+      .edit-input {
+        padding: 4px 8px;
+        border: 1px solid #4f7ef8;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        width: 100%;
+      }
+      .empty {
+        text-align: center;
+        color: #aaa;
+        padding: 12px;
+        font-style: italic;
+      }
+      .error {
+        color: #e74c3c;
+        font-size: 0.85rem;
+        margin-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Accounting App</h1>
+
+    <div class="sections">
+      <!-- USERS -->
+      <div class="card">
+        <h2>Users</h2>
+        <div id="users-error" class="error" style="display: none"></div>
+        <form id="add-user-form">
+          <input
+            id="user-name"
+            type="text"
+            placeholder="Name"
+            required
+          />
+          <button type="submit" class="btn-primary">Add user</button>
+        </form>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="users-body"></tbody>
+        </table>
+      </div>
+
+      <!-- EXPENSES -->
+      <div class="card">
+        <h2>Expenses</h2>
+        <div id="expenses-error" class="error" style="display: none"></div>
+        <form id="add-expense-form">
+          <select id="expense-user" required>
+            <option value="">User…</option>
+          </select>
+          <input
+            id="expense-title"
+            type="text"
+            placeholder="Title"
+            required
+          />
+          <input
+            id="expense-amount"
+            type="number"
+            placeholder="Amount"
+            step="0.01"
+            required
+          />
+          <input
+            id="expense-category"
+            type="text"
+            placeholder="Category (optional)"
+          />
+          <input
+            id="expense-note"
+            type="text"
+            placeholder="Note (optional)"
+          />
+          <input
+            id="expense-date"
+            type="datetime-local"
+            required
+          />
+          <button type="submit" class="btn-primary">Add expense</button>
+        </form>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>User</th>
+              <th>Title</th>
+              <th>Amount</th>
+              <th>Category</th>
+              <th>Note</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="expenses-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      const API = 'http://localhost:5700';
+
+      // ─── Utils ─────────────────────────────────────────────────────────────
+
+      function showError(el, msg) {
+        el.textContent = msg;
+        el.style.display = 'block';
+        setTimeout(() => (el.style.display = 'none'), 4000);
+      }
+
+      function formatDate(iso) {
+        if (!iso) return '';
+        return new Date(iso).toLocaleString();
+      }
+
+      function toISO(localDatetime) {
+        return localDatetime ? new Date(localDatetime).toISOString() : '';
+      }
+
+      function nowLocal() {
+        const d = new Date();
+        d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+        return d.toISOString().slice(0, 16);
+      }
+
+      // ─── Users ─────────────────────────────────────────────────────────────
+
+      let users = [];
+
+      async function loadUsers() {
+        const res = await fetch(`${API}/users`);
+        users = await res.json();
+        renderUsers();
+        populateUserSelect();
+      }
+
+      function renderUsers() {
+        const tbody = document.getElementById('users-body');
+        if (!users.length) {
+          tbody.innerHTML = '<tr><td colspan="3" class="empty">No users yet</td></tr>';
+          return;
+        }
+        tbody.innerHTML = users
+          .map(
+            (u) => `
+          <tr id="user-row-${u.id}">
+            <td>${u.id}</td>
+            <td id="user-name-cell-${u.id}">${u.name}</td>
+            <td class="actions">
+              <button class="btn-edit btn-sm" onclick="startEditUser(${u.id}, '${u.name.replace(/'/g, "\\'") }')">Edit</button>
+              <button class="btn-danger btn-sm" onclick="deleteUser(${u.id})">Delete</button>
+            </td>
+          </tr>`,
+          )
+          .join('');
+      }
+
+      function populateUserSelect() {
+        const sel = document.getElementById('expense-user');
+        const current = sel.value;
+        sel.innerHTML = '<option value="">User…</option>' +
+          users.map((u) => `<option value="${u.id}">${u.name} (#${u.id})</option>`).join('');
+        if (current) sel.value = current;
+      }
+
+      function startEditUser(id, name) {
+        const cell = document.getElementById(`user-name-cell-${id}`);
+        cell.innerHTML = `
+          <input class="edit-input" id="edit-user-input-${id}" value="${name}" />`;
+        const row = document.getElementById(`user-row-${id}`);
+        const actionsCell = row.querySelector('.actions');
+        actionsCell.innerHTML = `
+          <button class="btn-primary btn-sm" onclick="saveUser(${id})">Save</button>
+          <button class="btn-sm" onclick="loadUsers()">Cancel</button>`;
+      }
+
+      async function saveUser(id) {
+        const input = document.getElementById(`edit-user-input-${id}`);
+        const name = input.value.trim();
+        if (!name) return;
+        await fetch(`${API}/users/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name }),
+        });
+        loadUsers();
+        loadExpenses();
+      }
+
+      async function deleteUser(id) {
+        if (!confirm('Delete user?')) return;
+        const res = await fetch(`${API}/users/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          loadUsers();
+          loadExpenses();
+        }
+      }
+
+      document.getElementById('add-user-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nameInput = document.getElementById('user-name');
+        const name = nameInput.value.trim();
+        if (!name) return;
+        const res = await fetch(`${API}/users`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name }),
+        });
+        if (!res.ok) {
+          showError(document.getElementById('users-error'), 'Failed to create user');
+          return;
+        }
+        nameInput.value = '';
+        loadUsers();
+      });
+
+      // ─── Expenses ──────────────────────────────────────────────────────────
+
+      let expenses = [];
+
+      async function loadExpenses() {
+        const res = await fetch(`${API}/expenses`);
+        expenses = await res.json();
+        renderExpenses();
+      }
+
+      function userName(userId) {
+        const u = users.find((x) => x.id === userId);
+        return u ? u.name : `#${userId}`;
+      }
+
+      function renderExpenses() {
+        const tbody = document.getElementById('expenses-body');
+        if (!expenses.length) {
+          tbody.innerHTML = '<tr><td colspan="8" class="empty">No expenses yet</td></tr>';
+          return;
+        }
+        tbody.innerHTML = expenses
+          .map(
+            (ex) => `
+          <tr id="expense-row-${ex.id}">
+            <td>${ex.id}</td>
+            <td>${userName(ex.userId)}</td>
+            <td id="exp-title-${ex.id}">${ex.title}</td>
+            <td id="exp-amount-${ex.id}">${ex.amount}</td>
+            <td id="exp-category-${ex.id}">${ex.category ?? ''}</td>
+            <td id="exp-note-${ex.id}">${ex.note ?? ''}</td>
+            <td>${formatDate(ex.spentAt)}</td>
+            <td class="actions">
+              <button class="btn-edit btn-sm" onclick="startEditExpense(${ex.id})">Edit</button>
+              <button class="btn-danger btn-sm" onclick="deleteExpense(${ex.id})">Delete</button>
+            </td>
+          </tr>`,
+          )
+          .join('');
+      }
+
+      function startEditExpense(id) {
+        const ex = expenses.find((x) => x.id === id);
+        if (!ex) return;
+
+        document.getElementById(`exp-title-${id}`).innerHTML =
+          `<input class="edit-input" id="ee-title-${id}" value="${ex.title}" />`;
+        document.getElementById(`exp-amount-${id}`).innerHTML =
+          `<input class="edit-input" id="ee-amount-${id}" type="number" step="0.01" value="${ex.amount}" />`;
+        document.getElementById(`exp-category-${id}`).innerHTML =
+          `<input class="edit-input" id="ee-category-${id}" value="${ex.category ?? ''}" />`;
+        document.getElementById(`exp-note-${id}`).innerHTML =
+          `<input class="edit-input" id="ee-note-${id}" value="${ex.note ?? ''}" />`;
+
+        const row = document.getElementById(`expense-row-${id}`);
+        const actionsCell = row.querySelector('.actions');
+        actionsCell.innerHTML = `
+          <button class="btn-primary btn-sm" onclick="saveExpense(${id})">Save</button>
+          <button class="btn-sm" onclick="loadExpenses()">Cancel</button>`;
+      }
+
+      async function saveExpense(id) {
+        const title = document.getElementById(`ee-title-${id}`).value.trim();
+        const amount = parseFloat(document.getElementById(`ee-amount-${id}`).value);
+        const category = document.getElementById(`ee-category-${id}`).value.trim();
+        const note = document.getElementById(`ee-note-${id}`).value.trim();
+
+        const body = { title, amount };
+        if (category) body.category = category;
+        if (note) body.note = note;
+
+        await fetch(`${API}/expenses/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        loadExpenses();
+      }
+
+      async function deleteExpense(id) {
+        if (!confirm('Delete expense?')) return;
+        const res = await fetch(`${API}/expenses/${id}`, { method: 'DELETE' });
+        if (res.ok) loadExpenses();
+      }
+
+      document.getElementById('add-expense-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const userId = parseInt(document.getElementById('expense-user').value);
+        const title = document.getElementById('expense-title').value.trim();
+        const amount = parseFloat(document.getElementById('expense-amount').value);
+        const category = document.getElementById('expense-category').value.trim();
+        const note = document.getElementById('expense-note').value.trim();
+        const spentAt = toISO(document.getElementById('expense-date').value);
+
+        if (!userId || !title || isNaN(amount) || !spentAt) return;
+
+        const body = { userId, title, amount, spentAt };
+        if (category) body.category = category;
+        if (note) body.note = note;
+
+        const res = await fetch(`${API}/expenses`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+
+        if (!res.ok) {
+          showError(document.getElementById('expenses-error'), 'Failed to create expense');
+          return;
+        }
+
+        document.getElementById('expense-title').value = '';
+        document.getElementById('expense-amount').value = '';
+        document.getElementById('expense-category').value = '';
+        document.getElementById('expense-note').value = '';
+        loadExpenses();
+      });
+
+      // ─── Init ──────────────────────────────────────────────────────────────
+
+      document.getElementById('expense-date').value = nowLocal();
+
+      loadUsers().then(() => loadExpenses());
+    </script>
+  </body>
+</html>
