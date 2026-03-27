@@ -4,6 +4,7 @@
 
 const { createServer } = require('./createServer');
 const { sequelize } = require('./db');
+
 require('./models/models');
 
 sequelize.sync().then(() => {

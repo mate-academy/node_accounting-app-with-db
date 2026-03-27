@@ -5,7 +5,7 @@ const express = require('express');
 const path = require('path');
 const { Op } = require('sequelize');
 const {
-  models: { User, Expense },
+  models: { User, Expense, Category },
 } = require('./models/models');
 
 const createServer = () => {
@@ -153,8 +153,65 @@ const createServer = () => {
     res.status(204).send();
   });
 
+  // --- Categories ---
+
+  const categoriesRouter = express.Router();
+
+  categoriesRouter.post('/', async (req, res) => {
+    const { name } = req.body;
+
+    if (!name) {
+      return res.status(400).json({ message: 'Name is required' });
+    }
+
+    const category = await Category.create({ name });
+
+    res.status(201).json(category);
+  });
+
+  categoriesRouter.get('/', async (req, res) => {
+    const categories = await Category.findAll();
+
+    res.json(categories);
+  });
+
+  categoriesRouter.get('/:id', async (req, res) => {
+    const category = await Category.findByPk(req.params.id);
+
+    if (!category) {
+      return res.status(404).json({ message: 'Category not found' });
+    }
+
+    res.json(category);
+  });
+
+  categoriesRouter.patch('/:id', async (req, res) => {
+    const category = await Category.findByPk(req.params.id);
+
+    if (!category) {
+      return res.status(404).json({ message: 'Category not found' });
+    }
+
+    await category.update(req.body);
+
+    res.json(category);
+  });
+
+  categoriesRouter.delete('/:id', async (req, res) => {
+    const category = await Category.findByPk(req.params.id);
+
+    if (!category) {
+      return res.status(404).json({ message: 'Category not found' });
+    }
+
+    await category.destroy();
+
+    res.status(204).send();
+  });
+
   app.use('/users', usersRouter);
   app.use('/expenses', expensesRouter);
+  app.use('/categories', categoriesRouter);
 
   app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'page.html'));
