@@ -7,42 +7,24 @@ function normilize({ id, name }) {
   };
 }
 
-async function getUsers() {
-  const users = await User.findAll();
-  return users;
+function getUsers() {
+  return User.findAll();
 }
 
 function getUserById(id) {
-  return users.find((user) => user.id === id);
+  return User.findByPk(id);
 }
 
 function createUser(name) {
-  const newUser = User.create({ name });
-
-  return newUser;
+  return User.create({ name });
 }
 
 function deleteUser(id) {
-  const index = users.findIndex((user) => user.id === id);
-
-  if (index === -1) {
-    return false;
-  }
-
-  users.splice(index, 1);
-
-  return true;
+  return User.destroy({ where: { id } });
 }
 
-function updateUser(id, name) {
-  const currentUser = users.find((user) => user.id === id);
-
-  if (!currentUser) {
-    return null;
-  }
-  currentUser.name = name;
-
-  return currentUser;
+function updateUser({ id, name }) {
+  return User.update({ name }, { where: { id } });
 }
 
 module.exports = {

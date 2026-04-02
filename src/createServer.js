@@ -1,4 +1,5 @@
 'use strict';
+
 const express = require('express');
 const { usersRouter } = require('./routers/users.router');
 const cors = require('cors');
@@ -10,21 +11,23 @@ const createServer = () => {
   const syncDb = async () => {
     try {
       await sequelize.authenticate();
+
       await User.sync({ force: true });
+
       await Expense.sync({ force: true });
-      console.log('Connection has been established successfully.');
-    } catch (error) {
-      console.error('Unable to connect to the database:', error);
-    }
+    } catch (error) {}
   };
+
   syncDb();
 
   const app = express();
+
   app.use(cors());
   app.use(express.json());
 
   app.use('/users', usersRouter);
   app.use('/expenses', expensesRouter);
+
   return app;
 };
 

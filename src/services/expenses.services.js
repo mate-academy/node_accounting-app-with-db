@@ -1,88 +1,85 @@
-let expenses = [];
-let currentId = 1;
+const { Expense } = require('../models/Expense.model');
+const { Op } = require('sequelize');
 
-function initExpenses() {
-  expenses = [];
-  currentId = 1;
+function normalize({ id, userId, spentAt, title, amount, category, note }) {
+  return {
+    id,
+    userId,
+    spentAt,
+    title,
+    amount,
+    category,
+    note,
+  };
 }
 
 function getExpenses(data) {
   const { userId, categories, from, to } = data;
 
-  return expenses.filter((expense) => {
-    if (userId && expense.userId !== userId) {
-      return false;
+  const whereConditions = {};
+
+  if (userId) {
+    whereConditions.userId = userId;
+  }
+
+  if (categories) {
+    const categoriesArray = Array.isArray(categories)
+      ? categories
+      : [categories];
+
+    whereConditions.category = {
+      [Op.in]: categoriesArray,
+    };
+  }
+
+  if (from || to) {
+    whereConditions.spentAt = {};
+
+    if (from) {
+      whereConditions.spentAt[Op.gte] = new Date(from);
     }
 
-    if (categories) {
-      const categoriesArray = Array.isArray(categories)
-        ? categories
-        : [categories];
-
-      if (!categoriesArray.includes(expense.category)) {
-        return false;
-      }
+    if (to) {
+      whereConditions.spentAt[Op.lte] = new Date(to);
     }
+  }
 
-    if (from && new Date(expense.spentAt) < new Date(from)) {
-      return false;
-    }
-
-    if (to && new Date(expense.spentAt) > new Date(to)) {
-      return false;
-    }
-
-    return true;
+  return Expense.findAll({
+    where: whereConditions,
   });
 }
 
 function getExpenseById(id) {
-  return expenses.find((expense) => expense.id === id);
+  return Expense.findByPk(id);
 }
 
-function createExpense(userId, spentAt, title, amount, category, note) {
-  const newExpense = {
-    id: currentId++,
+function createExpense({ userId, spentAt, title, amount, category, note }) {
+  return Expense.create({
     userId,
     spentAt,
     title,
     amount,
     category,
     note: note || '',
-  };
-
-  expenses.push(newExpense);
-
-  return newExpense;
+  });
 }
 
 function deleteExpense(id) {
-  const index = expenses.findIndex((expense) => expense.id === id);
-
-  if (index === -1) {
-    return false;
-  }
-
-  expenses.splice(index, 1);
-
-  return true;
+  return Expense.destroy({
+    where: {
+      id,
+    },
+  });
 }
 
-function updateExpense(data) {
-  const { id, ...changes } = data;
+async function updateExpense(data) {
+  await Expense.update(data, {
+    where: {
+      id: data.id,
+    },
+  });
 
-  const index = expenses.findIndex((expense) => expense.id === +id);
-
-  if (index === -1) {
-    return null;
-  }
-
-  expenses[index] = {
-    ...expenses[index],
-    ...changes,
-  };
-
-  return expenses[index];
+  return Expense.findByPk(data.id);
 }
 
 module.exports = {
@@ -91,5 +88,5 @@ module.exports = {
   createExpense,
   deleteExpense,
   updateExpense,
-  initExpenses,
+  normalize,
 };

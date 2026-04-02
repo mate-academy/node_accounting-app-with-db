@@ -11,7 +11,7 @@ async function getExpenses(req, res) {
     to,
   });
 
-  res.send(expenses);
+  res.send(expenses.map(expensesServices.normalize));
 }
 
 async function getExpenseById(req, res) {
@@ -26,7 +26,7 @@ async function getExpenseById(req, res) {
   if (!expense) {
     return res.status(404).json({ message: 'Not found' });
   }
-  res.send(expense);
+  res.send(expensesServices.normalize(expense));
 }
 
 async function createExpense(req, res) {
@@ -48,16 +48,16 @@ async function createExpense(req, res) {
     return res.status(400).json({ message: 'Bad Request' });
   }
 
-  const newExpense = await expensesServices.createExpense(
-    userId,
+  const newExpense = await expensesServices.createExpense({
+    userId: +userId,
     spentAt,
     title,
     amount,
     category,
-    note,
-  );
+    note: note || '',
+  });
 
-  res.status(201).send(newExpense);
+  res.status(201).send(expensesServices.normalize(newExpense));
 }
 
 async function deleteExpense(req, res) {

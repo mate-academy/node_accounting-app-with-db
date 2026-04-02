@@ -18,7 +18,7 @@ async function getUserById(req, res) {
   if (!user) {
     return res.status(404).json({ message: 'Not found' });
   }
-  res.send(user);
+  res.send(usersService.normilize(user));
 }
 
 async function createUser(req, res) {
@@ -56,7 +56,7 @@ async function updateUser(req, res) {
     return res.status(400).json({ message: 'Bad Request' });
   }
 
-  const updatedUser = await usersService.updateUser(+id, name);
+  const updatedUser = await usersService.updateUser({ id: +id, name });
 
   if (!updatedUser) {
     return res.status(404).json({ message: 'Not found' });
