@@ -1,6 +1,4 @@
-const {
-  models: { Expense },
-} = require('../models/models');
+const { Expense } = require('../models/Expense.model');
 const { User } = require('../models/User.model');
 
 const expensesService = require('../services/expenses.service');

@@ -1,7 +1,5 @@
 const { Op } = require('sequelize');
-const {
-  models: { Expense },
-} = require('../models/models');
+const { Expense } = require('../models/Expense.model');
 
 const getAll = async (filters) => {
   const { userId, category, from, to } = filters;
