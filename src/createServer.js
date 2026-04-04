@@ -4,18 +4,18 @@ const express = require('express');
 
 const userRouter = require('./routes/users.route');
 const expensesRouter = require('./routes/expenses.route');
+const categoriesRouter = require('./routes/categories.route');
 
 function createServer() {
   const app = express();
 
   app.use(express.json());
 
-  const users = [];
-  const expenses = [];
+  app.use('/users', userRouter());
 
-  app.use('/users', userRouter(users));
+  app.use('/expenses', expensesRouter());
 
-  app.use('/expenses', expensesRouter(users, expenses));
+  app.use('/categories', categoriesRouter());
 
   return app;
 }
