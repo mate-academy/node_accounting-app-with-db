@@ -58,9 +58,9 @@ describe('User', () => {
 
   describe('createUser', () => {
     it('should create a new user', async () => {
-      const name = 'John Doe';
+      const firstName = 'John Doe';
 
-      const res = await api.post('users', { name });
+      const res = await api.post('users', { firstName });
 
       expect(res.status).toBe(201);
 
@@ -71,12 +71,12 @@ describe('User', () => {
       expect(res.data).toEqual(
         expect.objectContaining({
           id: expect.any(Number),
-          name,
+          firstName,
         }),
       );
     });
 
-    it('should return 400 if name is not provided', async () => {
+    it('should return 400 if firstName is not provided', async () => {
       expect.assertions(1);
 
       await api
@@ -101,10 +101,10 @@ describe('User', () => {
     it('should return all users', async () => {
       const users = [
         {
-          name: 'John Doe',
+          firstName: 'John Doe',
         },
         {
-          name: 'Jane Doe',
+          firstName: 'Jane Doe',
         },
       ];
 
@@ -139,7 +139,7 @@ describe('User', () => {
 
     it('should return user', async () => {
       const { data: createdUser } = await api.post('users', {
-        name: 'John Doe',
+        firstName: 'John Doe',
       });
 
       const response = await api.get(`users/${createdUser.id}`);
@@ -159,17 +159,17 @@ describe('User', () => {
       expect.assertions(1);
 
       await api
-        .put('users/1', { name: 'John Doe' })
+        .put('users/1', { firstName: 'John Doe' })
         .catch((err) => expect(err.response.status).toBe(404));
     });
 
     it('should update user', async () => {
       const { data: createdUser } = await api.post('/users', {
-        name: 'John Doe',
+        firstName: 'John Doe',
       });
 
       const response = await api.patch(`users/${createdUser.id}`, {
-        name: 'Jane Doe',
+        firstName: 'Jane Doe',
       });
 
       expect(response.status).toBe(200);
@@ -180,7 +180,7 @@ describe('User', () => {
 
       expect(response.data).toEqual({
         ...createdUser,
-        name: 'Jane Doe',
+        firstName: 'Jane Doe',
       });
     });
   });
@@ -195,7 +195,7 @@ describe('User', () => {
     });
 
     it('should delete user', async () => {
-      const createdUser = await api.post('users', { name: 'John Doe' });
+      const createdUser = await api.post('users', { firstName: 'John Doe' });
 
       const res = await api.delete(`users/${createdUser.data.id}`);
 
