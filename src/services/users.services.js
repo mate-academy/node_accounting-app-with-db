@@ -1,6 +1,6 @@
 const { User } = require('../models/User.model');
 
-function normilize({ id, name }) {
+function normalize({ id, name }) {
   return {
     id,
     name,
@@ -35,5 +35,5 @@ module.exports = {
   deleteUser,
   getUserById,
   updateUser,
-  normilize,
+  normalize,
 };

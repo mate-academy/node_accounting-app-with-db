@@ -13,7 +13,10 @@ const createServer = () => {
       await sequelize.authenticate();
       await User.sync();
       await Expense.sync();
-    } catch (error) {}
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('DB sync failed:', error);
+    }
   };
 
   syncDb();

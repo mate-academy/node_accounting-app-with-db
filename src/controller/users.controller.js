@@ -3,7 +3,7 @@ const usersService = require('../services/users.services');
 async function getUsers(req, res) {
   const users = await usersService.getUsers();
 
-  res.send(users.map(usersService.normilize));
+  res.send(users.map(usersService.normalize));
 }
 
 async function getUserById(req, res) {
@@ -18,7 +18,7 @@ async function getUserById(req, res) {
   if (!user) {
     return res.status(404).json({ message: 'Not found' });
   }
-  res.send(usersService.normilize(user));
+  res.send(usersService.normalize(user));
 }
 
 async function createUser(req, res) {
@@ -30,7 +30,7 @@ async function createUser(req, res) {
 
   const newUser = await usersService.createUser(name);
 
-  res.status(201).send(usersService.normilize(newUser));
+  res.status(201).send(usersService.normalize(newUser));
 }
 
 async function deleteUser(req, res) {
@@ -61,7 +61,7 @@ async function updateUser(req, res) {
   if (!updatedUser) {
     return res.status(404).json({ message: 'Not found' });
   }
-  res.send(usersService.normilize(updatedUser));
+  res.send(usersService.normalize(updatedUser));
 }
 
 module.exports = {
