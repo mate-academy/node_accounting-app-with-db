@@ -11,10 +11,8 @@ const createServer = () => {
   const syncDb = async () => {
     try {
       await sequelize.authenticate();
-
-      await User.sync({ force: true });
-
-      await Expense.sync({ force: true });
+      await User.sync();
+      await Expense.sync();
     } catch (error) {}
   };
 

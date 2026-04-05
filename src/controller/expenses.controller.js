@@ -31,20 +31,20 @@ async function getExpenseById(req, res) {
 
 async function createExpense(req, res) {
   const { userId, spentAt, title, amount, category, note } = req.body;
-  const userExist = await usersService.getUserById(+userId);
-
-  if (!userExist) {
-    return res.status(400).json({ message: 'Bad Request' });
-  }
 
   if (
     userId == null ||
     !spentAt ||
     !title ||
     amount == null ||
-    isNaN(+amount) ||
-    !category
+    isNaN(+amount)
   ) {
+    return res.status(400).json({ message: 'Bad Request' });
+  }
+
+  const userExist = await usersService.getUserById(+userId);
+
+  if (!userExist) {
     return res.status(400).json({ message: 'Bad Request' });
   }
 
@@ -53,7 +53,7 @@ async function createExpense(req, res) {
     spentAt,
     title,
     amount,
-    category,
+    category: category || '',
     note: note || '',
   });
 
@@ -108,8 +108,7 @@ async function updateExpense(req, res) {
   if (!updatedExpense) {
     return res.status(404).json({ message: 'Not found' });
   }
-
-  res.send(updatedExpense);
+  res.send(expensesServices.normalize(updatedExpense));
 }
 
 module.exports = {

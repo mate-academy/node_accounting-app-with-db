@@ -61,8 +61,7 @@ async function updateUser(req, res) {
   if (!updatedUser) {
     return res.status(404).json({ message: 'Not found' });
   }
-
-  res.send(updatedUser);
+  res.send(usersService.normilize(updatedUser));
 }
 
 module.exports = {

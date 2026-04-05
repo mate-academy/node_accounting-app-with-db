@@ -23,8 +23,10 @@ function deleteUser(id) {
   return User.destroy({ where: { id } });
 }
 
-function updateUser({ id, name }) {
-  return User.update({ name }, { where: { id } });
+async function updateUser({ id, name }) {
+  await User.update({ name }, { where: { id } });
+
+  return User.findByPk(id);
 }
 
 module.exports = {
