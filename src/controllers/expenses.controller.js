@@ -41,14 +41,6 @@ const create = () => async (req, res) => {
     return res.status(400).send('Bad Request');
   }
 
-  if (typeof category !== 'string' || category.trim() === '') {
-    return res.status(400).send('Bad Request');
-  }
-
-  if (typeof note !== 'string') {
-    return res.status(400).send('Bad Request');
-  }
-
   const userExists = await User.findByPk(parsedUserId);
 
   if (!userExists) {
@@ -160,7 +152,9 @@ const update = () => async (req, res) => {
 
   await Expense.update(updates, { where: { id } });
 
-  return res.status(200).json(expense);
+  const updatedExpense = await expensesService.getById(id);
+
+  return res.status(200).json(updatedExpense);
 };
 
 const remove = () => async (req, res) => {

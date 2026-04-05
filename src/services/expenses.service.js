@@ -2,7 +2,7 @@ const { Op } = require('sequelize');
 const { Expense } = require('../models/Expense.model');
 
 const getAll = async (filters) => {
-  const { userId, category, from, to } = filters;
+  const { userId, categories, from, to } = filters;
 
   const options = { where: {}, order: [] };
 
@@ -10,8 +10,8 @@ const getAll = async (filters) => {
     options.where.userId = userId;
   }
 
-  if (category) {
-    options.where.category = category;
+  if (categories) {
+    options.where.category = categories;
   }
 
   if (from || to) {
