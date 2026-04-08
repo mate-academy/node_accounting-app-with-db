@@ -7,7 +7,7 @@ const { Category } = require('./Category.model');
 // Expense.belongsTo(User);
 // User.hasMany(Expense);
 
-// Expense.belongsTo(Category);
+// Expense.belongsTo(Category); якщо я це додам тести не проходитимуть
 // Category.hasMany(Expense);
 
 module.exports = {
