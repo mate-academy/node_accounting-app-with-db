@@ -1,21 +1,11 @@
 'use strict';
 
 const express = require('express');
-const { Client } = require('pg');
 const { sequelize } = require('./db');
 const { Op } = require('sequelize');
 
 const { User } = require('./models/User.model');
 const { Expense } = require('./models/Expense.model');
-
-const client = new Client({
-  host: 'localhost',
-  user: 'postgres',
-  password: '123',
-  database: 'postgres',
-});
-
-client.connect();
 
 const createServer = () => {
   // your code goes here
