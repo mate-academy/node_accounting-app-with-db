@@ -6,6 +6,7 @@ const { Op } = require('sequelize');
 
 const { User } = require('./models/User.model');
 const { Expense } = require('./models/Expense.model');
+const { Category } = require('./models/Category.model');
 
 const createServer = () => {
   // your code goes here
@@ -157,6 +158,57 @@ const createServer = () => {
 
     await expense.update(req.body);
     res.json(expense);
+  });
+
+  // ==================== CATEGORIES ====================
+  app.get('/categories', async (req, res) => {
+    const categories = await Category.findAll();
+
+    res.json(categories);
+  });
+
+  app.post('/categories', async (req, res) => {
+    const { name } = req.body;
+
+    if (!name) {
+      return res.status(400).send('A more descriptive message');
+    }
+
+    const category = await Category.create({ name });
+
+    res.status(201).json(category);
+  });
+
+  app.get('/categories/:id', async (req, res) => {
+    const category = await Category.findByPk(Number(req.params.id));
+
+    if (!category) {
+      return res.status(404).send('Category not found');
+    }
+
+    res.json(category);
+  });
+
+  app.delete('/categories/:id', async (req, res) => {
+    const category = await Category.findByPk(Number(req.params.id));
+
+    if (!category) {
+      return res.status(404).send('Category not found');
+    }
+
+    await category.destroy();
+    res.sendStatus(204);
+  });
+
+  app.patch('/categories/:id', async (req, res) => {
+    const category = await Category.findByPk(Number(req.params.id));
+
+    if (!category) {
+      return res.status(404).send('Category not found');
+    }
+
+    await category.update(req.body);
+    res.json(category);
   });
 
   return app;
