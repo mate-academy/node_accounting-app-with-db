@@ -27,7 +27,7 @@ const createServer = () => {
     const { name } = req.body;
 
     if (!name) {
-      return res.status(400).send('A more descriptive message');
+      return res.status(400).send('Missing required field: name');
     }
 
     const user = await User.create({ name });
@@ -171,7 +171,7 @@ const createServer = () => {
     const { name } = req.body;
 
     if (!name) {
-      return res.status(400).send('A more descriptive message');
+      return res.status(400).send('Missing required field: name');
     }
 
     const category = await Category.create({ name });

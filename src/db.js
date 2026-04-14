@@ -29,6 +29,11 @@ const sequelize = new Sequelize({
   password: POSTGRES_PASSWORD || '123',
 });
 
+const initDB = async () => {
+  await sequelize.sync();
+};
+
 module.exports = {
   sequelize,
+  initDB,
 };

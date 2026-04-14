@@ -3,7 +3,14 @@
 'use strict';
 
 const { createServer } = require('./createServer');
+const { initDB } = require('./db');
 
-createServer().listen(5700, () => {
-  console.log('Server is running on localhost:5700');
-});
+(async () => {
+  await initDB();
+
+  const app = createServer();
+
+  app.listen(5700, () => {
+    console.log('Server is running on localhost:5700');
+  });
+})();
