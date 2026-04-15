@@ -23,14 +23,16 @@ function parseCategories(categories) {
 
 router.get('/', async (req, res) => {
   const { userId, from, to, categories } = req.query;
-  const categoryIdList = parseCategories(categories)
+  const parsedCategories = parseCategories(categories);
+  const numericCategoryIds = parsedCategories
     .map(Number)
     .filter((n) => !isNaN(n));
+  const nameCategoryFilters = parsedCategories.filter((v) => isNaN(Number(v)));
 
   const where = {};
 
   if (userId !== undefined) {
-    where.userId = userId;
+    where.userId = Number(userId);
   }
 
   if (from || to) {
@@ -45,8 +47,12 @@ router.get('/', async (req, res) => {
     }
   }
 
-  if (categoryIdList.length > 0) {
-    where.categoryId = { [Op.in]: categoryIdList };
+  if (numericCategoryIds.length > 0) {
+    where.categoryId = { [Op.in]: numericCategoryIds };
+  }
+
+  if (nameCategoryFilters.length > 0) {
+    where.category = { [Op.in]: nameCategoryFilters };
   }
 
   const expenses = await Expense.findAll({
@@ -68,7 +74,8 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const { userId, spentAt, title, amount, categoryId, note } = req.body;
+  const { userId, spentAt, title, amount, categoryId, category, note } =
+    req.body;
 
   if (
     userId === undefined ||
@@ -85,10 +92,10 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'User not found' });
   }
 
-  if (categoryId !== undefined) {
-    const category = await Category.findByPk(categoryId);
+  if (categoryId !== undefined && categoryId !== null) {
+    const cat = await Category.findByPk(categoryId);
 
-    if (!category) {
+    if (!cat) {
       return res.status(400).json({ error: 'Category not found' });
     }
   }
@@ -100,6 +107,7 @@ router.post('/', async (req, res) => {
       title,
       amount,
       categoryId,
+      category,
       note,
     });
 
@@ -111,7 +119,8 @@ router.post('/', async (req, res) => {
 
 const updateHandler = async (req, res) => {
   const { id } = req.params;
-  const { userId, spentAt, title, amount, categoryId, note } = req.body;
+  const { userId, spentAt, title, amount, categoryId, category, note } =
+    req.body;
   const expense = await Expense.findByPk(id);
 
   if (!expense) {
@@ -140,12 +149,18 @@ const updateHandler = async (req, res) => {
   }
 
   if (categoryId !== undefined) {
-    const categoryExists = await Category.findByPk(categoryId);
+    if (categoryId !== null) {
+      const categoryExists = await Category.findByPk(categoryId);
 
-    if (!categoryExists) {
-      return res.status(400).json({ error: 'Category not found' });
+      if (!categoryExists) {
+        return res.status(400).json({ error: 'Category not found' });
+      }
     }
     expense.categoryId = categoryId;
+  }
+
+  if (category !== undefined) {
+    expense.category = category;
   }
 
   if (note !== undefined) {
@@ -153,6 +168,7 @@ const updateHandler = async (req, res) => {
   }
 
   await expense.save();
+  await expense.reload();
   res.status(200).json(expense);
 };
 

@@ -27,6 +27,10 @@ const Expense = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: true,
     },
+    category: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     note: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -37,6 +41,14 @@ const Expense = sequelize.define(
     timestamps: false,
   },
 );
+
+Expense.prototype.toJSON = function () {
+  const values = { ...this.get() };
+
+  delete values.categoryId;
+
+  return values;
+};
 
 module.exports = {
   Expense,
