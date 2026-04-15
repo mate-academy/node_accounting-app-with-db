@@ -3,7 +3,7 @@
 const express = require('express');
 const { Op } = require('sequelize');
 const {
-  models: { Expense, User },
+  models: { Expense, User, Category },
 } = require('../models/models');
 
 const router = express.Router();
@@ -23,7 +23,9 @@ function parseCategories(categories) {
 
 router.get('/', async (req, res) => {
   const { userId, from, to, categories } = req.query;
-  const categoryList = parseCategories(categories);
+  const categoryIdList = parseCategories(categories)
+    .map(Number)
+    .filter((n) => !isNaN(n));
 
   const where = {};
 
@@ -43,8 +45,8 @@ router.get('/', async (req, res) => {
     }
   }
 
-  if (categoryList.length > 0) {
-    where.category = { [Op.in]: categoryList };
+  if (categoryIdList.length > 0) {
+    where.categoryId = { [Op.in]: categoryIdList };
   }
 
   const expenses = await Expense.findAll({
@@ -66,7 +68,7 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const { userId, spentAt, title, amount, category, note } = req.body;
+  const { userId, spentAt, title, amount, categoryId, note } = req.body;
 
   if (
     userId === undefined ||
@@ -83,13 +85,21 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'User not found' });
   }
 
+  if (categoryId !== undefined) {
+    const category = await Category.findByPk(categoryId);
+
+    if (!category) {
+      return res.status(400).json({ error: 'Category not found' });
+    }
+  }
+
   try {
     const expense = await Expense.create({
       userId,
       spentAt,
       title,
       amount,
-      category,
+      categoryId,
       note,
     });
 
@@ -101,7 +111,7 @@ router.post('/', async (req, res) => {
 
 const updateHandler = async (req, res) => {
   const { id } = req.params;
-  const { userId, spentAt, title, amount, category, note } = req.body;
+  const { userId, spentAt, title, amount, categoryId, note } = req.body;
   const expense = await Expense.findByPk(id);
 
   if (!expense) {
@@ -129,8 +139,13 @@ const updateHandler = async (req, res) => {
     expense.amount = amount;
   }
 
-  if (category !== undefined) {
-    expense.category = category;
+  if (categoryId !== undefined) {
+    const categoryExists = await Category.findByPk(categoryId);
+
+    if (!categoryExists) {
+      return res.status(400).json({ error: 'Category not found' });
+    }
+    expense.categoryId = categoryId;
   }
 
   if (note !== undefined) {
