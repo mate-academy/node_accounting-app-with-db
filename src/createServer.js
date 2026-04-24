@@ -2,8 +2,8 @@
 
 const express = require('express');
 const cors = require('cors');
-const userRoter = require('./routes/user.routes');
-const expensesRouter = require('./routes/expenses.rotes');
+const userRouter = require('./routes/user.routes');
+const expensesRouter = require('./routes/expenses.routes');
 const categoriesRouter = require('./routes/categories.routes');
 
 const createServer = () => {
@@ -11,11 +11,11 @@ const createServer = () => {
 
   app.use(cors());
 
-  app.use('/users', express.json(), userRoter);
+  app.use('/users', express.json(), userRouter);
 
   app.use('/expenses', express.json(), expensesRouter);
 
-  app.use('/category', express.json(), categoriesRouter);
+  app.use('/categories', express.json(), categoriesRouter);
 
   return app;
 };

@@ -40,7 +40,7 @@ const remove = async (req, res) => {
   const normalaizedId = Number(id);
 
   if (isNaN(normalaizedId)) {
-    return res.status(400).status('Bad request');
+    return res.status(400).send('Bad request');
   }
 
   const category = await categoryServices.getOne(normalaizedId);

@@ -45,7 +45,7 @@ const remove = async (req, res) => {
     return res.status(400).send('Bad request');
   }
 
-  const userForRemove = await userServices.getOne(id);
+  const userForRemove = await userServices.getOne(normalaizedId);
 
   if (!userForRemove) {
     return res.status(404).send('Not found');
