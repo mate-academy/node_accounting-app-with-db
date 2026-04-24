@@ -69,7 +69,7 @@ const getOne = async (req, res) => {
   const expense = await expenseServices.getOne(normalaizedId);
 
   if (!expense) {
-    return res.status(404).send('Not fond');
+    return res.status(404).send('Not found');
   }
 
   res.status(200).send(expense);
@@ -123,19 +123,19 @@ const add = async (req, res) => {
 
 const remove = async (req, res) => {
   const { id } = req.params;
-  const narmalaizedId = Number(id);
+  const normalizedId = Number(id);
 
-  if (isNaN(narmalaizedId)) {
+  if (isNaN(normalizedId)) {
     return res.status(400).send('Bad request');
   }
 
-  const expense = await expenseServices.getOne(narmalaizedId);
+  const expense = await expenseServices.getOne(normalizedId);
 
   if (!expense) {
     return res.status(404).send('Not found');
   }
 
-  await expenseServices.remove(narmalaizedId);
+  await expenseServices.remove(normalizedId);
   res.sendStatus(204);
 };
 
