@@ -14,6 +14,10 @@ const Expense = sequelize.define(
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: 'users',
+        key: 'id',
+      },
     },
     spentAt: {
       type: DataTypes.DATE,
@@ -28,9 +32,13 @@ const Expense = sequelize.define(
       type: DataTypes.FLOAT,
       allowNull: false,
     },
-    category: {
-      type: DataTypes.STRING,
+    categoryId: {
+      type: DataTypes.INTEGER,
       allowNull: true,
+      references: {
+        model: 'categories',
+        key: 'id',
+      },
     },
     note: {
       type: DataTypes.TEXT,

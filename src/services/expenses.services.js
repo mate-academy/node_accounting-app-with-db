@@ -2,15 +2,15 @@ const { Op } = require('sequelize');
 const { models } = require('../models/models');
 const Expenses = models.Expense;
 
-const get = async ({ userId, categories, from, to }) => {
+const get = async ({ userId, categoriesId, from, to }) => {
   const where = {};
 
   if (userId) {
     where.userId = userId;
   }
 
-  if (categories) {
-    where.category = { [Op.in]: categories };
+  if (categoriesId) {
+    where.categoryId = { [Op.in]: categoriesId };
   }
 
   if (from || to) {
