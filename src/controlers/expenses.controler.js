@@ -123,19 +123,19 @@ const add = async (req, res) => {
 
 const remove = async (req, res) => {
   const { id } = req.params;
-  const normalizedId = Number(id);
+  const narmalaizedId = Number(id);
 
-  if (isNaN(normalizedId)) {
+  if (isNaN(narmalaizedId)) {
     return res.status(400).send('Bad request');
   }
 
-  const expense = await expenseServices.getOne(normalizedId);
+  const expense = await expenseServices.getOne(narmalaizedId);
 
   if (!expense) {
     return res.status(404).send('Not found');
   }
 
-  await expenseServices.remove(normalizedId);
+  await expenseServices.remove(narmalaizedId);
   res.sendStatus(204);
 };
 

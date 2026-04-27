@@ -11,11 +11,13 @@ const createServer = () => {
 
   app.use(cors());
 
-  app.use('/users', express.json(), userRouter);
+  app.use(express.json({ limit: '1mb' }));
 
-  app.use('/expenses', express.json(), expensesRouter);
+  app.use('/users', userRouter);
 
-  app.use('/categories', express.json(), categoriesRouter);
+  app.use('/expenses', expensesRouter);
+
+  app.use('/categories', categoriesRouter);
 
   return app;
 };
