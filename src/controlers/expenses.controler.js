@@ -1,9 +1,8 @@
 const expenseServices = require('../services/expenses.services');
 const userServices = require('../services/user.services');
-const categoryServices = require('../services/categories.services');
 
 const getAll = async (req, res) => {
-  let { userId, categoriesId, from, to } = req.query;
+  let { userId, categories, from, to } = req.query;
 
   if (userId) {
     userId = Number(userId);
@@ -15,13 +14,13 @@ const getAll = async (req, res) => {
     userId = null;
   }
 
-  if (categoriesId && categoriesId.length > 0) {
-    categoriesId = categoriesId
+  if (categories && categories.length > 0) {
+    categories = categories
       .split(',')
-      .map((category) => Number(category))
-      .filter((category) => !isNaN(category));
+      .map((c) => c.trim())
+      .filter(Boolean);
   } else {
-    categoriesId = null;
+    categories = null;
   }
 
   if (from) {
@@ -50,7 +49,7 @@ const getAll = async (req, res) => {
 
   const data = await expenseServices.get({
     userId,
-    categoriesId,
+    categories,
     from,
     to,
   });
@@ -76,20 +75,18 @@ const getOne = async (req, res) => {
 };
 
 const add = async (req, res) => {
-  const { userId, spentAt, title, amount, categoryId, note } = req.body;
+  const { userId, spentAt, title, amount, category, note } = req.body;
 
   const normalaizedId = Number(userId);
   const normalaizedAmount = Number(amount);
   const normalaizedTitle = title ? title.trim() : null;
   const normalaizedSpentAt = spentAt ? Date.parse(spentAt) : Date.now();
-  const normalaizedCategoryId = categoryId ? Number(categoryId) : null;
 
   const checker =
     isNaN(normalaizedId) ||
     isNaN(normalaizedAmount) ||
     !normalaizedTitle ||
-    isNaN(normalaizedSpentAt) ||
-    (categoryId && isNaN(normalaizedCategoryId));
+    isNaN(normalaizedSpentAt);
 
   if (checker) {
     return res.status(400).send('Bad request');
@@ -101,20 +98,12 @@ const add = async (req, res) => {
     return res.status(400).send('Not found');
   }
 
-  if (categoryId) {
-    const category = await categoryServices.getOne(normalaizedCategoryId);
-
-    if (!category) {
-      return res.status(404).send('Not found');
-    }
-  }
-
   const newExpense = await expenseServices.add({
     userId: normalaizedId,
     title: normalaizedTitle,
     amount: normalaizedAmount,
     spentAt: normalaizedSpentAt,
-    categoryId: normalaizedCategoryId,
+    category,
     note: note ? note.trim() : null,
   });
 
@@ -141,7 +130,7 @@ const remove = async (req, res) => {
 
 const update = async (req, res) => {
   const { id } = req.params;
-  const { spentAt, title, amount, categoryId, note } = req.body;
+  const { spentAt, title, amount, category, note } = req.body;
 
   const normalaizedId = Number(id);
 
@@ -187,20 +176,8 @@ const update = async (req, res) => {
     data.spentAt = new Date(normalaizedSpentAt);
   }
 
-  if (categoryId !== undefined) {
-    const normalaizedCategoryId = Number(categoryId);
-
-    if (isNaN(normalaizedCategoryId)) {
-      return res.status(400).send('Bad request');
-    }
-
-    const category = await categoryServices.getOne(normalaizedCategoryId);
-
-    if (!category) {
-      return res.status(404).send('Category not found');
-    }
-
-    data.categoryId = normalaizedCategoryId;
+  if (category !== undefined) {
+    data.category = category || null;
   }
 
   if (note !== undefined) {

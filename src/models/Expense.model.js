@@ -6,18 +6,9 @@ const { sequelize } = require('../db.js');
 const Expense = sequelize.define(
   'Expense',
   {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: 'users',
-        key: 'id',
-      },
     },
     spentAt: {
       type: DataTypes.DATE,
@@ -32,13 +23,9 @@ const Expense = sequelize.define(
       type: DataTypes.FLOAT,
       allowNull: false,
     },
-    categoryId: {
-      type: DataTypes.INTEGER,
+    category: {
+      type: DataTypes.TEXT,
       allowNull: true,
-      references: {
-        model: 'categories',
-        key: 'id',
-      },
     },
     note: {
       type: DataTypes.TEXT,

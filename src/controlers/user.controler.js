@@ -26,7 +26,7 @@ const getOne = async (req, res) => {
 const add = async (req, res) => {
   const { name } = req.body;
 
-  if (!name) {
+  if (!name || !name.trim()) {
     return res.status(400).send('Bad request');
   }
 
@@ -60,7 +60,7 @@ const update = async (req, res) => {
   const { name } = req.body;
   const normalaizedId = Number(id);
 
-  if (isNaN(normalaizedId) || !name) {
+  if (isNaN(normalaizedId) || !name || !name.trim()) {
     return res.status(400).send('Bad request');
   }
 
