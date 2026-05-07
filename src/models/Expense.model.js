@@ -2,9 +2,53 @@
 
 const { sequelize } = require('../db.js');
 
+const { DataTypes } = require('sequelize');
+
 const Expense = sequelize.define(
-  // your code goes here
+  'Expense',
+  {
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    spentAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    title: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    amount: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+    categoryId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    category: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    note: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+  },
+  {
+    tableName: 'expenses',
+    timestamps: false,
+  },
 );
+
+Expense.prototype.toJSON = function () {
+  const values = { ...this.get() };
+
+  delete values.categoryId;
+
+  return values;
+};
 
 module.exports = {
   Expense,
