@@ -48,8 +48,8 @@ describe('Expense', () => {
     });
 
     [user, secondUser] = await Promise.all([
-      User.create({ name: 'John Doe' }),
-      User.create({ name: 'Jane Doe' }),
+      User.create({ firstName: 'John Doe' }),
+      User.create({ firstName: 'Jane Doe' }),
     ]);
   });
 
