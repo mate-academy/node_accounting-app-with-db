@@ -20,14 +20,17 @@ const {
   replace if needed with your own
 */
 
-const sequelize = new Sequelize({
-  database: POSTGRES_DB || 'postgres',
-  username: POSTGRES_USER || 'postgres',
-  host: POSTGRES_HOST || 'localhost',
-  dialect: 'postgres',
-  port: POSTGRES_PORT || 5432,
-  password: POSTGRES_PASSWORD || '123',
-});
+const sequelize = new Sequelize(
+  POSTGRES_DB || 'postgres',
+  POSTGRES_USER || 'postgres',
+  POSTGRES_PASSWORD || '123123',
+  {
+    host: POSTGRES_HOST || 'localhost',
+    port: POSTGRES_PORT || 5432,
+    dialect: 'postgres',
+    logging: false,
+  },
+);
 
 module.exports = {
   sequelize,
