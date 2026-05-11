@@ -17,13 +17,14 @@
   "license": "GPL-3.0",
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.19.2",
-    "pg": "^8.12.0",
-    "sequelize": "^6.37.3"
+    "express": "^4.21.1",
+    "pg": "^8.13.0",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.37.4"
   },
   "devDependencies": {
     "@mate-academy/eslint-config": "latest",
-    "@mate-academy/scripts": "^1.8.6",
+    "@mate-academy/scripts": "^1.9.12",
     "axios": "^1.7.2",
     "eslint": "^8.57.0",
     "eslint-plugin-jest": "^28.6.0",
