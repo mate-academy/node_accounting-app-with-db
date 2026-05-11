@@ -45,8 +45,8 @@ const create = async (req, res) => {
     spentAt,
     title,
     amount,
-    category: category || 'Uknown',
-    note: note || 'Uknown',
+    category,
+    note,
   };
 
   try {
@@ -77,7 +77,7 @@ const update = async (req, res) => {
       const isUser = await userService.getUserById(+userId);
 
       if (!isUser) {
-        return res.status(404).send({ message: 'Not such user' });
+        return res.status(400).send({ message: 'Not such user' });
       }
     }
 

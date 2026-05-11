@@ -4,9 +4,7 @@ const getAll = async (req, res) => {
   try {
     const result = await userService.getAllUsers();
 
-    if (result) {
-      res.status(200).json(result);
-    }
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ serverError: error });
   }
@@ -20,7 +18,7 @@ const getById = async (req, res) => {
   }
 
   try {
-    const user = await userService.getUserById(+id);
+    const user = await userService.getUserById(id);
 
     if (!user) {
       res.status(404).json({ message: 'Not such user' });
