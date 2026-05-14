@@ -1,3 +1,5 @@
+/* eslint-disable prettier/prettier */
+
 'use strict';
 
 const { User } = require('./User.model');

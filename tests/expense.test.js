@@ -58,7 +58,7 @@ describe('Expense', () => {
 
     serverInstance = server.listen(7080, () => {
       // eslint-disable-next-line no-console
-      console.log(HOST);
+      HOST;
     });
 
     await Expense.destroy({ truncate: true });
