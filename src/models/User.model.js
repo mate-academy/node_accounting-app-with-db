@@ -1,9 +1,25 @@
 'use strict';
 
+const { DataTypes } = require('sequelize');
 const { sequelize } = require('../db.js');
 
 const User = sequelize.define(
-  // your code goes here
+  'User',
+  {
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+  },
+  {
+    hooks: {
+      beforeBulkDestroy: (options) => {
+        if (options.truncate) {
+          options.truncate = false;
+        }
+      },
+    },
+  },
 );
 
 module.exports = {
