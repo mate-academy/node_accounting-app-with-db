@@ -3,7 +3,18 @@
 'use strict';
 
 const { createServer } = require('./createServer');
+const { sequelize } = require('./db');
 
-createServer().listen(5700, () => {
-  console.log('Server is running on localhost:5700');
-});
+async function start() {
+  try {
+    await sequelize.sync();
+    console.log('✅ Database synchronized');
+
+    createServer().listen(5700, () => {
+      console.log('Server is running on localhost:5700');
+    });
+  } catch {
+    console.log('error synchronized');
+  }
+}
+start();
