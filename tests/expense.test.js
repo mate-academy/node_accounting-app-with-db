@@ -4,9 +4,7 @@ const { createServer } = require('../src/createServer');
 const { sequelize } = require('../src/db');
 const axios = require('axios');
 const https = require('https');
-const {
-  models: { User, Expense },
-} = require('../src/models/models');
+const { User, Expense } = require('../src/models');
 const { Agent } = require('http');
 
 // this prevents `socket hang up` for Node.js 20.10+
