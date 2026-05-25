@@ -4,7 +4,7 @@ const { Sequelize } = require('sequelize');
 const utils = require('util');
 
 // Needed for testing purposes, do not remove
-require('dotenv').config();
+require('dotenv/config');
 global.TextEncoder = utils.TextEncoder;
 
 const {
@@ -26,9 +26,7 @@ const sequelize = new Sequelize({
   host: POSTGRES_HOST || 'localhost',
   dialect: 'postgres',
   port: POSTGRES_PORT || 5432,
-  password: POSTGRES_PASSWORD || '123',
+  password: POSTGRES_PASSWORD || 'manevr21',
 });
 
-module.exports = {
-  sequelize,
-};
+module.exports = { sequelize };
