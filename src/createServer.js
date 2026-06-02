@@ -1,12 +1,12 @@
 'use strict';
 
 const express = require('express');
+const { Op } = require('sequelize');
 const { User } = require('./models/User.model');
 const { Expense } = require('./models/Expense.model');
 
 const createServer = () => {
   const app = express();
-  const expenses = [];
 
   app.use(express.json());
 
@@ -89,39 +89,36 @@ const createServer = () => {
       note,
     });
 
-    expenses.push(expense);
-
     return res.status(201).json(expense);
   });
 
-  app.get('/expenses', (req, res) => {
+  app.get('/expenses', async (req, res) => {
     const { userId, from, to, categories } = req.query;
+    const where = {};
 
-    const fromDate = from ? new Date(from) : null;
-    const toDate = to ? new Date(to) : null;
-    const categorySet = categories ? new Set(categories.split(',')) : null;
+    if (userId) {
+      where.userId = userId;
+    }
 
-    const filteredExpenses = expenses.filter((expense) => {
-      if (userId && expense.userId !== Number(userId)) {
-        return false;
+    if (from || to) {
+      where.spentAt = {};
+
+      if (from) {
+        where.spentAt[Op.gte] = new Date(from);
       }
 
-      if (fromDate && new Date(expense.spentAt) < fromDate) {
-        return false;
+      if (to) {
+        where.spentAt[Op.lte] = new Date(to);
       }
+    }
 
-      if (toDate && new Date(expense.spentAt) > toDate) {
-        return false;
-      }
+    if (categories) {
+      where.category = { [Op.in]: categories.split(',') };
+    }
 
-      if (categorySet && !categorySet.has(expense.category)) {
-        return false;
-      }
+    const expenses = await Expense.findAll({ where });
 
-      return true;
-    });
-
-    return res.json(filteredExpenses);
+    return res.json(expenses);
   });
 
   app.get('/expenses/:id', (req, res) => {
