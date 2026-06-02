@@ -1,29 +1,24 @@
 'use strict';
 
 const express = require('express');
+const { User } = require('./models/User.model');
 
 const createServer = () => {
   const app = express();
   const users = [];
   const expenses = [];
-  let nextUserId = 1;
   let nextExpenseId = 1;
 
   app.use(express.json());
 
-  app.post('/users', (req, res) => {
+  app.post('/users', async (req, res) => {
     const { name } = req.body;
 
     if (!name) {
       return res.status(400).json({ error: 'Name is required' });
     }
 
-    const newUser = {
-      id: nextUserId++,
-      name,
-};
-
-    users.push(newUser);
+    const newUser = await User.create({ name });
 
     return res.status(201).json(newUser);
   });
@@ -191,7 +186,7 @@ const createServer = () => {
   });
 
   return app;
-}
+};
 
 module.exports = {
   createServer,
