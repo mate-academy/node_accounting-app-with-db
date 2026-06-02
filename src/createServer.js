@@ -132,10 +132,9 @@ const createServer = () => {
     return res.json(expense);
   });
 
-  app.patch('/expenses/:id', (req, res) => {
+  app.patch('/expenses/:id', async (req, res) => {
     const { id } = req.params;
-    const expenseId = Number(id);
-    const expense = expenses.find((e) => e.id === expenseId);
+    const expense = await Expense.findByPk(id);
 
     if (!expense) {
       return res.status(404).json({ error: 'Expense not found' });
@@ -143,39 +142,26 @@ const createServer = () => {
 
     const { spentAt, title, amount, category, note } = req.body;
 
-    if (spentAt !== undefined) {
-      expense.spentAt = spentAt;
-    }
-
-    if (title !== undefined) {
-      expense.title = title;
-    }
-
-    if (amount !== undefined) {
-      expense.amount = amount;
-    }
-
-    if (category !== undefined) {
-      expense.category = category;
-    }
-
-    if (note !== undefined) {
-      expense.note = note;
-    }
+    await expense.update({
+      spentAt,
+      title,
+      amount,
+      category,
+      note,
+    });
 
     return res.json(expense);
   });
 
-  app.delete('/expenses/:id', (req, res) => {
+  app.delete('/expenses/:id', async (req, res) => {
     const { id } = req.params;
-    const expenseId = Number(id);
-    const index = expenses.findIndex((e) => e.id === expenseId);
+    const expense = await Expense.findByPk(id);
 
-    if (index === -1) {
+    if (!expense) {
       return res.status(404).json({ error: 'Expense not found' });
     }
 
-    expenses.splice(index, 1);
+    await expense.destroy();
 
     return res.sendStatus(204);
   });
