@@ -39,31 +39,30 @@ const createServer = () => {
     return res.json(user);
   });
 
-  app.patch('/users/:id', (req, res) => {
+  app.patch('/users/:id', async (req, res) => {
     const { id } = req.params;
     const { name } = req.body;
-    const user = users.find((u) => u.id === Number(id));
+    const user = await User.findByPk(id);
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    if (name) {
-      user.name = name;
-    }
+    await user.update({ name });
+    await user.reload();
 
     return res.json(user);
   });
 
-  app.delete('/users/:id', (req, res) => {
+  app.delete('/users/:id', async (req, res) => {
     const { id } = req.params;
-    const index = users.findIndex((u) => u.id === Number(id));
+    const user = await User.findByPk(id);
 
-    if (index === -1) {
+    if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    users.splice(index, 1);
+    await user.destroy();
 
     return res.sendStatus(204);
   });
