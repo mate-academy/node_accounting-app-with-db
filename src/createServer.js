@@ -1,7 +1,172 @@
 'use strict';
 
+const express = require('express');
+const { Op } = require('sequelize');
+const { User } = require('./models/User.model');
+const { Expense } = require('./models/Expense.model');
+
 const createServer = () => {
-  // your code goes here
+  const app = express();
+
+  app.use(express.json());
+
+  app.post('/users', async (req, res) => {
+    const { name } = req.body;
+
+    if (!name) {
+      return res.status(400).json({ error: 'Name is required' });
+    }
+
+    const newUser = await User.create({ name });
+
+    return res.status(201).json(newUser);
+  });
+
+  app.get('/users', async (req, res) => {
+    const users = await User.findAll();
+
+    return res.json(users);
+  });
+
+  app.get('/users/:id', async (req, res) => {
+    const { id } = req.params;
+    const user = await User.findByPk(id);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    return res.json(user);
+  });
+
+  app.patch('/users/:id', async (req, res) => {
+    const { id } = req.params;
+    const { name } = req.body;
+    const user = await User.findByPk(id);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    await user.update({ name });
+    await user.reload();
+
+    return res.json(user);
+  });
+
+  app.delete('/users/:id', async (req, res) => {
+    const { id } = req.params;
+    const user = await User.findByPk(id);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    await user.destroy();
+
+    return res.sendStatus(204);
+  });
+
+  app.post('/expenses', async (req, res) => {
+    const { userId, spentAt, title, amount, category, note } = req.body;
+
+    if (!spentAt || !title || !amount) {
+      return res.status(400).json({ error: 'Required fields are missing' });
+    }
+
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res.status(400).json({ error: 'User not found' });
+    }
+
+    const expense = await Expense.create({
+      userId,
+      spentAt,
+      title,
+      amount,
+      category,
+      note,
+    });
+
+    return res.status(201).json(expense);
+  });
+
+  app.get('/expenses', async (req, res) => {
+    const { userId, from, to, categories } = req.query;
+    const where = {};
+
+    if (userId) {
+      where.userId = userId;
+    }
+
+    if (from || to) {
+      where.spentAt = {};
+
+      if (from) {
+        where.spentAt[Op.gte] = new Date(from);
+      }
+
+      if (to) {
+        where.spentAt[Op.lte] = new Date(to);
+      }
+    }
+
+    if (categories) {
+      where.category = { [Op.in]: categories.split(',') };
+    }
+
+    const expenses = await Expense.findAll({ where });
+
+    return res.json(expenses);
+  });
+
+  app.get('/expenses/:id', async (req, res) => {
+    const { id } = req.params;
+    const expense = await Expense.findByPk(id);
+
+    if (!expense) {
+      return res.status(404).json({ error: 'Expense not found' });
+    }
+
+    return res.json(expense);
+  });
+
+  app.patch('/expenses/:id', async (req, res) => {
+    const { id } = req.params;
+    const expense = await Expense.findByPk(id);
+
+    if (!expense) {
+      return res.status(404).json({ error: 'Expense not found' });
+    }
+
+    const { spentAt, title, amount, category, note } = req.body;
+
+    await expense.update({
+      spentAt,
+      title,
+      amount,
+      category,
+      note,
+    });
+
+    return res.json(expense);
+  });
+
+  app.delete('/expenses/:id', async (req, res) => {
+    const { id } = req.params;
+    const expense = await Expense.findByPk(id);
+
+    if (!expense) {
+      return res.status(404).json({ error: 'Expense not found' });
+    }
+
+    await expense.destroy();
+
+    return res.sendStatus(204);
+  });
+
+  return app;
 };
 
 module.exports = {
