@@ -5,7 +5,6 @@ const { User } = require('./models/User.model');
 
 const createServer = () => {
   const app = express();
-  const users = [];
   const expenses = [];
   let nextExpenseId = 1;
 
@@ -29,9 +28,9 @@ const createServer = () => {
     return res.json(users);
   });
 
-  app.get('/users/:id', (req, res) => {
+  app.get('/users/:id', async (req, res) => {
     const { id } = req.params;
-    const user = users.find((u) => u.id === Number(id));
+    const user = await User.findByPk(id);
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
