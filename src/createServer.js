@@ -23,7 +23,9 @@ const createServer = () => {
     return res.status(201).json(newUser);
   });
 
-  app.get('/users', (req, res) => {
+  app.get('/users', async (req, res) => {
+    const users = await User.findAll();
+
     return res.json(users);
   });
 
