@@ -2,11 +2,11 @@
 
 const express = require('express');
 const { User } = require('./models/User.model');
+const { Expense } = require('./models/Expense.model');
 
 const createServer = () => {
   const app = express();
   const expenses = [];
-  let nextExpenseId = 1;
 
   app.use(express.json());
 
@@ -67,28 +67,27 @@ const createServer = () => {
     return res.sendStatus(204);
   });
 
-  app.post('/expenses', (req, res) => {
+  app.post('/expenses', async (req, res) => {
     const { userId, spentAt, title, amount, category, note } = req.body;
 
-    if (!spentAt || !title || !amount || !category) {
+    if (!spentAt || !title || !amount) {
       return res.status(400).json({ error: 'Required fields are missing' });
     }
 
-    const user = users.find((u) => u.id === userId);
+    const user = await User.findByPk(userId);
 
     if (!user) {
       return res.status(400).json({ error: 'User not found' });
     }
 
-    const expense = {
-      id: nextExpenseId++,
+    const expense = await Expense.create({
       userId,
       spentAt,
       title,
       amount,
       category,
       note,
-    };
+    });
 
     expenses.push(expense);
 
