@@ -121,10 +121,9 @@ const createServer = () => {
     return res.json(expenses);
   });
 
-  app.get('/expenses/:id', (req, res) => {
+  app.get('/expenses/:id', async (req, res) => {
     const { id } = req.params;
-    const expenseId = Number(id);
-    const expense = expenses.find((e) => e.id === expenseId);
+    const expense = await Expense.findByPk(id);
 
     if (!expense) {
       return res.status(404).json({ error: 'Expense not found' });
