@@ -1,9 +1,30 @@
 'use strict';
 
 const { sequelize } = require('../db.js');
+const { DataTypes } = require('sequelize');
 
 const User = sequelize.define(
-  // your code goes here
+  'User',
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+  },
+  {
+    tableName: 'users',
+    timestamps: false,
+  },
 );
 
 module.exports = {
