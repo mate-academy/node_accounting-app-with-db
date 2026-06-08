@@ -59,7 +59,10 @@ const addExpense = async (req, res) => {
   const { userId, spentAt, title, amount, category, note } = req.body;
 
   if (
-    userId === undefined ||
+    !userId ||
+    !title ||
+    !spentAt ||
+    !amount ||
     typeof title !== 'string' ||
     typeof amount !== 'number'
   ) {
