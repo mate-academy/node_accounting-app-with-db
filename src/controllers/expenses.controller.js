@@ -25,13 +25,15 @@ const create = async (req, res) => {
     userId === undefined ||
     spentAt === undefined ||
     title === undefined ||
-    amount === undefined
+    title.trim() !== '' ||
+    amount === undefined ||
+    amount < 0
   ) {
     return res.sendStatus(400);
   }
 
   if (!(await usersService.getById(userId))) {
-    return res.sendStatus(400);
+    return res.sendStatus(404);
   }
 
   const expense = await expensesService.create({
@@ -66,7 +68,7 @@ const update = async (req, res) => {
     note,
   });
 
-  res.json(updatedExpense);
+  res.status(200).json(updatedExpense);
 };
 
 const remove = async (req, res) => {
