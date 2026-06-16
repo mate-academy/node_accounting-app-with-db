@@ -12,7 +12,7 @@ const getOne = async (req, res) => {
   const expense = await expensesService.getById(id);
 
   if (!expense) {
-    return res.sendStatus(404);
+    return res.sendStatus(400);
   }
 
   res.json(expense);
@@ -25,7 +25,7 @@ const create = async (req, res) => {
     userId === undefined ||
     spentAt === undefined ||
     title === undefined ||
-    title.trim() !== '' ||
+    title.trim() === '' ||
     amount === undefined ||
     amount < 0
   ) {
@@ -33,7 +33,7 @@ const create = async (req, res) => {
   }
 
   if (!(await usersService.getById(userId))) {
-    return res.sendStatus(404);
+    return res.sendStatus(400);
   }
 
   const expense = await expensesService.create({
@@ -55,7 +55,7 @@ const update = async (req, res) => {
   const expense = await expensesService.getById(id);
 
   if (!expense) {
-    return res.sendStatus(404);
+    return res.sendStatus(400);
   }
 
   const updatedExpense = await expensesService.update({
@@ -75,7 +75,7 @@ const remove = async (req, res) => {
   const id = req.params.id;
 
   if (!(await expensesService.getById(id))) {
-    return res.sendStatus(404);
+    return res.sendStatus(400);
   }
 
   await expensesService.remove(id);

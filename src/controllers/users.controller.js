@@ -9,7 +9,7 @@ const getOne = async (req, res) => {
   const user = await usersService.getById(id);
 
   if (!user) {
-    return res.sendStatus(404);
+    return res.sendStatus(400);
   }
 
   res.json(user);
@@ -31,14 +31,14 @@ const update = async (req, res) => {
   const id = req.params.id;
   const { name } = req.body;
 
-  if (name === undefined || name.trim() === '') {
-    return res.sendStatus(404);
-  }
+  // if (name === undefined || name.trim() === '') {
+  //   return res.sendStatus(404);
+  // }
 
   const user = await usersService.getById(id);
 
   if (!user) {
-    return res.sendStatus(404);
+    return res.sendStatus(400);
   }
 
   const updatedUser = await usersService.update({ id, name });
@@ -50,7 +50,7 @@ const remove = async (req, res) => {
   const id = req.params.id;
 
   if (!(await usersService.getById(id))) {
-    return res.sendStatus(404);
+    return res.sendStatus(400);
   }
 
   await usersService.remove(id);
