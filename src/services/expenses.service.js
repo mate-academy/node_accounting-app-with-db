@@ -27,10 +27,10 @@ const getAll = async ({ userId, from, to, categories } = {}) => {
     where.category = {
       [Op.in]: categories,
     };
-  } else if (categories !== undefined) {
-    where.category = categories;
   } else if (typeof categories === 'string') {
     where.category = { [Op.in]: categories.split(',') };
+  } else if (categories !== undefined) {
+    where.category = categories;
   }
 
   const result = await Expense.findAll({

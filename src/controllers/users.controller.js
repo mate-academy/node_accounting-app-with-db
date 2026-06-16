@@ -32,7 +32,7 @@ const update = async (req, res) => {
   const { name } = req.body;
 
   if (name === undefined || name.trim() === '') {
-    return res.sendStatus(400);
+    return res.sendStatus(404);
   }
 
   const user = await usersService.getById(id);
@@ -43,7 +43,7 @@ const update = async (req, res) => {
 
   const updatedUser = await usersService.update({ id, name });
 
-  res.json(updatedUser);
+  res.status(200).json(updatedUser);
 };
 
 const remove = async (req, res) => {
