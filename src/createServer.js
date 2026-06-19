@@ -1,7 +1,24 @@
 'use strict';
 
+const express = require('express');
+
+const {
+  userRouter,
+  expenseRouter,
+  categoryRouter,
+} = require('./routers/routers');
+
 const createServer = () => {
   // your code goes here
+  const server = express();
+
+  server.use(express.json());
+
+  server.use('/users', userRouter);
+  server.use('/expenses', expenseRouter);
+  server.use('/categories', categoryRouter);
+
+  return server;
 };
 
 module.exports = {
