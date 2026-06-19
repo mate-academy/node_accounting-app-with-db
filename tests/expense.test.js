@@ -40,11 +40,12 @@ describe('Expense', () => {
   beforeAll(async () => {
     await sequelize.sync({ force: true });
 
+    server = createServer();
+    serverInstance = server.listen(7080);
+
     api = axios.create({
       baseURL: HOST,
-      httpsAgent: new https.Agent({
-        rejectUnauthorized: false,
-      }),
+      httpsAgent: new https.Agent({ rejectUnauthorized: false }),
     });
 
     [user, secondUser] = await Promise.all([
@@ -54,14 +55,14 @@ describe('Expense', () => {
   });
 
   beforeEach(async () => {
-    server = createServer();
-
-    serverInstance = server.listen(7080, () => {
-      // eslint-disable-next-line no-console
-      console.log(HOST);
-    });
-
     await Expense.destroy({ truncate: true });
+  });
+
+  afterAll(async () => {
+    if (serverInstance) {
+      await serverInstance.close();
+    }
+    await sequelize.close();
   });
 
   afterEach(async () => {

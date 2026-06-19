@@ -23,12 +23,23 @@ const {
 const sequelize = new Sequelize({
   database: POSTGRES_DB || 'postgres',
   username: POSTGRES_USER || 'postgres',
+  password: POSTGRES_PASSWORD || '1234',
   host: POSTGRES_HOST || 'localhost',
-  dialect: 'postgres',
   port: POSTGRES_PORT || 5432,
-  password: POSTGRES_PASSWORD || '123',
+  dialect: 'postgres',
 });
 
-module.exports = {
-  sequelize,
-};
+async function connectDB() {
+  try {
+    await sequelize.authenticate();
+    // eslint-disable-next-line no-console
+    console.log('Database connected');
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Unable to connect to DB:', error);
+  }
+}
+
+connectDB();
+
+module.exports = { sequelize };

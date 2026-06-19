@@ -43,7 +43,7 @@ describe('User', () => {
       console.log(HOST);
     });
 
-    await User.destroy({ truncate: true });
+    await User.destroy({ where: {}, force: true });
   });
 
   afterEach(async () => {
