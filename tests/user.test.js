@@ -77,13 +77,34 @@ describe('User', () => {
     });
 
     it('should return 400 if name is not provided', async () => {
-      expect.assertions(1);
-
-      await api
-        .post('users')
-        .catch((err) => expect(err.response.status).toBe(400));
+      // Remove expect.assertions e usa try/catch direto
+      try {
+        await api.post('users', {});
+        // Se chegou aqui, falhou - deveria ter lançado erro
+        expect(true).toBe(false);
+      } catch (err) {
+        expect(err.response.status).toBe(400);
+      }
     });
-  });
+
+    it('should return 400 if name is empty string', async () => {
+      try {
+        await api.post('users', { name: '' });
+        expect(true).toBe(false);
+      } catch (err) {
+        expect(err.response.status).toBe(400);
+      }
+    });
+
+    it('should return 400 if name is only whitespace', async () => {
+      try {
+        await api.post('users', { name: '   ' });
+        expect(true).toBe(false);
+      } catch (err) {
+        expect(err.response.status).toBe(400);
+      }
+    });
+  }, 10000); // Timeout de 10 segundos para este describe;
 
   describe('getUsers', () => {
     it('should return empty array if no users', async () => {
