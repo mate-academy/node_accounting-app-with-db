@@ -11,7 +11,16 @@
     "test:only": "mate-scripts test",
     "update": "mate-scripts update",
     "postinstall": "npm run update",
-    "test": "npm run lint && npm run test:only"
+    "test": "npm run lint && npm run test:only",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:stop": "docker compose stop",
+    "db:logs": "docker compose logs -f db",
+    "db:reset": "docker compose down -v",
+    "build": "sequelize generate && tsc",
+    "test:watch": "jest --watch",
+    "test:user:watch": "npx jest tests/user.test.js --runInBand --verbose --watch ",
+    "test:expense:watch": "npx jest tests/expense.test.js --runInBand --verbose --watch "
   },
   "author": "Mate academy",
   "license": "GPL-3.0",
@@ -23,7 +32,7 @@
   },
   "devDependencies": {
     "@mate-academy/eslint-config": "latest",
-    "@mate-academy/scripts": "^1.8.6",
+    "@mate-academy/scripts": "^2.1.3",
     "axios": "^1.7.2",
     "eslint": "^8.57.0",
     "eslint-plugin-jest": "^28.6.0",
