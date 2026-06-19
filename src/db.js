@@ -25,8 +25,8 @@ const sequelize = new Sequelize({
   username: POSTGRES_USER || 'postgres',
   host: POSTGRES_HOST || 'localhost',
   dialect: 'postgres',
-  port: POSTGRES_PORT || 5432,
-  password: POSTGRES_PASSWORD || '123',
+  port: POSTGRES_PORT || 8080,
+  password: POSTGRES_PASSWORD || 'qwerty',
 });
 
 module.exports = {
