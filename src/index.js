@@ -4,6 +4,16 @@
 
 const { createServer } = require('./createServer');
 
-createServer().listen(5700, () => {
-  console.log('Server is running on localhost:5700');
-});
+const PORT = process.env.PORT || 5700;
+
+async function main() {
+  const app = createServer();
+
+  const startedApp = await app.start();
+
+  startedApp.listen(PORT, () => {
+    console.log(`Server is running on localhost:${PORT}`);
+  });
+}
+
+main();
