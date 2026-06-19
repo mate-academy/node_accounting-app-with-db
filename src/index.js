@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 
 'use strict';
+require('./setup');
 
 const { createServer } = require('./createServer');
 
