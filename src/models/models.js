@@ -1,7 +1,14 @@
 'use strict';
 
-const { User } = require('./User.model');
-const { Expense } = require('./Expense.model');
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../db');
+
+const User = require('./User.model')(sequelize, DataTypes);
+const Expense = require('./Expense.model')(sequelize, DataTypes);
+
+// Створення зв'язків
+User.hasMany(Expense, { foreignKey: 'userId', onDelete: 'CASCADE' });
+Expense.belongsTo(User, { foreignKey: 'userId' });
 
 module.exports = {
   models: {
