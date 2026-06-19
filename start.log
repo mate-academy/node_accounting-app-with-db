@@ -1,0 +1,808 @@
+
+> node_accounting-app-with-db@1.0.0 test:only
+> mate-scripts test
+
+FAIL tests/user.test.js
+  ● Console
+
+    console.log
+      Executing (default): DROP TABLE IF EXISTS "categories" CASCADE;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): DROP TABLE IF EXISTS "expenses" CASCADE;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): DROP TABLE IF EXISTS "users" CASCADE;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): SELECT DISTINCT tc.constraint_name as constraint_name, tc.constraint_schema as constraint_schema, tc.constraint_catalog as constraint_catalog, tc.table_name as table_name,tc.table_schema as table_schema,tc.table_catalog as table_catalog,tc.initially_deferred as initially_deferred,tc.is_deferrable as is_deferrable,kcu.column_name as column_name,ccu.table_schema  AS referenced_table_schema,ccu.table_catalog  AS referenced_table_catalog,ccu.table_name  AS referenced_table_name,ccu.column_name AS referenced_column_name FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE constraint_type = 'FOREIGN KEY' AND tc.table_name = 'users' AND tc.table_catalog = 'postgres'
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): SELECT DISTINCT tc.constraint_name as constraint_name, tc.constraint_schema as constraint_schema, tc.constraint_catalog as constraint_catalog, tc.table_name as table_name,tc.table_schema as table_schema,tc.table_catalog as table_catalog,tc.initially_deferred as initially_deferred,tc.is_deferrable as is_deferrable,kcu.column_name as column_name,ccu.table_schema  AS referenced_table_schema,ccu.table_catalog  AS referenced_table_catalog,ccu.table_name  AS referenced_table_name,ccu.column_name AS referenced_column_name FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE constraint_type = 'FOREIGN KEY' AND tc.table_name = 'expenses' AND tc.table_catalog = 'postgres'
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): SELECT DISTINCT tc.constraint_name as constraint_name, tc.constraint_schema as constraint_schema, tc.constraint_catalog as constraint_catalog, tc.table_name as table_name,tc.table_schema as table_schema,tc.table_catalog as table_catalog,tc.initially_deferred as initially_deferred,tc.is_deferrable as is_deferrable,kcu.column_name as column_name,ccu.table_schema  AS referenced_table_schema,ccu.table_catalog  AS referenced_table_catalog,ccu.table_name  AS referenced_table_name,ccu.column_name AS referenced_column_name FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE constraint_type = 'FOREIGN KEY' AND tc.table_name = 'categories' AND tc.table_catalog = 'postgres'
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): DROP TABLE IF EXISTS "users" CASCADE;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): DROP TABLE IF EXISTS "expenses" CASCADE;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): DROP TABLE IF EXISTS "categories" CASCADE;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): DROP TABLE IF EXISTS "users" CASCADE;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): CREATE TABLE IF NOT EXISTS "users" ("id"  SERIAL , "name" VARCHAR(255) NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL, "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL, PRIMARY KEY ("id"));
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): SELECT i.relname AS name, ix.indisprimary AS primary, ix.indisunique AS unique, ix.indkey AS indkey, array_agg(a.attnum) as column_indexes, array_agg(a.attname) AS column_names, pg_get_indexdef(ix.indexrelid) AS definition FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND t.relkind = 'r' and t.relname = 'users' GROUP BY i.relname, ix.indexrelid, ix.indisprimary, ix.indisunique, ix.indkey ORDER BY i.relname;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): DROP TABLE IF EXISTS "expenses" CASCADE;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): CREATE TABLE IF NOT EXISTS "expenses" ("id"  SERIAL , "user_id" INTEGER NOT NULL REFERENCES "users" ("id"), "spent_at" TIMESTAMP WITH TIME ZONE NOT NULL, "title" VARCHAR(255), "amount" INTEGER NOT NULL, "category" VARCHAR(255), "note" TEXT, PRIMARY KEY ("id"));
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): SELECT i.relname AS name, ix.indisprimary AS primary, ix.indisunique AS unique, ix.indkey AS indkey, array_agg(a.attnum) as column_indexes, array_agg(a.attname) AS column_names, pg_get_indexdef(ix.indexrelid) AS definition FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND t.relkind = 'r' and t.relname = 'expenses' GROUP BY i.relname, ix.indexrelid, ix.indisprimary, ix.indisunique, ix.indkey ORDER BY i.relname;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): CREATE INDEX "expenses_user_id" ON "expenses" ("user_id")
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): CREATE INDEX "expenses_spent_at" ON "expenses" ("spent_at")
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): CREATE INDEX "expenses_category" ON "expenses" ("category")
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): DROP TABLE IF EXISTS "categories" CASCADE;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): CREATE TABLE IF NOT EXISTS "categories" ("id"  SERIAL , "name" VARCHAR(255) NOT NULL UNIQUE, "description" TEXT, PRIMARY KEY ("id"));
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): SELECT i.relname AS name, ix.indisprimary AS primary, ix.indisunique AS unique, ix.indkey AS indkey, array_agg(a.attnum) as column_indexes, array_agg(a.attname) AS column_names, pg_get_indexdef(ix.indexrelid) AS definition FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND t.relkind = 'r' and t.relname = 'categories' GROUP BY i.relname, ix.indexrelid, ix.indisprimary, ix.indisunique, ix.indkey ORDER BY i.relname;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      http://localhost:7080/
+
+      at Server.log (tests/user.test.js:45:15)
+
+    console.log
+      Executing (default): SELECT "id", "name", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "users" AS "User" WHERE "User"."name" = 'John Doe' LIMIT 1;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): INSERT INTO "users" ("id","name","created_at","updated_at") VALUES (DEFAULT,$1,$2,$3) RETURNING "id","name","created_at","updated_at";
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      http://localhost:7080/
+
+      at Server.log (tests/user.test.js:45:15)
+
+    console.log
+      Executing (default): TRUNCATE "users"
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      http://localhost:7080/
+
+      at Server.log (tests/user.test.js:45:15)
+
+    console.log
+      Executing (default): TRUNCATE "users"
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): TRUNCATE "users"
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      http://localhost:7080/
+
+      at Server.log (tests/user.test.js:45:15)
+
+    console.log
+      Executing (default): SELECT "id", "name", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "users" AS "User" WHERE "User"."name" = 'John Doe' LIMIT 1;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): SELECT "id", "name", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "users" AS "User" WHERE "User"."name" = 'Jane Doe' LIMIT 1;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): INSERT INTO "users" ("id","name","created_at","updated_at") VALUES (DEFAULT,$1,$2,$3) RETURNING "id","name","created_at","updated_at";
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): SELECT "id", "name", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "users" AS "User";
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): TRUNCATE "users"
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      http://localhost:7080/
+
+      at Server.log (tests/user.test.js:45:15)
+
+    console.log
+      Executing (default): SELECT "id", "name", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "users" AS "User" WHERE "User"."id" = 1;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      http://localhost:7080/
+
+      at Server.log (tests/user.test.js:45:15)
+
+    console.log
+      Executing (default): SELECT "id", "name", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "users" AS "User" WHERE "User"."name" = 'John Doe' LIMIT 1;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): SELECT "id", "name", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "users" AS "User" WHERE "User"."id" = 1;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      http://localhost:7080/
+
+      at Server.log (tests/user.test.js:45:15)
+
+    console.log
+      http://localhost:7080/
+
+      at Server.log (tests/user.test.js:45:15)
+
+    console.log
+      Executing (default): SELECT "id", "name", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "users" AS "User" WHERE "User"."name" = 'John Doe' LIMIT 1;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): SELECT "id", "name", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "users" AS "User" WHERE "User"."id" = 1;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): UPDATE "users" SET "name"=$1,"updated_at"=$2 WHERE "id" = $3
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      http://localhost:7080/
+
+      at Server.log (tests/user.test.js:45:15)
+
+    console.log
+      Executing (default): SELECT "id", "name", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "users" AS "User" WHERE "User"."id" = 1;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): DELETE FROM "users" WHERE "id" = 1
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      http://localhost:7080/
+
+      at Server.log (tests/user.test.js:45:15)
+
+    console.log
+      Executing (default): SELECT "id", "name", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "users" AS "User" WHERE "User"."name" = 'John Doe' LIMIT 1;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): INSERT INTO "users" ("id","name","created_at","updated_at") VALUES (DEFAULT,$1,$2,$3) RETURNING "id","name","created_at","updated_at";
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): SELECT "id", "name", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "users" AS "User" WHERE "User"."id" = 3;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): DELETE FROM "users" WHERE "id" = 3
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): SELECT "id", "name", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "users" AS "User" WHERE "User"."id" = 3;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+  ● User › getUsers › should return empty array if no users
+
+
+
+      92 |     it('should return empty array if no users', async () => {
+      93 |
+    > 94 |       await User.destroy({ truncate: true });
+         |       ^
+      95 |
+      96 |       const response = await api.get('users');
+      97 | console.log("should return empty array if no users", response)
+
+      at Query.run (node_modules/sequelize/src/dialects/postgres/query.js:76:25)
+      at node_modules/sequelize/src/sequelize.js:650:28
+      at Function.destroy (node_modules/sequelize/src/model.js:3083:16)
+      at Object.<anonymous> (tests/user.test.js:94:7)
+
+  ● User › getUser › should return 404 if user does not exist
+
+    expect.assertions(1)
+
+    Expected one assertion to be called but received zero assertion calls.
+
+      138 |     it('should return 404 if user does not exist', async () => {
+      139 |       User.destroy({truncate:true})
+    > 140 |       expect.assertions(1);
+          |              ^
+      141 |
+      142 |       await api
+      143 |         .get('users/1')
+
+      at Object.assertions (tests/user.test.js:140:14)
+
+  ● User › deleteUser › should return 404 if user does not exist
+
+    expect.assertions(1)
+
+    Expected one assertion to be called but received zero assertion calls.
+
+      195 |   describe('deleteUser', () => {
+      196 |     it('should return 404 if user does not exist', async () => {
+    > 197 |       expect.assertions(1);
+          |              ^
+      198 |
+      199 |       await api
+      200 |         .delete('users/1')
+
+      at Object.assertions (tests/user.test.js:197:14)
+
+FAIL tests/expense.test.js
+  ● Console
+
+    console.log
+      Executing (default): DROP TABLE IF EXISTS "categories" CASCADE;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): DROP TABLE IF EXISTS "expenses" CASCADE;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): DROP TABLE IF EXISTS "users" CASCADE;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): SELECT DISTINCT tc.constraint_name as constraint_name, tc.constraint_schema as constraint_schema, tc.constraint_catalog as constraint_catalog, tc.table_name as table_name,tc.table_schema as table_schema,tc.table_catalog as table_catalog,tc.initially_deferred as initially_deferred,tc.is_deferrable as is_deferrable,kcu.column_name as column_name,ccu.table_schema  AS referenced_table_schema,ccu.table_catalog  AS referenced_table_catalog,ccu.table_name  AS referenced_table_name,ccu.column_name AS referenced_column_name FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE constraint_type = 'FOREIGN KEY' AND tc.table_name = 'users' AND tc.table_catalog = 'postgres'
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): SELECT DISTINCT tc.constraint_name as constraint_name, tc.constraint_schema as constraint_schema, tc.constraint_catalog as constraint_catalog, tc.table_name as table_name,tc.table_schema as table_schema,tc.table_catalog as table_catalog,tc.initially_deferred as initially_deferred,tc.is_deferrable as is_deferrable,kcu.column_name as column_name,ccu.table_schema  AS referenced_table_schema,ccu.table_catalog  AS referenced_table_catalog,ccu.table_name  AS referenced_table_name,ccu.column_name AS referenced_column_name FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE constraint_type = 'FOREIGN KEY' AND tc.table_name = 'expenses' AND tc.table_catalog = 'postgres'
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): SELECT DISTINCT tc.constraint_name as constraint_name, tc.constraint_schema as constraint_schema, tc.constraint_catalog as constraint_catalog, tc.table_name as table_name,tc.table_schema as table_schema,tc.table_catalog as table_catalog,tc.initially_deferred as initially_deferred,tc.is_deferrable as is_deferrable,kcu.column_name as column_name,ccu.table_schema  AS referenced_table_schema,ccu.table_catalog  AS referenced_table_catalog,ccu.table_name  AS referenced_table_name,ccu.column_name AS referenced_column_name FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE constraint_type = 'FOREIGN KEY' AND tc.table_name = 'categories' AND tc.table_catalog = 'postgres'
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): DROP TABLE IF EXISTS "users" CASCADE;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): DROP TABLE IF EXISTS "expenses" CASCADE;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): DROP TABLE IF EXISTS "categories" CASCADE;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): DROP TABLE IF EXISTS "users" CASCADE;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): CREATE TABLE IF NOT EXISTS "users" ("id"  SERIAL , "name" VARCHAR(255) NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL, "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL, PRIMARY KEY ("id"));
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): SELECT i.relname AS name, ix.indisprimary AS primary, ix.indisunique AS unique, ix.indkey AS indkey, array_agg(a.attnum) as column_indexes, array_agg(a.attname) AS column_names, pg_get_indexdef(ix.indexrelid) AS definition FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND t.relkind = 'r' and t.relname = 'users' GROUP BY i.relname, ix.indexrelid, ix.indisprimary, ix.indisunique, ix.indkey ORDER BY i.relname;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): DROP TABLE IF EXISTS "expenses" CASCADE;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): CREATE TABLE IF NOT EXISTS "expenses" ("id"  SERIAL , "user_id" INTEGER NOT NULL REFERENCES "users" ("id"), "spent_at" TIMESTAMP WITH TIME ZONE NOT NULL, "title" VARCHAR(255), "amount" INTEGER NOT NULL, "category" VARCHAR(255), "note" TEXT, PRIMARY KEY ("id"));
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): SELECT i.relname AS name, ix.indisprimary AS primary, ix.indisunique AS unique, ix.indkey AS indkey, array_agg(a.attnum) as column_indexes, array_agg(a.attname) AS column_names, pg_get_indexdef(ix.indexrelid) AS definition FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND t.relkind = 'r' and t.relname = 'expenses' GROUP BY i.relname, ix.indexrelid, ix.indisprimary, ix.indisunique, ix.indkey ORDER BY i.relname;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): CREATE INDEX "expenses_user_id" ON "expenses" ("user_id")
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): CREATE INDEX "expenses_spent_at" ON "expenses" ("spent_at")
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): CREATE INDEX "expenses_category" ON "expenses" ("category")
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): DROP TABLE IF EXISTS "categories" CASCADE;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): CREATE TABLE IF NOT EXISTS "categories" ("id"  SERIAL , "name" VARCHAR(255) NOT NULL UNIQUE, "description" TEXT, PRIMARY KEY ("id"));
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): SELECT i.relname AS name, ix.indisprimary AS primary, ix.indisunique AS unique, ix.indkey AS indkey, array_agg(a.attnum) as column_indexes, array_agg(a.attname) AS column_names, pg_get_indexdef(ix.indexrelid) AS definition FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND t.relkind = 'r' and t.relname = 'categories' GROUP BY i.relname, ix.indexrelid, ix.indisprimary, ix.indisunique, ix.indkey ORDER BY i.relname;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): INSERT INTO "users" ("id","name","created_at","updated_at") VALUES (DEFAULT,$1,$2,$3) RETURNING "id","name","created_at","updated_at";
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+          at async Promise.all (index 0)
+
+    console.log
+      Executing (default): INSERT INTO "users" ("id","name","created_at","updated_at") VALUES (DEFAULT,$1,$2,$3) RETURNING "id","name","created_at","updated_at";
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+          at async Promise.all (index 1)
+
+    console.log
+      Executing (default): TRUNCATE "expenses"
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      http://localhost:7080/
+
+      at Server.log (tests/expense.test.js:61:15)
+
+    console.log
+      Executing (default): SELECT "id", "name", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "users" AS "User" WHERE "User"."id" = 1;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): INSERT INTO "expenses" ("id","user_id","spent_at","title","amount","category","note") VALUES (DEFAULT,$1,$2,$3,$4,$5,$6) RETURNING "id","user_id","spent_at","title","amount","category","note";
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): TRUNCATE "expenses"
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      http://localhost:7080/
+
+      at Server.log (tests/expense.test.js:61:15)
+
+    console.log
+      Executing (default): TRUNCATE "expenses"
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      http://localhost:7080/
+
+      at Server.log (tests/expense.test.js:61:15)
+
+    console.log
+      Executing (default): SELECT "id", "name", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "users" AS "User" WHERE "User"."id" = 1;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): INSERT INTO "expenses" ("id","user_id","spent_at","title","amount","category","note") VALUES (DEFAULT,$1,$2,$3,$4,$5,$6) RETURNING "id","user_id","spent_at","title","amount","category","note";
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): TRUNCATE "expenses"
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      http://localhost:7080/
+
+      at Server.log (tests/expense.test.js:61:15)
+
+    console.log
+      Executing (default): SELECT "id", "name", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "users" AS "User" WHERE "User"."id" = 0;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): TRUNCATE "expenses"
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      http://localhost:7080/
+
+      at Server.log (tests/expense.test.js:61:15)
+
+    console.log
+      Executing (default): SELECT "id", "user_id" AS "userId", "spent_at" AS "spentAt", "title", "amount", "category", "note" FROM "expenses" AS "Expense" ORDER BY "spentAt" ASC;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): TRUNCATE "expenses"
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      http://localhost:7080/
+
+      at Server.log (tests/expense.test.js:61:15)
+
+    console.log
+      Executing (default): SELECT "id", "name", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "users" AS "User" WHERE "User"."id" = 1;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): INSERT INTO "expenses" ("id","user_id","spent_at","title","amount","category","note") VALUES (DEFAULT,$1,$2,$3,$4,$5,$6) RETURNING "id","user_id","spent_at","title","amount","category","note";
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): SELECT "id", "user_id" AS "userId", "spent_at" AS "spentAt", "title", "amount", "category", "note" FROM "expenses" AS "Expense" ORDER BY "spentAt" ASC;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): TRUNCATE "expenses"
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      http://localhost:7080/
+
+      at Server.log (tests/expense.test.js:61:15)
+
+    console.log
+      Executing (default): SELECT "id", "name", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "users" AS "User" WHERE "User"."id" = 1;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): INSERT INTO "expenses" ("id","user_id","spent_at","title","amount","category","note") VALUES (DEFAULT,$1,$2,$3,$4,$5,$6) RETURNING "id","user_id","spent_at","title","amount","category","note";
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): SELECT "id", "name", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "users" AS "User" WHERE "User"."id" = 2;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): INSERT INTO "expenses" ("id","user_id","spent_at","title","amount","category","note") VALUES (DEFAULT,$1,$2,$3,$4,$5,$6) RETURNING "id","user_id","spent_at","title","amount","category","note";
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): SELECT "id", "user_id" AS "userId", "spent_at" AS "spentAt", "title", "amount", "category", "note" FROM "expenses" AS "Expense" WHERE "Expense"."user_id" = 1 ORDER BY "spentAt" ASC;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): TRUNCATE "expenses"
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      http://localhost:7080/
+
+      at Server.log (tests/expense.test.js:61:15)
+
+    console.log
+      Executing (default): SELECT "id", "name", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "users" AS "User" WHERE "User"."id" = 1;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): INSERT INTO "expenses" ("id","user_id","spent_at","title","amount","category","note") VALUES (DEFAULT,$1,$2,$3,$4,$5,$6) RETURNING "id","user_id","spent_at","title","amount","category","note";
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): SELECT "id", "name", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "users" AS "User" WHERE "User"."id" = 1;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): INSERT INTO "expenses" ("id","user_id","spent_at","title","amount","category","note") VALUES (DEFAULT,$1,$2,$3,$4,$5,$6) RETURNING "id","user_id","spent_at","title","amount","category","note";
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): SELECT "id", "user_id" AS "userId", "spent_at" AS "spentAt", "title", "amount", "category", "note" FROM "expenses" AS "Expense" WHERE "Expense"."spent_at" BETWEEN '2022-10-19 11:01:43.462 +00:00' AND '2022-10-20 11:01:43.462 +00:00' ORDER BY "spentAt" ASC;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): TRUNCATE "expenses"
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      http://localhost:7080/
+
+      at Server.log (tests/expense.test.js:61:15)
+
+    console.log
+      Executing (default): SELECT "id", "name", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "users" AS "User" WHERE "User"."id" = 1;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): INSERT INTO "expenses" ("id","user_id","spent_at","title","amount","category","note") VALUES (DEFAULT,$1,$2,$3,$4,$5,$6) RETURNING "id","user_id","spent_at","title","amount","category","note";
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): SELECT "id", "name", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "users" AS "User" WHERE "User"."id" = 1;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): INSERT INTO "expenses" ("id","user_id","spent_at","title","amount","category","note") VALUES (DEFAULT,$1,$2,$3,$4,$5,$6) RETURNING "id","user_id","spent_at","title","amount","category","note";
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): SELECT "id", "user_id" AS "userId", "spent_at" AS "spentAt", "title", "amount", "category", "note" FROM "expenses" AS "Expense" WHERE "Expense"."category" IN ('Electronics') AND "Expense"."user_id" = 1 ORDER BY "spentAt" ASC;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): TRUNCATE "expenses"
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      http://localhost:7080/
+
+      at Server.log (tests/expense.test.js:61:15)
+
+    console.log
+      Executing (default): SELECT "id", "name", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "users" AS "User" WHERE "User"."id" = 1;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): INSERT INTO "expenses" ("id","user_id","spent_at","title","amount","category","note") VALUES (DEFAULT,$1,$2,$3,$4,$5,$6) RETURNING "id","user_id","spent_at","title","amount","category","note";
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): SELECT "id", "user_id" AS "userId", "spent_at" AS "spentAt", "title", "amount", "category", "note" FROM "expenses" AS "Expense" WHERE "Expense"."id" = 10;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): TRUNCATE "expenses"
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      http://localhost:7080/
+
+      at Server.log (tests/expense.test.js:61:15)
+
+    console.log
+      Executing (default): SELECT "id", "user_id" AS "userId", "spent_at" AS "spentAt", "title", "amount", "category", "note" FROM "expenses" AS "Expense" WHERE "Expense"."id" = 1;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): TRUNCATE "expenses"
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      http://localhost:7080/
+
+      at Server.log (tests/expense.test.js:61:15)
+
+    console.log
+      Executing (default): SELECT "id", "name", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "users" AS "User" WHERE "User"."id" = 1;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): INSERT INTO "expenses" ("id","user_id","spent_at","title","amount","category","note") VALUES (DEFAULT,$1,$2,$3,$4,$5,$6) RETURNING "id","user_id","spent_at","title","amount","category","note";
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): SELECT "id", "user_id" AS "userId", "spent_at" AS "spentAt", "title", "amount", "category", "note" FROM "expenses" AS "Expense" WHERE "Expense"."id" = 11;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): UPDATE "expenses" SET "title"=$1 WHERE "id" = $2
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): TRUNCATE "expenses"
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      http://localhost:7080/
+
+      at Server.log (tests/expense.test.js:61:15)
+
+    console.log
+      Executing (default): SELECT "id", "user_id" AS "userId", "spent_at" AS "spentAt", "title", "amount", "category", "note" FROM "expenses" AS "Expense" WHERE "Expense"."id" = 1;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): TRUNCATE "expenses"
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      http://localhost:7080/
+
+      at Server.log (tests/expense.test.js:61:15)
+
+    console.log
+      Executing (default): SELECT "id", "name", "created_at" AS "createdAt", "updated_at" AS "updatedAt" FROM "users" AS "User" WHERE "User"."id" = 1;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): INSERT INTO "expenses" ("id","user_id","spent_at","title","amount","category","note") VALUES (DEFAULT,$1,$2,$3,$4,$5,$6) RETURNING "id","user_id","spent_at","title","amount","category","note";
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): SELECT "id", "user_id" AS "userId", "spent_at" AS "spentAt", "title", "amount", "category", "note" FROM "expenses" AS "Expense" WHERE "Expense"."id" = 12;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): DELETE FROM "expenses" WHERE "id" = 12
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): SELECT "id", "user_id" AS "userId", "spent_at" AS "spentAt", "title", "amount", "category", "note" FROM "expenses" AS "Expense" WHERE "Expense"."id" = 12;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      Executing (default): TRUNCATE "expenses"
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+    console.log
+      http://localhost:7080/
+
+      at Server.log (tests/expense.test.js:61:15)
+
+    console.log
+      Executing (default): SELECT "id", "user_id" AS "userId", "spent_at" AS "spentAt", "title", "amount", "category", "note" FROM "expenses" AS "Expense" WHERE "Expense"."id" = 1;
+
+      at Sequelize.log (node_modules/sequelize/src/sequelize.js:1281:15)
+
+
+
+  ● Test suite failed to run
+
+    ConnectionManager.getConnection was called after the connection manager was closed!
+
+      at ConnectionManager.getConnection (node_modules/sequelize/src/dialects/abstract/connection-manager.js:113:13)
+      at node_modules/sequelize/src/sequelize.js:638:111
+      at node_modules/retry-as-promised/dist/index.js:59:25
+      at retryAsPromised (node_modules/retry-as-promised/dist/index.js:48:12)
+      at Timeout._onTimeout (node_modules/retry-as-promised/dist/index.js:94:21)
+
+Test Suites: 2 failed, 2 total
+Tests:       3 failed, 22 passed, 25 total
+Snapshots:   0 total
+Time:        1.483 s, estimated 3 s
+Ran all test suites matching /.\//i.
