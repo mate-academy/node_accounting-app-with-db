@@ -5,7 +5,7 @@ const { sequelize } = require('../src/db');
 const axios = require('axios');
 const https = require('https');
 const {
-  models: { User, Expense },
+  models: { User, Expense, Category },
 } = require('../src/models/models');
 const { Agent } = require('http');
 
@@ -50,6 +50,12 @@ describe('Expense', () => {
     [user, secondUser] = await Promise.all([
       User.create({ name: 'John Doe' }),
       User.create({ name: 'Jane Doe' }),
+    ]);
+
+    await Category.bulkCreate([
+      { name: 'Electronics' },
+      { name: 'laptops' },
+      { name: 'Food' },
     ]);
   });
 
@@ -112,6 +118,7 @@ describe('Expense', () => {
         title: 'Buy a new laptop',
         amount: 999,
         userId: user.id,
+        category: 'laptops',
       };
 
       const response = await api.post('/expenses', data);
