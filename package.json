@@ -17,9 +17,11 @@
   "license": "GPL-3.0",
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.19.2",
-    "pg": "^8.12.0",
-    "sequelize": "^6.37.3"
+    "express": "^4.21.2",
+    "pg": "^8.16.0",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.37.3",
+    "swiper": "^11.2.8"
   },
   "devDependencies": {
     "@mate-academy/eslint-config": "latest",

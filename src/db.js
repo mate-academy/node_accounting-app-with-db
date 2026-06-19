@@ -1,6 +1,6 @@
 'use strict';
 
-const { Sequelize } = require('sequelize');
+const { Sequelize, DataTypes } = require('sequelize');
 const utils = require('util');
 
 // Needed for testing purposes, do not remove
@@ -26,9 +26,21 @@ const sequelize = new Sequelize({
   host: POSTGRES_HOST || 'localhost',
   dialect: 'postgres',
   port: POSTGRES_PORT || 5432,
-  password: POSTGRES_PASSWORD || '123',
+  password: POSTGRES_PASSWORD || '1234',
+  pool: {
+    max: 5,
+    min: 0,
+    idle: 10000,
+    acquire: 30000,
+  },
+});
+
+process.on('SIGINT', async () => {
+  await sequelize.close();
+  process.exit(0);
 });
 
 module.exports = {
   sequelize,
+  DataTypes,
 };
