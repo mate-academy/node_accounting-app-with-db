@@ -1,8 +1,15 @@
 'use strict';
 
-const createServer = () => {
-  // your code goes here
-};
+const express = require('express');
+const routes = require('../routes/routes');
+
+function createServer() {
+  const app = express();
+
+  app.use(routes);
+
+  return app;
+}
 
 module.exports = {
   createServer,
