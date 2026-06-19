@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 'use strict';
 
 const { createServer } = require('../src/createServer');
@@ -9,7 +10,6 @@ const {
 } = require('../src/models/models');
 const { Agent } = require('http');
 
-// this prevents `socket hang up` for Node.js 20.10+
 axios.defaults.httpAgent = new Agent({ keepAlive: false });
 
 describe('Expense', () => {
@@ -35,10 +35,14 @@ describe('Expense', () => {
     note: 'I need a new TV',
   };
 
-  const HOST = 'http://localhost:7080/';
-
   beforeAll(async () => {
     await sequelize.sync({ force: true });
+
+    server = createServer();
+    serverInstance = server.listen(0);
+
+    const port = serverInstance.address().port;
+    const HOST = `http://localhost:${port}/`;
 
     api = axios.create({
       baseURL: HOST,
@@ -51,27 +55,19 @@ describe('Expense', () => {
       User.create({ name: 'John Doe' }),
       User.create({ name: 'Jane Doe' }),
     ]);
-  });
 
-  beforeEach(async () => {
-    server = createServer();
-
-    serverInstance = server.listen(7080, () => {
-      // eslint-disable-next-line no-console
-      console.log(HOST);
-    });
-
-    await Expense.destroy({ truncate: true });
-  });
-
-  afterEach(async () => {
-    if (serverInstance) {
-      await serverInstance.close();
-    }
+    console.log('Test server running at', HOST);
   });
 
   afterAll(async () => {
+    if (serverInstance) {
+      await serverInstance.close();
+    }
     await sequelize.close();
+  });
+
+  beforeEach(async () => {
+    await Expense.destroy({ truncate: true });
   });
 
   describe('createExpense', () => {
