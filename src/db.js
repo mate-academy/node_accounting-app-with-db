@@ -25,7 +25,7 @@ const sequelize = new Sequelize({
   username: POSTGRES_USER || 'postgres',
   host: POSTGRES_HOST || 'localhost',
   dialect: 'postgres',
-  port: POSTGRES_PORT || 5432,
+  port: POSTGRES_PORT || 5433,
   password: POSTGRES_PASSWORD || '123',
 });
 
