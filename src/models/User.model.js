@@ -3,7 +3,16 @@
 const { sequelize } = require('../db.js');
 
 const User = sequelize.define(
-  // your code goes here
+  'User',
+  {
+    name: {
+      type: sequelize.Sequelize.STRING,
+      allowNull: false,
+    },
+  },
+  {
+    timestamps: false,
+  },
 );
 
 module.exports = {
