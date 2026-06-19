@@ -5,7 +5,7 @@ const { sequelize } = require('../src/db');
 const axios = require('axios');
 const https = require('https');
 const {
-  models: { User, Expense },
+  models: { User, Expense, Category },
 } = require('../src/models/models');
 const { Agent } = require('http');
 
@@ -18,12 +18,13 @@ describe('Expense', () => {
   let api;
   let user = null;
   let secondUser = null;
+  let electronicsCategory = null;
+  let foodCategory = null;
 
   const laptop = {
     spentAt: '2022-10-19T11:01:43.462Z',
     title: 'Buy a new laptop',
     amount: 999,
-    category: 'Electronics',
     note: 'I need a new laptop',
   };
 
@@ -31,7 +32,6 @@ describe('Expense', () => {
     spentAt: '2022-10-19T11:01:43.462Z',
     title: 'Buy a new TV',
     amount: 999,
-    category: 'Electronics',
     note: 'I need a new TV',
   };
 
@@ -50,6 +50,11 @@ describe('Expense', () => {
     [user, secondUser] = await Promise.all([
       User.create({ name: 'John Doe' }),
       User.create({ name: 'Jane Doe' }),
+    ]);
+
+    [electronicsCategory, foodCategory] = await Promise.all([
+      Category.create({ name: 'Electronics' }),
+      Category.create({ name: 'Food' }),
     ]);
   });
 
@@ -162,6 +167,7 @@ describe('Expense', () => {
       expect(response.data).toEqual([
         {
           id: expenseId,
+          categoryId: null,
           ...data,
         },
       ]);
@@ -187,6 +193,7 @@ describe('Expense', () => {
       expect(response.data).toEqual([
         {
           id: expenseId,
+          categoryId: null,
           ...data,
         },
       ]);
@@ -221,10 +228,12 @@ describe('Expense', () => {
       expect(response.data).toEqual([
         {
           id: expenseId,
+          categoryId: null,
           ...data,
         },
         {
           id: secondExpenseId,
+          categoryId: null,
           ...seconData,
         },
       ]);
@@ -234,6 +243,7 @@ describe('Expense', () => {
       const data = {
         ...laptop,
         userId: user.id,
+        categoryId: electronicsCategory.id,
       };
 
       const {
@@ -241,12 +251,13 @@ describe('Expense', () => {
       } = await api.post('expenses', data);
 
       await api.post('/expenses', {
-        ...data,
-        category: 'Food',
+        ...laptop,
+        userId: user.id,
+        categoryId: foodCategory.id,
       });
 
       const response = await api.get(
-        `expenses?userId=${user.id}&categories=Electronics`,
+        `expenses?userId=${user.id}&categories=${electronicsCategory.id}`,
       );
 
       expect(response.data).toEqual([
@@ -273,6 +284,7 @@ describe('Expense', () => {
 
       expect(response.data).toEqual({
         id: expenseId,
+        categoryId: null,
         ...data,
       });
     });
@@ -303,6 +315,7 @@ describe('Expense', () => {
 
       expect(response.data).toEqual({
         id: expenseId,
+        categoryId: null,
         ...data,
         title: 'Buy a new TV',
       });
