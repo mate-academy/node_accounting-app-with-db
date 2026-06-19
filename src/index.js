@@ -4,6 +4,17 @@
 
 const { createServer } = require('./createServer');
 
-createServer().listen(5700, () => {
-  console.log('Server is running on localhost:5700');
-});
+const startServer = async () => {
+  try {
+    const app = await createServer();
+
+    app.listen(5700, () => {
+      // Server started
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
+startServer();
