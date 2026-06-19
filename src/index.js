@@ -2,8 +2,11 @@
 
 'use strict';
 
-const { createServer } = require('./createServer');
+import { createServer } from './createServer.js';
 
-createServer().listen(5700, () => {
-  console.log('Server is running on localhost:5700');
+const PORT = 5700;
+const app = createServer();
+
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
