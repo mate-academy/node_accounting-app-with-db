@@ -26,9 +26,22 @@ const sequelize = new Sequelize({
   host: POSTGRES_HOST || 'localhost',
   dialect: 'postgres',
   port: POSTGRES_PORT || 5432,
-  password: POSTGRES_PASSWORD || '123',
+  password: POSTGRES_PASSWORD || '314159',
+  logging: false,
 });
+
+const initializeDatabase = async () => {
+  try {
+    await sequelize.authenticate();
+    await sequelize.sync({ force: true });
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Database initialization failed:', error);
+    process.exit(1);
+  }
+};
 
 module.exports = {
   sequelize,
+  initializeDatabase,
 };
