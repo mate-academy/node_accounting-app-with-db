@@ -91,7 +91,7 @@ describe('Expense', () => {
 
       expect(response.data).toEqual(
         expect.objectContaining({
-          id: expect.any(Number),
+          id: expect.any(String),
           ...data,
         }),
       );
@@ -118,7 +118,7 @@ describe('Expense', () => {
 
       expect(response.data).toEqual(
         expect.objectContaining({
-          id: expect.any(Number),
+          id: expect.any(String),
           ...data,
         }),
       );
@@ -198,7 +198,7 @@ describe('Expense', () => {
         userId: user.id,
       };
 
-      const seconData = {
+      const secondData = {
         ...laptop,
         userId: user.id,
         spentAt: '2022-10-20T11:01:43.462Z',
@@ -210,7 +210,7 @@ describe('Expense', () => {
 
       const {
         data: { id: secondExpenseId },
-      } = await api.post('expenses', { ...seconData });
+      } = await api.post('expenses', { ...secondData });
 
       const response = await api
         // eslint-disable-next-line max-len
@@ -225,7 +225,7 @@ describe('Expense', () => {
         },
         {
           id: secondExpenseId,
-          ...seconData,
+          ...secondData,
         },
       ]);
     });
