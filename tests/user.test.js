@@ -70,7 +70,7 @@ describe('User', () => {
 
       expect(res.data).toEqual(
         expect.objectContaining({
-          id: expect.any(Number),
+          id: expect.any(String),
           name,
         }),
       );
