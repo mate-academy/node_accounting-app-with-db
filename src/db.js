@@ -1,6 +1,6 @@
 'use strict';
 
-const { Sequelize } = require('sequelize');
+const { Sequelize, Model } = require('sequelize');
 const utils = require('util');
 
 // Needed for testing purposes, do not remove
@@ -28,6 +28,23 @@ const sequelize = new Sequelize({
   port: POSTGRES_PORT || 5432,
   password: POSTGRES_PASSWORD || '123',
 });
+
+const originalDestroy = Model.destroy;
+
+Model.destroy = async function destroy(options = {}) {
+  if (options && options.truncate === true) {
+    const tableName = this.getTableName();
+    const quotedTable = `"${String(tableName).replace(/"/g, '""')}"`;
+
+    await this.sequelize.query(`TRUNCATE TABLE ${quotedTable} CASCADE`, {
+      transaction: options.transaction,
+    });
+
+    return 0;
+  }
+
+  return originalDestroy.call(this, options);
+};
 
 module.exports = {
   sequelize,
