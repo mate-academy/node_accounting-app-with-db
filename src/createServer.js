@@ -109,9 +109,10 @@ const createServer = () => {
     }
 
     if (categories) {
-      const categoryList = Array.isArray(categories)
-        ? categories
-        : [categories];
+      const categoryList = categories
+        .split(',')
+        .map((category) => category.trim())
+        .filter(Boolean);
 
       where.category = {
         [Op.in]: categoryList,
@@ -146,6 +147,12 @@ const createServer = () => {
         .json({ message: 'One or more required fields are missing' });
 
       return;
+    }
+
+    if (!(await models.User.findByPk(userId))) {
+      res.status(400).json({
+        message: 'The user tablet do not have user with id: ' + 'userId',
+      });
     }
 
     const expense = await models.Expense.create({
