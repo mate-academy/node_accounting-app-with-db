@@ -11,6 +11,11 @@ const createServer = () => {
   app.use(cors());
   app.use(express.json());
 
+  app.use((req, res, next) => {
+    res.set('Content-Type', 'application/json; charset=utf-8');
+    next();
+  });
+
   // #region users
   app.get('/users', async (req, res) => {
     const users = await models.User.findAll();
@@ -53,7 +58,7 @@ const createServer = () => {
     const users = await models.User.findByPk(id);
 
     if (!users) {
-      res.sendStatus(404);
+      res.status(404).json(null);
 
       return;
     }
@@ -75,14 +80,14 @@ const createServer = () => {
     const users = await models.User.findByPk(id);
 
     if (!users) {
-      res.sendStatus(404);
+      res.status(404).json(null);
 
       return;
     }
 
     await models.User.destroy({ where: { id } });
 
-    res.sendStatus(204);
+    res.status(204).json(null);
   });
   // #endregion
 
@@ -153,6 +158,8 @@ const createServer = () => {
       res.status(400).json({
         message: 'The user tablet do not have user with id: ' + 'userId',
       });
+
+      return;
     }
 
     const expense = await models.Expense.create({
@@ -174,7 +181,7 @@ const createServer = () => {
     const expense = await models.Expense.findByPk(id);
 
     if (!expense) {
-      res.sendStatus(404);
+      res.status(404).json(null);
 
       return;
     }
@@ -207,7 +214,7 @@ const createServer = () => {
     const expense = await models.Expense.findByPk(id);
 
     if (!expense) {
-      res.sendStatus(404);
+      res.status(404).json(null);
 
       return;
     }
