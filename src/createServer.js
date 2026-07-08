@@ -83,9 +83,6 @@ function createServer() {
     const { name } = req.body;
 
     if (name !== undefined) {
-      if (typeof name !== 'string' || name.trim() === '') {
-        return res.status(400).json({ message: 'Invalid name format' });
-      }
       user.name = name;
       await user.save(); // Зберігаємо зміни в базу
     }
