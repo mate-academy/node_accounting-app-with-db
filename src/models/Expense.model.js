@@ -7,7 +7,7 @@ const Expense = sequelize.define(
   'Expense',
   {
     spentAt: {
-      type: DataTypes.DATE,
+      type: DataTypes.STRING,
       allowNull: false,
     },
     title: {

@@ -5,9 +5,9 @@ const { Expense } = require('./Expense.model');
 
 // Додаємо каскадне видалення, щоб тести могли безпечно очищати базу
 
-// User.hasMany(Expense, { foreignKey: 'userId', onDelete: 'CASCADE' });
+User.hasMany(Expense, { foreignKey: 'userId', constraints: false });
 
-// Expense.belongsTo(User, { foreignKey: 'userId', onDelete: 'CASCADE' });
+Expense.belongsTo(User, { foreignKey: 'userId', constraints: false });
 
 module.exports = {
   models: {

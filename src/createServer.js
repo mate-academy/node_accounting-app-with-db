@@ -10,6 +10,12 @@ function createServer() {
 
   app.use(express.json());
 
+  // Встановлюємо правильний Content-Type з charset для ВСІХ відповідей
+  app.use((req, res, next) => {
+    res.set('Content-Type', 'application/json; charset=utf-8');
+    next();
+  });
+
   // Функція парсингу ID залишається без змін (вона чудова)
   function parseId(idParam, res) {
     const id = Number(idParam);
@@ -113,7 +119,6 @@ function createServer() {
       return res.status(400).json({ message: 'Invalid userId format' });
     }
 
-    // Будуємо об'єкт фільтрації для Sequelize
     const whereClause = {};
 
     if (userId) {
@@ -130,17 +135,18 @@ function createServer() {
       whereClause.category = { [Op.in]: categoriesArray };
     }
 
-    // Логіка для діапазону дат
+    // Логіка для діапазону дат — порівнюємо як рядки,
+    // бо spentAt тепер зберігається як STRING у форматі ISO
     if (from || to) {
       whereClause.spentAt = {};
 
       if (from) {
-        whereClause.spentAt[Op.gte] = new Date(from);
-      } // Більше або дорівнює
+        whereClause.spentAt[Op.gte] = from; // Більше або дорівнює
+      }
 
       if (to) {
-        whereClause.spentAt[Op.lte] = new Date(to);
-      } // Менше або дорівнює
+        whereClause.spentAt[Op.lte] = to; // Менше або дорівнює
+      }
     }
 
     const filteredExpenses = await Expense.findAll({ where: whereClause });
