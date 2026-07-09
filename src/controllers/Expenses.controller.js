@@ -1,4 +1,5 @@
 const expensesModel = require('../models/Expense.model.js');
+const userModel = require('../models/User.model.js');
 
 const getAllExpenses = async (req, res) => {
   const expenses = await expensesModel.getAllExpenses(req.query);
@@ -22,6 +23,14 @@ const createExpense = async (req, res) => {
 
   if (!userId || !title || amount === undefined || !spentAt) {
     return res.status(400).json({ message: 'All fields are required' });
+  }
+
+  const user = await userModel.getUserById(userId);
+
+  if (!user) {
+    return res.status(400).json({
+      message: 'User not found',
+    });
   }
 
   const newExpense = await expensesModel.createExpense({
