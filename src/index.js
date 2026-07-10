@@ -3,7 +3,17 @@
 'use strict';
 
 const { createServer } = require('./createServer');
+const { sequelize } = require('./db.js');
 
-createServer().listen(5700, () => {
-  console.log('Server is running on localhost:5700');
-});
+const PORT = process.env.PORT || 5700;
+
+sequelize
+  .sync()
+  .then(() => {
+    createServer().listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error('Unable to connect to the database:', err);
+  });
