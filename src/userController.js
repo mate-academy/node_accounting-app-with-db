@@ -19,7 +19,7 @@ const createUserController = () => {
 
   const postAddUser = async (request, response) => {
     try {
-      const { name } = await request.body;
+      const { name } = request.body;
 
       if (!name) {
         return response.sendStatus(400);
@@ -37,7 +37,7 @@ const createUserController = () => {
   };
 
   const getOne = async (request, response) => {
-    const id = await parseInt(request.params.id);
+    const id = parseInt(request.params.id);
 
     try {
       const get = await User.findOne({
@@ -66,11 +66,6 @@ const createUserController = () => {
       await User.destroy({ where: { id: id } });
       response.sendStatus(204);
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(error, 'erro');
-
-      response.sendStatus(404);
-
       return response.status(500).json({ error: error });
     }
   };
@@ -119,10 +114,6 @@ const createUserController = () => {
         where: filtros,
       });
 
-      if (allExpense.length === 0) {
-        return response.status(200).json(allExpense);
-      }
-
       return response.status(200).json(allExpense);
     } catch (error) {
       return response.status(500).json({ error: error });
@@ -138,7 +129,7 @@ const createUserController = () => {
       return response.sendStatus(400);
     }
 
-    const isUser = User.findOne({ where: { id: userId } });
+    const isUser = await User.findOne({ where: { id: userId } });
 
     if (!isUser) {
       return response.sendStatus(400);
