@@ -1,7 +1,7 @@
 const express = require('express');
-const { createUserController } = require('./userController.js');
+const { createUserController } = require('../controllers/usersController.js');
 
-const accountingRouter = () => {
+const usersRouter = () => {
   const userController = createUserController();
   const router = express.Router();
 
@@ -16,18 +16,7 @@ const accountingRouter = () => {
 
   router.patch('/users/:id', userController.editUser);
 
-  router
-    .route('/expenses')
-    .get(userController.getExpense)
-    .post(userController.postExpense);
-
-  router
-    .route('/expenses/:id')
-    .get(userController.getOneExpense)
-    .patch(userController.updateExpense)
-    .delete(userController.deleteExpense);
-
   return router;
 };
 
-module.exports = accountingRouter;
+module.exports = usersRouter;
