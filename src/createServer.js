@@ -56,10 +56,6 @@ const createServer = () => {
   app.patch('/users/:id', async (req, res) => {
     const userId = +req.params.id;
 
-    if (!req.body.name) {
-      return res.status(400).send('Name is required');
-    }
-
     try {
       const patchedUser = await User.findByPk(userId);
 
@@ -67,7 +63,7 @@ const createServer = () => {
         return res.status(404).send('User not found');
       }
 
-      patchedUser.name = req.body.name;
+      Object.assign(patchedUser, req.body);
       await patchedUser.save();
 
       return res.status(200).json(patchedUser);
@@ -93,15 +89,17 @@ const createServer = () => {
   });
 
   app.get('/expenses', async (req, res) => {
-    const { userId, category, from, to } = req.query;
+    const { userId, categories, from, to } = req.query;
     const whereConditions = {};
 
     if (userId) {
       whereConditions.userId = +userId;
     }
 
-    if (category) {
-      whereConditions.category = category;
+    if (categories) {
+      const categoryArray = categories.split(',');
+
+      whereConditions.category = { [Op.in]: categoryArray };
     }
 
     if (from || to) {
@@ -187,10 +185,6 @@ const createServer = () => {
   app.patch('/expenses/:id', async (req, res) => {
     const expenseId = +req.params.id;
 
-    if (!req.body.title) {
-      return res.status(400).send('Title is required');
-    }
-
     try {
       const patchedExpense = await Expense.findByPk(expenseId);
 
@@ -198,7 +192,7 @@ const createServer = () => {
         return res.status(404).send('Expense not found');
       }
 
-      patchedExpense.title = req.body.title;
+      Object.assign(patchedExpense, req.body);
       await patchedExpense.save();
 
       return res.status(200).json(patchedExpense);
