@@ -10,8 +10,8 @@ const createServer = () => {
   const app = express();
 
   app.use(cors());
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
+  app.use(express.json({ defaultCharset: 'utf-8' }));
+  app.use(express.urlencoded({ extended: true, defaultCharset: 'utf-8' }));
 
   app.use('/users', userRoutes);
   app.use('/expenses', expenseRoutes);

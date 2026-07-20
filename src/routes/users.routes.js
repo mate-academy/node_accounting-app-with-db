@@ -42,6 +42,10 @@ router.patch('/:id', async (req, res) => {
 
   const { name } = req.body;
 
+  if (!name) {
+    return res.status(400).json({ error: 'Name is required' });
+  }
+
   user.name = name;
   await user.save();
 

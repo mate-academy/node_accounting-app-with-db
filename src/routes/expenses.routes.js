@@ -73,11 +73,15 @@ router.get('/:id', async (req, res) => {
 
 router.patch('/:id', async (req, res) => {
   const { id } = req.params;
-  const { title, amount, category, note } = req.body;
+  const { spentAt, title, amount, category, note } = req.body;
   const expense = await Expense.findOne({ where: { id } });
 
   if (!expense) {
     return res.status(404).json({ error: 'Expense not found' });
+  }
+
+  if (spentAt) {
+    expense.spentAt = spentAt;
   }
 
   if (title) {
