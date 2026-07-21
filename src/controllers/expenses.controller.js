@@ -43,10 +43,6 @@ const create = async (req, res) => {
 const getById = async (req, res) => {
   const { id } = req.params;
 
-  if (!id) {
-    return res.status(404).json({ error: 'expenseId is required' });
-  }
-
   const expense = await expensesServises.getById(id);
 
   if (!expense) {
