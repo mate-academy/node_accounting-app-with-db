@@ -7,6 +7,8 @@ const utils = require('util');
 require('dotenv').config();
 global.TextEncoder = utils.TextEncoder;
 
+// console.log(process.env.POSTGRES_PASSWORD);
+
 const {
   POSTGRES_HOST,
   POSTGRES_PORT,
@@ -26,8 +28,13 @@ const sequelize = new Sequelize({
   host: POSTGRES_HOST || 'localhost',
   dialect: 'postgres',
   port: POSTGRES_PORT || 5432,
-  password: POSTGRES_PASSWORD || '123',
+  password: POSTGRES_PASSWORD || '1234',
 });
+
+// sequelize
+//   .authenticate()
+//   .then(() => console.log('✅ Database connected'))
+//   .catch((err) => console.error('❌ Database error:', err));
 
 module.exports = {
   sequelize,
