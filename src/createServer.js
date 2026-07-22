@@ -11,13 +11,18 @@ const createServer = () => {
 
   app.use(express.json());
 
+  app.use((req, res, next) => {
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    next();
+  });
+
   app.get('/users', async (req, res) => {
     try {
       const users = await User.findAll();
 
       res.json(users);
     } catch (error) {
-      res.status(500).send('Internal Server Error');
+      res.status(500).json({ error: 'Internal Server Error' });
     }
   });
 
@@ -25,7 +30,7 @@ const createServer = () => {
     const { name } = req.body;
 
     if (!name) {
-      return res.status(400).send('Name is required');
+      return res.status(400).json({ error: 'Name is required' });
     }
 
     try {
@@ -33,7 +38,7 @@ const createServer = () => {
 
       res.status(201).json(newUser);
     } catch (error) {
-      res.status(500).send('Internal Server Error');
+      res.status(500).json({ error: 'Internal Server Error' });
     }
   });
 
@@ -44,12 +49,12 @@ const createServer = () => {
       const deletedCount = await User.destroy({ where: { id: userId } });
 
       if (deletedCount === 0) {
-        return res.status(404).send('User not found');
+        return res.status(404).json({ error: 'User not found' });
       }
 
       return res.sendStatus(204);
     } catch (error) {
-      return res.status(500).send('Internal Server Error');
+      return res.status(500).json({ error: 'Internal Server Error' });
     }
   });
 
@@ -60,7 +65,7 @@ const createServer = () => {
       const patchedUser = await User.findByPk(userId);
 
       if (!patchedUser) {
-        return res.status(404).send('User not found');
+        return res.status(404).json({ error: 'User not found' });
       }
 
       Object.assign(patchedUser, req.body);
@@ -68,7 +73,7 @@ const createServer = () => {
 
       return res.status(200).json(patchedUser);
     } catch (error) {
-      return res.status(500).send('Internal Server Error');
+      return res.status(500).json({ error: 'Internal Server Error' });
     }
   });
 
@@ -79,12 +84,12 @@ const createServer = () => {
       const foundUser = await User.findByPk(userId);
 
       if (!foundUser) {
-        return res.status(404).send('User not found');
+        return res.status(404).json({ error: 'User not found' });
       }
 
       return res.status(200).json(foundUser);
     } catch (error) {
-      return res.status(500).send('Internal Server Error');
+      return res.status(500).json({ error: 'Internal Server Error' });
     }
   });
 
@@ -121,7 +126,7 @@ const createServer = () => {
 
       return res.status(200).json(expenses);
     } catch (error) {
-      return res.status(500).send('Internal Server Error');
+      return res.status(500).json({ error: 'Internal Server Error' });
     }
   });
 
@@ -129,26 +134,26 @@ const createServer = () => {
     const { userId, spentAt, title, amount, category, note } = req.body;
 
     if (!userId) {
-      return res.status(400).send('UserId is required');
+      return res.status(400).json({ error: 'UserId is required' });
     }
 
     if (!spentAt) {
-      return res.status(400).send('SpentAt is required');
+      return res.status(400).json({ error: 'SpentAt is required' });
     }
 
     if (!title) {
-      return res.status(400).send('Title is required');
+      return res.status(400).json({ error: 'Title is required' });
     }
 
     if (!amount) {
-      return res.status(400).send('Amount is required');
+      return res.status(400).json({ error: 'Amount is required' });
     }
 
     try {
       const user = await User.findByPk(userId);
 
       if (user === null) {
-        return res.status(400).send('User not found');
+        return res.status(400).json({ error: 'User not found' });
       }
 
       const newExpense = await Expense.create({
@@ -162,7 +167,7 @@ const createServer = () => {
 
       return res.status(201).json(newExpense);
     } catch (error) {
-      return res.status(500).send('Internal Server Error');
+      return res.status(500).json({ error: 'Internal Server Error' });
     }
   });
 
@@ -173,12 +178,12 @@ const createServer = () => {
       const deletedCount = await Expense.destroy({ where: { id: expenseId } });
 
       if (deletedCount === 0) {
-        return res.status(404).send('Expense not found');
+        return res.status(404).json({ error: 'Expense not found' });
       }
 
       return res.sendStatus(204);
     } catch (error) {
-      return res.status(500).send('Internal Server Error');
+      return res.status(500).json({ error: 'Internal Server Error' });
     }
   });
 
@@ -189,7 +194,7 @@ const createServer = () => {
       const patchedExpense = await Expense.findByPk(expenseId);
 
       if (!patchedExpense) {
-        return res.status(404).send('Expense not found');
+        return res.status(404).json({ error: 'Expense not found' });
       }
 
       Object.assign(patchedExpense, req.body);
@@ -197,7 +202,7 @@ const createServer = () => {
 
       return res.status(200).json(patchedExpense);
     } catch (error) {
-      return res.status(500).send('Internal Server Error');
+      return res.status(500).json({ error: 'Internal Server Error' });
     }
   });
 
@@ -208,12 +213,12 @@ const createServer = () => {
       const expense = await Expense.findByPk(expenseId);
 
       if (!expense) {
-        return res.status(404).send('Expense not found');
+        return res.status(404).json({ error: 'Expense not found' });
       }
 
       return res.status(200).json(expense);
     } catch (error) {
-      return res.status(500).send('Internal Server Error');
+      return res.status(500).json({ error: 'Internal Server Error' });
     }
   });
 
