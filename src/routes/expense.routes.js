@@ -1,0 +1,14 @@
+'use strict';
+
+const { Router } = require('express');
+const expenseController = require('../controllers/expense.controller');
+
+const router = Router();
+
+router.post('/', expenseController.create);
+router.get('/', expenseController.getAll);
+router.get('/:id', expenseController.getOne);
+router.patch('/:id', expenseController.update);
+router.delete('/:id', expenseController.remove);
+
+module.exports = router;
