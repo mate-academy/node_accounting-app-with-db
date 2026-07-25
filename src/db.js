@@ -3,7 +3,6 @@
 const { Sequelize } = require('sequelize');
 const utils = require('util');
 
-// Needed for testing purposes, do not remove
 require('dotenv').config();
 global.TextEncoder = utils.TextEncoder;
 
@@ -13,12 +12,15 @@ const {
   POSTGRES_USER,
   POSTGRES_PASSWORD,
   POSTGRES_DB,
+  DB_SSL,
 } = process.env;
 
-/*
-  All credentials setted to default values (exsept password - it is exapmle)
-  replace if needed with your own
-*/
+const sslOptions = {
+  ssl: {
+    require: true,
+    rejectUnauthorized: false,
+  },
+};
 
 const sequelize = new Sequelize({
   database: POSTGRES_DB || 'postgres',
@@ -27,6 +29,7 @@ const sequelize = new Sequelize({
   dialect: 'postgres',
   port: POSTGRES_PORT || 5432,
   password: POSTGRES_PASSWORD || '123',
+  dialectOptions: DB_SSL === 'true' ? sslOptions : {},
 });
 
 module.exports = {
