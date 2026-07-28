@@ -42,13 +42,8 @@ const getById = async (id) => {
 const create = async (data) => {
   const { userId, title, amount, spentAt, category, note } = data || {};
 
-  if (
-    !userId ||
-    !title ||
-    amount === undefined ||
-    amount === null ||
-    !spentAt
-  ) {
+  // 1. Обов'язковими є ТІЛЬКИ userId, title та amount!
+  if (!userId || !title || amount === undefined || amount === null) {
     const error = new Error('Missing required fields');
 
     error.status = 400;
@@ -64,13 +59,15 @@ const create = async (data) => {
     throw error;
   }
 
+  // 2. Явно підставляємо 'Uncategorized' та поточну дату,
+  // якщо опціональні поля category чи spentAt відсутні у запиті
   return Expense.create({
     userId,
     title,
     amount,
-    spentAt,
-    category,
-    note,
+    category: category || 'Uncategorized',
+    spentAt: spentAt || new Date(),
+    note: note || null,
   });
 };
 
