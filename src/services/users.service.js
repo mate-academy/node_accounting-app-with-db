@@ -19,8 +19,14 @@ const createUser = (name) => {
   return User.create({ name });
 };
 
-const update = async ({ id, name }) => {
-  await User.update({ name }, { where: { id } });
+const update = async ({ id, ...updates }) => {
+  const definedUpdates = Object.fromEntries(
+    Object.entries(updates).filter(([, value]) => value !== undefined),
+  );
+
+  await User.update(definedUpdates, {
+    where: { id },
+  });
 
   return getById(id);
 };

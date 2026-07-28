@@ -32,7 +32,11 @@ const createExpense = (userId, spentAt, title, amount, category, note) => {
 };
 
 const update = async ({ id, ...updates }) => {
-  await Expense.update(updates, {
+  const definedUpdates = Object.fromEntries(
+    Object.entries(updates).filter(([, value]) => value !== undefined),
+  );
+
+  await Expense.update(definedUpdates, {
     where: { id },
   });
 
