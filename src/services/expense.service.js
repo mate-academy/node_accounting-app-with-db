@@ -59,14 +59,12 @@ const create = async (data) => {
     throw error;
   }
 
-  // 2. Явно підставляємо 'Uncategorized' та поточну дату,
-  // якщо опціональні поля category чи spentAt відсутні у запиті
   return Expense.create({
     userId,
     title,
     amount,
+    spentAt,
     category: category || 'Uncategorized',
-    spentAt: spentAt || new Date(),
     note: note || null,
   });
 };

@@ -41,9 +41,9 @@ const getById = async (req, res, next) => {
 
 const create = async (req, res, next) => {
   try {
-    const { userId, title, amount } = req.body;
+    const { userId, title, amount, spentAt } = req.body;
 
-    if (!userId || !title || amount === undefined) {
+    if (!userId || !title || amount === undefined || !spentAt) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
