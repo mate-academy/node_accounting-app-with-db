@@ -8,6 +8,7 @@ function createServer() {
   const app = express();
 
   app.use(express.json());
+  app.setHeader('Content-Type', 'application/json; charset=utf-8');
 
   app.use('/', userRouter);
   app.use('/', expenseRouter);

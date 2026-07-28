@@ -31,17 +31,10 @@ const createExpense = (userId, spentAt, title, amount, category, note) => {
   });
 };
 
-const update = async ({ id, spentAt, title, amount, category, note }) => {
-  await Expense.update(
-    {
-      spentAt,
-      title,
-      amount,
-      category,
-      note,
-    },
-    { where: { id } },
-  );
+const update = async ({ id, ...updates }) => {
+  await Expense.update(updates, {
+    where: { id },
+  });
 
   return getById(id);
 };
