@@ -6,9 +6,14 @@ function createServer() {
   const app = express();
   const {
     models: { User, Expense },
-  } = require('./models/models');
+  } = require('./models/models.js');
 
   app.use(express.json());
+
+  app.use((req, res, next) => {
+    res.set('Content-Type', 'application/json; charset=utf-8');
+    next();
+  });
 
   app.get('/users', async (req, res) => {
     const users = await User.findAll();
@@ -109,9 +114,9 @@ function createServer() {
   app.post('/expenses', async (req, res) => {
     const { userId, title, amount, category, note, spentAt } = req.body;
 
-    if (!title || amount === undefined) {
+    if (!userId || !title || amount === undefined || !spentAt) {
       return res.status(400).json({
-        error: 'Title and amount are required',
+        error: 'UserId, title, amount and spentAt are required',
       });
     }
 
@@ -166,7 +171,7 @@ function createServer() {
   });
 
   app.patch('/expenses/:id', async (req, res) => {
-    const { userId, title, amount } = req.body;
+    const { userId, title, amount, category, note, spentAt } = req.body;
 
     const expense = await Expense.findByPk(req.params.id);
 
@@ -186,6 +191,18 @@ function createServer() {
 
     if (amount !== undefined) {
       expense.amount = amount;
+    }
+
+    if (category !== undefined) {
+      expense.category = category;
+    }
+
+    if (note !== undefined) {
+      expense.note = note;
+    }
+
+    if (spentAt !== undefined) {
+      expense.spentAt = spentAt;
     }
 
     await expense.save();
