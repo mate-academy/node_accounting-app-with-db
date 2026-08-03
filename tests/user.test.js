@@ -6,7 +6,7 @@ const https = require('https');
 
 const {
   models: { User },
-} = require('../src/models/models');
+} = require('../src/models');
 const { createServer } = require('../src/createServer');
 const { sequelize } = require('../src/db');
 const { Agent } = require('http');
