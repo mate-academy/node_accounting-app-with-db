@@ -23,6 +23,10 @@ const create = async (name) => {
 const update = async (id, data) => {
   const user = await User.findByPk(id);
 
+  if (!user) {
+    throw new Error('User not found');
+  }
+
   await user.update(data);
 
   return user;
