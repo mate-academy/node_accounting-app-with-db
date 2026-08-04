@@ -31,6 +31,10 @@ const update = async (id, data) => {
 const remove = async (id) => {
   const user = await User.findByPk(id);
 
+  if (!user) {
+    throw new Error('Not found');
+  }
+
   await user.destroy();
 };
 

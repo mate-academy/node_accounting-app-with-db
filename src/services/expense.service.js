@@ -1,5 +1,5 @@
 const { Op } = require('sequelize');
-const { Expense } = require('../models/models').models;
+const { Expense, User } = require('../models/models').models;
 
 const getAll = async ({ userId, from, to, categories }) => {
   const whereClause = {};
@@ -38,6 +38,12 @@ const getById = async (id) => {
 };
 
 const create = async (data) => {
+  const user = await User.findByPk(data.userId);
+
+  if (!user) {
+    throw new Error('User not found');
+  }
+
   const expense = await Expense.create(data);
 
   return expense;
@@ -59,6 +65,10 @@ const update = async (id, data) => {
 
 const remove = async (id) => {
   const expense = await getById(id);
+
+  if (!expense) {
+    throw new Error('Not found');
+  }
 
   await expense.destroy();
 };

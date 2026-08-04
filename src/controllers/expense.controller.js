@@ -63,7 +63,7 @@ const create = async (req, res, next) => {
 
     res.status(201).json(createdExpense);
   } catch (error) {
-    res.sendStatus(error.statusCode);
+    res.sendStatus(400);
   }
 };
 
