@@ -1,10 +1,25 @@
 'use strict';
 
+const { DataTypes } = require('sequelize');
 const { sequelize } = require('../db.js');
 
-const User = sequelize.define(
-  // your code goes here
-);
+const User = sequelize.define('User', {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+});
+
+User.beforeBulkDestroy((options) => {
+  if (options.truncate) {
+    options.cascade = true;
+  }
+});
 
 module.exports = {
   User,
