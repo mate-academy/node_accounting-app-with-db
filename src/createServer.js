@@ -8,6 +8,11 @@ const { User, Expense } = models;
 const createServer = () => {
   const app = express();
 
+  app.use((req, res, next) => {
+    res.set('Content-Type', 'application/json; charset=utf-8');
+    next();
+  });
+
   app.use(express.json());
 
   app.get('/users', async (req, res) => {
@@ -55,7 +60,7 @@ const createServer = () => {
     const user = await User.findByPk(id);
 
     if (!user) {
-      return res.status(404).send('User not found');
+      return res.status(404).json({ error: 'User not found' });
     }
 
     const { name } = req.body;
@@ -71,7 +76,13 @@ const createServer = () => {
   app.post('/expenses', async (req, res) => {
     const { userId, amount, title, spentAt, category, note } = req.body;
 
-    if (amount === undefined || !title || !spentAt || !userId) {
+    if (
+      amount === undefined ||
+      !title ||
+      !spentAt ||
+      userId === undefined ||
+      userId === null
+    ) {
       return res.status(400).json({ error: 'required fields are missing' });
     }
 
@@ -98,7 +109,7 @@ const createServer = () => {
     const where = {};
 
     if (userId) {
-      where.userId = userId;
+      where.userId = Number(userId);
     }
 
     if (categories) {
@@ -130,7 +141,7 @@ const createServer = () => {
     const expense = await Expense.findByPk(req.params.id);
 
     if (!expense) {
-      return res.status(404).json({ error: 'not found' });
+      return res.status(404).json({ error: 'Expense not found' });
     }
 
     return res.json(expense);
@@ -140,7 +151,7 @@ const createServer = () => {
     const expense = await Expense.findByPk(req.params.id);
 
     if (!expense) {
-      return res.status(404).json({ error: 'not found' });
+      return res.status(404).json({ error: 'Expense not found' });
     }
 
     await expense.destroy();
@@ -152,7 +163,7 @@ const createServer = () => {
     const expense = await Expense.findByPk(req.params.id);
 
     if (!expense) {
-      return res.status(404).json({ error: 'not found' });
+      return res.status(404).json({ error: 'Expense not found' });
     }
 
     await expense.update(req.body);
