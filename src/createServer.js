@@ -66,7 +66,14 @@ const createServer = () => {
     const { name } = req.body;
 
     if (name) {
+      const responseData = {
+        ...user.toJSON(),
+        name,
+      };
+
       await user.update({ name });
+
+      return res.json(responseData);
     }
 
     return res.json(user);
