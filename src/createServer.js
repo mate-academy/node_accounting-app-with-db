@@ -52,7 +52,7 @@ const createServer = () => {
 
     await user.destroy();
 
-    return res.sendStatus(204);
+    return res.status(204).end();
   });
 
   app.patch('/users/:id', async (req, res) => {
@@ -66,8 +66,7 @@ const createServer = () => {
     const { name } = req.body;
 
     if (name) {
-      await User.update({ name }, { where: { id } });
-      user.name = name;
+      await user.update({ name });
     }
 
     return res.json(user);
@@ -89,7 +88,7 @@ const createServer = () => {
     const user = await User.findByPk(userId);
 
     if (!user) {
-      return res.status(400).json({ error: 'user not found' });
+      return res.status(400).json({ error: 'User not found' });
     }
 
     const expense = await Expense.create({
@@ -115,7 +114,7 @@ const createServer = () => {
     if (categories) {
       const categoriesList = Array.isArray(categories)
         ? categories
-        : categories.split(',');
+        : categories.split(',').map((s) => s.trim());
 
       where.category = { [Op.in]: categoriesList };
     }
@@ -124,11 +123,11 @@ const createServer = () => {
       where.spentAt = {};
 
       if (from) {
-        where.spentAt[Op.gte] = from;
+        where.spentAt[Op.gte] = new Date(from);
       }
 
       if (to) {
-        where.spentAt[Op.lte] = to;
+        where.spentAt[Op.lte] = new Date(to);
       }
     }
 
@@ -156,7 +155,7 @@ const createServer = () => {
 
     await expense.destroy();
 
-    return res.sendStatus(204);
+    return res.status(204).end();
   });
 
   app.patch('/expenses/:id', async (req, res) => {
