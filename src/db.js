@@ -21,12 +21,12 @@ const {
 */
 
 const sequelize = new Sequelize({
-  database: POSTGRES_DB || 'postgres',
+  database: POSTGRES_DB || 'accounting',
   username: POSTGRES_USER || 'postgres',
   host: POSTGRES_HOST || 'localhost',
   dialect: 'postgres',
   port: POSTGRES_PORT || 5432,
-  password: POSTGRES_PASSWORD || '123',
+  password: POSTGRES_PASSWORD || 'Kohanysya_2011',
 });
 
 module.exports = {
