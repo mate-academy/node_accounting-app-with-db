@@ -5,7 +5,7 @@ const { Op } = require('sequelize');
 
 const {
   models: { User, Expense },
-} = require('./models');
+} = require('./models/models');
 
 const createServer = () => {
   const app = express();
