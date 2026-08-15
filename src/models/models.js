@@ -1,7 +1,7 @@
 'use strict';
 
-const { User } = require('./User.model');
-const { Expense } = require('./Expense.model');
+const { User } = require('./User.model.js');
+const { Expense } = require('./Expense.model.js');
 
 module.exports = {
   models: {
