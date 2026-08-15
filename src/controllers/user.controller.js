@@ -47,7 +47,7 @@ function createUserController(userService) {
     const { id } = req.params;
     const { name } = req.body;
 
-    if (typeof name !== 'string') {
+    if (!name || typeof name !== 'string') {
       return res.sendStatus(400);
     }
 

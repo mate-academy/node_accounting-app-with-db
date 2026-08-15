@@ -26,12 +26,12 @@ function createExpenseService() {
     const where = {};
 
     if (userId) {
-      where.userId = userId;
+      where.userId = Number(userId);
     }
 
     if (categories) {
       where.category = {
-        [Op.in]: categories.split(','),
+        [Op.in]: categories.split(',').map((category) => category.trim()),
       };
     }
 
@@ -39,11 +39,11 @@ function createExpenseService() {
       where.spentAt = {};
 
       if (from) {
-        where.spentAt[Op.gte] = from;
+        where.spentAt[Op.gte] = new Date(from);
       }
 
       if (to) {
-        where.spentAt[Op.lte] = to;
+        where.spentAt[Op.lte] = new Date(to);
       }
     }
 
