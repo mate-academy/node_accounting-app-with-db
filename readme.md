@@ -2,6 +2,7 @@
 Take the Accounting app from prev lesson and use PostgreSQL as a storage
 
 # Requirements
+
 Implement a REST API server using Node.js that manages **Users** and **Expenses**.
 
 ## Users API
