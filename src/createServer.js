@@ -70,12 +70,13 @@ const createServer = () => {
   app.post('/expenses', async (req, res) => {
     const { userId, spentAt, title, amount, category, note } = req.body;
 
-    if (
-      userId === undefined ||
-      spentAt === undefined ||
-      title === undefined ||
-      amount === undefined
-    ) {
+    const isValidUserId = typeof userId === 'number';
+    const isValidTitle = typeof title === 'string' && title.trim() !== '';
+    const isValidAmount = typeof amount === 'number' && Number.isFinite(amount);
+    const isValidSpentAt =
+      typeof spentAt === 'string' && !Number.isNaN(Date.parse(spentAt));
+
+    if (!isValidUserId || !isValidTitle || !isValidAmount || !isValidSpentAt) {
       return res.sendStatus(400);
     }
 
