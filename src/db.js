@@ -1,13 +1,17 @@
+/* eslint-disable indent */
 'use strict';
 
-const { Sequelize } = require('sequelize');
+const Sequelize = require('sequelize');
 const utils = require('util');
 
 // Needed for testing purposes, do not remove
-require('dotenv').config();
+const dotenv = require('dotenv');
+
+dotenv.config();
 global.TextEncoder = utils.TextEncoder;
 
 const {
+  DB_URL,
   POSTGRES_HOST,
   POSTGRES_PORT,
   POSTGRES_USER,
@@ -20,15 +24,25 @@ const {
   replace if needed with your own
 */
 
-const sequelize = new Sequelize({
-  database: POSTGRES_DB || 'postgres',
-  username: POSTGRES_USER || 'postgres',
-  host: POSTGRES_HOST || 'localhost',
-  dialect: 'postgres',
-  port: POSTGRES_PORT || 5432,
-  password: POSTGRES_PASSWORD || '123',
-});
+const sequelize = DB_URL
+  ? new Sequelize(DB_URL, {
+      dialect: 'postgres',
+      dialectOptions: {
+        ssl: {
+          require: true,
+          rejectUnauthorized: false,
+        },
+      },
+    })
+  : new Sequelize({
+      database: POSTGRES_DB || 'postgres',
+      username: POSTGRES_USER || 'postgres',
+      host: POSTGRES_HOST || 'localhost',
+      dialect: 'postgres',
+      port: Number(POSTGRES_PORT) || 5433,
+      password: POSTGRES_PASSWORD || 'Begemotik12!@',
+    });
 
-module.exports = {
-  sequelize,
-};
+sequelize.sync();
+
+module.exports = { sequelize };
