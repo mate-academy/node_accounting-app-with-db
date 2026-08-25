@@ -29,13 +29,13 @@ const create = async (req, res) => {
   const { userId, spentAt, title, amount, category, note } = req.body;
 
   if (!userId || !spentAt || !title || !amount) {
-    return res.status(400).send('Missing required fields');
+    return res.status(400).json({ error: 'Missing required fields' });
   }
 
   const user = await usersService.getById(userId);
 
   if (!user) {
-    return res.status(400).send('User not found');
+    return res.status(400).json({ error: 'User not found' });
   }
 
   const expense = await expensesService.create({
