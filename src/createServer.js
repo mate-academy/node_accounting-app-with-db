@@ -11,6 +11,11 @@ const createServer = () => {
 
   app.use(express.json());
 
+  app.use((req, res, next) => {
+    res.set('Content-Type', 'application/json; charset=utf-8');
+    next();
+  });
+
   app.get('/users', async (req, res) => {
     const users = await User.findAll();
 
