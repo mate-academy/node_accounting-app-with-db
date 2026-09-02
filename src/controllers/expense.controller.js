@@ -1,12 +1,12 @@
 'use strict';
 
-const exspresService = require('../services/expense.service');
+const expressService = require('../services/expense.service');
 const usersService = require('../services/users.service');
 
 const get = async (req, res) => {
   const { userId, from, to, categories } = req.query;
 
-  const result = await exspresService.getAll({
+  const result = await expressService.getAll({
     userId,
     from,
     to,
@@ -18,7 +18,7 @@ const get = async (req, res) => {
 
 const getOne = async (req, res) => {
   const { id } = req.params;
-  const data = await exspresService.getById(id);
+  const data = await expressService.getById(id);
 
   if (!data) {
     res.sendStatus(404);
@@ -46,7 +46,7 @@ const create = async (req, res) => {
     return res.sendStatus(400);
   }
 
-  const newExpense = await exspresService.create({
+  const newExpense = await expressService.create({
     userId,
     spentAt,
     title,
@@ -62,7 +62,7 @@ const create = async (req, res) => {
 const remove = async (req, res) => {
   const { id } = req.params;
 
-  const expense = await exspresService.getById(id);
+  const expense = await expressService.getById(id);
 
   if (!expense) {
     res.sendStatus(404);
@@ -70,7 +70,7 @@ const remove = async (req, res) => {
     return;
   }
 
-  await exspresService.remove(id);
+  await expressService.remove(id);
 
   res.sendStatus(204);
 };
@@ -78,7 +78,7 @@ const remove = async (req, res) => {
 const update = async (req, res) => {
   const { id } = req.params;
 
-  const expense = await exspresService.getById(id);
+  const expense = await expressService.getById(id);
 
   if (!expense) {
     res.sendStatus(404);
@@ -86,7 +86,7 @@ const update = async (req, res) => {
     return;
   }
 
-  const newExpense = await exspresService.update(id, req.body);
+  const newExpense = await expressService.update(id, req.body);
 
   res.send(newExpense);
 };
