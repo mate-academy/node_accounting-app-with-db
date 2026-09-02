@@ -30,15 +30,10 @@ const update = async (id, name) => {
   return user.update({ name });
 };
 
-const reset = async () => {
-  return User.destroy({ truncate: true, cascade: true });
-};
-
 module.exports = {
   getAll,
   getById,
   create,
   remove,
   update,
-  reset,
 };

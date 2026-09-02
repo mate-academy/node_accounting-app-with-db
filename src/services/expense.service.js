@@ -55,15 +55,10 @@ const update = async (id, data) => {
   return expense.update(data);
 };
 
-const reset = async () => {
-  return Expense.destroy({ truncate: true, cascade: true });
-};
-
 module.exports = {
   getAll,
   getById,
   create,
   remove,
   update,
-  reset,
 };
