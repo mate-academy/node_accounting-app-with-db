@@ -63,7 +63,7 @@ const deleteUser = async (req, res) => {
 
   await user.destroy();
 
-  res.status(204).end();
+  res.status(204).send();
 };
 
 module.exports = {

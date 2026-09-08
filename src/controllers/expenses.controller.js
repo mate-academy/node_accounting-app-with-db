@@ -37,7 +37,14 @@ const createExpense = async (req, res) => {
   const { userId, title, amount, spentAt, category, note } = req.body;
   const user = await User.findByPk(userId);
 
-  if (!userId || !title || !amount || !spentAt || !user) {
+  if (
+    !userId ||
+    !title ||
+    amount === 0 ||
+    amount === undefined ||
+    !spentAt ||
+    !user
+  ) {
     res
       .status(400)
       .json({ message: 'Required fields are missing or user not found' });
