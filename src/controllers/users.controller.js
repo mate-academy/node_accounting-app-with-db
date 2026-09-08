@@ -12,7 +12,7 @@ const createUser = async (req, res) => {
   const name = req.body.name;
 
   if (!name) {
-    res.status(400).json({ message: ' Name is required' });
+    res.status(400).json({ message: 'Name is required' });
 
     return;
   }
@@ -27,7 +27,7 @@ const getById = async (req, res) => {
   const user = await User.findByPk(id);
 
   if (!user) {
-    res.status(404).json({ message: ' User not found ' });
+    res.status(404).json({ message: 'User not found' });
 
     return;
   }
