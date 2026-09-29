@@ -1,9 +1,19 @@
-/* eslint-disable no-console */
-
 'use strict';
 
 const { createServer } = require('./createServer');
+const { sequelize } = require('./db');
 
-createServer().listen(5700, () => {
-  console.log('Server is running on localhost:5700');
-});
+const PORT = process.env.PORT || 3000;
+
+async function startServer() {
+  await sequelize.sync();
+
+  const app = createServer();
+
+  app.listen(PORT, () => {
+    // eslint-disable-next-line no-console
+    console.log(`Server is running on port ${PORT}`);
+  });
+}
+
+startServer();
