@@ -6,20 +6,12 @@ const DataTypes = _require.DataTypes;
 const _require2 = require('../db.js');
 const sequelize = _require2.sequelize;
 
-const _require3 = require('./User.model.js');
-const User = _require3.User;
-
 const Expense = sequelize.define(
   'Expense',
   {
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: User,
-        key: 'id',
-      },
-      onDelete: 'CASCADE',
     },
     spentAt: {
       type: DataTypes.DATE,

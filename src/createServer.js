@@ -1,7 +1,5 @@
 'use strict';
 
-/*eslint-disable*/
-
 const http = require('http');
 const { Op } = require('sequelize');
 
@@ -150,6 +148,7 @@ const createServer = () => {
           return;
         }
 
+        await Expense.destroy({ where: { userId: chosenId } });
         await user.destroy();
 
         res.statusCode = 204;
@@ -157,8 +156,6 @@ const createServer = () => {
 
         return;
       }
-
-
 
       // POST /expenses
       if (req.method === 'POST' && pathname === '/expenses') {
@@ -206,7 +203,6 @@ const createServer = () => {
         const from = url.searchParams.get('from');
         const to = url.searchParams.get('to');
         const categories = url.searchParams.get('categories');
-
 
         if (userId) {
           where.userId = userId;
@@ -282,7 +278,35 @@ const createServer = () => {
           }
         }
 
-        await expense.update(body);
+        const { spentAt, title, amount, category, note, userId } = body;
+
+        const allowedUpdates = {};
+
+        if (spentAt !== undefined) {
+          allowedUpdates.spentAt = spentAt;
+        }
+
+        if (title !== undefined) {
+          allowedUpdates.title = title;
+        }
+
+        if (amount !== undefined) {
+          allowedUpdates.amount = amount;
+        }
+
+        if (category !== undefined) {
+          allowedUpdates.category = category;
+        }
+
+        if (note !== undefined) {
+          allowedUpdates.note = note;
+        }
+
+        if (userId !== undefined) {
+          allowedUpdates.userId = userId;
+        }
+
+        await expense.update(allowedUpdates);
 
         sendJson(res, 200, expense);
 
@@ -309,15 +333,10 @@ const createServer = () => {
         return;
       }
 
-
-
-
       sendJson(res, 404, {
         message: 'Not found',
       });
     } catch (error) {
-      console.error(error);
-
       sendJson(res, 500, {
         message: 'Internal server error',
       });

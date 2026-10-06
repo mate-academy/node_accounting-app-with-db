@@ -1,11 +1,10 @@
 'use strict';
-/*eslint-disable*/
 
-var _require = require('sequelize'),
-  DataTypes = _require.DataTypes;
+const _require = require('sequelize');
+const DataTypes = _require.DataTypes;
 
-var _require2 = require('../db.js'),
-  sequelize = _require2.sequelize;
+const _require2 = require('../db.js');
+const sequelize = _require2.sequelize;
 
 const User = sequelize.define(
   'User',
@@ -19,6 +18,7 @@ const User = sequelize.define(
     timestamps: false,
   },
 );
+
 module.exports = {
   User: User,
 };
