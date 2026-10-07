@@ -22,7 +22,10 @@ function createServer() {
 
   app.use(express.json());
 
-  app.set('json spaces', 2);
+  app.use((req, res, next) => {
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    next();
+  });
 
   // users
   app.get('/users', async (req, res) => {
@@ -104,18 +107,24 @@ function createServer() {
 
     if (categories) {
       const categoryList = Array.isArray(categories)
-        ? categories
-        : [categories];
+        ? categories.flatMap((item) => item.split(','))
+        : categories.split(',');
 
-      where.category = { [Op.in]: categoryList };
+      where.category = {
+        [Op.in]: categoryList,
+      };
     }
 
-    if (from) {
-      where.spentAt = { [Op.gte]: from };
-    }
+    if (from || to) {
+      where.spentAt = {};
 
-    if (to) {
-      where.spentAt = { [Op.lte]: to };
+      if (from) {
+        where.spentAt[Op.gte] = from;
+      }
+
+      if (to) {
+        where.spentAt[Op.lte] = to;
+      }
     }
 
     const result = await Expense.findAll({ where });
