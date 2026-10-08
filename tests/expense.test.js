@@ -163,6 +163,8 @@ describe('Expense', () => {
         {
           id: expenseId,
           ...data,
+          createdAt: expect.any(String),
+          updatedAt: expect.any(String),
         },
       ]);
     });
@@ -188,6 +190,8 @@ describe('Expense', () => {
         {
           id: expenseId,
           ...data,
+          createdAt: expect.any(String),
+          updatedAt: expect.any(String),
         },
       ]);
     });
@@ -222,10 +226,14 @@ describe('Expense', () => {
         {
           id: expenseId,
           ...data,
+          createdAt: expect.any(String),
+          updatedAt: expect.any(String),
         },
         {
           id: secondExpenseId,
           ...seconData,
+          createdAt: expect.any(String),
+          updatedAt: expect.any(String),
         },
       ]);
     });
@@ -253,6 +261,8 @@ describe('Expense', () => {
         {
           id: expenseId,
           ...data,
+          createdAt: expect.any(String),
+          updatedAt: expect.any(String),
         },
       ]);
     });
@@ -274,6 +284,8 @@ describe('Expense', () => {
       expect(response.data).toEqual({
         id: expenseId,
         ...data,
+        createdAt: expect.any(String),
+        updatedAt: expect.any(String),
       });
     });
 
@@ -305,6 +317,8 @@ describe('Expense', () => {
         id: expenseId,
         ...data,
         title: 'Buy a new TV',
+        createdAt: expect.any(String),
+        updatedAt: expect.any(String),
       });
     });
 

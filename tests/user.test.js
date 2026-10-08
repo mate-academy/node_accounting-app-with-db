@@ -43,12 +43,21 @@ describe('User', () => {
       console.log(HOST);
     });
 
-    await User.destroy({ truncate: true });
+    await User.destroy({ where: {} });
   });
 
   afterEach(async () => {
     if (serverInstance) {
-      await serverInstance.close();
+      // Properly await the server closing
+      await new Promise((resolve, reject) => {
+        serverInstance.close((err) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      });
     }
   });
 
@@ -181,6 +190,7 @@ describe('User', () => {
       expect(response.data).toEqual({
         ...createdUser,
         name: 'Jane Doe',
+        updatedAt: expect.any(String),
       });
     });
   });

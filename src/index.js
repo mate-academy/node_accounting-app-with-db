@@ -2,6 +2,8 @@
 
 'use strict';
 
+require('dotenv').config();
+
 const { createServer } = require('./createServer');
 
 createServer().listen(5700, () => {

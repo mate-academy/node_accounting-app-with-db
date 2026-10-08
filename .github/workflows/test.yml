@@ -15,8 +15,8 @@ jobs:
         image: postgres:latest
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: password
-          POSTGRES_DB: students
+          POSTGRES_PASSWORD: 1234 # 👈 Changed to match your local .env
+          POSTGRES_DB: accounting_app # 👈 Changed to match your local .env
           POSTGRES_PORT: 5432
           POSTGRES_HOST: localhost
         ports:
@@ -36,9 +36,9 @@ jobs:
         run: npm install
       - name: Run tests
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: password
-          POSTGRES_DB: students
-          POSTGRES_HOST: localhost
-          POSTGRES_PORT: 5432
+          PGUSER: postgres
+          PGPASSWORD: 1234
+          PGDATABASE: accounting_app
+          PGHOST: localhost
+          PGPORT: 5432
         run: npm test
