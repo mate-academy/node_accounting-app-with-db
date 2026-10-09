@@ -21,7 +21,7 @@ exports.getExpense = async (req, res) => {
 exports.createExpense = async (req, res) => {
   const { userId, amount, spentAt, title, category, note } = req.body;
 
-  if (!title || !title.trim() || amount === undefined || !spentAt) {
+  if (!title || !userId || !title.trim() || amount === undefined || !spentAt) {
     res.sendStatus(400);
 
     return;

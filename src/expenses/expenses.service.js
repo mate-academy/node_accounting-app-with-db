@@ -10,14 +10,23 @@ async function getAll(filters) {
   }
 
   if (filters.categories) {
-    where.category = filters.categories;
+    const arrayCategories = filters.categories.split(',');
+
+    where.category = { [Op.in]: arrayCategories };
   }
 
-  if (filters.from && filters.to) {
-    where.spentAt = {
-      [Op.gte]: new Date(filters.from),
-      [Op.lte]: new Date(filters.to),
-    };
+  const dateFilter = {};
+
+  if (filters.from) {
+    dateFilter[Op.gte] = new Date(filters.from);
+  }
+
+  if (filters.to) {
+    dateFilter[Op.lte] = new Date(filters.to);
+  }
+
+  if (filters.from || filters.to) {
+    where.spentAt = dateFilter;
   }
 
   return Expense.findAll({ where });
