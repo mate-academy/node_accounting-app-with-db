@@ -9,7 +9,7 @@ const getAll = async ({ userId, categories, from, to } = {}) => {
   }
 
   if (categories !== undefined) {
-    where.category = categories;
+    where.category = { [Op.in]: categories };
   }
 
   if (from !== undefined) {
