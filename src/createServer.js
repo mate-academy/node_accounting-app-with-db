@@ -8,8 +8,14 @@ const express = require('express');
 function createServer() {
   const app = express();
 
-  app.use('/users', express.json(), userRouter);
-  app.use('/expenses', express.json(), expenseRouter);
+  app.use(express.json());
+
+  app.use((req, res, next) => {
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    next();
+  });
+  app.use('/users', userRouter);
+  app.use('/expenses', expenseRouter);
 
   return app;
 }

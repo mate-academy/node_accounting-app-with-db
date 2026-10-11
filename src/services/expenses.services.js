@@ -40,21 +40,37 @@ const create = async (userId, spentAt, title, amount, category, note) => {
 
 const update = async (id, spentAt, title, amount, category, note) => {
   const exprense = await Expense.findByPk(id);
+  const changes = {};
 
   if (!exprense) {
     return null;
   }
 
-  await exprense.update({
-    spentAt,
-    title,
-    amount,
-    category,
-    note,
-  });
+  if (spentAt !== undefined) {
+    changes.spentAt = spentAt;
+  }
+
+  if (title !== undefined) {
+    changes.title = title;
+  }
+
+  if (amount !== undefined) {
+    changes.amount = amount;
+  }
+
+  if (category !== undefined) {
+    changes.category = category;
+  }
+
+  if (note !== undefined) {
+    changes.note = note;
+  }
+
+  await exprense.update(changes);
 
   return exprense;
 };
+
 const remove = async (id) => {
   await Expense.destroy({ where: { id } });
 };

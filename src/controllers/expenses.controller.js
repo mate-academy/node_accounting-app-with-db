@@ -10,7 +10,7 @@ const getAll = async (req, res) => {
   }
 
   if (categories !== undefined) {
-    filters.categories = [].concat(categories);
+    filters.categories = categories.split(',');
   }
 
   if (from !== undefined) {
@@ -28,7 +28,7 @@ const getExpense = async (req, res) => {
   const expense = await expenseServices.getExpense(req.params.id);
 
   if (!expense) {
-    res.sendStatus(404);
+    res.status(404).json({ message: 'Not found' });
 
     return;
   }
@@ -51,7 +51,7 @@ const add = async (req, res) => {
   }
 
   if (!(await userServices.getUser(userId))) {
-    res.sendStatus(400);
+    res.status(400).json({ message: 'Name is required' });
 
     return;
   }
@@ -73,7 +73,7 @@ const update = async (req, res) => {
   const { spentAt, title, amount, category, note } = req.body;
 
   if (!(await expenseServices.getExpense(id))) {
-    res.sendStatus(404);
+    res.status(404).json({ message: 'Not found' });
 
     return;
   }
@@ -82,10 +82,11 @@ const update = async (req, res) => {
     (spentAt === undefined || typeof spentAt === 'string') &&
     (title === undefined || typeof title === 'string') &&
     (amount === undefined || typeof amount === 'number') &&
-    (category === undefined || typeof category === 'string');
+    (category === undefined || typeof category === 'string') &&
+    (note === undefined || typeof note === 'string');
 
   if (!isValid) {
-    res.sendStatus(400);
+    res.status(400).json({ message: 'Name is required' });
 
     return;
   }
@@ -99,7 +100,7 @@ const remove = async (req, res) => {
   const { id } = req.params;
 
   if (!(await expenseServices.getExpense(id))) {
-    res.sendStatus(404);
+    res.status(404).json({ message: 'Not found' });
 
     return;
   }

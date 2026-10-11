@@ -8,7 +8,7 @@ const getUser = async (req, res) => {
   const user = await userServices.getUser(req.params.id);
 
   if (!user) {
-    res.sendStatus(404);
+    res.status(404).json({ message: 'Not found' });
 
     return;
   }
@@ -20,7 +20,7 @@ const add = async (req, res) => {
   const { name } = req.body;
 
   if (typeof name !== 'string' || !name) {
-    res.sendStatus(400);
+    res.status(400).json({ message: 'Name is required' });
 
     return;
   }
@@ -35,13 +35,13 @@ const update = async (req, res) => {
   const { name } = req.body;
 
   if (!(await userServices.getUser(id))) {
-    res.sendStatus(404);
+    res.status(404).json({ message: 'Not found' });
 
     return;
   }
 
   if (typeof name !== 'string' || !name) {
-    res.sendStatus(400);
+    res.status(400).json({ message: 'Name is required' });
 
     return;
   }
@@ -53,7 +53,7 @@ const remove = async (req, res) => {
   const { id } = req.params;
 
   if (!(await userServices.getUser(id))) {
-    res.sendStatus(404);
+    res.status(404).json({ message: 'Not found' });
 
     return;
   }
