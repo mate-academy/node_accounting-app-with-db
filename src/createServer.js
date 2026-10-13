@@ -9,6 +9,11 @@ const createServer = () => {
 
   app.use(express.json());
 
+  app.use((req, res, next) => {
+    res.setHeader('content-type', 'application/json; charset=utf-8');
+    next();
+  });
+
   app.use('/users', usersRouter);
   app.use('/expenses', expensesRouter);
 
