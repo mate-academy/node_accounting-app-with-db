@@ -42,7 +42,10 @@ const getAll = ({ categories, from, to, userId }) => {
 
   if (categories) {
     conditions.push('category IN (:categories)');
-    replacements.categories = categories;
+
+    replacements.categories = categories
+      .split(',')
+      .map((category) => category.trim());
   }
 
   if (from) {
