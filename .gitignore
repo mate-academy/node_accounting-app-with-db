@@ -5,9 +5,10 @@
 # Node
 node_modules
 
-# MacOS
-.DS_Store
-
 # env files
 *.env
 .env*
+.env
+
+# MacOS
+.DS_Store
