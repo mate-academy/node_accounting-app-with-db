@@ -11,6 +11,11 @@ const createServer = () => {
   app.use('/users', usersRouter);
   app.use('/expenses', expensesRouter);
 
+  app.use((req, res, next) => {
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    next();
+  });
+
   return app;
 };
 
