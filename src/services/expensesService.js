@@ -1,4 +1,5 @@
 const { Expense } = require('../models/Expense.model');
+const { User } = require('../models/User.model');
 const { Op } = require('sequelize');
 
 async function getAll(filters = {}) {
@@ -18,7 +19,7 @@ async function getAll(filters = {}) {
     };
   }
 
-  const result = await Expense.findAll({ where });
+  const result = await Expense.findAll({ order: ['title'] });
 
   return result;
 }
@@ -34,8 +35,10 @@ function createExpense(body) {
   });
 }
 
-function findUser(userId) {
-  return Expense.findByPk(userId);
+async function findUser(userId) {
+  const user = await User.findByPk(userId);
+
+  return user;
 }
 
 function getExpenseById(id) {
@@ -43,7 +46,7 @@ function getExpenseById(id) {
 }
 
 async function deleteExpenseById(id) {
-  const deletedExpense = getExpenseById(id);
+  const deletedExpense = await getExpenseById(id);
   const copy = structuredClone(deletedExpense);
 
   await Expense.destroy({
@@ -56,7 +59,7 @@ async function deleteExpenseById(id) {
 }
 
 async function updateExpenseById(id, body) {
-  Expense.update(body, { where: { id } });
+  await Expense.update(body, { where: { id } });
 
   return Expense.findByPk(id);
 }

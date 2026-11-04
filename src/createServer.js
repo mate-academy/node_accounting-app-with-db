@@ -2,8 +2,8 @@
 
 const express = require('express');
 const cors = require('cors');
-const usersService = require('./services/usersService.js');
-const expensesService = require('./services/expensesService.js');
+const { usersService } = require('./services/usersService.js');
+const { expensesService } = require('./services/expensesService.js');
 
 function createServer() {
   const app = express();
@@ -17,31 +17,27 @@ function createServer() {
     next();
   });
 
-  app.get('/users', (req, res) => {
+  app.get('/users', async (req, res) => {
     usersService
       .getAll()
       .then((users) => {
-        // res.status(200).json(users.map((user) => usersService.normalize(user)));
         res.status(200).json(users);
       })
-      .catch((err) => {
-        console.log(err);
-
-        res.status(500).json({ message: 'Server error' });
-      });
+      // eslint-disable-next-line handle-callback-err
+      .catch((err) => res.status(500).json({ message: 'Server error' }));
   });
 
   app.post('/users', (req, res) => {
-    const user = req.body.name;
+    const name = req.body.name;
 
-    // console.log(user);
-
-    if (user === undefined) {
+    if (!name) {
       res.sendStatus(400);
+
+      return;
     }
 
     usersService
-      .create(user)
+      .create(name)
       .then((createdUser) => {
         // console.log(createdUser);
 
@@ -91,7 +87,7 @@ function createServer() {
     const name = req.body.name;
 
     if (!name || !userId) {
-      res.sendStatus(404);
+      res.sendStatus(400);
 
       return;
     }
@@ -121,14 +117,18 @@ function createServer() {
       return res.status(400).json({ error: 'User not found' });
     }
 
-    const expense = await expensesService.createExpense({
-      spentAt,
-      title,
-      amount,
-      userId,
-      category,
-      note,
-    });
+    const expense = await expensesService
+      .createExpense({
+        spentAt,
+        title,
+        amount,
+        userId,
+        category,
+        note,
+      })
+      .catch((err) => {
+        throw err;
+      });
 
     res.status(201).json(expense);
   });
@@ -173,7 +173,7 @@ function createServer() {
     res.status(204).json(deletedExpense);
   });
 
-  app.patch('/expenses/:id', (req, res) => {
+  app.patch('/expenses/:id', async (req, res) => {
     const id = req.params.id;
     const body = req.body;
 
@@ -191,7 +191,7 @@ function createServer() {
       return;
     }
 
-    const updatedExpense = expensesService.updateExpenseById(id, body);
+    const updatedExpense = await expensesService.updateExpenseById(id, body);
 
     res.status(200).json(updatedExpense);
   });

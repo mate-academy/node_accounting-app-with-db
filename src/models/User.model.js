@@ -7,9 +7,9 @@ const User = sequelize.define(
   'User',
   {
     id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
+      type: DataTypes.INTEGER,
       primaryKey: true,
+      autoIncrement: true,
     },
 
     name: {
@@ -24,6 +24,4 @@ const User = sequelize.define(
   },
 );
 
-module.exports = {
-  User,
-};
+module.exports = { User };

@@ -7,6 +7,16 @@ const normalize = ({ id, name }) => {
   };
 };
 
+// async function getAll() {
+//   const sql = `
+//     SELECT * FROM users
+//   `;
+
+//   const users = await client.query(sql, []);
+
+//   return users.rows;
+// }
+
 async function getAll() {
   const result = await User.findAll({
     order: ['name'],
@@ -26,13 +36,15 @@ async function getUserById(userId) {
 async function deleteUserById(userId) {
   await User.destroy({
     where: {
-      userId,
+      id: userId,
     },
   });
 }
 
 async function patchItem(userId, name) {
-  await User.update({ name }, { where: { userId } });
+  await User.update({ name }, { where: { id: userId } });
+
+  return User.findByPk(userId);
 }
 
 const usersService = {
