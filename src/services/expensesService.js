@@ -19,7 +19,7 @@ async function getAll(filters = {}) {
     };
   }
 
-  const result = await Expense.findAll({ order: ['title'] });
+  const result = await Expense.findAll({ where, order: ['title'] });
 
   return result;
 }

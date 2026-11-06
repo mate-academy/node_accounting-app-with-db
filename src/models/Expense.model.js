@@ -28,7 +28,7 @@ const Expense = sequelize.define(
     },
 
     amount: {
-      type: DataTypes.NUMBER,
+      type: DataTypes.FLOAT,
       allowNull: false,
     },
 

@@ -126,7 +126,7 @@ function createServer() {
       })
       .catch((err) => res.status(500).json({ message: err }));
 
-    res.statusCode(201);
+    res.status(201).json(expensesService);
   });
 
   app.get('/expenses/:id', async (req, res) => {
