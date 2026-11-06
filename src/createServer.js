@@ -39,8 +39,6 @@ function createServer() {
     usersService
       .create(name)
       .then((createdUser) => {
-        // console.log(createdUser);
-
         res.status(201).json(createdUser);
       })
       .catch((err) => res.status(500).json({ message: err }));
@@ -117,7 +115,7 @@ function createServer() {
       return res.status(400).json({ error: 'User not found' });
     }
 
-    const expense = await expensesService
+    await expensesService
       .createExpense({
         spentAt,
         title,
@@ -126,11 +124,9 @@ function createServer() {
         category,
         note,
       })
-      .catch((err) => {
-        throw err;
-      });
+      .catch((err) => res.status(500).json({ message: err }));
 
-    res.status(201).json(expense);
+    res.statusCode(201);
   });
 
   app.get('/expenses/:id', async (req, res) => {
@@ -162,7 +158,9 @@ function createServer() {
       return;
     }
 
-    const deletedExpense = await expensesService.deleteExpenseById(id);
+    const deletedExpense = await expensesService
+      .deleteExpenseById(id)
+      .catch((err) => res.status(500).json({ message: err }));
 
     if (!deletedExpense) {
       res.sendStatus(404);
@@ -183,7 +181,9 @@ function createServer() {
       return;
     }
 
-    const updateExpense = expensesService.getExpenseById(id);
+    const updateExpense = await expensesService
+      .getExpenseById(id)
+      .catch((err) => res.status(500).json({ message: err }));
 
     if (updateExpense === undefined) {
       res.status(404).json('Not found');
@@ -191,7 +191,9 @@ function createServer() {
       return;
     }
 
-    const updatedExpense = await expensesService.updateExpenseById(id, body);
+    const updatedExpense = await expensesService
+      .updateExpenseById(id, body)
+      .catch((err) => res.status(500).json({ message: err }));
 
     res.status(200).json(updatedExpense);
   });

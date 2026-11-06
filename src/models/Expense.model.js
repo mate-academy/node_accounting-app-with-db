@@ -15,7 +15,6 @@ const Expense = sequelize.define(
 
     userId: {
       type: DataTypes.INTEGER,
-      primaryKey: true,
     },
 
     spentAt: {
