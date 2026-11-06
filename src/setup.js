@@ -1,5 +1,5 @@
 const { models } = require('./models/models');
 const { Expense, User } = models;
 
-Expense.sync({ force: true });
-User.sync({ force: true });
+await Expense.sync({ force: true });
+await User.sync({ force: true });

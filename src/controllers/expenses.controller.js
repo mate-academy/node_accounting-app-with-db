@@ -20,13 +20,14 @@ const getOne = async (req, res) => {
 
 const create = async (req, res) => {
   const expenseBody = req.body;
+  const { spentAt, title, amount, userId } = expenseBody;
 
-  if (!expenseBody?.title) {
+  if (!spentAt || !title || !amount || !userId) {
     return res.sendStatus(400);
   }
 
-  const userId = Number(expenseBody.userId);
-  const user = await usersService.getById(userId);
+  const userIdNormalized = Number(userId);
+  const user = await usersService.getById(userIdNormalized);
 
   if (!user) {
     return res.sendStatus(400);
@@ -44,7 +45,7 @@ const deleteOne = async (req, res) => {
     return res.sendStatus(400);
   }
 
-  const expense = expensesService.getById(id);
+  const expense = await expensesService.getById(id);
 
   if (!expense) {
     return res.sendStatus(404);

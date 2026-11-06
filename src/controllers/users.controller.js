@@ -31,11 +31,6 @@ const create = async (req, res) => {
 
 const deleteOne = async (req, res) => {
   const id = Number(req.params.id);
-
-  if (!id) {
-    return res.sendStatus(400);
-  }
-
   const user = await usersService.getById(id);
 
   if (!user) {

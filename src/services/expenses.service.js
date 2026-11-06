@@ -2,37 +2,23 @@ const { Op } = require('sequelize');
 const { Expense } = require('../models/Expense.model');
 
 function getAll(query) {
-  const { userId, from, to, category } = query;
-  const filterParams = {
-    userId,
-    from,
-    to,
-    category,
-  };
+  const { from, to, categories, userId } = query;
+  const where = {};
+  const isDateFilter = from && to;
 
-  const validParams = Object.entries(filterParams).reduce((acc, param) => {
-    // eslint-disable-next-line no-unused-vars
-    const [key, value] = param;
-
-    if (!value) {
-      return acc;
-    }
-
-    return { ...acc, [key]: value };
-  }, {});
-
-  const { from: fromDate, to: toDate, ...rest } = validParams;
-  const isDateFilter = fromDate && toDate;
-
-  if (isDateFilter) {
-    const spentAt = { [Op.between]: [fromDate, toDate] };
-
-    return Expense.findAll({ where: { ...rest, spentAt } });
+  if (userId) {
+    where.userId = userId;
   }
 
-  return Expense.findAll({
-    where: validParams,
-  });
+  if (isDateFilter) {
+    where.spentAt = { [Op.between]: [from, to] };
+  }
+
+  if (categories) {
+    where.category = { [Op.in]: categories.split(',') };
+  }
+
+  return Expense.findAll({ where });
 }
 
 function getById(id) {
@@ -49,8 +35,8 @@ function deleteById(id) {
   });
 }
 
-function update({ id, expenseBody }) {
-  const expense = getById(id);
+async function update({ id, expenseBody }) {
+  const expense = await getById(id);
 
   if (!expense) {
     return;
