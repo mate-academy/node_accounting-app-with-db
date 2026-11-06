@@ -170,7 +170,7 @@ function createServer() {
       return;
     }
 
-    res.status(204).json(deletedExpense);
+    res.sendStatus(204);
   });
 
   app.patch('/expenses/:id', async (req, res) => {

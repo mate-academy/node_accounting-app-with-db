@@ -7,16 +7,6 @@ const normalize = ({ id, name }) => {
   };
 };
 
-// async function getAll() {
-//   const sql = `
-//     SELECT * FROM users
-//   `;
-
-//   const users = await client.query(sql, []);
-
-//   return users.rows;
-// }
-
 async function getAll() {
   const result = await User.findAll({
     order: ['name'],
