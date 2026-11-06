@@ -246,7 +246,7 @@ describe('Expense', () => {
       });
 
       const response = await api.get(
-        `expenses?userId=${user.id}&categories=Electronics`,
+        `expenses?userId=${user.id}&category=Electronics`,
       );
 
       expect(response.data).toEqual([
