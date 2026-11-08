@@ -24,14 +24,14 @@ async function getAll(filters = {}) {
   return result;
 }
 
-function createExpense(body) {
+function createExpense(userId, spentAt, title, amount, category, note) {
   return Expense.create({
-    userId: body.userId,
-    spentAt: body.spentAt,
-    title: body.title,
-    amount: body.amount,
-    category: body.category,
-    note: body.note,
+    userId: userId,
+    spentAt: spentAt,
+    title: title,
+    amount: amount,
+    category: category,
+    note: note,
   });
 }
 

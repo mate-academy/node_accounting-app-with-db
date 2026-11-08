@@ -10,7 +10,6 @@ const Expense = sequelize.define(
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
-      allowNull: false,
     },
 
     userId: {
@@ -28,7 +27,7 @@ const Expense = sequelize.define(
     },
 
     amount: {
-      type: DataTypes.FLOAT,
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
 

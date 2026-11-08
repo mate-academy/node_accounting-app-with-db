@@ -115,18 +115,11 @@ function createServer() {
       return res.status(400).json({ error: 'User not found' });
     }
 
-    await expensesService
-      .createExpense({
-        spentAt,
-        title,
-        amount,
-        userId,
-        category,
-        note,
-      })
+    const newExpens = await expensesService
+      .createExpense(userId, spentAt, title, amount, category, note)
       .catch((err) => res.status(500).json({ message: err }));
 
-    res.status(201).json(expensesService);
+    res.status(201).json(newExpens);
   });
 
   app.get('/expenses/:id', async (req, res) => {
