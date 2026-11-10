@@ -2,8 +2,8 @@
 
 'use strict';
 
-const { createServer } = require('./createServer');
+const { createServer } = require('./createServer.js');
 
-createServer().listen(5700, () => {
-  console.log('Server is running on localhost:5700');
+createServer().listen(7080, () => {
+  console.log('Server is running on localhost:7080');
 });
