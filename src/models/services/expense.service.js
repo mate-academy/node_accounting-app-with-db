@@ -91,7 +91,7 @@ const upDate = async ({ id, spentAt, title, amount, category, note }) => {
     updateData.title = title;
   }
 
-  if (amount !== undefined) {
+  if (amount && !isNaN(amount)) {
     updateData.amount = +amount;
   }
 
