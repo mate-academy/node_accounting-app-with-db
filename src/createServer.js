@@ -9,6 +9,13 @@ const {
 const createServer = () => {
   const app = express();
 
+  // Глобальный middleware для установки требуемого заголовка
+  app.use((req, res, next) => {
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    next();
+  });
+
+  // Middleware для парсинга JSON тела запроса
   app.use(express.json());
 
   // ============================
@@ -51,7 +58,6 @@ const createServer = () => {
 
       res.status(200).json(user);
     } catch (error) {
-      // Обробка помилок (наприклад, якщо ID має невалідний формат UUID)
       res.status(404).json({ error: 'User not found' });
     }
   });
@@ -94,12 +100,10 @@ const createServer = () => {
     try {
       const { spentAt, title, amount, userId, category, note } = req.body;
 
-      // Перевірка на наявність обов'язкових полів
       if (!spentAt || !title || amount === undefined || !userId) {
         return res.status(400).json({ error: 'Missing required fields' });
       }
 
-      // Перевірка, чи існує користувач
       const user = await User.findByPk(userId);
 
       if (!user) {
