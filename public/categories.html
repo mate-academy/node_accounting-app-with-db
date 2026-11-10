@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button.delete {
+            background-color: #dc3545;
+        }
+        button.delete:hover {
+            background-color: #c82333;
+        }
+        button.edit {
+            background-color: #28a745;
+        }
+        button.edit:hover {
+            background-color: #218838;
+        }
+        .categories-list {
+            margin-top: 20px;
+        }
+        .category-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .category-name {
+            font-size: 16px;
+            font-weight: 500;
+        }
+        .message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Categories Management</h1>
+        
+        <div class="form-section">
+            <h2>Add New Category</h2>
+            <form id="addCategoryForm">
+                <div class="form-group">
+                    <label for="categoryName">Category Name:</label>
+                    <input type="text" id="categoryName" name="categoryName" required>
+                </div>
+                <button type="submit">Add Category</button>
+            </form>
+        </div>
+
+        <div id="message"></div>
+
+        <div class="categories-list">
+            <h2>Categories</h2>
+            <div id="categoriesContainer">
+                <div class="loading">Loading categories...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/categories';
+        
+        // DOM elements
+        const addForm = document.getElementById('addCategoryForm');
+        const categoryNameInput = document.getElementById('categoryName');
+        const messageDiv = document.getElementById('message');
+        const categoriesContainer = document.getElementById('categoriesContainer');
+
+        // Show message
+        function showMessage(text, type = 'success') {
+            messageDiv.innerHTML = `<div class="message ${type}">${text}</div>`;
+            setTimeout(() => messageDiv.innerHTML = '', 3000);
+        }
+
+        // Load and display categories
+        async function loadCategories() {
+            try {
+                const response = await fetch(API_BASE);
+                const categories = await response.json();
+                
+                if (categories.length === 0) {
+                    categoriesContainer.innerHTML = '<p>No categories found.</p>';
+                    return;
+                }
+
+                categoriesContainer.innerHTML = categories.map(category => `
+                    <div class="category-item" data-id="${category.id}">
+                        <span class="category-name">${category.name}</span>
+                        <div>
+                            <button class="edit" onclick="editCategory(${category.id}, '${category.name}')">Edit</button>
+                            <button class="delete" onclick="deleteCategory(${category.id})">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                categoriesContainer.innerHTML = '<p class="error">Error loading categories</p>';
+                console.error('Error loading categories:', error);
+            }
+        }
+
+        // Add new category
+        addForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = categoryNameInput.value.trim();
+            if (!name) {
+                showMessage('Please enter a category name', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(API_BASE, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name }),
+                });
+
+                if (response.ok) {
+                    showMessage('Category added successfully!');
+                    categoryNameInput.value = '';
+                    loadCategories();
+                } else {
+                    const error = await response.json();
+                    showMessage(error.message || 'Error adding category', 'error');
+                }
+            } catch (error) {
+                showMessage('Error adding category', 'error');
+                console.error('Error adding category:', error);
+            }
+        });
+
+        // Edit category
+        async function editCategory(id, currentName) {
+            const newName = prompt('Enter new category name:', currentName);
+            if (!newName || newName.trim() === currentName) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/${id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name: newName.trim() }),
+                });
+
+                if (response.ok) {
+                    showMessage('Category updated successfully!');
+                    loadCategories();
+                } else {
+                    const error = await response.json();
+                    showMessage(error.message || 'Error updating category', 'error');
+                }
+            } catch (error) {
+                showMessage('Error updating category', 'error');
+                console.error('Error updating category:', error);
+            }
+        }
+
+        // Delete category
+        async function deleteCategory(id) {
+            if (!confirm('Are you sure you want to delete this category?')) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/${id}`, {
+                    method: 'DELETE',
+                });
+
+                if (response.ok) {
+                    showMessage('Category deleted successfully!');
+                    loadCategories();
+                } else {
+                    const error = await response.json();
+                    showMessage(error.message || 'Error deleting category', 'error');
+                }
+            } catch (error) {
+                showMessage('Error deleting category', 'error');
+                console.error('Error deleting category:', error);
+            }
+        }
+
+        // Load categories on page load
+        loadCategories();
+    </script>
+</body>
+</html>

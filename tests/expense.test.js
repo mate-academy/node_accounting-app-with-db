@@ -54,11 +54,11 @@ describe('Expense', () => {
   });
 
   beforeEach(async () => {
-    server = createServer();
+    server = await createServer();
 
     serverInstance = server.listen(7080, () => {
       // eslint-disable-next-line no-console
-      console.log(HOST);
+      // Server started
     });
 
     await Expense.destroy({ truncate: true });

@@ -21,11 +21,11 @@ const {
 */
 
 const sequelize = new Sequelize({
-  database: POSTGRES_DB || 'postgres',
+  database: POSTGRES_DB || 'accounting_app',
   username: POSTGRES_USER || 'postgres',
   host: POSTGRES_HOST || 'localhost',
   dialect: 'postgres',
-  port: POSTGRES_PORT || 5432,
+  port: Number(POSTGRES_PORT) || 5432,
   password: POSTGRES_PASSWORD || '123',
 });
 

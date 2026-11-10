@@ -28,7 +28,7 @@ describe('User', () => {
     try {
       await sequelize.sync({ force: true });
     } catch (err) {
-      console.log(err);
+      // Error occurred
     }
 
     api = axios.create({
@@ -40,10 +40,10 @@ describe('User', () => {
   }, 7000);
 
   beforeEach(async () => {
-    server = createServer();
+    server = await createServer();
 
     serverInstance = server.listen(7080, () => {
-      console.log(HOST);
+      // Server started
     });
 
     await User.destroy({ truncate: true });
@@ -184,6 +184,7 @@ describe('User', () => {
       expect(response.data).toEqual({
         ...createdUser,
         name: 'Jane Doe',
+        updatedAt: expect.any(String),
       });
     });
   });
