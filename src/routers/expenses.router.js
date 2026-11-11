@@ -5,7 +5,7 @@ const { Expense } = require('../models/Expense.model');
 const { User } = require('../models/User.model');
 const { Op } = require('sequelize');
 const { validateId } = require('../middlewares/validateId');
-const { isUuid } = require('../utils/isUuid'); // ✅ 1
+const { isUuid } = require('../utils/isUuid');
 
 const createExpenses = () => {
   const router = express.Router();
@@ -15,7 +15,7 @@ const createExpenses = () => {
     const where = {};
 
     if (userId) {
-      where.userId = userId; // ✅ 2: без Number()
+      where.userId = userId;
     }
 
     if (categories) {
@@ -69,7 +69,6 @@ const createExpenses = () => {
       return;
     }
 
-    // ✅ 3: якщо userId не схожий на UUID, в базу не йдемо
     if (!isUuid(userId)) {
       res.status(400).json({ message: 'User not found' });
 

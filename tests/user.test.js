@@ -14,6 +14,9 @@ const { Agent } = require('http');
 // this prevents `socket hang up` for Node.js 20.10+
 axios.defaults.httpAgent = new Agent({ keepAlive: false });
 
+const missingUserId = '00000000-0000-4000-8000-000000000000';
+const uuidPattern = /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
+
 describe('User', () => {
   let server;
   let serverInstance;
@@ -70,7 +73,7 @@ describe('User', () => {
 
       expect(res.data).toEqual(
         expect.objectContaining({
-          id: expect.any(Number),
+          id: expect.stringMatching(uuidPattern),
           name,
         }),
       );
@@ -133,7 +136,7 @@ describe('User', () => {
       expect.assertions(1);
 
       await api
-        .get('users/1')
+        .get(`users/${missingUserId}`)
         .catch((err) => expect(err.response.status).toBe(404));
     });
 
@@ -159,7 +162,7 @@ describe('User', () => {
       expect.assertions(1);
 
       await api
-        .put('users/1', { name: 'John Doe' })
+        .patch(`users/${missingUserId}`, { name: 'John Doe' })
         .catch((err) => expect(err.response.status).toBe(404));
     });
 
@@ -190,7 +193,7 @@ describe('User', () => {
       expect.assertions(1);
 
       await api
-        .delete('users/1')
+        .delete(`users/${missingUserId}`)
         .catch((err) => expect(err.response.status).toBe(404));
     });
 
