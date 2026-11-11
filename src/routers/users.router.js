@@ -2,7 +2,7 @@
 
 const express = require('express');
 const { User } = require('../models/User.model');
-const { validateId } = require('../middlewares/validateId');
+const { validateUuid } = require('../middlewares/validateUuid');
 
 const createUsers = () => {
   const router = express.Router();
@@ -13,8 +13,8 @@ const createUsers = () => {
     res.send(users);
   });
 
-  router.get('/:id', validateId, async (req, res) => {
-    const id = Number(req.params.id);
+  router.get('/:id', validateUuid, async (req, res) => {
+    const id = req.params.id;
 
     const user = await User.findByPk(id);
 
@@ -41,9 +41,9 @@ const createUsers = () => {
     res.status(201).send(newUser);
   });
 
-  router.patch('/:id', validateId, async (req, res) => {
+  router.patch('/:id', validateUuid, async (req, res) => {
     const { name } = req.body;
-    const id = Number(req.params.id);
+    const id = req.params.id;
 
     if (!name) {
       res.status(400).json({ message: 'Name is required' });
@@ -64,8 +64,8 @@ const createUsers = () => {
     res.send(user);
   });
 
-  router.delete('/:id', validateId, async (req, res) => {
-    const id = Number(req.params.id);
+  router.delete('/:id', validateUuid, async (req, res) => {
+    const id = req.params.id;
 
     const user = await User.findByPk(id);
 
