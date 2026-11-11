@@ -2,7 +2,7 @@
 
 const express = require('express');
 const { User } = require('../models/User.model');
-const { validateId } = require('../middlewares/valedateId');
+const { validateId } = require('../middlewares/validateId');
 
 const createUsers = () => {
   const router = express.Router();
@@ -19,7 +19,7 @@ const createUsers = () => {
     const user = await User.findByPk(id);
 
     if (!user) {
-      res.sendStatus(404);
+      res.status(404).json({ message: 'User not found' });
 
       return;
     }
@@ -31,7 +31,7 @@ const createUsers = () => {
     const { name } = req.body;
 
     if (!name) {
-      res.sendStatus(400);
+      res.status(400).json({ message: 'Name is required' });
 
       return;
     }
@@ -46,7 +46,7 @@ const createUsers = () => {
     const id = Number(req.params.id);
 
     if (!name) {
-      res.sendStatus(400);
+      res.status(400).json({ message: 'Name is required' });
 
       return;
     }
@@ -54,14 +54,14 @@ const createUsers = () => {
     const user = await User.findByPk(id);
 
     if (!user) {
-      res.sendStatus(404);
+      res.status(404).json({ message: 'User not found' });
 
       return;
     }
 
-    const userUpdate = await user.update({ name });
+    await user.update({ name });
 
-    res.status(200).send(userUpdate);
+    res.send(user);
   });
 
   router.delete('/:id', validateId, async (req, res) => {
@@ -70,7 +70,7 @@ const createUsers = () => {
     const user = await User.findByPk(id);
 
     if (!user) {
-      res.sendStatus(404);
+      res.status(404).json({ message: 'User not found' });
 
       return;
     }

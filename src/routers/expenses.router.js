@@ -4,7 +4,7 @@ const express = require('express');
 const { Expense } = require('../models/Expense.model');
 const { User } = require('../models/User.model');
 const { Op } = require('sequelize');
-const { validateId } = require('../middlewares/valedateId');
+const { validateId } = require('../middlewares/validateId');
 
 const createExpenses = () => {
   const router = express.Router();
@@ -23,12 +23,16 @@ const createExpenses = () => {
       where.category = { [Op.in]: categoryList };
     }
 
+    if (from || to) {
+      where.spentAt = {};
+    }
+
     if (from) {
-      where.spentAt = { [Op.gte]: from };
+      where.spentAt[Op.gte] = from;
     }
 
     if (to) {
-      where.spentAt = { [Op.lte]: to };
+      where.spentAt[Op.lte] = to;
     }
 
     const expenses = await Expense.findAll({ where });
@@ -42,7 +46,7 @@ const createExpenses = () => {
     const expense = await Expense.findByPk(id);
 
     if (!expense) {
-      res.sendStatus(404);
+      res.status(404).json({ message: 'Expense not found' });
 
       return;
     }
@@ -53,8 +57,13 @@ const createExpenses = () => {
   router.post('/', async (req, res) => {
     const { spentAt, title, amount, userId, category, note } = req.body;
 
-    if (!spentAt || !title || amount === undefined || !userId) {
-      res.sendStatus(400);
+    if (
+      spentAt === undefined ||
+      title === undefined ||
+      amount === undefined ||
+      userId === undefined
+    ) {
+      res.status(400).json({ message: 'Missing required fields' });
 
       return;
     }
@@ -62,7 +71,7 @@ const createExpenses = () => {
     const user = await User.findByPk(userId);
 
     if (!user) {
-      res.sendStatus(400);
+      res.status(400).json({ message: 'User not found' });
 
       return;
     }
@@ -86,16 +95,16 @@ const createExpenses = () => {
     const expense = await Expense.findByPk(id);
 
     if (!expense) {
-      res.sendStatus(404);
+      res.status(404).json({ message: 'Expense not found' });
 
       return;
     }
 
     const updates = {};
 
-    allowedFields.forEach((filed) => {
-      if (req.body[filed] !== undefined) {
-        updates[filed] = req.body[filed];
+    allowedFields.forEach((field) => {
+      if (req.body[field] !== undefined) {
+        updates[field] = req.body[field];
       }
     });
 
@@ -109,7 +118,7 @@ const createExpenses = () => {
     const expense = await Expense.findByPk(id);
 
     if (!expense) {
-      res.sendStatus(404);
+      res.status(404).json({ message: 'Expense not found' });
 
       return;
     }
