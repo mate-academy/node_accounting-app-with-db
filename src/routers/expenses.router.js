@@ -53,7 +53,7 @@ const createExpenses = () => {
   router.post('/', async (req, res) => {
     const { spentAt, title, amount, userId, category, note } = req.body;
 
-    if (!spentAt || !title || !amount || !userId) {
+    if (!spentAt || !title || amount !== undefined || !userId) {
       res.sendStatus(400);
 
       return;
@@ -94,7 +94,7 @@ const createExpenses = () => {
     const updates = {};
 
     allowedFields.forEach((filed) => {
-      if (req.body[filed]) {
+      if (req.body[filed !== undefined]) {
         updates[filed] = req.body[filed];
       }
     });

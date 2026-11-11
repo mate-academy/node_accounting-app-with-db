@@ -4,7 +4,7 @@ const validateId = (req, res, next) => {
   const id = Number(req.params.id);
 
   if (!id) {
-    res.sendStatus(400);
+    res.status(400).json({ message: 'Invalid id' });
 
     return;
   }
