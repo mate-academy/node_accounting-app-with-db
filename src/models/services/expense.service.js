@@ -30,7 +30,9 @@ const getAll = async (userId, categories, from, to) => {
   }
 
   if (categories) {
-    where.category = categories;
+    where.category = {
+      [Op.in]: categories.split(',').map((category) => category.trim()),
+    };
   }
 
   if (from || to) {

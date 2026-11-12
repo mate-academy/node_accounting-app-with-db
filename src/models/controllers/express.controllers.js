@@ -14,7 +14,7 @@ const getById = async (req, res) => {
   const expense = await expensesService.getById(+id);
 
   if (!expense) {
-    return res.status(404).send({ message: 'Not found' });
+    return res.status(404).json({ message: 'Not found' });
   }
   res.send(expensesService.normalizeExpense(expense));
 };
@@ -53,7 +53,7 @@ const deleteById = async (req, res) => {
   const deleteExpense = await expensesService.deleteById(+id);
 
   if (!deleteExpense) {
-    return res.status(404).send({ message: 'Not found' });
+    return res.status(404).json({ message: 'Not found' });
   }
 
   return res.status(204).send();
