@@ -62,19 +62,19 @@ const createServer = () => {
 
   app.patch('/users/:id', async (req, res) => {
     const id = +req.params.id;
-    
+
     if (Number.isNaN(id)) {
       return res.status(400).json({ message: 'Invalid ID' });
     }
 
     const user = await User.findByPk(id);
-    
+
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
     const { name } = req.body;
-    
+
     if (!name) {
       return res.status(400).json({ message: 'Bad request' });
     }
@@ -87,7 +87,7 @@ const createServer = () => {
   app.post('/expenses', async (req, res) => {
     const { userId, title, amount, category, note, spentAt } = req.body;
 
-    if (!userId || !title || amount === null || !spentAt) {
+    if (!userId || !title || amount == null || !spentAt) {
       return res.status(400).json({ message: 'Bad Request' });
     }
 
@@ -119,7 +119,9 @@ const createServer = () => {
     }
 
     if (categories) {
-      const categoriesList = String(categories).split(',').map((c) => c.trim());
+      const categoriesList = String(categories)
+        .split(',')
+        .map((c) => c.trim());
 
       filteredExpenses = filteredExpenses.filter((e) => {
         return categoriesList.includes(e.category);
