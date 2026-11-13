@@ -1,4 +1,4 @@
-const usersService = require('../srvices/users.service.js');
+const usersService = require('../services/users.service.js');
 
 const getAll = async (req, res) => {
   const users = await usersService.getAll();
@@ -11,7 +11,9 @@ const getOne = async (req, res) => {
   const user = await usersService.getById(id);
 
   if (!user) {
-    return res.sendStatus(404);
+    return res.status(404).json({
+      error: 'User not found',
+    });
   }
 
   res.send(user);
@@ -21,7 +23,9 @@ const create = async (req, res) => {
   const { name } = req.body;
 
   if (!name) {
-    return res.sendStatus(400);
+    return res.status(400).json({
+      error: 'Name is required',
+    });
   }
 
   const user = await usersService.create(name);
@@ -35,7 +39,9 @@ const remove = async (req, res) => {
   const user = await usersService.getById(id);
 
   if (!user) {
-    return res.sendStatus(404);
+    return res.status(404).json({
+      error: 'User not found',
+    });
   }
 
   await usersService.remove(id);
@@ -49,7 +55,9 @@ const update = async (req, res) => {
   const user = await usersService.getById(id);
 
   if (!user) {
-    return res.sendStatus(404);
+    return res.status(404).json({
+      error: 'User not found',
+    });
   }
 
   await usersService.update({ id, name });

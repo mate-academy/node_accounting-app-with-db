@@ -3,14 +3,21 @@ const { Expense } = require('../models/Expense.model.js');
 
 const getAll = ({ from, to, categories, userId }) => {
   const where = {};
-  const isDateFilter = from && to;
 
   if (userId) {
     where.userId = userId;
   }
 
-  if (isDateFilter) {
-    where.spentAt = { [Op.between]: [from, to] };
+  if (from || to) {
+    where.spentAt = {};
+
+    if (from) {
+      where.spentAt[Op.gte] = from;
+    }
+
+    if (to) {
+      where.spentAt[Op.lte] = to;
+    }
   }
 
   if (categories) {

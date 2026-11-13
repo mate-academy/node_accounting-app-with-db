@@ -1,5 +1,5 @@
-const expresesService = require('../srvices/expenses.service.js');
-const userService = require('../srvices/users.service.js');
+const expresesService = require('../services/expenses.service.js');
+const userService = require('../services/users.service.js');
 
 const getAll = async (req, res) => {
   const expense = await expresesService.getAll(req.query);
@@ -12,7 +12,9 @@ const getOne = async (req, res) => {
   const expense = await expresesService.getById(id);
 
   if (!expense) {
-    return res.sendStatus(404);
+    return res.status(404).json({
+      error: 'Expense not found',
+    });
   }
 
   res.send(expense);
@@ -21,14 +23,18 @@ const getOne = async (req, res) => {
 const create = async (req, res) => {
   const { userId, spentAt, title, amount, category, note } = req.body;
 
-  if (!userId || !spentAt || !title || !amount) {
-    return res.sendStatus(400);
+  if (!userId || !spentAt || !title || amount === undefined) {
+    return res.status(400).json({
+      error: 'Required fields are missing',
+    });
   }
 
   const user = await userService.getById(userId);
 
   if (!user) {
-    return res.sendStatus(400);
+    return res.status(400).json({
+      error: 'User not found',
+    });
   }
 
   const expense = await expresesService.create({
@@ -49,7 +55,9 @@ const remove = async (req, res) => {
   const expense = await expresesService.getById(id);
 
   if (!expense) {
-    return res.sendStatus(404);
+    return res.status(404).json({
+      error: 'Expense not found',
+    });
   }
 
   await expresesService.remove(id);
@@ -59,16 +67,29 @@ const remove = async (req, res) => {
 
 const update = async (req, res) => {
   const { id } = req.params;
-  const { spentAt, title, amount, category, note } = req.body;
+  const { userId, spentAt, title, amount, category, note } = req.body;
   const expense = await expresesService.getById(id);
 
   if (!expense) {
-    return res.sendStatus(404);
+    return res.status(404).json({
+      error: 'Expense not found',
+    });
+  }
+
+  if (userId !== undefined) {
+    const user = await userService.getById(userId);
+
+    if (!user) {
+      return res.status(400).json({
+        error: 'User not found',
+      });
+    }
   }
 
   await expresesService.update({
     id,
     body: {
+      userId,
       spentAt,
       title,
       amount,
