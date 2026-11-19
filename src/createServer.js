@@ -25,6 +25,11 @@ const isBlank = (value) =>
 
 const isValidDate = (value) => !Number.isNaN(new Date(value).getTime());
 
+const sendError = (res, status, message) =>
+  res.status(status).json({ error: message });
+
+const sendNoContent = (res) => res.status(204).end();
+
 const wrap = (fn) => (req, res, next) => {
   Promise.resolve(fn(req, res, next)).catch(next);
 };
@@ -42,7 +47,7 @@ const createServer = () => {
       const { name } = req.body || {};
 
       if (isBlank(name) || typeof name !== 'string') {
-        return res.sendStatus(400);
+        return sendError(res, 400, 'Name is required');
       }
 
       const user = await User.create({ name });
@@ -67,7 +72,7 @@ const createServer = () => {
       const user = id ? await User.findByPk(id) : null;
 
       if (!user) {
-        return res.sendStatus(404);
+        return sendError(res, 404, 'User not found');
       }
 
       res.status(200).json(user);
@@ -81,14 +86,14 @@ const createServer = () => {
       const user = id ? await User.findByPk(id) : null;
 
       if (!user) {
-        return res.sendStatus(404);
+        return sendError(res, 404, 'User not found');
       }
 
       const { name } = req.body || {};
 
       if (name !== undefined) {
         if (isBlank(name) || typeof name !== 'string') {
-          return res.sendStatus(400);
+          return sendError(res, 400, 'Name must be a non-empty string');
         }
 
         user.name = name;
@@ -106,13 +111,13 @@ const createServer = () => {
       const user = id ? await User.findByPk(id) : null;
 
       if (!user) {
-        return res.sendStatus(404);
+        return sendError(res, 404, 'User not found');
       }
 
       await Expense.destroy({ where: { userId: user.id } });
       await user.destroy();
 
-      res.sendStatus(204);
+      sendNoContent(res);
     }),
   );
 
@@ -129,18 +134,18 @@ const createServer = () => {
         isBlank(amount) ||
         isBlank(userId)
       ) {
-        return res.sendStatus(400);
+        return sendError(res, 400, 'Required fields are missing');
       }
 
       if (!isValidDate(spentAt) || Number.isNaN(Number(amount))) {
-        return res.sendStatus(400);
+        return sendError(res, 400, 'Invalid spentAt or amount');
       }
 
       const uid = parseUuid(userId);
       const user = uid ? await User.findByPk(uid) : null;
 
       if (!user) {
-        return res.sendStatus(400);
+        return sendError(res, 400, 'User not found');
       }
 
       const expense = await Expense.create({
@@ -200,7 +205,7 @@ const createServer = () => {
       const expense = id ? await Expense.findByPk(id) : null;
 
       if (!expense) {
-        return res.sendStatus(404);
+        return sendError(res, 404, 'Expense not found');
       }
 
       res.status(200).json(expense);
@@ -214,10 +219,17 @@ const createServer = () => {
       const expense = id ? await Expense.findByPk(id) : null;
 
       if (!expense) {
-        return res.sendStatus(404);
+        return sendError(res, 404, 'Expense not found');
       }
 
-      const allowed = ['spentAt', 'title', 'amount', 'category', 'note'];
+      const allowed = [
+        'spentAt',
+        'title',
+        'amount',
+        'category',
+        'note',
+        'userId',
+      ];
       const updates = {};
 
       for (const key of allowed) {
@@ -227,18 +239,29 @@ const createServer = () => {
       }
 
       if (updates.spentAt !== undefined && !isValidDate(updates.spentAt)) {
-        return res.sendStatus(400);
+        return sendError(res, 400, 'Invalid spentAt');
       }
 
       if (updates.amount !== undefined) {
         if (Number.isNaN(Number(updates.amount))) {
-          return res.sendStatus(400);
+          return sendError(res, 400, 'Invalid amount');
         }
         updates.amount = Number(updates.amount);
       }
 
       if (updates.title !== undefined && isBlank(updates.title)) {
-        return res.sendStatus(400);
+        return sendError(res, 400, 'Title must be a non-empty string');
+      }
+
+      if (updates.userId !== undefined) {
+        const uid = parseUuid(updates.userId);
+        const user = uid ? await User.findByPk(uid) : null;
+
+        if (!user) {
+          return sendError(res, 400, 'User not found');
+        }
+
+        updates.userId = uid;
       }
 
       await expense.update(updates);
@@ -254,24 +277,26 @@ const createServer = () => {
       const expense = id ? await Expense.findByPk(id) : null;
 
       if (!expense) {
-        return res.sendStatus(404);
+        return sendError(res, 404, 'Expense not found');
       }
 
       await expense.destroy();
 
-      res.sendStatus(204);
+      sendNoContent(res);
     }),
   );
 
-  // ---------- Errors ----------
+  // ---------- Fallbacks ----------
+
+  app.use((req, res) => sendError(res, 404, 'Not found'));
 
   // eslint-disable-next-line no-unused-vars
   app.use((err, req, res, next) => {
     if (err.type === 'entity.parse.failed') {
-      return res.sendStatus(400);
+      return sendError(res, 400, 'Invalid JSON');
     }
 
-    res.sendStatus(500);
+    sendError(res, 500, 'Internal server error');
   });
 
   return app;
