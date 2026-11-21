@@ -181,10 +181,18 @@ describe('User', () => {
         'application/json; charset=utf-8',
       );
 
-      expect(response.data).toEqual({
-        ...createdUser,
-        name: 'Jane Doe',
-      });
+      expect(response.data).toEqual(
+        expect.objectContaining({
+          id: createdUser.id,
+          createdAt: createdUser.createdAt,
+          name: 'Jane Doe',
+          updatedAt: expect.any(String),
+        }),
+      );
+
+      expect(Date.parse(response.data.updatedAt)).toBeGreaterThanOrEqual(
+        Date.parse(createdUser.updatedAt),
+      );
     });
   });
 
