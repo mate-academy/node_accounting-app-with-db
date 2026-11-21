@@ -1,3 +1,16 @@
+function sendJsonError(res, statusCode) {
+  const messages = {
+    400: 'Bad Request',
+    404: 'Not Found',
+    500: 'Internal Server Error',
+  };
+
+  return res
+    .status(statusCode)
+    .set('Content-Type', 'application/json; charset=utf-8')
+    .json({ error: messages[statusCode] });
+}
+
 function createExpensesController(ExpensesService, UsersService) {
   return {
     getAllExpenses: async (req, res) => {
@@ -10,7 +23,7 @@ function createExpensesController(ExpensesService, UsersService) {
       );
 
       if (invalidDate || (from && to && Date.parse(from) > Date.parse(to))) {
-        return res.sendStatus(400);
+        return sendJsonError(res, 400);
       }
 
       try {
@@ -24,7 +37,7 @@ function createExpensesController(ExpensesService, UsersService) {
         res.statusCode = 200;
         res.send(expens);
       } catch {
-        res.sendStatus(404);
+        return sendJsonError(res, 404);
       }
     },
 
@@ -39,17 +52,13 @@ function createExpensesController(ExpensesService, UsersService) {
         amount === undefined ||
         amount === null
       ) {
-        res.sendStatus(400);
-
-        return;
+        return sendJsonError(res, 400);
       }
 
       try {
         await UsersService.getUserById(userId);
       } catch {
-        res.sendStatus(400);
-
-        return;
+        return sendJsonError(res, 400);
       }
 
       try {
@@ -66,7 +75,7 @@ function createExpensesController(ExpensesService, UsersService) {
 
         res.send(user);
       } catch {
-        res.sendStatus(500);
+        return sendJsonError(res, 500);
       }
     },
 
@@ -74,9 +83,7 @@ function createExpensesController(ExpensesService, UsersService) {
       const { id } = req.params;
 
       if (!id) {
-        res.sendStatus(400);
-
-        return;
+        return sendJsonError(res, 400);
       }
 
       try {
@@ -85,7 +92,7 @@ function createExpensesController(ExpensesService, UsersService) {
         res.statusCode = 200;
         res.send(expenses);
       } catch {
-        res.sendStatus(404);
+        return sendJsonError(res, 404);
       }
     },
 
@@ -93,13 +100,13 @@ function createExpensesController(ExpensesService, UsersService) {
       const { id } = req.params;
 
       if (!id) {
-        return res.sendStatus(400);
+        return sendJsonError(res, 400);
       }
 
       try {
         await ExpensesService.getExpensesById(id);
       } catch {
-        return res.sendStatus(404);
+        return sendJsonError(res, 404);
       }
 
       const fields = ['spentAt', 'title', 'amount', 'category', 'note'];
@@ -110,7 +117,7 @@ function createExpensesController(ExpensesService, UsersService) {
       );
 
       if (Object.keys(updates).length === 0) {
-        return res.sendStatus(400);
+        return sendJsonError(res, 400);
       }
 
       try {
@@ -121,7 +128,7 @@ function createExpensesController(ExpensesService, UsersService) {
 
         res.status(200).send(updatedExpenses);
       } catch {
-        res.sendStatus(404);
+        return sendJsonError(res, 404);
       }
     },
 
@@ -129,9 +136,7 @@ function createExpensesController(ExpensesService, UsersService) {
       const { id } = req.params;
 
       if (!id) {
-        res.sendStatus(400);
-
-        return;
+        return sendJsonError(res, 400);
       }
 
       try {
@@ -139,7 +144,7 @@ function createExpensesController(ExpensesService, UsersService) {
         res.statusCode = 204;
         res.end();
       } catch {
-        res.sendStatus(404);
+        return sendJsonError(res, 404);
       }
     },
   };

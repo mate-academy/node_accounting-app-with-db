@@ -1,5 +1,18 @@
 const { TIME } = require('sequelize');
 
+function sendJsonError(res, statusCode) {
+  const messages = {
+    400: 'Bad Request',
+    404: 'Not Found',
+    500: 'Internal Server Error',
+  };
+
+  return res
+    .status(statusCode)
+    .set('Content-Type', 'application/json; charset=utf-8')
+    .json({ error: messages[statusCode] });
+}
+
 function createUserController(UserService) {
   return {
     getAllUsers: async (req, res) => {
@@ -10,7 +23,7 @@ function createUserController(UserService) {
 
         res.send(users);
       } catch {
-        res.sendStatus(404);
+        return sendJsonError(res, 404);
       }
     },
 
@@ -18,9 +31,7 @@ function createUserController(UserService) {
       const { name } = req.body;
 
       if (!name) {
-        res.sendStatus(400);
-
-        return;
+        return sendJsonError(res, 400);
       }
 
       try {
@@ -30,7 +41,7 @@ function createUserController(UserService) {
 
         res.send(user);
       } catch {
-        res.sendStatus(500);
+        return sendJsonError(res, 500);
       }
     },
 
@@ -38,7 +49,7 @@ function createUserController(UserService) {
       const { id } = req.params;
 
       if (!id) {
-        return res.sendStatus(400);
+        return sendJsonError(res, 400);
       }
 
       try {
@@ -47,7 +58,7 @@ function createUserController(UserService) {
         res.statusCode = 200;
         res.send(user);
       } catch {
-        res.sendStatus(404);
+        return sendJsonError(res, 404);
       }
     },
 
@@ -56,7 +67,7 @@ function createUserController(UserService) {
       const { name } = req.body;
 
       if (!id || !name) {
-        return res.sendStatus(400);
+        return sendJsonError(res, 400);
       }
 
       try {
@@ -65,7 +76,7 @@ function createUserController(UserService) {
         res.statusCode = 200;
         res.send(user);
       } catch {
-        res.sendStatus(404);
+        return sendJsonError(res, 404);
       }
     },
 
@@ -73,9 +84,7 @@ function createUserController(UserService) {
       const { id } = req.params;
 
       if (!id) {
-        res.sendStatus(400);
-
-        return;
+        return sendJsonError(res, 400);
       }
 
       try {
@@ -83,7 +92,7 @@ function createUserController(UserService) {
         res.statusCode = 204;
         res.end();
       } catch {
-        res.sendStatus(404);
+        return sendJsonError(res, 404);
       }
     },
   };
