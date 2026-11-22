@@ -20,6 +20,22 @@ const isValidId = (id) => /^\d+$/.test(String(id));
 const isValidUuid = (id) =>
   /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(String(id));
 
+const isValidUserId = (id) => isValidUuid(id) || isValidId(id);
+
+const findUserById = async (id) => {
+  if (isValidUuid(id)) {
+    return User.findOne({
+      where: { publicId: id },
+    });
+  }
+
+  if (isValidId(id)) {
+    return User.findByPk(id);
+  }
+
+  return null;
+};
+
 const hasValue = (value) => value !== undefined && value !== null;
 
 const isValidAmount = (value) =>
@@ -161,7 +177,7 @@ const createServer = () => {
         !title.trim() ||
         !isValidAmount(amount) ||
         !isValidDate(spentAt) ||
-        !isValidId(userId)
+        !isValidUserId(userId)
       ) {
         return res.status(400).json({
           error: 'Invalid expense data',
@@ -174,7 +190,7 @@ const createServer = () => {
         });
       }
 
-      const user = await User.findByPk(userId);
+      const user = await findUserById(userId);
 
       if (!user) {
         return res.status(400).json({ error: 'User not found' });
@@ -184,7 +200,7 @@ const createServer = () => {
         spentAt,
         title: title.trim(),
         amount: Number(amount),
-        userId: Number(userId),
+        userId: user.id,
         category: category ?? null,
         note: note ?? null,
       });
@@ -199,11 +215,17 @@ const createServer = () => {
       const where = {};
 
       if (req.query.userId !== undefined) {
-        if (!isValidId(req.query.userId)) {
+        if (!isValidUserId(req.query.userId)) {
           return res.status(400).json({ error: 'Invalid userId' });
         }
 
-        where.userId = Number(req.query.userId);
+        const user = await findUserById(req.query.userId);
+
+        if (!user) {
+          return res.status(200).json([]);
+        }
+
+        where.userId = user.id;
       }
 
       if (req.query.from || req.query.to) {
@@ -351,13 +373,13 @@ const createServer = () => {
       }
 
       if (updates.userId !== undefined) {
-        if (!isValidId(updates.userId)) {
+        if (!isValidUserId(updates.userId)) {
           return res.status(400).json({
             error: 'Invalid userId',
           });
         }
 
-        const user = await User.findByPk(updates.userId);
+        const user = await findUserById(updates.userId);
 
         if (!user) {
           return res.status(400).json({
@@ -365,7 +387,7 @@ const createServer = () => {
           });
         }
 
-        updates.userId = Number(updates.userId);
+        updates.userId = user.id;
       }
 
       await expense.update(updates);
