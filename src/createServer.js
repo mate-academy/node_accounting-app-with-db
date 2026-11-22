@@ -7,7 +7,7 @@ const { models } = require('./models/models');
 const { User, Expense } = models;
 
 const formatUser = (user) => ({
-  id: user.publicId,
+  id: user.id,
   name: user.name,
 });
 
@@ -19,22 +19,6 @@ const isValidId = (id) => /^\d+$/.test(String(id));
 
 const isValidUuid = (id) =>
   /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(String(id));
-
-const isValidUserId = (id) => isValidUuid(id) || isValidId(id);
-
-const findUserById = async (id) => {
-  if (isValidUuid(id)) {
-    return User.findOne({
-      where: { publicId: id },
-    });
-  }
-
-  if (isValidId(id)) {
-    return User.findByPk(id);
-  }
-
-  return null;
-};
 
 const hasValue = (value) => value !== undefined && value !== null;
 
@@ -90,9 +74,7 @@ const createServer = () => {
         return res.status(404).json({ error: 'User not found' });
       }
 
-      const user = await User.findOne({
-        where: { publicId: req.params.id },
-      });
+      const user = await User.findByPk(req.params.id);
 
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
@@ -109,9 +91,7 @@ const createServer = () => {
         return res.status(404).json({ error: 'User not found' });
       }
 
-      const user = await User.findOne({
-        where: { publicId: req.params.id },
-      });
+      const user = await User.findByPk(req.params.id);
 
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
@@ -140,9 +120,7 @@ const createServer = () => {
         return res.status(404).json({ error: 'User not found' });
       }
 
-      const user = await User.findOne({
-        where: { publicId: req.params.id },
-      });
+      const user = await User.findByPk(req.params.id);
 
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
@@ -177,7 +155,7 @@ const createServer = () => {
         !title.trim() ||
         !isValidAmount(amount) ||
         !isValidDate(spentAt) ||
-        !isValidUserId(userId)
+        !isValidUuid(userId)
       ) {
         return res.status(400).json({
           error: 'Invalid expense data',
@@ -190,7 +168,7 @@ const createServer = () => {
         });
       }
 
-      const user = await findUserById(userId);
+      const user = await User.findByPk(userId);
 
       if (!user) {
         return res.status(400).json({ error: 'User not found' });
@@ -215,11 +193,11 @@ const createServer = () => {
       const where = {};
 
       if (req.query.userId !== undefined) {
-        if (!isValidUserId(req.query.userId)) {
+        if (!isValidUuid(req.query.userId)) {
           return res.status(400).json({ error: 'Invalid userId' });
         }
 
-        const user = await findUserById(req.query.userId);
+        const user = await User.findByPk(req.query.userId);
 
         if (!user) {
           return res.status(200).json([]);
@@ -373,13 +351,13 @@ const createServer = () => {
       }
 
       if (updates.userId !== undefined) {
-        if (!isValidUserId(updates.userId)) {
+        if (!isValidUuid(updates.userId)) {
           return res.status(400).json({
             error: 'Invalid userId',
           });
         }
 
-        const user = await findUserById(updates.userId);
+        const user = await User.findByPk(updates.userId);
 
         if (!user) {
           return res.status(400).json({
