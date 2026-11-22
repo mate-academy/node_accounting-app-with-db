@@ -28,6 +28,10 @@ function createUserController(UserService) {
     },
 
     createUser: async (req, res) => {
+      if (!req.body) {
+        return sendJsonError(res, 400);
+      }
+
       const { name } = req.body;
 
       if (!name) {
