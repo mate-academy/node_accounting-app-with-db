@@ -6,7 +6,7 @@ const axios = require('axios');
 const https = require('https');
 const {
   models: { User, Expense },
-} = require('../src/models/models');
+} = require('../src/models');
 const { Agent } = require('http');
 
 // this prevents `socket hang up` for Node.js 20.10+
